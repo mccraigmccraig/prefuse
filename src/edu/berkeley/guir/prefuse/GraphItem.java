@@ -40,6 +40,7 @@ public abstract class GraphItem {
 	protected Paint   m_fillColor;
 	protected Paint   m_startFillColor;
 	protected Paint   m_endFillColor;
+    protected boolean m_fixed = false;
 	protected double m_size;
 	protected double m_startSize;
 	protected double m_endSize;
@@ -96,9 +97,9 @@ public abstract class GraphItem {
 		m_fillColor = null;
 		m_startFillColor = null;
 		m_endFillColor = null;
-		m_size = 0;
-		m_startSize = 0;
-		m_endSize = 0;
+		m_size = 1;
+		m_startSize = 1;
+		m_endSize = 1;
 	} //
 
 	/**
@@ -287,6 +288,14 @@ public abstract class GraphItem {
 
 	// == convenience methods for viz attributes ==============================
 
+    public boolean isFixed() {
+        return m_fixed;
+    } //
+    
+    public void setFixed(boolean s) {
+        m_fixed = s;
+    } //
+    
 	public double getDOI() { return m_doi; } //
 	
 	public void setDOI(double doi) { m_doi = doi; } //

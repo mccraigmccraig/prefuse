@@ -82,8 +82,7 @@ public class ForceDirectedLayout extends Layout {
         Iterator iter = registry.getNodeItems();
         while ( iter.hasNext() ) {
             NodeItem  nitem = (NodeItem)iter.next();
-            Boolean b = (Boolean)nitem.getVizAttribute("fixed");
-            if ( b != null && b.booleanValue() )
+            if ( nitem.isFixed() )
                 continue;
             
             ForceItem fitem = (ForceItem)nitem.getVizAttribute("forceItem");

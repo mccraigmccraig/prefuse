@@ -82,9 +82,9 @@ public class ForceDemo extends Display {
         m_pipeline = initPipeline();
         setSize(700,700);
         pan(350,350);
-        this.addControlListener(new MouseOverControl());
         this.addControlListener(new NeighborHighlightControl());
         this.addControlListener(new DragControl(false));
+        this.addControlListener(new MouseOverControl());
         this.addControlListener(new PanHandler(false));
         this.addControlListener(new ZoomHandler(false));
     } //
@@ -167,14 +167,14 @@ public class ForceDemo extends Display {
         //    g = (new XMLGraphReader()).loadGraph(file);
         //} catch ( Exception e ) { e.printStackTrace(); return; }
         
-        Graph g = GraphLib.getStar(40);
+        Graph g = GraphLib.getGrid(15,15);
         
         System.out.println("Visualizing Graph: "
             +g.getNumNodes()+" nodes, "+g.getNumEdges()+" edges");
         
         ForceSimulator fsim = new ForceSimulator();
         fsim.addForce(new NBodyForce(-0.4f, 0.9f));
-        fsim.addForce(new SpringForce(4E-5f, 100f));
+        fsim.addForce(new SpringForce(4E-5f, 75f));
         fsim.addForce(new DragForce(-0.005f));
         
         ForceDemo fdemo = new ForceDemo(g, fsim);
@@ -201,8 +201,7 @@ public class ForceDemo extends Display {
             if ( h != null && h.booleanValue() )
                 return pastelOrange;
             else if ( item instanceof NodeItem ) {
-                Boolean f = (Boolean)item.getVizAttribute("fixed");
-                if ( f != null && f.booleanValue() )
+                if ( item.isFixed() )
                     return pastelRed;
                 else
                     return lightGray;
@@ -219,16 +218,16 @@ public class ForceDemo extends Display {
         
         public void itemEntered(GraphItem item, MouseEvent e) {
             ((Display)e.getSource()).setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            item.setVizAttribute("fixed", Boolean.TRUE);
+            item.setFixed(true);
         } //
         
         public void itemExited(GraphItem item, MouseEvent e) {
             ((Display)e.getSource()).setCursor(Cursor.getDefaultCursor());
-            item.setVizAttribute("fixed", null);
+            item.setFixed(false);
         } //
         
         public void itemReleased(GraphItem item, MouseEvent e) {
-            item.setVizAttribute("fixed", null);
+            item.setFixed(false);
         } //
         
     } // end of inner class FocusControl

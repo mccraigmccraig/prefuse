@@ -1,5 +1,6 @@
 package edu.berkeley.guir.prefusex.controls;
 
+import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
@@ -20,6 +21,7 @@ public class DragControl extends ControlAdapter {
     private GraphItem activeItem;
     private Point2D down = new Point2D.Double();
     private Point2D tmp = new Point2D.Double();
+    private boolean wasFixed;
     private boolean repaint = true;
     
     public DragControl() {
@@ -29,14 +31,27 @@ public class DragControl extends ControlAdapter {
         this.repaint = repaint;
     } //
     
+    public void itemEntered(GraphItem item, MouseEvent e) {
+        Display d = (Display)e.getSource();
+        d.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    } //
+    
+    public void itemExited(GraphItem item, MouseEvent e) {
+        Display d = (Display)e.getSource();
+        d.setCursor(Cursor.getDefaultCursor());
+    } //
+    
     public void itemPressed(GraphItem item, MouseEvent e) {
         Display d = (Display)e.getComponent();
         down = d.getAbsoluteCoordinate(e.getPoint(), down);
         activeItem = item;
+        wasFixed = item.isFixed();
+        item.setFixed(true);
     } //
     
     public void itemReleased(GraphItem item, MouseEvent e) {
         activeItem = null;
+        item.setFixed(wasFixed);
     } //
     
     public void itemDragged(GraphItem item, MouseEvent e) {
@@ -45,6 +60,7 @@ public class DragControl extends ControlAdapter {
         double dx = tmp.getX()-down.getX();
         double dy = tmp.getY()-down.getY();
         Point2D p = item.getLocation();
+        item.updateLocation(p.getX()+dx,p.getY()+dy);
         item.setLocation(p.getX()+dx,p.getY()+dy);
         down.setLocation(tmp);
         if ( repaint ) {
