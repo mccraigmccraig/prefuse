@@ -29,11 +29,11 @@ import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
-import edu.berkeley.guir.prefuse.PrefuseContainer;
-import edu.berkeley.guir.prefuse.action.AbstractAction;
+import edu.berkeley.guir.prefuse.action.GarbageCollector;
 import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
 import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
+import edu.berkeley.guir.prefuse.action.AbstractAction;
 import edu.berkeley.guir.prefuse.activity.ActionPipeline;
 import edu.berkeley.guir.prefuse.activity.Activity;
 import edu.berkeley.guir.prefuse.activity.ActivityMap;
@@ -56,13 +56,11 @@ import edu.berkeley.guir.prefusex.layout.RandomLayout;
 
 /**
  * GraphEditor Application, an editor for hand creating directed graphs
- * 
- * Apr 25, 2003 - jheer - Created class
- * 
+ *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> - prefuse(AT)jheer.org
  */
-public class GraphEditor {
+public class GraphEditor extends JFrame {
 
 	public static final String OPEN    = "Open";
 	public static final String SAVE    = "Save";
@@ -71,8 +69,7 @@ public class GraphEditor {
     public static final String RANDOM  = "Random Layout";
     public static final String FORCE   = "Force-Directed Layout";
 
-	private static JMenuItem saveItem;
-	private static JFrame frame;
+	private JMenuItem saveItem;
 
 	public static final String TITLE = "Graph Editor";
 	public static final String DEFAULT_LABEL = "???";
@@ -80,14 +77,18 @@ public class GraphEditor {
 	public static final String nameField = "label";
 	public static final String idField   = "id";
 		
-	public static ItemRegistry registry;
-	public static Display display;
-	public static Graph g;
-    public static ActionPipeline filter, pipeline;
-	public static PrefuseContainer container;
-    public static ActivityMap actmap = new ActivityMap();
+	private ItemRegistry registry;
+	private Display display;
+	private Graph g;
+    private ActivityMap actmap = new ActivityMap();
 		
-	public static void main(String[] args) {
+    public static void main(String argv[]) {
+        new GraphEditor();
+    } //
+    
+	public GraphEditor() {
+        super(TITLE);
+        
 		setLookAndFeel();
 		try {
 			g = new SimpleGraph(Collections.EMPTY_LIST);
@@ -115,12 +116,16 @@ public class GraphEditor {
 			display.setRegistry(registry);
 			display.setSize(600,600);
 			display.setBackground(Color.WHITE);
+            display.setFont(new Font("SansSerif",Font.PLAIN,10));
+            display.getTextEditor().addKeyListener(controller);
 			display.addControlListener(controller);
 			
 			// initialize filter
             ActionPipeline filter = new ActionPipeline(registry);
             filter.add(new GraphNodeFilter());
+            filter.add(new GarbageCollector(ItemRegistry.DEFAULT_NODE_CLASS));
             filter.add(new GraphEdgeFilter());
+            filter.add(new GarbageCollector(ItemRegistry.DEFAULT_EDGE_CLASS));
             actmap.put("filter", filter);
             
             ActionPipeline update = new ActionPipeline(registry);
@@ -153,12 +158,7 @@ public class GraphEditor {
             });
             actmap.put("forceLayout", forceLayout);
 			
-			// initialize user interface components
-			container = new PrefuseContainer(display);
-			container.setFont(new Font("SansSerif",Font.PLAIN,10));
-			container.setBackground(Color.WHITE);
-			container.getTextEditor().addKeyListener(controller);
-			
+			// initialize menus
 			JMenuBar  menubar    = new JMenuBar();
 			JMenu     fileMenu   = new JMenu("File");
             JMenu     layoutMenu = new JMenu("Layout");
@@ -194,16 +194,15 @@ public class GraphEditor {
 			menubar.add(fileMenu);
             menubar.add(layoutMenu);
 			
-			frame = new JFrame(TITLE);
-			frame.addWindowListener(new WindowAdapter() {
+			addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e) {
 					System.exit(0);
 				}
 			});
-			frame.setJMenuBar(menubar);
-			frame.getContentPane().add(container, BorderLayout.CENTER);
-			frame.pack();
-			frame.setVisible(true);
+			setJMenuBar(menubar);
+			getContentPane().add(display, BorderLayout.CENTER);
+			pack();
+			setVisible(true);
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}
@@ -216,7 +215,7 @@ public class GraphEditor {
 		} catch ( Exception e ) {}
 	} //
 	
-	private static void setLocations(Graph g) {
+	private void setLocations(Graph g) {
 		Iterator nodeIter = g.getNodes();
 		while ( nodeIter.hasNext() ) {
 			Node n = (Node)nodeIter.next();
@@ -239,7 +238,7 @@ public class GraphEditor {
 	 * @version 1.0
 	 * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
 	 */
-	static class Controller extends ControlAdapter 
+	class Controller extends ControlAdapter 
 		implements MouseListener, KeyListener, ActionListener
 	{
 		private int xDown, yDown, xCur, yCur;
@@ -255,23 +254,32 @@ public class GraphEditor {
 		private File    saveFile = null;
 		
 		public void itemEntered(GraphItem item, MouseEvent e) {
-			e.getComponent().setCursor(
-                Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            if ( item instanceof NodeItem ) {
+                e.getComponent().setCursor(
+                        Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
 		} //
 		
 		public void itemExited(GraphItem item, MouseEvent e) {
-			e.getComponent().setCursor(Cursor.getDefaultCursor());
+            if ( item instanceof NodeItem ) {
+                e.getComponent().setCursor(Cursor.getDefaultCursor());
+            }
 		} //
 		
 		public void itemPressed(GraphItem item, MouseEvent e) {
-			xDown = e.getX();
-			yDown = e.getY();
-			item.setColor(Color.RED);
-			item.setFillColor(Color.WHITE);
-            actmap.scheduleNow("update");
+			if ( item instanceof NodeItem ) {
+			    xDown = e.getX();
+			    yDown = e.getY();
+			    item.setColor(Color.RED);
+			    item.setFillColor(Color.WHITE);
+			    actmap.scheduleNow("update");
+            }
 		} //
 		
 		public void itemReleased(GraphItem item, MouseEvent e) {
+            if ( !(item instanceof NodeItem) )
+                return;
+            
 			boolean update = false;
 			if ( item instanceof NodeItem ) {
 				if ( activeItem == null && !drag ) {
@@ -282,8 +290,8 @@ public class GraphEditor {
 					update = true;
 				} else if ( activeItem == item && !drag ) {
 					editing = true;
-					container.editText(item, nameField);
-					container.getTextEditor().selectAll();
+					display.editText(item, nameField);
+					display.getTextEditor().selectAll();
 					setEdited(true);
 					update = true;
 				} else if ( activeItem != item ) {
@@ -305,6 +313,9 @@ public class GraphEditor {
 		} //
 		
 		public void itemDragged(GraphItem item, MouseEvent e) {
+            if ( !(item instanceof NodeItem) )
+                return;
+            
 			drag = true;
 			int dx = e.getX() - xDown;
 			int dy = e.getY() - yDown;
@@ -317,9 +328,10 @@ public class GraphEditor {
 		} //
 		
 		public void itemKeyTyped(GraphItem item, KeyEvent e) {
-			if ( item == activeItem && e.getKeyChar() == '\b' ) {				
-				activeItem = null;
+			if ( e.getKeyChar() == '\b' ) {				
+				if (item == activeItem) activeItem = null;
 				removeNode(item);
+                actmap.scheduleNow("filter");
                 actmap.scheduleNow("update");
 				setEdited(true);
 			}
@@ -370,7 +382,7 @@ public class GraphEditor {
 				Rectangle r = item.getBounds();
 				r.width = 52; r.height += 2;
 				r.x -= 1+r.width/2; r.y -= 1; 
-				container.editText(item, nameField, r);
+				display.editText(item, nameField, r);
 				setEdited(true);
                 actmap.scheduleNow("update");
 			}
@@ -378,7 +390,7 @@ public class GraphEditor {
 		
 		public void keyReleased(KeyEvent e) {
 			Object src = e.getSource();
-			if ( src == container.getTextEditor() && 
+			if ( src == display.getTextEditor() && 
 				e.getKeyCode() == KeyEvent.VK_ENTER ) {
 				stopEditing();
                 actmap.scheduleNow("update");
@@ -408,12 +420,12 @@ public class GraphEditor {
 		} //
 		
 		private void removeNode(GraphItem item) {
-			Node n = (Node)item.getEntity();
+            Node n = (Node)item.getEntity();
 			((SimpleGraph)g).removeNode(n);
 		} //
 
 		private void stopEditing() {
-			container.stopEditing();
+			display.stopEditing();
 			if ( activeItem != null ) {
 				activeItem.setColor(Color.BLACK);
 				activeItem.setFillColor(Color.WHITE);
@@ -431,7 +443,7 @@ public class GraphEditor {
 			String cmd = e.getActionCommand();
 			if ( OPEN.equals(cmd) ) {
 				JFileChooser chooser = new JFileChooser();
-				if ( chooser.showOpenDialog(container) == JFileChooser.APPROVE_OPTION ) {
+				if ( chooser.showOpenDialog(display) == JFileChooser.APPROVE_OPTION ) {
 					 File f = chooser.getSelectedFile();
 					 GraphReader gr = new XMLGraphReader();
 					 try {					 
@@ -444,7 +456,7 @@ public class GraphEditor {
 						setEdited(false);
 					 } catch ( Exception ex ) {
 						JOptionPane.showMessageDialog(
-							container,
+							display,
 							"Sorry, an error occurred while loading the graph.",
 							"Error Loading Graph",
 							JOptionPane.ERROR_MESSAGE);
@@ -454,7 +466,7 @@ public class GraphEditor {
 			} else if ( SAVE.equals(cmd) ) {
 				if ( saveFile == null ) {
 					JFileChooser chooser = new JFileChooser();
-					if ( chooser.showSaveDialog(container) == JFileChooser.APPROVE_OPTION ) {
+					if ( chooser.showSaveDialog(display) == JFileChooser.APPROVE_OPTION ) {
 						File f = chooser.getSelectedFile();
 						save(f);
 					}
@@ -463,7 +475,7 @@ public class GraphEditor {
 				}
 			} else if ( SAVE_AS.equals(cmd) ) {
 				JFileChooser chooser = new JFileChooser();
-				if ( chooser.showSaveDialog(container) == JFileChooser.APPROVE_OPTION ) {
+				if ( chooser.showSaveDialog(display) == JFileChooser.APPROVE_OPTION ) {
 					 File f = chooser.getSelectedFile();
 					 save(f);
 				}
@@ -486,7 +498,7 @@ public class GraphEditor {
 				setEdited(false);
 			 } catch ( Exception ex ) {
 				JOptionPane.showMessageDialog(
-					container,
+					display,
 					"Sorry, an error occurred while saving the graph.",
 					"Error Saving Graph",
 					JOptionPane.ERROR_MESSAGE);
@@ -505,8 +517,8 @@ public class GraphEditor {
 				titleString = TITLE + " - " + saveFile.getName() +
 								( s ? "*" : "" );
 			}
-			if ( !titleString.equals(frame.getTitle()) )
-				frame.setTitle(titleString);
+			if ( !titleString.equals(getTitle()) )
+				setTitle(titleString);
 		} //
 		
 	} // end of inner class MouseOverControl

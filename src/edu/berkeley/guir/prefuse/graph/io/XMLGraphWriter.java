@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Graph;
@@ -53,24 +55,32 @@ public class XMLGraphWriter extends AbstractGraphWriter {
 	} //
 	
 	protected void assignIDs(Graph g) {
-//		int maxID = 0;
-//		Iterator nodeIter = g.getNodes();
-//		while ( nodeIter.hasNext() ) {
-//			Node n = (Node)nodeIter.next();
-//			String sid;
-//			if ( (sid=n.getAttribute(ID)) != null ) {
-//				int id = Integer.parseInt(sid);
-//				maxID = Math.max(id, maxID);
-//			}
-//		}
-//		nodeIter = g.getNodes();
-//		while ( nodeIter.hasNext() ) {
-//			Node n = (Node)nodeIter.next();
-//			if ( n.getAttribute(ID) == null ) {
-//				n.setAttribute(ID, String.valueOf(++maxID));
-//			}
-//		}
+	    Set ids = initializeIDs(g);
+        int curID = 0;
+        String id;
+		Iterator nodeIter = g.getNodes();
+		while ( nodeIter.hasNext() ) {
+			Node n = (Node)nodeIter.next();
+			if ( n.getAttribute(ID) == null ) {
+                do {
+                    id = String.valueOf(++curID);
+                } while ( ids.contains(id) );
+				n.setAttribute(ID, id);
+			}
+		}
 	} //
+    
+    private Set initializeIDs(Graph g) {
+        Set s = new HashSet(g.getNumNodes()/2);
+        String a;
+        Iterator nodeIter = g.getNodes();
+        while ( nodeIter.hasNext() ) {
+            Node n = (Node)nodeIter.next();
+            if ( (a=n.getAttribute(ID)) != null )
+                s.add(a);
+        }
+        return s;
+    } //
 	
 	private void printGraph(PrintWriter pw, Graph g) {
 		int directed = g.isDirected() ? 1 : 0;

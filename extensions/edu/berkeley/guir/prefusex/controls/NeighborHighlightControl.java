@@ -39,6 +39,10 @@ public class NeighborHighlightControl extends ControlAdapter {
         setNeighborHighlight((NodeItem)item, false);
     } //
     
+    public void itemReleased(GraphItem item, MouseEvent e) {
+        setNeighborHighlight((NodeItem)item, false);
+    } //
+    
     public void setNeighborHighlight(NodeItem n, boolean state) {
         ItemRegistry registry = n.getItemRegistry();
         Boolean val = state ? Boolean.TRUE : null;
