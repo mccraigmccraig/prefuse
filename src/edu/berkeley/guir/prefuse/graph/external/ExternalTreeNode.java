@@ -64,23 +64,32 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
     } //
     
     public void unload() {
-        Iterator iter = m_children.iterator();
-        while ( iter.hasNext() ) {
-            Edge e = (Edge)iter.next();
-            TreeNode n = (TreeNode)e.getAdjacentNode(this);
-            n.removeAsChild(this);
-            if ( n instanceof ExternalTreeNode )
-                ((ExternalTreeNode)n).setParentLoaded(false);
+        Iterator iter;
+        if ( m_children != null ) {
+            iter = m_children.iterator();
+            while ( iter.hasNext() ) {
+                Edge e = (Edge)iter.next();
+                TreeNode n = (TreeNode)e.getAdjacentNode(this);
+                n.removeAsChild(this);
+                if ( n instanceof ExternalTreeNode )
+                    ((ExternalTreeNode)n).setParentLoaded(false);
+            }
+            m_children.clear();
         }
+        
         m_parent.removeChild(this);
         if ( m_parent instanceof ExternalTreeNode )
             ((ExternalTreeNode)m_parent).setChildrenLoaded(false);
+        m_parent = null;
+        m_parentEdge = null;
+        
         iter = m_edges.iterator();
         while ( iter.hasNext() ) {
             Edge e = (Edge)iter.next();
             Node n = e.getAdjacentNode(this);
             n.removeEdge(e);
         }
+        m_edges.clear();
     } //
     
     // ========================================================================

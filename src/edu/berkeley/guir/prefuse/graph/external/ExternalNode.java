@@ -53,9 +53,13 @@ public class ExternalNode extends DefaultNode implements ExternalEntity {
             n.removeEdge(e);
             if ( n instanceof ExternalNode ) {
                 ((ExternalNode)n).setNeighborsLoaded(false);
+            } else if ( n instanceof ExternalTreeNode ) {
+                ((ExternalTreeNode)n).setParentLoaded(false);
+                ((ExternalTreeNode)n).setChildrenLoaded(false);
             }
         }
-    }
+        m_edges.clear();
+    } //
     
     // ========================================================================
     // == PROXIED NODE METHODS ================================================

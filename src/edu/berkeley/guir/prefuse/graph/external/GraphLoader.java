@@ -16,7 +16,10 @@ import edu.berkeley.guir.prefuse.graph.event.GraphLoaderMulticaster;
 
 /**
  * Loads graph data from an external data source, such as a database or
- * filesystem, and manages cache for storing and evicting this data.
+ * filesystem, and manages a LRU cache for storing and evicting this data. By
+ * default, the cache supports strict boundaries on it's size. This means
+ * that otherwise active data may be evicted! To prevent this, set the
+ * cache size appropriately!
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
@@ -32,7 +35,7 @@ public abstract class GraphLoader implements Runnable {
     protected Graph m_graph;
     protected ItemRegistry m_registry;
     
-    protected int m_maxSize = 50;
+    protected int m_maxSize = 5000;
     
     protected String m_keyField;
     protected LinkedHashMap m_cache = new LinkedHashMap(m_maxSize,.75f,true) {
@@ -52,6 +55,14 @@ public abstract class GraphLoader implements Runnable {
         // besides, most of its work is blocking on IO anyway...
         t.setPriority(Thread.MIN_PRIORITY);
         t.start();
+    } //
+    
+    public void setMaximumCacheSize(int size) {
+        m_maxSize = size;
+    } //
+    
+    public int getMaximumCacheSize() {
+        return m_maxSize;
     } //
     
     public void addGraphLoaderListener(GraphLoaderListener l) {
@@ -89,8 +100,10 @@ public abstract class GraphLoader implements Runnable {
         boolean b = m_cache.size()>m_maxSize && !m_registry.isVisible(eldest);
         if ( b && m_listener != null )
             m_listener.entityUnloaded(this, eldest);
-        if ( b )
-            m_graph.removeNode(eldest);
+        if ( b ) {
+            eldest.unload();
+            m_graph.removeNode(eldest); 
+        }
         return b;
     } //
     
@@ -125,11 +138,13 @@ public abstract class GraphLoader implements Runnable {
     } //
     
     protected void foundNode(int type, ExternalEntity src, ExternalEntity n, Edge e) {
+        boolean inCache = false;
         String key = n.getAttribute(m_keyField);
-        if ( m_cache.containsKey(key) )
+        if ( m_cache.containsKey(key) ) {
             // switch n reference to original loaded version 
             n = (ExternalEntity)m_cache.get(key);
-        else
+            inCache = true;
+        } else
             m_cache.put(key, n);
         
         n.setLoader(this);
@@ -144,15 +159,14 @@ public abstract class GraphLoader implements Runnable {
                 m_graph.addNode(n);
                 if ( src != null )
                     m_graph.addEdge(e);
-            } else if ( type == LOAD_PARENT || type == LOAD_CHILDREN ) {
-                if ( src != null )
-                    ((Tree)m_graph).addChild(e);
+            } else if ( src != null && (type == LOAD_PARENT || type == LOAD_CHILDREN) ) {
+                ((Tree)m_graph).addChild(e);
                 if ( type == LOAD_CHILDREN )
                     ((ExternalTreeNode)n).setParentLoaded(true);
             }
         }
         
-        if ( m_listener != null )
+        if ( m_listener != null && !inCache )
             m_listener.entityLoaded(this,n);
     } //
     

@@ -6,9 +6,20 @@ import java.io.IOException;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 
 /**
- * 
- * Mar 8, 2004 - jheer - Created class
+ * Loads graph data as needed from a local filesystem. Created nodes are given
+ * four attributes:
+ * <ul>
+ *  <li>"label" - The filename, not including the full path
+ *  <li>"filename" - The absolute filename, including the full path
+ *  <li>"size" - The size of the file, in bytes
+ *  <li>"modified" - The file's last modification date, in milliseconds since the epoch.
+ * </ul>
+ * The "filname" attribute is used as the key for indexing data in the
+ * <tt>GraphLoader</tt>'s cache. The "modified" attribute is a
+ * <tt>String</tt> instance representing a <tt>long</tt> value. Use the
+ * <tt>java.util.Date</tt> class to create corresponding <tt>Date</tt> instances.
  *
+ * @see GraphLoader
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
@@ -78,6 +89,7 @@ public class FileSystemLoader extends GraphLoader {
                 n.setAttribute("label",(name.equals("") ? f.getPath() : name));
                 n.setAttribute("filename", f.getPath());
                 n.setAttribute("size", String.valueOf(f.length()));
+                n.setAttribute("modified", String.valueOf(f.lastModified()));
             }
             foundNode(type, o, n, null);
         } catch ( IOException ie ) {
