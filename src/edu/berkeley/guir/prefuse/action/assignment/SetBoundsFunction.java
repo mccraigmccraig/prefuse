@@ -1,7 +1,7 @@
 /*
  * Created on Aug 4, 2004
  */
-package edu.berkeley.guir.prefuse.timeline;
+package edu.berkeley.guir.prefuse.action.assignment;
 
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
@@ -11,6 +11,7 @@ import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
 import edu.berkeley.guir.prefuse.action.Action;
 import edu.berkeley.guir.prefuse.graph.Node;
+import edu.berkeley.guir.prefuse.timeline.TimelineConstants;
 
 /**
  * Sets the current x coordinate bounds of the item; meant to be used after

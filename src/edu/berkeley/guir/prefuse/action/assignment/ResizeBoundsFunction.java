@@ -1,7 +1,7 @@
 /*
  * Created on Aug 5, 2004
  */
-package edu.berkeley.guir.prefuse.timeline;
+package edu.berkeley.guir.prefuse.action.assignment;
 
 import java.util.Iterator;
 
@@ -9,6 +9,7 @@ import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
 import edu.berkeley.guir.prefuse.action.Action;
+import edu.berkeley.guir.prefuse.timeline.TimelineConstants;
 import edu.berkeley.guir.prefusex.distortion.FisheyeDistortion;
 
 /**
