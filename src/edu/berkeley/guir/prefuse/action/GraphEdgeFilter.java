@@ -12,13 +12,31 @@ import edu.berkeley.guir.prefuse.graph.Node;
  * The GraphEdgeFilter allows all edges adjacent to visualized 
  * nodes to be visualized.
  * 
- * Apr 25, 2003 - jheer - Created class
- * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class GraphEdgeFilter extends AbstractAction {
 
+    private boolean m_edgesVisible;
+    
+    /**
+     * Filters graph edges, connecting filtered graph nodes into a
+     * graph structure. Filtered edges are visible by default.
+     */
+    public GraphEdgeFilter() {
+        this(true);
+    } //
+    
+    /**
+     * Filters graph edges, connecting filtered graph nodes into a
+     * graph structure. Edge visibility can be controlled.
+     * @param edgesVisible determines whether or not the filtered
+     *  edges are visible in the display.
+     */
+    public GraphEdgeFilter(boolean edgesVisible) {
+        m_edgesVisible = edgesVisible;
+    } //
+    
 	/**
 	 * @see edu.berkeley.guir.prefuse.filter.AbstractPipelineComponent#process()
 	 */
@@ -37,7 +55,10 @@ public class GraphEdgeFilter extends AbstractAction {
                     EdgeItem eitem = registry.getEdgeItem(edge, true);
                     try {
                         nitem.addEdge(eitem);
-                    } catch ( IllegalStateException e ) {}
+                    } catch ( IllegalStateException e ) { 
+                        // already a neighbor
+                    }
+                    if ( !m_edgesVisible ) eitem.setVisible(false);
                 }
 			}
 		}
