@@ -19,9 +19,7 @@ import edu.berkeley.guir.prefuse.graph.Node;
  * @author Jack Li jack(AT)cs_D0Tberkeley_D0Tedu
  */
 public class TimelineGraphFilter extends GraphFilter implements TimelineConstants {
-	/**
-	 * 
-	 */
+	// (( CONSTRUCTORS )) \\
 	public TimelineGraphFilter() {
 		super();
 	}
@@ -33,6 +31,8 @@ public class TimelineGraphFilter extends GraphFilter implements TimelineConstant
 		super(edgesVisible);
 	}
 
+	
+	// (( METHODS )) \\
 	public void run(ItemRegistry registry, double frac) {
         Graph graph = registry.getGraph();
         // initialize filtered graph

@@ -18,8 +18,11 @@ import edu.berkeley.guir.prefuse.graph.io.XMLGraphReader;
  * @author Jack Li jack(AT)cs_D0Tberkeley_D0Tedu
  */
 public class TimelineLayout extends Layout implements TimelineConstants {
+	// (( FIELDS )) \\
 	protected final int m_timelineLength, m_numDivisions;
 	
+	
+	// (( CONSTRUCTORS )) \\
 	public TimelineLayout(final int m_timelineLength, final int m_numDivisions) {
 		this.m_timelineLength = m_timelineLength;
 		this.m_numDivisions = m_numDivisions;
@@ -30,6 +33,8 @@ public class TimelineLayout extends Layout implements TimelineConstants {
 		return nodeID.replaceFirst(NOTCH, "");
 	}
 	
+	
+	// (( METHODS )) \\
 	public void run(final ItemRegistry registry, final double frac) {
 		final Iterator nodeItems = registry.getNodeItems();
 		final Dimension displaySize = registry.getDisplay(0).getSize();
