@@ -46,12 +46,12 @@ public class DefaultRendererFactory implements RendererFactory {
 	 * @see edu.berkeley.guir.prefuse.render.RendererFactory#getRenderer(edu.berkeley.guir.prefuse.VisualItem)
 	 */
 	public Renderer getRenderer(VisualItem item) {
-		if ( item instanceof NodeItem ) {
+        if ( item instanceof AggregateItem ) {
+            return m_aggrRenderer;
+        } else if ( item instanceof NodeItem ) {
 			return m_nodeRenderer;
 		} else if ( item instanceof EdgeItem ) {			
 			return m_edgeRenderer;
-		} else if ( item instanceof AggregateItem ) {
-			return m_aggrRenderer;
 		} else {
 			return null;
 		}
