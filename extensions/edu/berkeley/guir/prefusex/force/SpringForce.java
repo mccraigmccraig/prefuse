@@ -13,7 +13,7 @@ public class SpringForce extends AbstractForce {
         = new String[] { "SpringCoefficient", "DefaultSpringLength" };
     
     public static final float DEFAULT_SPRING_COEFF = 1E-4f;
-    public static final float DEFAULT_SPRING_LENGTH = 50;
+    public static final float DEFAULT_SPRING_LENGTH = 100;
     public static final int SPRING_COEFF = 0;
     public static final int SPRING_LENGTH = 1;
 
