@@ -49,6 +49,22 @@ public class DragControl extends ControlAdapter {
         this.repaint = repaint;
     } //
     
+    /**
+     * Creates a new drag control that optionally issues repaint requests
+     * as an item is dragged.
+     * @param repaint indicates whether or not repaint requests are issued
+     *  as drag events occur. This can be set to false if other activities
+     *  (for example, a continuously running force simulation) are already
+     *  issuing repaint events.
+     * @param fixOnMouseOver indicates if object positions should become
+     * fixed (made stationary) when the mouse pointer is over an item.
+     */
+    public DragControl(boolean repaint, boolean fixOnMouseOver) {
+        this.repaint = repaint;
+        this.fixOnMouseOver = fixOnMouseOver;
+    } //
+    
+    
     public DragControl(Activity update) {
         this.repaint = false;
         this.update = update;
