@@ -90,6 +90,8 @@ public class TreeFilter extends Filter {
         nodeIter = registry.getNodeItems();
         while ( nodeIter.hasNext() ) {
             NodeItem item = (NodeItem)nodeIter.next();
+            if ( item.getDirty() > 0 )
+                continue;
             Node     node = (Node)item.getEntity();
             Iterator edgeIter = node.getEdges();
             while ( edgeIter.hasNext() ) {
@@ -98,7 +100,8 @@ public class TreeFilter extends Filter {
                 // filter the edge
                 EdgeItem eitem = registry.getEdgeItem(edge, true);
                 eitem.getFirstNode().addEdge(eitem);
-                eitem.getSecondNode().addEdge(eitem);
+                if ( !eitem.isDirected() )
+                    eitem.getSecondNode().addEdge(eitem);
                 if ( !m_edgesVisible ) eitem.setVisible(false);
             }
         }
