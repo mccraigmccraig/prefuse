@@ -29,7 +29,13 @@ public class GraphEdgeFilter extends AbstractPipelineComponent implements Filter
 			Iterator edgeIter = node.getEdges();
 			while ( edgeIter.hasNext() ) {
 				Edge edge = (Edge)edgeIter.next();
-				EdgeItem eitem = m_registry.getEdgeItem(edge, true);
+                Node n = (Node)edge.getFirstNode();
+                if ( n == node )
+                    n = (Node)edge.getSecondNode();
+                if ( m_registry.isVisible(n) ) {
+                    EdgeItem eitem = m_registry.getEdgeItem(edge, true);
+                    nitem.addEdge(eitem);
+                }
 			}
 		}
 	} //

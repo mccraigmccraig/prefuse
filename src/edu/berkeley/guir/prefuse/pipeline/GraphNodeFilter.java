@@ -2,6 +2,7 @@ package edu.berkeley.guir.prefuse.pipeline;
 
 import java.util.Iterator;
 
+import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.graph.Node;
 
 /**
@@ -18,7 +19,7 @@ public class GraphNodeFilter extends AbstractPipelineComponent implements Filter
 		Iterator nodeIter = m_graph.getNodes();
 		while ( nodeIter.hasNext() ) {
 			Node node = (Node)nodeIter.next();
-			m_registry.getNodeItem(node, true);
+			NodeItem item = m_registry.getNodeItem(node, true);
 		}
 	} //
 

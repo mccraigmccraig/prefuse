@@ -20,8 +20,8 @@ public class TreeNodeFilter extends AbstractPipelineComponent implements Filter 
 		Tree t = (Tree)m_graph;
 		Iterator iter = t.getNodes();
 		while ( iter.hasNext() ) {
-			TreeNode cnode = (TreeNode)iter.next();
-			NodeItem citem = m_registry.getNodeItem(cnode, true);
+			TreeNode node = (TreeNode)iter.next();
+			NodeItem item = m_registry.getNodeItem(node, true);
 		}		
 	} //
 

@@ -433,12 +433,11 @@ public class ItemRegistry {
 				item = m_ifactory.getItem(itemClass);
 				item.init(this, itemClass, entity);
 				addItem(entry, entity, item);
-				item.setDirty(0);
-				item.setVisible(true);			
-			} else {
-				item.setDirty(0);
-				item.setVisible(true);
 			}
+            if ( item instanceof NodeItem )
+                ((NodeItem)item).removeAllNeighbors();
+            item.setDirty(0);
+            item.setVisible(true);
 			return item;
 		} else {
 			throw new IllegalArgumentException("The input string must be a"
