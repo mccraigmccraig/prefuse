@@ -1,4 +1,4 @@
-package edu.berkeley.guir.prefuse.util;
+package edu.berkeley.guir.prefuse.util.display;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;

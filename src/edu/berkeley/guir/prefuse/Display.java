@@ -23,23 +23,29 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.OutputStream;
 import java.util.Iterator;
 
+import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 
+import org.freehep.graphics2d.VectorGraphics;
+import org.freehep.util.export.ExportDialog;
+
 import edu.berkeley.guir.prefuse.activity.Activity;
 import edu.berkeley.guir.prefuse.activity.SlowInSlowOutPacer;
 import edu.berkeley.guir.prefuse.event.ControlEventMulticaster;
 import edu.berkeley.guir.prefuse.event.ControlListener;
 import edu.berkeley.guir.prefuse.render.Renderer;
-import edu.berkeley.guir.prefuse.util.Clip;
 import edu.berkeley.guir.prefuse.util.ColorLib;
 import edu.berkeley.guir.prefuse.util.FontLib;
-import edu.berkeley.guir.prefuse.util.ToolTipManager;
+import edu.berkeley.guir.prefuse.util.display.Clip;
+import edu.berkeley.guir.prefuse.util.display.SaveImageAction;
+import edu.berkeley.guir.prefuse.util.display.ToolTipManager;
 
 /**
  * <p>User interface component that provides an interactive visualization 
@@ -146,6 +152,10 @@ public class Display extends JComponent {
                     }
                 },
                 "debug", KeyStroke.getKeyStroke("ctrl D"), WHEN_FOCUSED);
+        // add image output control
+        registerKeyboardAction(
+                new SaveImageAction(this),
+                "image save", KeyStroke.getKeyStroke("ctrl I"), WHEN_FOCUSED);
         
         setItemRegistry(registry);
         setSize(400,400); // set a default size
@@ -240,6 +250,15 @@ public class Display extends JComponent {
      */
     public void setHighQuality(boolean on) {
         m_highQuality = on;
+    } //
+    
+    /**
+     * Indicates if the Display is using high quality (return value true) or
+     * regular quality (return value false) rendering.
+     * @return true if high quality rendering is enabled, false otherwise
+     */
+    public boolean isHighQuality() {
+        return m_highQuality;
     } //
     
     /**
@@ -551,6 +570,44 @@ public class Display extends JComponent {
         return (BufferedImage)createImage(getSize().width, getSize().height);
 	} //
 	
+	/**
+	 * Saves a copy of this display as an image to the specified output stream.
+	 * @param output the output stream to write to.
+	 * @param format the image format (e.g., "JPG", "PNG", "TIF").
+	 * @param scale how much to scale the image by.
+	 * @return true if image was successfully saved, false if an error occurred.
+	 */
+	public boolean saveImage(OutputStream output, String format, double scale) {
+	    try {
+	        Dimension d = new Dimension((int)(scale*getWidth()),(int)(scale*getHeight()));
+	        BufferedImage img = (BufferedImage) createImage(d.width, d.height);
+	        Graphics2D g = (Graphics2D)img.getGraphics();
+	        Point2D p = new Point2D.Double(0,0);
+	        zoom(p, scale);
+	        //boolean q = isHighQuality();
+	        //setHighQuality(true);
+	        paintDisplay(g,d);
+	        //setHighQuality(q);
+	        zoom(p, 1/scale);
+	        ImageIO.write(img,format,output);
+	        return true;
+	    } catch ( Exception e ) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	} //
+	
+	public boolean saveImage2() {
+	    Dimension d = new Dimension(getWidth(),getHeight());
+        BufferedImage img = (BufferedImage) createImage(d.width, d.height);
+        Graphics2D g = (Graphics2D)img.getGraphics();
+        VectorGraphics vg = VectorGraphics.create(g);
+        paintDisplay(vg,d);
+        ExportDialog export = new ExportDialog();
+        export.showExportDialog(this, "Export view as ...", this, "export");
+        return true;
+	} //
+	
     /**
      * Updates this display
      */
@@ -609,9 +666,13 @@ public class Display extends JComponent {
 	 * @param g the Graphics context on which to set the rendering hints
 	 */
 	protected void setRenderingHints(Graphics2D g) {
-		if ( m_highQuality )
+		if ( m_highQuality ) {
 		    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 		            RenderingHints.VALUE_ANTIALIAS_ON);
+		} else {
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_OFF);
+		}
         g.setRenderingHint(
             RenderingHints.KEY_RENDERING,
             RenderingHints.VALUE_RENDER_QUALITY);
@@ -671,40 +732,11 @@ public class Display extends JComponent {
 		if  (m_offscreen == null) {
 			m_offscreen = getNewOffscreenBuffer();
         }
-		Graphics2D g2D = (Graphics2D) m_offscreen.getGraphics();
+	    Graphics2D g2D = (Graphics2D) m_offscreen.getGraphics();
         //Graphics2D g2D = (Graphics2D)g;
         
-		// paint background
-		g2D.setColor(getBackground());
-		Dimension d = this.getSize();
-		g2D.fillRect(0, 0, d.width, d.height);
-        
-        // show debugging info?
-		if ( m_showDebug ) {
-            g2D.setFont(getFont());
-            g2D.setColor(getForeground());
-            g2D.drawString(getDebugString(), 5, 15);     
-        }
-
-		prepareGraphics(g2D);
-		prePaint(g2D);
-        
-		g2D.setColor(Color.BLACK);
-		synchronized (m_registry) {
-            m_clip.setClip(0,0,getWidth(),getHeight());
-            m_clip.transform(m_itransform);
-            Iterator items = m_registry.getItems();
-            while (items.hasNext()) {
-                VisualItem vi = (VisualItem) items.next();
-                Renderer renderer = vi.getRenderer();
-                Rectangle2D b = renderer.getBoundsRef(vi);
-                
-                if ( m_clip.intersects(b) )
-                    renderer.render(g2D, vi);
-            }
-		}
-
-		postPaint(g2D);
+	    // paint the visualization
+		paintDisplay(g2D, getSize());
 
 		paintBufferToScreen(g);		
 		g2D.dispose();
@@ -724,6 +756,39 @@ public class Display extends JComponent {
         }
 	} //
     
+	public void paintDisplay(Graphics2D g2D, Dimension d) {
+	    // paint background
+		g2D.setColor(getBackground());
+		g2D.fillRect(0, 0, d.width, d.height);
+        
+        // show debugging info?
+		if ( m_showDebug ) {
+            g2D.setFont(getFont());
+            g2D.setColor(getForeground());
+            g2D.drawString(getDebugString(), 5, 15);     
+        }
+
+		prepareGraphics(g2D);
+		prePaint(g2D);
+        
+		g2D.setColor(Color.BLACK);
+		synchronized (m_registry) {
+            m_clip.setClip(0,0,d.width,d.height);
+            m_clip.transform(m_itransform);
+            Iterator items = m_registry.getItems();
+            while (items.hasNext()) {
+                VisualItem vi = (VisualItem) items.next();
+                Renderer renderer = vi.getRenderer();
+                Rectangle2D b = renderer.getBoundsRef(vi);
+                
+                if ( m_clip.intersects(b) )
+                    renderer.render(g2D, vi);
+            }
+		}
+
+		postPaint(g2D);
+	} //
+	
     /**
      * Clears the specified region of the display (in screen co-ordinates)
      * in the display's offscreen buffer. The cleared region is replaced 
