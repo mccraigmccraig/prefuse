@@ -24,11 +24,12 @@ import edu.berkeley.guir.prefuse.event.ControlAdapter;
 public class DragControl extends ControlAdapter {
 
     private VisualItem activeItem;
-    private Activity update;
-    private Point2D down = new Point2D.Double();
-    private Point2D tmp = new Point2D.Double();
-    private boolean wasFixed, dragged, fixOnMouseOver;
-    private boolean repaint = true;
+    protected Activity update;
+    protected Point2D down = new Point2D.Double();
+    protected Point2D tmp = new Point2D.Double();
+    protected boolean dragged;
+    private boolean wasFixed, fixOnMouseOver;
+    protected boolean repaint = true;
     
     /**
      * Creates a new drag control that issues repaint requests as an item
