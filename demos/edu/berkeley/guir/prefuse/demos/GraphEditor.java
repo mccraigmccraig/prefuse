@@ -1,5 +1,5 @@
 package edu.berkeley.guir.prefuse.demos;
-import java.awt.BorderLayout;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -10,13 +10,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.Collections;
 import java.util.Iterator;
 
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -29,6 +29,7 @@ import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
+import edu.berkeley.guir.prefuse.action.ActionMap;
 import edu.berkeley.guir.prefuse.action.GarbageCollector;
 import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
 import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
@@ -80,7 +81,8 @@ public class GraphEditor extends JFrame {
 	private ItemRegistry registry;
 	private Display display;
 	private Graph g;
-    private ActivityMap actmap = new ActivityMap();
+    private ActivityMap activityMap = new ActivityMap();
+    private ActionMap   actionMap = new ActionMap();
 		
     public static void main(String argv[]) {
         new GraphEditor();
@@ -116,6 +118,7 @@ public class GraphEditor extends JFrame {
 			display.setRegistry(registry);
 			display.setSize(600,600);
 			display.setBackground(Color.WHITE);
+            display.setBorder(BorderFactory.createEmptyBorder(30,30,30,30));
             display.setFont(new Font("SansSerif",Font.PLAIN,10));
             display.getTextEditor().addKeyListener(controller);
 			display.addControlListener(controller);
@@ -126,7 +129,7 @@ public class GraphEditor extends JFrame {
             filter.add(new GarbageCollector(ItemRegistry.DEFAULT_NODE_CLASS));
             filter.add(new GraphEdgeFilter());
             filter.add(new GarbageCollector(ItemRegistry.DEFAULT_EDGE_CLASS));
-            actmap.put("filter", filter);
+            activityMap.put("filter", filter);
             
             ActionPipeline update = new ActionPipeline(registry);
             update.add(new AbstractAction() {
@@ -140,23 +143,25 @@ public class GraphEditor extends JFrame {
 				} //
 			});
             update.add(new RepaintAction());
-            actmap.put("update", update);
+            activityMap.put("update", update);
             
             ActionPipeline randomLayout = new ActionPipeline(registry);
-            randomLayout.add(new RandomLayout(30));
+            randomLayout.add(actionMap.put("random",new RandomLayout()));
             randomLayout.add(update);
-            actmap.put("randomLayout", randomLayout);
+            activityMap.put("randomLayout", randomLayout);
             
-            ActionPipeline forceLayout = new ActionPipeline(registry,5000,20);
-            forceLayout.add(new ForceDirectedLayout(true));
+            ActionPipeline forceLayout = new ActionPipeline(registry,-1,20);
+            forceLayout.add(actionMap.put("force",new ForceDirectedLayout(true)));
             forceLayout.add(update);
             forceLayout.addActivityListener(new ActivityAdapter() {
                 public void activityFinished(Activity a) {
-                    ((ForceDirectedLayout)((ActionPipeline)a).get(0))
-                        .reset(registry);
+                    ((ForceDirectedLayout)actionMap.get("force")).reset(registry);
+                } //
+                public void activityCancelled(Activity a) {
+                    ((ForceDirectedLayout)actionMap.get("force")).reset(registry);
                 } //
             });
-            actmap.put("forceLayout", forceLayout);
+            activityMap.put("forceLayout", forceLayout);
 			
 			// initialize menus
 			JMenuBar  menubar    = new JMenuBar();
@@ -167,7 +172,7 @@ public class GraphEditor extends JFrame {
 			JMenuItem saveAsItem = new JMenuItem(SAVE_AS);
 			JMenuItem exitItem   = new JMenuItem(EXIT);
             JMenuItem randomItem = new JMenuItem(RANDOM);
-            JMenuItem forceItem  = new JMenuItem(FORCE);
+            JMenuItem forceItem  = new JCheckBoxMenuItem(FORCE);
 			
 			openItem.setActionCommand(OPEN);
 			saveItem.setActionCommand(SAVE);
@@ -194,13 +199,9 @@ public class GraphEditor extends JFrame {
 			menubar.add(fileMenu);
             menubar.add(layoutMenu);
 			
-			addWindowListener(new WindowAdapter() {
-				public void windowClosing(WindowEvent e) {
-					System.exit(0);
-				}
-			});
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			setJMenuBar(menubar);
-			getContentPane().add(display, BorderLayout.CENTER);
+			getContentPane().add(display);
 			pack();
 			setVisible(true);
 		} catch ( Exception e ) {
@@ -231,7 +232,7 @@ public class GraphEditor extends JFrame {
 			}
 		}
 	}
-	
+    
 	/**
 	 * Input controller for interacting with the application.
 	 * 
@@ -272,11 +273,13 @@ public class GraphEditor extends JFrame {
 			    yDown = e.getY();
 			    item.setColor(Color.RED);
 			    item.setFillColor(Color.WHITE);
-			    actmap.scheduleNow("update");
+			    activityMap.scheduleNow("update");
+                item.setFixed(true);
             }
 		} //
 		
 		public void itemReleased(GraphItem item, MouseEvent e) {
+            item.setFixed(false);
             if ( !(item instanceof NodeItem) )
                 return;
             
@@ -304,12 +307,12 @@ public class GraphEditor extends JFrame {
 					activeItem.setFillColor(Color.WHITE);
 					activeItem = null;
 					update = true;
-                    actmap.scheduleNow("filter");
+                    activityMap.scheduleNow("filter");
 				}
 			}
 			drag = false;
             if ( update )
-                actmap.scheduleNow("update");
+                activityMap.scheduleNow("update");
 		} //
 		
 		public void itemDragged(GraphItem item, MouseEvent e) {
@@ -321,7 +324,7 @@ public class GraphEditor extends JFrame {
 			int dy = e.getY() - yDown;
 			Point2D p = item.getLocation();
 			item.setLocation(p.getX()+dx,p.getY()+dy);
-            actmap.scheduleNow("update");
+            activityMap.scheduleNow("update");
 			xDown = e.getX();
 			yDown = e.getY();
 			setEdited(true);
@@ -331,8 +334,8 @@ public class GraphEditor extends JFrame {
 			if ( e.getKeyChar() == '\b' ) {				
 				if (item == activeItem) activeItem = null;
 				removeNode(item);
-                actmap.scheduleNow("filter");
-                actmap.scheduleNow("update");
+                activityMap.scheduleNow("filter");
+                activityMap.scheduleNow("update");
 				setEdited(true);
 			}
 		} //
@@ -356,11 +359,11 @@ public class GraphEditor extends JFrame {
 			if ( rightClick ) {
 				addNode(e.getX(), e.getY());
 				setEdited(true);
-                actmap.scheduleNow("filter");
+                activityMap.scheduleNow("filter");
 				update = true;
 			}
 			if ( update ) {
-                actmap.scheduleNow("update");
+                activityMap.scheduleNow("update");
 			}
 		} //
 		
@@ -384,7 +387,7 @@ public class GraphEditor extends JFrame {
 				r.x -= 1+r.width/2; r.y -= 1; 
 				display.editText(item, nameField, r);
 				setEdited(true);
-                actmap.scheduleNow("update");
+                activityMap.scheduleNow("update");
 			}
 		} //
 		
@@ -393,7 +396,7 @@ public class GraphEditor extends JFrame {
 			if ( src == display.getTextEditor() && 
 				e.getKeyCode() == KeyEvent.VK_ENTER ) {
 				stopEditing();
-                actmap.scheduleNow("update");
+                activityMap.scheduleNow("update");
 			}
 		} //
 
@@ -450,8 +453,8 @@ public class GraphEditor extends JFrame {
 						g = gr.loadGraph(f);
 						registry.setGraph(g);
 						setLocations(g);
-                        actmap.scheduleNow("filter");
-                        actmap.scheduleNow("update");
+                        activityMap.scheduleNow("filter");
+                        activityMap.scheduleNow("update");
 						saveFile = f;
 						setEdited(false);
 					 } catch ( Exception ex ) {
@@ -482,9 +485,14 @@ public class GraphEditor extends JFrame {
 			} else if ( EXIT.equals(cmd) ) {
 				System.exit(0);
             } else if ( RANDOM.equals(cmd) ) {
-                actmap.scheduleNow("randomLayout");
+                activityMap.scheduleNow("randomLayout");
             } else if ( FORCE.equals(cmd) ) {
-                actmap.scheduleNow("forceLayout");
+                JCheckBoxMenuItem cb = (JCheckBoxMenuItem)e.getSource();
+                if ( cb.getState() )
+                    activityMap.scheduleNow("forceLayout");
+                else {
+                    activityMap.cancel("forceLayout");
+                }
 			} else {
 				throw new IllegalStateException();
 			}
