@@ -16,7 +16,7 @@ import edu.berkeley.guir.prefuse.graph.TreeNode;
  * Represents a trie data structure (a play on the words "tree" and 
  * "retrieval"). This builds a tree structure representing a set of
  * words by indexing on word prefixes. It is useful for performing
- * prefix-based searches over large amounts of text in a very
+ * prefix-based searches over large amounts of text in an
  * efficient manner.
  *
  * @version 1.0
@@ -93,6 +93,10 @@ public class Trie {
         addLeaf(root, leaf, 0);
     } //
     
+    public void removeString(String word, Entity e) {
+        removeLeaf(root, word, e, 0);
+    } //
+    
     private final int getIndex(char[] chars, char c) {
         for ( int i=0; i<chars.length; i++ )
             if ( chars[i] == c ) return i;
@@ -104,11 +108,74 @@ public class Trie {
         return ( caseSensitive ? c : Character.toLowerCase(c) );
     } //
     
+    private boolean removeLeaf(TrieBranch b, String word, Entity ent, int depth) {
+        char c = getChar(word, depth);
+        int i = getIndex(b.chars, c);
+        
+        if ( i == -1 ) {
+            // couldn't find leaf
+            return false;
+        } else {
+            TrieNode n = b.children[i];
+            if ( n instanceof TrieBranch ) {
+                TrieBranch tb = (TrieBranch)n;
+                boolean rem = removeLeaf(tb, word, ent, depth+1);
+                if ( rem ) {
+                    b.leafCount--;
+                    if ( tb.leafCount == 1 )
+                        b.children[i] = tb.children[tb.children[0]!=null?0:1];
+                }
+                return rem;
+            } else {
+                TrieLeaf nl = (TrieLeaf)n;
+                if ( nl.entity == ent ) {
+                    b.children[i] = nl.next;
+                    if ( nl.next == null )
+                        repairBranch(b,i);
+                    b.leafCount--;
+                    return true;
+                } else {
+                    TrieLeaf nnl = nl.next;
+                    while ( nnl != null && nnl.entity != ent ) {
+                        nl = nnl; nnl = nnl.next;
+                    }
+                    if ( nnl == null )
+                        return false; // couldn't find leaf
+                    
+                    // update leaf counts
+                    for ( TrieLeaf tl = (TrieLeaf)n; tl.entity != ent; tl = tl.next )
+                        tl.leafCount--;
+                    
+                    nl.next = nnl.next;
+                    b.leafCount--;
+                    return true;
+                }     
+            }
+        }
+    } //
+    
+    private void repairBranch(TrieBranch b, int i) {
+        if ( i == 0 ) {
+            b.children[0] = null;
+        } else {
+            int len = b.chars.length;
+            char[] nchars = new char[len-1];
+            TrieNode[] nkids = new TrieNode[len-1];
+            System.arraycopy(b.chars,0,nchars,0,i);
+            System.arraycopy(b.children,0,nkids,0,i);
+            System.arraycopy(b.chars,i+1,nchars,i,len-i-1);
+            System.arraycopy(b.children,i+1,nkids,i,len-i-1);
+            b.chars = nchars;
+            b.children = nkids;
+        }
+    } //
+    
     private void addLeaf(TrieBranch b, TrieLeaf l, int depth) {
         b.leafCount += l.leafCount;
         
         char c = getChar(l.word, depth);
         int i = getIndex(b.chars, c);
+        
         if ( i == -1 ) {
             addChild(b,l,c);
         } else {
@@ -122,7 +189,9 @@ public class Trie {
             } else {
                 // node is a leaf, need to do a split?
                 TrieLeaf nl = (TrieLeaf)n;
-                if ( i==0 || nl.word.equals(l.word) ) {
+                if ( i==0 || (caseSensitive ? nl.word.equals(l.word) 
+                                  : nl.word.equalsIgnoreCase(l.word)) )
+                {
                     // same word, so chain the entries
                     for ( ; nl.next != null; nl = nl.next )
                         nl.leafCount++;

@@ -171,6 +171,20 @@ public class KeywordSearchFocusSet implements FocusSet {
         m_trie.addString(s,e);
     } //
     
+    public void remove(Entity e, String attrName) {
+        String s;
+        if ( (s=e.getAttribute(attrName)) == null ) return;
+        StringTokenizer st = new StringTokenizer(s,m_delim);
+        while ( st.hasMoreTokens() ) {
+            String tok = st.nextToken();
+            removeString(tok, e);
+        }
+    } //
+    
+    private void removeString(String s, Entity e) {
+        m_trie.removeString(s,e);
+    } //
+    
     /**
      * Clears this focus set, invalidating any previous search.
      * @see edu.berkeley.guir.prefuse.util.FocusSet#clear()
