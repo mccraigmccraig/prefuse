@@ -130,9 +130,11 @@ public class ActivityMap {
      * Associates the given key with the given Activity
      * @param key the key to associate with the Activity
      * @param activity an Activity instance
+     * @return the activity just added to the map
      */
-    public void put(Object key, Activity activity) {
+    public Activity put(Object key, Activity activity) {
         m_map.put(key, activity);
+        return activity;
     } //
     
     /**
