@@ -1,7 +1,7 @@
 /*
  * Created on Aug 7, 2004
  */
-package edu.berkeley.guir.prefuse.timeline;
+package edu.berkeley.guir.prefusex.controls;
 
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
@@ -11,7 +11,6 @@ import javax.swing.SwingUtilities;
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
-import edu.berkeley.guir.prefusex.controls.DragControl;
 
 /**
  * @author Jack Li jack(AT)cs_D0Tberkeley_D0Tedu
