@@ -25,10 +25,18 @@ public class ColorLib {
         return getColor(rgba);
     } //
     
+    public static Color getColor(float r, float g, float b) {
+        return getColor(r,g,b,1.0f);
+    } //
+    
     public static Color getColor(int r, int g, int b, int a) {
         int rgba = ((a & 0xFF) << 24) | ((r & 0xFF) << 16) |
                    ((g & 0xFF) << 8)  | ((b & 0xFF) << 0);
         return getColor(rgba);
+    } //
+    
+    public static Color getColor(int r, int g, int b) {
+        return getColor(r,g,b,255);
     } //
     
     public static Color getColor(int rgba) {
