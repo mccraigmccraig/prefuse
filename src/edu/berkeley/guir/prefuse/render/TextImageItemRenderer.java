@@ -277,6 +277,22 @@ public class TextImageItemRenderer extends ShapeRenderer {
         }
 	} //
 	
+    /**
+     * Returns the image factory used by this renderer.
+     * @return the image factory
+     */
+    public ImageFactory getImageFactory() {
+        return m_images;
+    } //
+    
+    /**
+     * Sets the image factory used by this renderer.
+     * @param ifact the image factory
+     */
+    public void setImageFactory(ImageFactory ifact) {
+        m_images = ifact;
+    } //
+    
 	/**
 	 * Get the horizontal alignment of this node with respect to it's
 	 * location co-ordinate.

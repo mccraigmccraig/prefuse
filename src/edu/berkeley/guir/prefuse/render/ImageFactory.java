@@ -109,32 +109,38 @@ public class ImageFactory {
 			// if set for synchronous mode, block for image to load.
             if ( !m_asynch ) {
                 waitForImage(image);
-                loadImage(imageLocation, image);
+                addImage(imageLocation, image);
             } else {
                 int id = ++nextTrackerID;
                 tracker.addImage(image, id);
-                loadMap.put(imageLocation, new LoadMapEntry(id,image));
-                
-                //System.err.println((++lcount));
-                //loadingSet.add(imageLocation);
-                //loadingMap.put(image, imageLocation);
-                //int width = image.getWidth(this);    
+                loadMap.put(imageLocation, new LoadMapEntry(id,image));    
             }
-		} else if ( loadMap.containsKey(imageLocation) ) {
+		} else if ( image == null && loadMap.containsKey(imageLocation) ) {
             LoadMapEntry entry = (LoadMapEntry)loadMap.get(imageLocation);
             if ( tracker.checkID(entry.id, true) ) {
-                loadImage(imageLocation, entry.image);
+                addImage(imageLocation, entry.image);
                 loadMap.remove(imageLocation);
+                tracker.removeImage(entry.image, entry.id);
             }
+        } else {
+            return image;
         }
 		return (Image) imageCache.get(imageLocation);
 	} //
-
-    int lcount = 0;
     
-    protected Image loadImage(String location, Image image) {
-        if ( m_maxImageWidth > -1 || m_maxImageHeight > -1 )
+    /**
+     * Adds an image associated with a locaiton string to this factory's cache.
+     * The image will be scaled as dictated by this factory's setting.
+     * @param location the location string uniquely identifying the image
+     * @param image the actual image
+     * @return the final image added to the cache. This may be a scaled
+     *  version of the original input image.
+     */
+    public Image addImage(String location, Image image) {
+        if ( m_maxImageWidth > -1 || m_maxImageHeight > -1 ) {
             image = getScaledImage(image);
+            image.getWidth(null); // trigger image load
+        }
         imageCache.put(location, image);
         return image;
     } //
