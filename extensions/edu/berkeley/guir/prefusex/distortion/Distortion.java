@@ -54,10 +54,7 @@ public abstract class Distortion extends Layout {
         final Iterator iter;
         if (useFilteredGraph) {
             //registry.printAllEntries();
-            // XXX Gotta switch back later
             iter = registry.getFilteredGraph().getNodes();
-            //System.out.println("using this class: "+nodeClass);
-            //iter = registry.getItems(nodeClass, true);
         } else {
             iter = registry.getNodeItems();
         }
@@ -82,7 +79,6 @@ public abstract class Distortion extends Layout {
                     item.setSize(sz*item.getEndSize());
                 }
             }
-            
         }
     } //
     
@@ -94,7 +90,7 @@ public abstract class Distortion extends Layout {
      * @param bounds the layout bounds
      * @return the corrected anchor point
      */
-    private Point2D correct(Point2D anchor, Rectangle2D bounds) {
+    protected Point2D correct(Point2D anchor, Rectangle2D bounds) {
         if ( anchor == null ) return anchor;
         double x = anchor.getX(), y = anchor.getY();
         double x1 = bounds.getMinX(), y1 = bounds.getMinY();
