@@ -25,7 +25,6 @@ import javax.swing.event.DocumentListener;
 
 import edu.berkeley.guir.prefuse.FocusManager;
 import edu.berkeley.guir.prefuse.ItemRegistry;
-import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.event.ItemRegistryListener;
 import edu.berkeley.guir.prefuse.focus.FocusSet;
@@ -41,6 +40,7 @@ import edu.berkeley.guir.prefuse.graph.Entity;
 public class PrefixSearchPanel extends JPanel
     implements DocumentListener, ActionListener
 {
+    private ItemRegistry registry;
     private PrefixSearchFocusSet searcher;
     private FocusSet focus;
 
@@ -84,18 +84,22 @@ public class PrefixSearchPanel extends JPanel
         focus = focusSet;
         init(registry);
     } //
-
+    
     private void init(ItemRegistry registry) {
+        this.registry = registry;
+        
         // add a listener to dynamically build search index
         registry.addItemRegistryListener(new ItemRegistryListener() {
             public void registryItemAdded(VisualItem item) {
-                if ( !(item instanceof NodeItem) ) return;
+                if (!item.getItemClass().equals(ItemRegistry.DEFAULT_NODE_CLASS))
+                    return;
                 for ( int i=0; i < searchAttr.length; i++ )
                     searcher.index(item.getEntity(), searchAttr[i]);
                 searchUpdate();
             } //
             public void registryItemRemoved(VisualItem item) {
-                if ( !(item instanceof NodeItem) ) return;
+                if (!item.getItemClass().equals(ItemRegistry.DEFAULT_NODE_CLASS))
+                    return;
                 for ( int i=0; i < searchAttr.length; i++ )
                     searcher.remove(item.getEntity(), searchAttr[i]);
                 searchUpdate();
@@ -207,6 +211,11 @@ public class PrefixSearchPanel extends JPanel
         if ( downArrow != null ) downArrow.setForeground(fg);
     } //
 
+    public void setSearchPrompt(String prompt) {
+        searchL.setText(prompt);
+        searchL.validate();
+    } //
+    
     /**
      * @see javax.swing.event.DocumentListener#changedUpdate(javax.swing.event.DocumentEvent)
      */
