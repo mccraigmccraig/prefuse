@@ -27,6 +27,7 @@ public class FocusControl extends ControlAdapter {
 
     private Object focusSetKey = FocusManager.DEFAULT_KEY;
     protected int ccount;
+    protected Class[] itemTypes = new Class[] { NodeItem.class };
     
     /**
      * Creates a new FocusControl that changes the focus to another item
@@ -51,6 +52,18 @@ public class FocusControl extends ControlAdapter {
      * clicked the specified number of times. A click value of zero indicates
      * that the focus should be changed in response to mouse-over events.
      * @param clicks the number of clicks needed to switch the focus.
+     * @param types the VisualItem classes that eligible for focus status
+     */
+    public FocusControl(int clicks, Class[] types) {
+        ccount = clicks;
+        setFocusItemTypes(types);
+    } //
+    
+    /**
+     * Creates a new FocusControl that changes the focus when an item is 
+     * clicked the specified number of times. A click value of zero indicates
+     * that the focus should be changed in response to mouse-over events.
+     * @param clicks the number of clicks needed to switch the focus.
      * @param focusSetKey the key corresponding to the focus set to use
      */
     public FocusControl(int clicks, Object focusSetKey) {
@@ -58,8 +71,47 @@ public class FocusControl extends ControlAdapter {
         this.focusSetKey = focusSetKey;
     } //
     
+    /**
+     * Creates a new FocusControl that changes the focus when an item is 
+     * clicked the specified number of times. A click value of zero indicates
+     * that the focus should be changed in response to mouse-over events.
+     * @param clicks the number of clicks needed to switch the focus.
+     * @param focusSetKey the key corresponding to the focus set to use
+     * @param types the VisualItem classes that eligible for focus status
+     */
+    public FocusControl(int clicks, Object focusSetKey, Class[] types) {
+        ccount = clicks;
+        this.focusSetKey = focusSetKey;
+        setFocusItemTypes(types);
+    } //
+    
+    public void setFocusItemTypes(Class[] types) {
+        for ( int i=0; i<types.length; i++ ) {
+            if ( !isVisualItem(types[i]) ) {
+                throw new IllegalArgumentException("All types must be of type VisualItem");
+            }
+        }
+        itemTypes = (Class[])types.clone();
+    } //
+    
+    protected boolean isVisualItem(Class c) {
+        while ( c != null && !VisualItem.class.equals(c) ) {
+            c = c.getSuperclass();
+        }
+        return (c != null);
+    } //
+    
+    protected boolean isAllowedType(VisualItem item) {
+        for ( int i=0; i<itemTypes.length; i++ ) {
+            if ( itemTypes[i].isInstance(item) ) {
+                return true;
+            }
+        }
+        return false;
+    } //
+    
     public void itemEntered(VisualItem item, MouseEvent e) {
-        if ( item instanceof NodeItem ) {
+        if ( isAllowedType(item) ) {
             Display d = (Display)e.getSource();
             d.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             if ( ccount == 0 ) {
@@ -74,7 +126,7 @@ public class FocusControl extends ControlAdapter {
     } //
     
     public void itemExited(VisualItem item, MouseEvent e) {
-        if ( item instanceof NodeItem ) {
+        if ( isAllowedType(item) ) {
             Display d = (Display)e.getSource();
             d.setCursor(Cursor.getDefaultCursor());
             if ( ccount == 0 ) {
@@ -88,7 +140,7 @@ public class FocusControl extends ControlAdapter {
     } //
     
     public void itemClicked(VisualItem item, MouseEvent e) {
-        if ( item instanceof NodeItem && ccount > 0 && 
+        if ( isAllowedType(item) && ccount > 0 && 
              SwingUtilities.isLeftMouseButton(e)    && 
              e.getClickCount() == ccount )
         {
