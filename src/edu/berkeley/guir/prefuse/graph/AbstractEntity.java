@@ -9,10 +9,8 @@ import java.util.Map;
  * Abstract class from which graph entities (nodes and edges) can descend.
  * Provides support for handling entity attributes.
  * 
- * Apr 24, 2003 - jheer - Created class
- * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public abstract class AbstractEntity implements Entity {	
 
@@ -50,7 +48,7 @@ public abstract class AbstractEntity implements Entity {
 	 */
 	public void setAttribute(String name, String value) {
 		if ( m_attributes == null ) {
-		    m_attributes = new HashMap(3);
+		    m_attributes = new HashMap(3,0.9f);
 		}
 		m_attributes.put(name, value);
 	} //

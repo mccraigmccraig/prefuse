@@ -11,10 +11,8 @@ import edu.berkeley.guir.prefuse.graph.Tree;
 /**
  * Interface by which to read in DefaultTree instances from stored files.
  * 
- * Apr 22, 2003 - jheer - Created class
- * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public interface TreeReader {
 

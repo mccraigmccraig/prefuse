@@ -20,18 +20,17 @@ import edu.berkeley.guir.prefuse.graph.DefaultGraph;
 import edu.berkeley.guir.prefuse.graph.Node;
 
 /**
- * Reads in a graph from an XGMML-format XML file.
- * See <a href="www.cs.rpi.edu/~puninj/XGMML/">www.cs.rpi.edu/~puninj/XGMML/</a>
- * for a description of the XGMML format.
+ * <p>Reads in a graph from an XGMML-format XML file.
+ * See <a href="http://www.cs.rpi.edu/~puninj/XGMML/">
+ * www.cs.rpi.edu/~puninj/XGMML/</a>
+ * for a description of the XGMML format.</p>
  * 
- * This class supports setting the node type to use when building the graph.
- * For example, one should set the node type to DefaultTreeNode.class if one wants
- * to impose tree structures on the input graph.
- * 
- * May 21, 2003 - jheer - Created class
+ * <p>This class supports setting the node type to use when building the graph.
+ * For example, one should set the node type to DefaultTreeNode.class if one 
+ * wants to impose tree structures on the input graph.</p>
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class XMLGraphReader extends AbstractGraphReader	implements GraphReader {
 

@@ -17,7 +17,7 @@ import edu.berkeley.guir.prefuse.VisualItem;
  * 
  * @version 1.0
  * @author newbergr
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public interface ControlListener extends 
     EventListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener

@@ -290,9 +290,7 @@ public class GraphEditor extends JFrame {
     
 	/**
 	 * Input controller for interacting with the application.
-	 * 
-	 * @version 1.0
-	 * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+	 * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
 	 */
 	class Controller extends ControlAdapter 
 		implements MouseListener, KeyListener, ActionListener

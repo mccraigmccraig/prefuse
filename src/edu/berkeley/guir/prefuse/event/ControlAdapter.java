@@ -10,10 +10,8 @@ import edu.berkeley.guir.prefuse.VisualItem;
  * Adapter class for prefuse interface events. Subclasses can override the
  * desired methods to perform user interface event handling.
  * 
- * Apr 25, 2003 - jheer - Created class
- * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class ControlAdapter implements ControlListener {
 

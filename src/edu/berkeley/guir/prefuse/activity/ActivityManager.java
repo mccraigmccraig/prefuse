@@ -16,24 +16,25 @@ import edu.berkeley.guir.prefuse.event.ActivityAdapter;
  * package visible here.</p>
  * 
  * <p>Activity instances can be scheduled by using their 
- * {@link Activity.run() run()}, {@link Activity.runNow() runNow()},
- * {@link Activity.runAt(long) runAt()}, and 
- * {@link Activity.runAfter(Activity) runAfter()}, 
- * methods. These will automatically call the
+ * {@link edu.berkeley.guir.prefuse.activity.Activity#run() run()}, 
+ * {@link edu.berkeley.guir.prefuse.activity.Activity#runNow() runNow()},
+ * {@link edu.berkeley.guir.prefuse.activity.Activity#runAt(long) runAt()}, and 
+ * {@link edu.berkeley.guir.prefuse.activity.Activity#runAfter(Activity) 
+ * runAfter()} methods. These will automatically call the
  * appropriate methods with the ActivityManager.</p>
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
- * @see edu.berkeley.guir.prefuse.activity.Activity
- * @see edu.berkeley.guir.prefuse.activity.ActionPipeline
+ * @see Activity
+ * @see ActionPipeline
  */
 public class ActivityManager extends Thread {
 
     private static ActivityManager s_instance;
     
-    private ArrayList    m_activities;
-    private ArrayList    m_tmp;
-    private long         m_nextTime;
+    private ArrayList m_activities;
+    private ArrayList m_tmp;
+    private long      m_nextTime;
     
     /**
      * Returns the active ActivityManager instance.

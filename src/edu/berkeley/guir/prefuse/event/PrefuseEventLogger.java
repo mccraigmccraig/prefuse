@@ -19,11 +19,12 @@ import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.graph.Entity;
 
 /**
- * 
- * Nov 21, 2003 - jheer - Created class
+ * A listener implementation that logs events from the prefuse architecture.
+ * This can be useful for debugging as well as for logging events during user
+ * studies.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class PrefuseEventLogger implements ControlListener, 
 	ItemRegistryListener, FocusListener, ComponentListener {

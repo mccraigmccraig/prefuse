@@ -11,9 +11,7 @@ import edu.berkeley.guir.prefuse.graph.Tree;
 /**
  * Reads in trees from HDir formatted files.
  * 
- * May 5, 2003 - jheer- Created class
- * 
- * @author Jeffrey Heer (<a href="mailto:jheer@acm.org">jheer@acm.org</a>)
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class HDirTreeReader extends AbstractTreeReader {
 

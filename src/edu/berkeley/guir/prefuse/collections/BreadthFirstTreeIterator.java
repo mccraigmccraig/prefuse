@@ -11,7 +11,7 @@ import edu.berkeley.guir.prefuse.graph.TreeNode;
  * Iterates over tree nodes in a breadth-first manner.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class BreadthFirstTreeIterator implements Iterator {
 
@@ -52,4 +52,4 @@ public class BreadthFirstTreeIterator implements Iterator {
 		return n;
 	} //
 
-} // end of class BreadthFirstIterator
+} // end of class BreadthFirstTreeIterator

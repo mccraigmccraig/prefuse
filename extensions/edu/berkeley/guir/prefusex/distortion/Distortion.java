@@ -89,7 +89,7 @@ public abstract class Distortion extends Layout {
      * @param pf the location of the distorted item
      * @param anchor the anchor or focus point of the display
      * @param bounds the layout bounds
-     * @return
+     * @return the scaling factor by which to change the size
      */
     protected abstract double transformSize(Rectangle2D bbox, Point2D pf, 
             Point2D anchor, Rectangle2D bounds);

@@ -108,9 +108,9 @@ public class KeywordSearchFocusSet implements FocusSet {
     /**
      * Provides a Tree of the underlying Trie backing this focus set.
      * This is here solely for debugging purposes.
-     * @param entities
-     * @param attrName
-     * @return
+     * @param entities the entities to index
+     * @param attrName the Entity attribute to index
+     * @return a Tree of the Trie
      */
     public static Tree getTree(Iterator entities, String attrName) {
         KeywordSearchFocusSet set = new KeywordSearchFocusSet(false);

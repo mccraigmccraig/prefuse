@@ -13,15 +13,41 @@ import edu.berkeley.guir.prefuse.render.Renderer;
 import edu.berkeley.guir.prefuse.util.FontLib;
 
 /**
- * Abstract class for a visual representation of a graph element. Subclasses
- * include NodeItem, EdgeItem, and AggregateItem.
+ * <p>Top-level class for visual representations of graph elements, providing
+ * numerous visual attributes (e.g. getLocation, getColor, getFont) as well
+ * as access to the original abstract data. All interactive objects displayed
+ * by a prefuse application descend from this class. An active VisualItem is
+ * associated with one, and only one, {@link ItemRegistry ItemRegistry}.</p>
+ * 
+ * <p>Visual items implement the
+ * {@link edu.berkeley.guir.prefuse.graph.Entity Entity} interface, but act as
+ * a proxy to the original abstract data. The {@link #getAttribute(String)
+ * getAttribute} method returns the attributes from the abstract Entity this
+ * VisualItem represents. The {@link #getEntity() getEntity} method will
+ * return this original abstract data element.</p>
+ * 
+ * <p>In addition, any number of arbitrary attributes specific to a
+ * particular VisualItem can be set or retrieved using the 
+ * {@link #setVizAttribute(String,Object) setVizAttribute} and
+ * {@link #getVizAttribute(String) getVizAttribute} methods. These can be
+ * useful for applying attributes beyond the basics provided by the VisualItem
+ * API (e.g. getLocation, getColor, getSize). For example, many of the provided
+ * layout algorithms set their own visualization attributes as a means of
+ * managing various layout parameters.</p>
+ * 
+ * <p>Subclasses of VisualItem include {@link NodeItem NodeItem}, 
+ * {@link EdgeItem EdgeItem}, and {@link AggregateItem AggregateItem}.
+ * Custom VisualItem types can also be created by subclasses. These should
+ * be registered as their own item class with the {@link ItemRegistry
+ * ItemRegistry}.</p>
  * 
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
+ * @see NodeItem
+ * @see EdgeItem
+ * @see AggregateItem
  */
 public abstract class VisualItem implements Entity {
-    
-    // TODO: abstract the various properties into the attributes map?
 	
 	protected ItemRegistry m_registry;  // the item registry this item is associated with
 	protected String       m_itemClass; // the item class this item belongs to
@@ -67,8 +93,12 @@ public abstract class VisualItem implements Entity {
 		m_endLocation   = new Point2D.Float();
 	} //
 	
+    /**
+     * Returns a String describing this VisualItem and its contents.
+     * @see java.lang.Object#toString()
+     */
 	public String toString() {
-		return m_entity.toString();
+		return "VisualItem{"+m_entity+"}";
 	} //
 	
 	/**
@@ -114,7 +144,7 @@ public abstract class VisualItem implements Entity {
     }
     
 	/**
-	 * Clear the state of this VisualItem.
+	 * Clears the state of this VisualItem.
 	 */
 	public void clear() {
 		m_registry = null;
@@ -123,15 +153,17 @@ public abstract class VisualItem implements Entity {
 	} //
 
 	/**
-	 * Return the ItemRegistry associated with this VisualItem.
-	 * @return the ItemRegistry
+	 * Returns the ItemRegistry associated with this VisualItem.
+	 * @return the ItemRegistry this VisualItem is contained in
 	 */
 	public ItemRegistry getItemRegistry() {
 		return m_registry;
 	} //
 
 	/**
-	 * Return the item class this item belongs to.
+	 * Return the item class this item belongs to. Item class labels are used
+     * by the {@link ItemRegistry ItemRegistry} to organize various VisualItem
+     * types.
 	 * @return String label of this item's item class
 	 */
 	public String getItemClass() {
@@ -147,9 +179,10 @@ public abstract class VisualItem implements Entity {
 	} //
 
 	/**
-	 * Get an entity attribute (a value associated with the actual graph data structure).
+     * Retrieves an attribute from this item's backing Entity. Equivalent to
+     * <code>getEntity().getAttributes(name)</code>.
 	 * @param name the name of the attribute
-	 * @return String
+	 * @return String the value of the attribute, or null if none
 	 */
 	public String getAttribute(String name) {
 		if ( m_entity == null ) {
@@ -160,9 +193,10 @@ public abstract class VisualItem implements Entity {
 	} //
 
 	/**
-	 * Set an entity attribute (a value associated with the actual graph data structure).
-	 * @param name the name of the attribute
-	 * @param value
+	 * Sets an attribute on this item's backing Entity. Equivalent to
+     * <code>getEntity().setAttribute(name,value)</code>.
+	 * @param name the name of the attribute to set
+	 * @param value the value of the attribute to set
 	 */
 	public void setAttribute(String name, String value) {
 		if ( m_entity == null ) {
@@ -173,6 +207,8 @@ public abstract class VisualItem implements Entity {
 	} //
     
     /**
+     * Retrieves the attribute map of this item's backing Entity. Equivalent to
+     * <code>getEntity().getAttributes()</code>.
      * @see edu.berkeley.guir.prefuse.graph.Entity#getAttributes()
      */
     public Map getAttributes() {
@@ -180,6 +216,8 @@ public abstract class VisualItem implements Entity {
     } //
 
     /**
+     * Sets the attribute map on this item's backing Entity. Equivalent to
+     * <code>getEntity().setAttributes(attrMap)</code>.
      * @see edu.berkeley.guir.prefuse.graph.Entity#setAttributes(java.util.Map)
      */
     public void setAttributes(Map attrMap) {
@@ -187,6 +225,8 @@ public abstract class VisualItem implements Entity {
     } //
 
     /**
+     * Clears the attributes on this item's backing Entity. Equivalent to
+     * <code>getEntity().clearAttributes()</code>.
      * @see edu.berkeley.guir.prefuse.graph.Entity#clearAttributes()
      */
     public void clearAttributes() {
@@ -237,7 +277,7 @@ public abstract class VisualItem implements Entity {
 	/**
 	 * "Touching" an item tells the system that the item is to be used
 	 * in the visualization, and so resets any garbage collecting data
-	 * to it's freshest state. If an item has been retrieved using
+	 * to its freshest state. If an item has been retrieved using
 	 * the <code>ItemRegistry.getNodeItem(node, true)</code> method it is
 	 * touched automatically.
 	 */
@@ -247,7 +287,10 @@ public abstract class VisualItem implements Entity {
 
 	/**
 	 * Gets the dirty counter for this item. This counter is used
-	 * by the ItemRegistry to control garbage collection. 
+	 * by the ItemRegistry to control garbage collection. An item will be
+     * garbage collected (removed from the registry) when a filter has
+     * been run the number of times indicated by the dirty counter without
+     * re-filtering this item.
 	 * @return the dirty counter
 	 */
 	public int getDirty() {
@@ -256,7 +299,10 @@ public abstract class VisualItem implements Entity {
 	
 	/**
 	 * Sets the dirty counter for this item. This counter is used
-	 * by the ItemRegistry to control garbage collection. 
+	 * by the ItemRegistry to control garbage collection. An item will be
+     * garbage collected (removed from the registry) when a filter has
+     * been run the number of times indicated by the dirty counter without
+     * re-filtering this item.
 	 * @param dirty the new value of the dirty counter
 	 */
 	public void setDirty(int dirty) {
@@ -265,7 +311,10 @@ public abstract class VisualItem implements Entity {
 
 	/**
 	 * Returns true if this item became visible within the last
-	 * processing cycle.
+	 * processing cycle. Processing cycles are determined whenever
+     * garbage collection is run on the ItemRegistry. This usually
+     * occurs whenever a {@link edu.berkeley.guir.prefuse.action.Filter
+     * Filter} is run.
 	 * @return true if newly visible, false otherwise
 	 */
 	public boolean isNewlyVisible() {
@@ -290,6 +339,13 @@ public abstract class VisualItem implements Entity {
 		m_visible = s;
 	} //
 
+    /**
+     * Indicates if the abstract data entity associated with this VisualItem
+     * is currently a focus. Focus determination is achieved by querying the
+     * {@link FocusManager FocusManager}
+     * associated with this item's {@link ItemRegistry ItemRegistry}.
+     * @return true if this item's backing Entity is a focus, false otherwise.
+     */
     public boolean isFocus() {
         FocusManager fmanager = m_registry.getFocusManager();
         return fmanager.isFocus(m_entity);

@@ -10,7 +10,7 @@ import edu.berkeley.guir.prefuse.graph.external.GraphLoader;
  * Manages listeners for graph data loading and unloading events.
  * 
  * @author newbergr
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class GraphLoaderMulticaster extends EventMulticaster 
     implements GraphLoaderListener

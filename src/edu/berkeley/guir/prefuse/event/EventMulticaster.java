@@ -6,7 +6,7 @@ import java.util.EventListener;
  * Manages a list of listeners for events.
  * 
  * @author newbergr
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class EventMulticaster implements EventListener {
 

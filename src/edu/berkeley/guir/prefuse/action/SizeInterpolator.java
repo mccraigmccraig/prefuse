@@ -9,7 +9,7 @@ import edu.berkeley.guir.prefuse.ItemRegistry;
  * Linearly interpolates the size of a VisualItem.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class SizeInterpolator extends AbstractAction {
 

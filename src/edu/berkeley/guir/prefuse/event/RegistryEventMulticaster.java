@@ -8,7 +8,7 @@ import edu.berkeley.guir.prefuse.VisualItem;
  * Manages a list of listeners for prefuse item registry events.
  * 
  * @author newbergr
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class RegistryEventMulticaster extends EventMulticaster
     implements ItemRegistryListener

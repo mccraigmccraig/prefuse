@@ -42,7 +42,7 @@ public class DefaultNodeRenderer extends ShapeRenderer {
     
     /**
      * Gets the radius of the circle drawn to represent a node.
-     * @param r the radius value
+     * @return the radius value
      */
     public int getRadius() {
         return m_radius;

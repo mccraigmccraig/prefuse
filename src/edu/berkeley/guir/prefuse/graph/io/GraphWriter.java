@@ -10,10 +10,8 @@ import edu.berkeley.guir.prefuse.graph.Graph;
 /**
  * Interface by which to write Graph instances out.
  * 
- * June 23, 2003 - jheer - Created class
- * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public interface GraphWriter {
 

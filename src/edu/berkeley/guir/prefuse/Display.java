@@ -67,7 +67,7 @@ import edu.berkeley.guir.prefuse.util.ToolTipManager;
  * methods.</p>
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  * @see ItemRegistry
  * @see edu.berkeley.guir.prefuse.event.ControlListener
  * @see edu.berkeley.guir.prefusex.controls

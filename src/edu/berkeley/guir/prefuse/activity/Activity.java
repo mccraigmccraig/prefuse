@@ -114,8 +114,7 @@ public abstract class Activity {
      * Activity. If the first Activity is never scheduled, this Activity
      * will correspondingly never be run unless scheduled by a separate
      * scheduling call.
-     * @param before the first Activity to run
-     * @param after the Activity to run immediately after the first
+     * @param before the Activity that must finish before this one starts
      */
     public void runAfter(Activity before) {
         ActivityManager.scheduleAfter(before, this);

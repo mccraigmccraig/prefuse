@@ -5,10 +5,8 @@ import java.util.Map;
 /**
  * Interface from which all graph nodes and edges descend.
  * 
- * Apr 24, 2003 - jheer - Created class
- * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public interface Entity {
 	

@@ -66,10 +66,10 @@ public class EdgeItem extends VisualItem implements Edge {
     /**
      * Given a node item incident on this edge, returns the other node item
      * incident on this edge.
-     * @param nitem a NodeItem incident on this edge
+     * @param n a NodeItem incident on this edge
      * @return the other NodeItem incident on this edge
-     * @throws IllegalArgumentException if the provided NodeItem is not
-     *  incident on this edge.
+     * @throws IllegalArgumentException if the provided NodeItem is either
+     *  not a NodeItem or is not incident on this edge.
      */
     public Node getAdjacentNode(Node n) {
         nodeItemCheck(n);

@@ -23,13 +23,12 @@ import edu.berkeley.guir.prefuse.graph.TreeNode;
 
 /**
  * Reads in a tree from an XGMML-format XML file.
- * See <a href="www.cs.rpi.edu/~puninj/XGMML/">www.cs.rpi.edu/~puninj/XGMML/</a>
+ * See <a href="http://www.cs.rpi.edu/~puninj/XGMML/">
+ * www.cs.rpi.edu/~puninj/XGMML/</a>
  * for a description of the XGMML format.
  * 
- * Aug 8, 2003 - jheer - Created class
- * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class XMLTreeReader extends AbstractTreeReader implements TreeReader {
 

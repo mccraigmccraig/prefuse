@@ -18,11 +18,10 @@ import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
 /**
- * 
- * Jul 22, 2003 - jheer - Created class
+ * Reads in tree-structured data in the TreeML, XML-based format.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class TreeMLTreeReader extends AbstractTreeReader {
 

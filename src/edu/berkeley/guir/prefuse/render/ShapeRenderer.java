@@ -13,15 +13,21 @@ import java.awt.geom.Point2D;
 import edu.berkeley.guir.prefuse.VisualItem;
 
 /**
- * An abstract implementation of the Renderer interface supporting the
+ * <p>An abstract implementation of the Renderer interface supporting the
  * drawing of basic shapes. Subclasses should override the
- * {@link getRawShape(edu.berkeley.guir.prefuse.VisualItem) getRawShape}
+ * {@link #getRawShape(edu.berkeley.guir.prefuse.VisualItem) getRawShape}
  * which return the shape to draw. Optionally, subclasses can also override the
- * {@link getGraphicsSpaceTransform(edu.berkeley.guir.prefuse.VisualItem)
- * getGraphicsSpaceTransform} to apply a desired <code>AffineTransform</code>
- * to the shape. For more efficient rendering, subclasses should use a
+ * {@link #getTransform(edu.berkeley.guir.prefuse.VisualItem)
+ * getTransform} to apply a desired <code>AffineTransform</code>
+ * to the shape.</p>
+ * 
+ * <p><b>NOTE:</b> For more efficient rendering, subclasses should use a
  * single shape instance in memory, and update its parameters on each call
  * to getRawShape, rather than allocating a new Shape object each time.
+ * Otherwise, a new object will be allocated every time something needs to
+ * be drawn. This can significantly reduce performance, especially when
+ * there are many things to draw.
+ * </p>
  * 
  * @version 1.0
  * @author Alan Newberger
