@@ -156,6 +156,7 @@ public class ForceDirectedLayout extends Layout {
            ForceItem fitem = (ForceItem)nitem.getVizAttribute("forceItem");
            if ( fitem == null ) {
                fitem = new ForceItem();
+               fitem.mass = getMassValue(nitem);
                nitem.setVizAttribute("forceItem", fitem);
            }
            double x = nitem.getEndLocation().getX();
@@ -175,6 +176,10 @@ public class ForceDirectedLayout extends Layout {
            float slen = getSpringLength(n1, n2);
            fsim.addSpring(f1, f2, (coeff>=0?coeff:-1.f), (slen>=0?slen:-1.f));
        }      
+    } //
+    
+    protected float getMassValue(NodeItem n) {
+        return 1.0f;
     } //
     
     protected float getSpringLength(NodeItem n1, NodeItem n2) {
