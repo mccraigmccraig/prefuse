@@ -17,7 +17,6 @@ public class ActionPipeline extends Activity implements Action {
 
     private ItemRegistry   m_registry;
     private ArrayList      m_actions = new ArrayList();
-    private Pacer m_pacer;
     
     public ActionPipeline(ItemRegistry registry) {
         this(registry, 0);
@@ -34,14 +33,6 @@ public class ActionPipeline extends Activity implements Action {
     public ActionPipeline(ItemRegistry registry, long duration, long stepTime, long startTime) {
         super(duration, stepTime, startTime);
         m_registry = registry;
-    } //
-    
-    public synchronized Pacer getPacingFunction() {
-        return m_pacer;
-    } //
-    
-    public synchronized void setPacingFunction(Pacer pfunc) {
-        m_pacer = pfunc;
     } //
     
     public synchronized int size() {
@@ -69,12 +60,7 @@ public class ActionPipeline extends Activity implements Action {
     } //
     
     protected synchronized void run(long elapsedTime) {
-        // determine the fraction of elapsed activity time
-        long duration = getDuration();
-        double frac = (duration == 0L ? 0.0 : ((double)elapsedTime)/duration);
-        frac = Math.min(1, Math.max(0, frac));
-        frac = m_pacer!=null ? m_pacer.pace(frac) : frac;
-        run(m_registry, frac);
+        run(m_registry, getPace(elapsedTime));
     } //
     
     public void run(ItemRegistry registry, double frac) {

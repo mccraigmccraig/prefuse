@@ -25,6 +25,7 @@ public abstract class Activity {
     private static final int CANCELLED = 4;
     
     private boolean m_enabled = true;
+    private Pacer m_pacer;
     
     private long m_startTime = -1L;
     private long m_duration  = -1L;
@@ -206,6 +207,45 @@ public abstract class Activity {
     
     // ========================================================================
     // == ACCESSOR / MUTATOR METHODS ==========================================
+    
+    /**
+     * Returns a value between 0 and 1 inclusive, indicating the current
+     * position in an animation or other similarly parameterized activity.
+     * The returned value is determined by consulting this Activity's
+     * pacing function.
+     * @param elapsedTime the time in milliseconds since the start of this
+     *  Activity.
+     * @return a value between 0 and 1 indicating the current position in
+     *  an animation.
+     * @see edu.berkeley.guir.prefuse.activity.Activity#getPacingFunction()
+     */
+    public double getPace(long elapsedTime) {
+        long duration = getDuration();
+        double frac = (duration == 0L ? 0.0 : ((double)elapsedTime)/duration);
+        frac = Math.min(1, Math.max(0, frac));
+        return m_pacer!=null ? m_pacer.pace(frac) : frac;
+    } //
+    
+    /**
+     * Returns the pacing function associated with this Activity. Pacing
+     * functions are used to control the pace of animations.
+     * @return this Activity's pacing function. A value of null indicates a
+     *  basic, linear pace is used, moving from 0 to 1 uniformly over time.
+     */
+    public synchronized Pacer getPacingFunction() {
+        return m_pacer;
+    } //
+    
+    /**
+     * Sets the pacing function associated with this Activity. Pacing
+     * functions are used to control the pace of animations.
+     * @param pfunc this Activity's new pacing function, or null to
+     *  indicate a basic, linear pace moving from 0 to 1 uniformly
+     *  over time.
+     */
+    public synchronized void setPacingFunction(Pacer pfunc) {
+        m_pacer = pfunc;
+    } //
     
     /**
      * Get the time at which this activity should complete.
