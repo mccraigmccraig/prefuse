@@ -50,13 +50,13 @@ public class GraphLib {
             TreeNode node = new TreeNode();
             node.setAttribute("label", "n"+i);
             nodes.add(node);
-            if ( i >= m ) {
-                TreeNode above = (TreeNode)nodes.get(i-m);
+            if ( i >= n ) {
+                TreeNode above = (TreeNode)nodes.get(i-n);
                 Edge e = new Edge(above, node);
                 node.addEdge(e);
                 above.addEdge(e);
             }
-            if ( i % m != 0 ) {
+            if ( i % n != 0 ) {
                 TreeNode bfor = (TreeNode)nodes.get(i-1);
                 Edge e = new Edge(bfor, node);
                 node.addEdge(e);
