@@ -143,7 +143,11 @@ public class FisheyeDistortion extends Distortion {
         }
         
         double sf = (!by ? fx : (!bx ? fy : Math.min(fx,fy)));
-        return sz*sf;
+        if (Double.isInfinite(sf) || Double.isNaN(sf)) {
+            return 1.;
+        } else {
+            return sz*sf;
+        }
     } //
     
     private double fisheye(double x, double a, double d, double min, double max) {
