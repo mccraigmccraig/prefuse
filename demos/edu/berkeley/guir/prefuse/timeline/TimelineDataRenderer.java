@@ -10,7 +10,6 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
 import edu.berkeley.guir.prefuse.VisualItem;
-import edu.berkeley.guir.prefuse.demos.TimelineDemo;
 import edu.berkeley.guir.prefuse.graph.io.XMLGraphReader;
 import edu.berkeley.guir.prefuse.render.TextItemRenderer;
 

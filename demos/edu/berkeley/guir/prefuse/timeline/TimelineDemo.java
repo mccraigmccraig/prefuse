@@ -1,7 +1,7 @@
 /*
  * Created on Jul 3, 2004
  */
-package edu.berkeley.guir.prefuse.demos;
+package edu.berkeley.guir.prefuse.timeline;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -26,10 +26,10 @@ import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.graph.io.XMLGraphReader;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
-import edu.berkeley.guir.prefuse.timeline.TimelineConstants;
-import edu.berkeley.guir.prefuse.timeline.TimelineDataRenderer;
-import edu.berkeley.guir.prefuse.timeline.TimelineLayout;
+import edu.berkeley.guir.prefuse.render.TextItemRenderer;
+import edu.berkeley.guir.prefusex.controls.AnchorUpdateControl;
 import edu.berkeley.guir.prefusex.controls.DragControl;
+import edu.berkeley.guir.prefusex.distortion.FisheyeDistortion;
 
 /**
  * @author Jack Li jack(AT)cs_D0Tberkeley_D0Tedu
@@ -52,6 +52,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
     private final int timelineSpan = timeline_end - timeline_start;
     private Graph graph;
 
+    
     // (( CONSTRUCTOR )) \\
     public TimelineDemo() {
         // 1a. Load the timeline data into graph
@@ -96,13 +97,26 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         final int timelineLength = appWidth * 3 / 4; // this factor ought to be
                                                      // shared across all
                                                      // timeline instances
-        registry.setRendererFactory(new DefaultRendererFactory(
-                new TimelineDataRenderer(timeline_start, timeline_end,
-                        timelineLength), new DefaultEdgeRenderer(), null));
+        final TextItemRenderer nodeRenderer = new TimelineDataRenderer(
+        		timeline_start, timeline_end, timelineLength);
+        nodeRenderer.setVerticalAlignment(TextItemRenderer.ALIGNMENT_CENTER);
+		registry.setRendererFactory(new DefaultRendererFactory(
+                nodeRenderer, new DefaultEdgeRenderer(), null));
 
         final Display display = new Display(registry);
         display.setSize(appWidth, appHeight);
         display.addControlListener(new DragControl());
+        
+        final ActionList distort = new ActionList(registry);
+        distort.add(new TimelineGraphFilter());
+        final FisheyeDistortion feye = new FisheyeDistortion(1,0);
+        distort.add(feye);
+        distort.add(new RepaintAction());
+        
+        // enable distortion mouse-over
+        final AnchorUpdateControl auc = new AnchorUpdateControl(feye, distort);
+        display.addMouseListener(auc);
+        display.addMouseMotionListener(auc);
 
         // set up this JFrame
         final JFrame frame = new JFrame(TITLE);
@@ -111,23 +125,24 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         frame.pack();
         frame.setVisible(true);
 
-        final ActionList actions = new ActionList(registry);
-        actions.add(new GraphFilter());
-        actions.add(new MusicHistoryColorFunction());
-        actions.add(new MusicHistoryLayout(timelineLength, notchIndex));
-        actions.add(new RepaintAction());
-        actions.runNow();
+        final ActionList initialArrange = new ActionList(registry);
+        initialArrange.add(new GraphFilter());
+        initialArrange.add(new MusicHistoryColorFunction());
+        initialArrange.add(new MusicHistoryLayout(timelineLength, notchIndex));
+        initialArrange.add(new RepaintAction());
+        initialArrange.runNow();
     }
 
+    
     // (( METHODS )) \\
     private Node connectNewNotchNode(final String notchIndex,
             final Node prevNotchNode, final int nextNotchNum) {
         final DefaultNode nextNotchNode = new DefaultNode();
-        nextNotchNode.setAttribute(XMLGraphReader.XMLGraphHandler.ID, NOTCH
-                + notchIndex);
-        nextNotchNode.setAttribute(XMLGraphReader.XMLGraphHandler.LABEL, ""
-                + nextNotchNum);
         nextNotchNode.setAttribute(NODE_TYPE, NOTCH_TYPE);
+        nextNotchNode.setAttribute(
+        		XMLGraphReader.XMLGraphHandler.ID, NOTCH+notchIndex);
+        nextNotchNode.setAttribute(
+        		XMLGraphReader.XMLGraphHandler.LABEL, ""+nextNotchNum);
         graph.addNode(nextNotchNode);
 
         if (prevNotchNode != null) { // the first node doesn't have an in-edge
@@ -137,6 +152,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         return nextNotchNode;
     }
 
+    
     // (( INNER CLASSES )) \\
     private static class MusicHistoryColorFunction extends ColorFunction {
         public Paint getFillColor(VisualItem item) {
@@ -238,6 +254,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         }
     } // end of class MusicHistoryLayout
 
+    
     // (( MAIN )) \\
     public static void main(String[] args) {
         new TimelineDemo();
