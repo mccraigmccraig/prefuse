@@ -41,6 +41,10 @@ public class FocusEvent extends EventObject {
         return m_type;
     } //
     
+    public FocusSet getFocusSet() {
+    	return (FocusSet)getSource();
+    } //
+    
     public Entity[] getAddedFoci() {
         return m_added;
     } //
