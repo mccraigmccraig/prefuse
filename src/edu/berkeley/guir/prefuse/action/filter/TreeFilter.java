@@ -100,7 +100,7 @@ public class TreeFilter extends Filter {
                 EdgeItem eitem = registry.getEdgeItem(edge, true);
                 if ( edge.isTreeEdge() ) {
                     TreeNode c = (TreeNode)eitem.getAdjacentNode(item);
-                    TreeNode p = (TreeNode)(c.getParent()==item?item:c);
+                    TreeNode p = ((TreeNode)n).getParent()==node?item:c;
                     p.addChild(eitem);
                 } else {
                     eitem.getFirstNode().addEdge(eitem);
