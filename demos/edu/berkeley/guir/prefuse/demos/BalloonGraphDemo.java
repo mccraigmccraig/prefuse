@@ -43,10 +43,10 @@ import edu.berkeley.guir.prefuse.render.TextItemRenderer;
 import edu.berkeley.guir.prefuse.util.ColorMap;
 import edu.berkeley.guir.prefuse.util.StringAbbreviator;
 import edu.berkeley.guir.prefusex.layout.BalloonTreeLayout;
-import edu.berkeley.guir.prefusex.controls.DragControl;
 import edu.berkeley.guir.prefusex.controls.FocusControl;
 import edu.berkeley.guir.prefusex.controls.NeighborHighlightControl;
 import edu.berkeley.guir.prefusex.controls.PanHandler;
+import edu.berkeley.guir.prefusex.controls.SubtreeDragControl;
 import edu.berkeley.guir.prefusex.controls.ZoomHandler;
 
 /**
@@ -141,7 +141,7 @@ public class BalloonGraphDemo {
             display.setSize(700,700);
             display.setBackground(Color.WHITE);
             display.addControlListener(new FocusControl());
-            display.addControlListener(new DragControl());
+            display.addControlListener(new SubtreeDragControl());
             display.addControlListener(new PanHandler());
             display.addControlListener(new ZoomHandler());
             display.addControlListener(new NeighborHighlightControl(update));
