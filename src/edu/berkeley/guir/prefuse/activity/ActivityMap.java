@@ -127,6 +127,19 @@ public class ActivityMap {
     } //
     
     /**
+     * Cancels the Activity corresponding to the given key.
+     * @param key the lookup key for the Activity to cancel
+     * @return the cancelled Activity, or null if no Activity
+     *  was found for the given key.
+     */
+    public Activity cancel(Object key) {
+        Activity a = get(key);
+        if ( a != null )
+            a.cancel();
+        return a;
+    } //
+    
+    /**
      * Associates the given key with the given Activity
      * @param key the key to associate with the Activity
      * @param activity an Activity instance
