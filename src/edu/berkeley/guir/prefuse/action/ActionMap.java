@@ -36,8 +36,9 @@ public class ActionMap {
         return (a==null && m_parent!=null ? m_parent.get(key) : a);
     } //
     
-    public void put(Object key, Action action) {
+    public Action put(Object key, Action action) {
         m_map.put(key, action);
+        return action;
     } //
     
     public void remove(Object key) {
