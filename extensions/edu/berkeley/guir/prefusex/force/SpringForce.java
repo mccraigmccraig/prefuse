@@ -65,7 +65,7 @@ public class SpringForce extends AbstractForce {
             r  = (float)Math.sqrt(dx*dx+dy*dy);
         }
         float d  = r-length;
-        float coeff = params[SPRING_COEFF]*d/r;
+        float coeff = (s.coeff < 0 ? params[SPRING_COEFF] : s.coeff)*d/r;
         item1.force[0] += coeff*dx;
         item1.force[1] += coeff*dy;
         item2.force[0] += -coeff*dx;
