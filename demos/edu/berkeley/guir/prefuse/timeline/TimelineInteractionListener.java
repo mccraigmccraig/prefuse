@@ -64,6 +64,7 @@ public class TimelineInteractionListener extends ControlAdapter implements Timel
         moveEvent(e);
     } //
     
+    // only do the activity if mouse is near or over timeline
     public void moveEvent(MouseEvent e) {
         Display d = (Display)e.getSource();
         d.getAbsoluteCoordinate(e.getPoint(), m_tmp);
@@ -71,7 +72,7 @@ public class TimelineInteractionListener extends ControlAdapter implements Timel
         for ( int i=0; i<m_layouts.length; i++ ) {
             m_layouts[i].setLayoutAnchor(m_tmp);
             // highlight nearby nodes
-            highlighNearbyNodes(d, m_tmp.getX());
+            highlightNearbyNodes(d, m_tmp.getX());
         }
         if ( m_activity != null )
             m_activity.runNow();
@@ -86,7 +87,7 @@ public class TimelineInteractionListener extends ControlAdapter implements Timel
     // need function: draws line from given node (compute center) to given x (find y)
     // for all nodes, compute if the node is nearby
     // draw lines from nearby nodes to that point on the timeline
-    private void highlighNearbyNodes(final Display display, final double mouseXCoord) {
+    private void highlightNearbyNodes(final Display display, final double mouseXCoord) {
         // get the registry
         final ItemRegistry registry = display.getRegistry();
         synchronized ( registry ) {
@@ -113,6 +114,8 @@ public class TimelineInteractionListener extends ControlAdapter implements Timel
         double leftBound = nodeBounds.getMinX();
         double rightBound = nodeBounds.getMaxX();
         final double nodeWidth = rightBound - leftBound;
+        // if the nodeWidth is less than a certain threshold, extend
+        // the bounds to that threshold
         if (nodeWidth < highlightThresh) {
             leftBound -= (highlightThresh - nodeWidth) / 2;
             rightBound += (highlightThresh - nodeWidth) / 2;
@@ -123,6 +126,5 @@ public class TimelineInteractionListener extends ControlAdapter implements Timel
             return false;
         }
     }
-        
 } // end of class AnchorUpdateControl
 
