@@ -154,14 +154,16 @@ public class RadialGraphDemo {
             display.setSize(700,700);
             display.setBackground(Color.WHITE);
             display.addControlListener(new FocusControl());
-            display.addControlListener(new NeighborHighlightControl(update));
             display.addControlListener(new DragControl());
             display.addControlListener(new PanHandler());
             display.addControlListener(new ZoomHandler());
+            display.addControlListener(new NeighborHighlightControl(update));
             
 			// set up initial focus and focus listener
             registry.getDefaultFocusSet().addFocusListener(new FocusListener() {
                 public void focusChanged(FocusEvent e) {
+                    if ( update.isScheduled() )
+                        update.cancel();
                     TreeNode node = (TreeNode)e.getFirstAdded();
                     if ( node != null && !node.equals(tree.getRoot()) ) {                           
                         tree = TreeLib.breadthFirstTree(node);
