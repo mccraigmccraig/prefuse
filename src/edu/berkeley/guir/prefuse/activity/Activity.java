@@ -121,6 +121,27 @@ public abstract class Activity {
     } //
     
     /**
+     * Schedules this Activity to start immediately after another Activity.
+     * This Activity will be scheduled to start immediately after the
+     * first one finishes, overwriting any previously set startTime. If the
+     * first Activity is cancelled, this one will not run.
+     * 
+     * This functionality is provided by using an ActivityListener to monitor
+     * the first Activity. The listener will persist across mulitple runs,
+     * meaning the second Activity will always be evoked upon a successful
+     * finish of the first.
+     * 
+     * This method does not in any way affect the scheduling of the first 
+     * Activity. If the first Activity is never scheduled, this Activity
+     * will correspondingly never be run unless scheduled by a separate
+     * scheduling call.
+     * @param before the Activity that must finish before this one starts
+     */
+    public void alwaysRunAfter(Activity before) {
+        ActivityManager.alwaysScheduleAfter(before, this);
+    } //
+    
+    /**
      * Run this activity one step. Subclasses should override this method to
      * specify the actions this activity should perform.
      * @param elapsedTime the time elapsed since the start of the activity.

@@ -103,6 +103,25 @@ public class ActivityManager extends Thread {
     } //
     
     /**
+     * Schedules an Activity to start immediately after another Activity.
+     * The second Activity will be scheduled to start immediately after the
+     * first one finishes, overwriting any previously set startTime. If the
+     * first Activity is cancelled, the second one will not run.
+     * 
+     * This functionality is provided by using an ActivityListener to monitor
+     * the first Activity. The listener will persist across mulitple runs,
+     * meaning the second Activity will always be evoked upon a successful
+     * finish of the first.
+     * 
+     * This method does not otherwise effect the scheduling of the first Activity.
+     * @param before the first Activity to run
+     * @param after the Activity to run immediately after the first
+     */
+    static void alwaysScheduleAfter(Activity before, Activity after) {
+        getInstance()._alwaysScheduleAfter(before, after);
+    } //
+    
+    /**
      * Removes an Activity from this manager, called by an
      * Activity when it finishes or is cancelled. Application 
      * code should not call this method! Instead, use 
@@ -176,7 +195,26 @@ public class ActivityManager extends Thread {
      * @param after the Activity to run immediately after the first
      */
     private synchronized void _scheduleAfter(Activity before, Activity after) {
-        before.addActivityListener(new ScheduleAfterActivity(after));
+        before.addActivityListener(new ScheduleAfterActivity(after,true));
+    } //
+    
+    /**
+     * Schedules an Activity to start immediately after another Activity.
+     * The second Activity will be scheduled to start immediately after the
+     * first one finishes, overwriting any previously set startTime. If the
+     * first Activity is cancelled, the second one will not run.
+     * 
+     * This functionality is provided by using an ActivityListener to monitor
+     * the first Activity. The listener will persist across mulitple runs,
+     * meaning the second Activity will always be evoked upon a successful
+     * finish of the first.
+     * 
+     * This method does not otherwise effect the scheduling of the first Activity.
+     * @param before the first Activity to run
+     * @param after the Activity to run immediately after the first
+     */
+    private synchronized void _alwaysScheduleAfter(Activity before, Activity after) {
+        before.addActivityListener(new ScheduleAfterActivity(after,false));
     } //
     
     /**
@@ -252,15 +290,17 @@ public class ActivityManager extends Thread {
     
     public class ScheduleAfterActivity extends ActivityAdapter {
         Activity after;
-        public ScheduleAfterActivity(Activity after) {
+        boolean remove;
+        public ScheduleAfterActivity(Activity after, boolean remove) {
             this.after = after;
+            this.remove = remove;
         } //
         public void activityFinished(Activity a) {
-            a.removeActivityListener(this);
+            if ( remove ) a.removeActivityListener(this);
             scheduleNow(after);
         } //
         public void activityCancelled(Activity a) {
-            a.removeActivityListener(this);
+            if ( remove ) a.removeActivityListener(this);
         } //
     } // end of inner class ScheduleAfterActivity
     
