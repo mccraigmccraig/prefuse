@@ -50,6 +50,12 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
     private final int timeline_start = 0;
     private final int timeline_end = 2005;
     private final int timelineSpan = timeline_end - timeline_start;
+
+    private final int timelineLength = appWidth * 3 / 4; // this factor ought to be
+                                                 // shared across all
+                                                 // timeline instances
+    private final double yearPerPixel = (double) timelineSpan / timelineLength;
+    
     private Graph graph;
 
     
@@ -100,9 +106,6 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         // XXX Gotta switch back later (comment out)
         registry.addItemClass(XMLGraphReader.XMLGraphHandler.NODE, NodeItem.class);
         registry.addItemClass(ItemRegistry.DEFAULT_EDGE_CLASS, EdgeItem.class);
-        final int timelineLength = appWidth * 3 / 4; // this factor ought to be
-                                                     // shared across all
-                                                     // timeline instances
         final TextItemRenderer nodeRenderer = new TimelineDataRenderer(
         		timeline_start, timeline_end, timelineLength);
         nodeRenderer.setVerticalAlignment(TextItemRenderer.ALIGNMENT_CENTER);
@@ -110,8 +113,19 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
                 nodeRenderer, new DefaultEdgeRenderer(), null));
 
         final Display display = new Display(registry);
+        display.setUseCustomTooltips(true);
         display.setSize(appWidth, appHeight);
         display.addControlListener(new DragControl());
+/*        display.addControlListener(new ControlAdapter() {
+            private Point2D  m_tmp = new Point2D.Float();
+            
+            public void mouseMoved(MouseEvent e) {
+                final Display d = (Display)e.getSource();
+                d.getAbsoluteCoordinate(e.getPoint(), m_tmp);
+                d.setToolTipText(""+getYear(m_tmp.getX()));
+            } //
+            
+        });*/
         
         final ActionList distort = new ActionList(registry);
         distort.add(new TimelineGraphFilter());
@@ -123,7 +137,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         
         // enable distortion mouse-over
         final TimelineInteractionListener mouseOverUpdates = 
-            new TimelineInteractionListener(feye, distort, 10);
+            new TimelineInteractionListener(feye, distort, 10, timelineSpan, appWidth, timelineLength);
         display.addMouseListener(mouseOverUpdates);
         display.addMouseMotionListener(mouseOverUpdates);
 
@@ -144,6 +158,11 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
 
     
     // (( METHODS )) \\
+    private int getYear(final double xCoord) {
+        //return (int) ((xCoord - (appWidth / 8)) * timelineSpan / timelineLength);
+        return ((8 * (int) xCoord * timelineSpan) - (timelineSpan * appWidth)) / (8 * timelineLength);
+    }
+    
     private Node connectNewNotchNode(final String notchIndex,
             final Node prevNotchNode, final int nextNotchNum) {
         final Node nextNotchNode = new /*NotchNode();*/DefaultNode();

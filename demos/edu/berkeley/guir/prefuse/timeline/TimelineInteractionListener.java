@@ -24,23 +24,27 @@ public class TimelineInteractionListener extends ControlAdapter implements Timel
     private Activity m_activity;
     private Point2D  m_tmp = new Point2D.Float();
     private final double highlightThresh;
-    
+    private final int timelineSpan, appWidth, timelineLength;
     
     // (( CONSTRUCTORS )) \\
-    public TimelineInteractionListener(Layout layout, final double highlightThresh) {
-        this(layout, null, highlightThresh);
+    public TimelineInteractionListener(Layout layout, final double highlightThresh,
+            final int timelineSpan, final int appWidth, final int timelineLength) {
+        this(layout, null, highlightThresh, timelineSpan, appWidth, timelineLength);
     } //
     
     public TimelineInteractionListener(Layout layout, Activity update, 
-            final double highlightThresh) {
-        this(new Layout[] {layout}, update, highlightThresh);
+            final double highlightThresh, final int timelineSpan, final int appWidth, final int timelineLength) {
+        this(new Layout[] {layout}, update, highlightThresh, timelineSpan, appWidth, timelineLength);
     } //
     
     public TimelineInteractionListener(Layout[] layout, Activity update, 
-            final double highlightThresh) {
+            final double highlightThresh, final int timelineSpan, final int appWidth, final int timelineLength) {
         m_layouts = (Layout[])layout.clone();
         m_activity = update;
         this.highlightThresh = highlightThresh;
+        this.timelineSpan = timelineSpan;
+        this.appWidth = appWidth;
+        this.timelineLength = timelineLength;
     } //
     
     
@@ -63,6 +67,7 @@ public class TimelineInteractionListener extends ControlAdapter implements Timel
     public void moveEvent(MouseEvent e) {
         Display d = (Display)e.getSource();
         d.getAbsoluteCoordinate(e.getPoint(), m_tmp);
+        d.setToolTipText(""+getYear(m_tmp.getX()));
         for ( int i=0; i<m_layouts.length; i++ ) {
             m_layouts[i].setLayoutAnchor(m_tmp);
             // highlight nearby nodes
@@ -71,6 +76,11 @@ public class TimelineInteractionListener extends ControlAdapter implements Timel
         if ( m_activity != null )
             m_activity.runNow();
     } //
+    
+    private int getYear(final double xCoord) {
+        //return (int) ((xCoord - (appWidth / 8)) * timelineSpan / timelineLength);
+        return ((8 * (int) xCoord * timelineSpan) - (timelineSpan * appWidth)) / (8 * timelineLength);
+    }
     
 
     // need function: draws line from given node (compute center) to given x (find y)
