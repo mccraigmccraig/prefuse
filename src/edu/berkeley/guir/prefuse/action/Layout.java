@@ -1,6 +1,6 @@
 package edu.berkeley.guir.prefuse.action;
 
-import java.awt.Rectangle;
+import java.awt.Insets;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -17,6 +17,10 @@ public abstract class Layout extends AbstractAction {
 
     protected Rectangle2D m_bounds = null;
     protected Point2D     m_anchor = null;
+    private   Insets      m_insets = new Insets(0,0,0,0);
+    
+    private   double[]    m_bpts   = new double[4];
+    private   Rectangle2D m_tmp    = new Rectangle2D.Double();
     
     public Rectangle2D getLayoutBounds() {
         return m_bounds;
@@ -26,10 +30,18 @@ public abstract class Layout extends AbstractAction {
         if ( m_bounds != null )
             return m_bounds;
         Display d;
-        if ( registry != null && (d=registry.getDisplay(0)) != null )
-            return new Rectangle(0,0,d.getWidth(),d.getHeight());
-        else
-            return new Rectangle();
+        if ( registry != null && (d=registry.getDisplay(0)) != null ) {
+            Insets i = d.getInsets(m_insets);
+            m_bpts[0] = i.left; m_bpts[1] = i.top;
+            m_bpts[2] = d.getWidth()-i.right;
+            m_bpts[3] = d.getHeight()-i.bottom;
+            d.getInverseTransform().transform(m_bpts,0,m_bpts,0,2);
+            m_tmp.setRect(m_bpts[0],m_bpts[1],
+                          m_bpts[2]-m_bpts[0],
+                          m_bpts[3]-m_bpts[1]);
+            return m_tmp;
+        } else
+            return null;
     } //
     
     public void setLayoutBounds(Rectangle2D b) {
@@ -43,12 +55,13 @@ public abstract class Layout extends AbstractAction {
     public Point2D getLayoutAnchor(ItemRegistry registry) {
         if ( m_anchor != null )
             return m_anchor;
-        double x = 0, y = 0;
+        Point2D a = new Point2D.Double(0,0);
         if ( registry != null ) {
             Display d = registry.getDisplay(0);
-            x = d.getWidth()/2; y = d.getHeight()/2;
+            a.setLocation(d.getWidth()/2.0,d.getHeight()/2.0);
+            d.getInverseTransform().transform(a,a);
         }
-        return new Point2D.Double(x,y);
+        return a;
     } //
     
     public void setLayoutAnchor(Point2D a) {

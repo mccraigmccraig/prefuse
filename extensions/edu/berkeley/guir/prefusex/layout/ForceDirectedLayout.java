@@ -91,12 +91,12 @@ public class ForceDirectedLayout extends Layout {
             
             if ( m_enforceBounds ) {
                 Rectangle2D bounds = getLayoutBounds(registry);
-                double xb = bounds.getX(), yb = bounds.getY();
-                double w = bounds.getWidth(), h = bounds.getHeight();
-                if ( x >= w ) x = xb+w;
-                if ( x <= 0 ) x = xb;
-                if ( y >= h ) y = yb+h;
-                if ( y <= 0 ) y = yb;
+                double x1 = bounds.getMinX(), y1 = bounds.getMinY();
+                double x2 = bounds.getMaxX(), y2 = bounds.getMaxY();
+                if ( x > x2 ) x = x2;
+                if ( x < x1 ) x = x1;
+                if ( y > y2 ) y = y2;
+                if ( y < y1 ) y = y1;
             }
             nitem.updateLocation(x,y);
             nitem.setLocation(x,y);
