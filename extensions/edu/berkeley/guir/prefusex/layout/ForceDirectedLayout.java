@@ -128,8 +128,8 @@ public class ForceDirectedLayout extends Layout {
                fitem = new ForceItem();
                nitem.setVizAttribute("forceItem", fitem);
            }
-           fitem.location[0] = (float)nitem.getX();
-           fitem.location[1] = (float)nitem.getY();
+           fitem.location[0] = (float)nitem.getEndLocation().getX();
+           fitem.location[1] = (float)nitem.getEndLocation().getY();
            m_fsim.addItem(fitem);
        }
        iter = registry.getEdgeItems();
