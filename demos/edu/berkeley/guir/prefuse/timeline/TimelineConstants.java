@@ -33,14 +33,6 @@ public interface TimelineConstants {
 	public static final String END = "end"; // (these are helpers, not actual NOTCH_TYPEs)
 	public static final String NOTCH_START = NOTCH+START;
 	public static final String NOTCH_END = NOTCH+END;
-	
-	// Additional keys for registry's entrymap
-	public static final String NOTCH_NODE_TYPE = "notchnode";
-	public static final Class NOTCH_NODE_CLASS = NotchNode.class;
-	public static final Class NOTCH_NODE_ITEM_CLASS = NotchNode.Item.class;
-	public static final String NOTNOTCH_NODE_TYPE = "notnotchnode";
-	public static final Class NOTNOTCH_NODE_CLASS = NotNotchNode.class;
-	public static final Class NOTNOTCH_NODE_ITEM_CLASS = NotNotchNode.Item.class;
 
 	// Visual Node Attributes
 	public static final String LEFT_NORMAL = "left_normal";
