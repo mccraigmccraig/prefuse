@@ -51,6 +51,7 @@ public class ActivityManager extends Thread {
      * Create a new ActivityManger.
      */
     private ActivityManager() {
+        super("prefuse-activity-manager");
         m_activities = new ArrayList();
         m_tmp = new ArrayList();
         m_nextTime = Long.MAX_VALUE;
@@ -146,14 +147,16 @@ public class ActivityManager extends Thread {
      * Schedules an Activity with the manager.
      * @param a the Activity to schedule
      */
-    private synchronized void _schedule(Activity a) {
+    private void _schedule(Activity a) {
         if ( a.isScheduled() ) return; // already scheduled, do nothing
-        m_activities.add(a);
-        a.setScheduled(true);
-        long start = a.getStartTime();
-        if ( start < m_nextTime ) { 
-           m_nextTime = start;
-           notify();
+        synchronized ( this ) {
+	        m_activities.add(a);
+	        a.setScheduled(true);
+	        long start = a.getStartTime();
+	        if ( start < m_nextTime ) { 
+	           m_nextTime = start;
+	           notify();
+	        }
         }
     } //
     
@@ -163,7 +166,7 @@ public class ActivityManager extends Thread {
      * @param a the Activity to schedule
      * @param startTime the time at which the activity should run
      */
-    private synchronized void _scheduleAt(Activity a, long startTime) {
+    private void _scheduleAt(Activity a, long startTime) {
         if ( a.isScheduled() ) return; // already scheduled, do nothing
         a.setStartTime(startTime);
         schedule(a);
@@ -174,7 +177,7 @@ public class ActivityManager extends Thread {
      * Activity's currently set startTime.
      * @param a the Activity to schedule
      */    
-    private synchronized void _scheduleNow(Activity a) {
+    private void _scheduleNow(Activity a) {
         if ( a.isScheduled() ) return; // already scheduled, do nothing
         a.setStartTime(System.currentTimeMillis());
         schedule(a);
@@ -194,7 +197,7 @@ public class ActivityManager extends Thread {
      * @param before the first Activity to run
      * @param after the Activity to run immediately after the first
      */
-    private synchronized void _scheduleAfter(Activity before, Activity after) {
+    private void _scheduleAfter(Activity before, Activity after) {
         before.addActivityListener(new ScheduleAfterActivity(after,true));
     } //
     
@@ -213,7 +216,7 @@ public class ActivityManager extends Thread {
      * @param before the first Activity to run
      * @param after the Activity to run immediately after the first
      */
-    private synchronized void _alwaysScheduleAfter(Activity before, Activity after) {
+    private void _alwaysScheduleAfter(Activity before, Activity after) {
         before.addActivityListener(new ScheduleAfterActivity(after,false));
     } //
     
@@ -226,13 +229,18 @@ public class ActivityManager extends Thread {
      * @return true if the activity was found and removed, false
      *  if the activity is not scheduled with this manager.
      */
-    private synchronized boolean _removeActivity(Activity a) {
-        boolean r = m_activities.remove(a);
+    private boolean _removeActivity(Activity a) {
+        boolean r;
+        synchronized ( this ) {
+            r = m_activities.remove(a);
+            if ( r ) {
+                if ( m_activities.size() == 0 ) {
+                    m_nextTime = Long.MAX_VALUE;
+                }
+            }
+        }
         if ( r ) {
             a.setScheduled(false);
-            if ( m_activities.size() == 0 ) {
-                m_nextTime = Long.MAX_VALUE;
-            }
         }
         return r;
     } //
