@@ -1,7 +1,6 @@
 package edu.berkeley.guir.prefuse.render;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Rectangle;
@@ -9,6 +8,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import edu.berkeley.guir.prefuse.VisualItem;
 
@@ -59,9 +59,7 @@ public abstract class ShapeRenderer implements Renderer {
 	protected void drawShape(Graphics2D g, VisualItem item, Shape shape) {
 	    // set up colors
         Paint itemColor = item.getColor();
-        if ( itemColor == null ) itemColor = Color.BLACK;
         Paint fillColor = item.getFillColor();
-        if ( fillColor == null ) fillColor = Color.LIGHT_GRAY;
         
         // render the shape
         Stroke s = g.getStroke();
@@ -161,19 +159,18 @@ public abstract class ShapeRenderer implements Renderer {
 	/**
 	 * @see edu.berkeley.guir.prefuse.render.Renderer#getBoundsRef(edu.berkeley.guir.prefuse.VisualItem)
 	 */
-	public Rectangle getBoundsRef(VisualItem item) {
+	public Rectangle2D getBoundsRef(VisualItem item) {
 		Shape s = getShape(item);
         if ( s == null ) {
             return new Rectangle(-1,-1,0,0);
         } else {
-            Rectangle r = s.getBounds();
+            Rectangle2D r = s.getBounds2D();
             BasicStroke st = (BasicStroke)getStroke(item);
             if ( st != null ) {
-                double lw = st.getLineWidth();
-                int w = (int)Math.round(st.getLineWidth());
-                int w2 = (int)Math.round(st.getLineWidth()/2);
-                r.x -= w2; r.y -= w2;
-                r.width += w; r.height += w;
+                double w = st.getLineWidth();
+                double w2 = w/2.0;
+                r.setFrame(r.getX()-w2,r.getY()-w2,
+                    r.getWidth()+w,r.getHeight()+w);
             }
             return r;
         }

@@ -17,8 +17,8 @@ import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
 import edu.berkeley.guir.prefuse.action.filter.TreeFilter;
-import edu.berkeley.guir.prefuse.action.interpolate.ColorInterpolator;
-import edu.berkeley.guir.prefuse.action.interpolate.PolarInterpolator;
+import edu.berkeley.guir.prefuse.action.animate.ColorAnimator;
+import edu.berkeley.guir.prefuse.action.animate.PolarLocationAnimator;
 import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.activity.SlowInSlowOutPacer;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
@@ -87,7 +87,7 @@ public class RadialGraphDemo extends JFrame {
 					String s = item.getAttribute(m_labelName);
 					Font font = item.getFont();
 					if ( font == null ) { font = m_font; }
-					FontMetrics fm = m_g.getFontMetrics(font);
+					FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(font);
 					if ( fm.stringWidth(s) > maxWidth ) {
 						s = abbrev.abbreviate(s, 
 							StringAbbreviator.NAME, 
@@ -128,8 +128,8 @@ public class RadialGraphDemo extends JFrame {
             
             animate = new ActionList(registry, 1500, 20);
             animate.setPacingFunction(new SlowInSlowOutPacer());
-            animate.add(new PolarInterpolator());
-            animate.add(new ColorInterpolator());
+            animate.add(new PolarLocationAnimator());
+            animate.add(new ColorAnimator());
             animate.add(new RepaintAction());
             
             // initialize display 
@@ -200,8 +200,7 @@ public class RadialGraphDemo extends JFrame {
 	   	} //
 	   
 		public Paint getColor(VisualItem item) {
-            Boolean hl = (Boolean)item.getVizAttribute("highlight");
-            if ( hl != null && hl.booleanValue() ) {
+            if ( item.isHighlighted() ) {
                 return highlightColor;
             } else if (item instanceof NodeItem) {
                 int d = ((NodeItem)item).getDepth();

@@ -29,33 +29,33 @@ public class DefaultItemComparator implements Comparator {
 		boolean f1 = item1.isFocus();
 		boolean f2 = item2.isFocus();
 		
-		if ( item1 instanceof NodeItem ) {
-			if ( item2 instanceof NodeItem ) {
-				return ( f1 && !f2 ? 1 : (!f1 && f2 ? -1 : 0) );			
-			} else {
-				return 1;
-			}
-		} else if ( item2 instanceof NodeItem ) {
-			return -1;
-		} else if ( item1 instanceof EdgeItem ) {
-			if ( item2 instanceof EdgeItem ) {
-				return ( f1 && !f2 ? 1 : (!f1 && f2 ? -1 : 0) );
-			} else {
-				return 1;
-			}
-		} else if ( item2 instanceof EdgeItem ) {
-			return -1;
-		} else if ( item1 instanceof AggregateItem ) {
-			if ( item2 instanceof AggregateItem ) {
-				return ( f1 && !f2 ? 1 : (!f1 && f2 ? -1 : 0) );
-			} else {
-				return 1;
-			}
-		} else if ( item2 instanceof AggregateItem ) {
-			return -1;
-		} else {
-			return 0;
-		}		
+        if ( f1 && !f2 )
+            return 1;
+        else if ( !f1 && f2 )
+            return -1;
+        
+        boolean n1 = item1 instanceof NodeItem;
+        boolean n2 = item2 instanceof NodeItem;
+        
+        if ( n1 && !n2 )
+            return 1;
+        else if ( !n1 && n2 )
+            return -1;
+        else if ( n1 && n2 ) {
+            boolean a1 = item1 instanceof AggregateItem;
+            boolean a2 = item2 instanceof AggregateItem;
+            return (a1 && !a2 ? -1 : (!a1 && a2 ? 1 : 0));
+        }
+        
+        boolean e1 = item1 instanceof EdgeItem;
+        boolean e2 = item2 instanceof EdgeItem;
+        
+        if ( e1 && !e2 )
+            return 1;
+        else if ( !e1 && e2 )
+            return -1;
+        else
+            return 0;	
 	} //
 
 } // end of class DefaultItemComparator

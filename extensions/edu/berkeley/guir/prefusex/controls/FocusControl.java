@@ -13,7 +13,7 @@ import edu.berkeley.guir.prefuse.event.ControlAdapter;
 
 /**
  * Sets the current focus (according to the ItemRegistry's default focus
- * set) when an item is clicked. This does not necessarily cause the
+ * set) in response to mouse actions. This does not necessarily cause the
  * display to change. For this functionality, use a 
  * {@link edu.berkeley.guir.prefuse.event.FocusListener FocusListener} 
  * to drive display updates when the focus changes.
@@ -35,7 +35,8 @@ public class FocusControl extends ControlAdapter {
     
     /**
      * Creates a new FocusControl that changes the focus when an item is 
-     * clicked the specified number of times.
+     * clicked the specified number of times. A click value of zero indicates
+     * that the focus shoudl be changed in response to mouse-over events.
      * @param clicks the number of clicks needed to switch the focus.
      */
     public FocusControl(int clicks) {
@@ -46,6 +47,10 @@ public class FocusControl extends ControlAdapter {
         if ( item instanceof NodeItem ) {
             Display d = (Display)e.getSource();
             d.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            if ( ccount == 0 ) {
+                ItemRegistry registry = item.getItemRegistry();
+                registry.getDefaultFocusSet().set(item.getEntity());
+            }
         }
     } //
     
@@ -57,8 +62,9 @@ public class FocusControl extends ControlAdapter {
     } //
     
     public void itemClicked(VisualItem item, MouseEvent e) {
-        if ( item instanceof NodeItem && SwingUtilities.isLeftMouseButton(e) 
-                && e.getClickCount() == ccount )
+        if ( item instanceof NodeItem && ccount > 0 && 
+             SwingUtilities.isLeftMouseButton(e)    && 
+             e.getClickCount() == ccount )
         {
             ItemRegistry registry = item.getItemRegistry();
             registry.getDefaultFocusSet().set(item.getEntity());

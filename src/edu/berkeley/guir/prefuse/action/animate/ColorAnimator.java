@@ -1,4 +1,4 @@
-package edu.berkeley.guir.prefuse.action.interpolate;
+package edu.berkeley.guir.prefuse.action.animate;
 
 import java.awt.Color;
 import java.awt.Paint;
@@ -18,7 +18,7 @@ import edu.berkeley.guir.prefuse.util.ColorLib;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class ColorInterpolator extends AbstractAction {
+public class ColorAnimator extends AbstractAction {
 
 	/**
 	 * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
@@ -45,4 +45,4 @@ public class ColorInterpolator extends AbstractAction {
 		}
 	} //
 
-} // end of class ColorInterpolator
+} // end of class ColorAnimator

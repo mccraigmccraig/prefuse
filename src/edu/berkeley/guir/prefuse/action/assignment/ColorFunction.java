@@ -44,11 +44,17 @@ public class ColorFunction extends AbstractAction {
 	} //
 
 	public Paint getColor(VisualItem item) {
-		return Color.BLACK;
+        if ( item.isFocus() ) {
+            return Color.RED;
+        } else if ( item.isHighlighted() ) {
+            return Color.BLUE;
+        } else {
+            return Color.BLACK;   
+        }
 	} //
 
 	public Paint getFillColor(VisualItem item) {
-		return Color.GRAY;
+        return Color.WHITE;
 	} //
 
 } // end of class ColorFunction

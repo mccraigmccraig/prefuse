@@ -162,7 +162,16 @@ public class ImageFactory {
 	 * @return the corresponding URL
 	 */
 	protected URL getImageURL(String location) {
-		return ImageFactory.class.getResource(location);
+        if ( location.startsWith("http:/") ||
+             location.startsWith("ftp:/")  ||
+             location.startsWith("file:/") ) {
+            try {
+                return new URL(location);
+            } catch ( Exception e ) {
+                e.printStackTrace();
+            }
+        }
+        return ImageFactory.class.getResource(location);
 	} //
 	
 	/**

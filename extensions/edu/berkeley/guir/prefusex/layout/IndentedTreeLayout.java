@@ -36,7 +36,7 @@ public class IndentedTreeLayout extends TreeLayout {
 			index    = -1;
 			depth    = d;
 		} //
-		VisualItem nodeItem, aggrItem;
+		NodeItem nodeItem, aggrItem;
 		boolean elided, hidden;
 		int index, depth;
 	} //
@@ -106,7 +106,7 @@ public class IndentedTreeLayout extends TreeLayout {
 			if ( m_elide && treeHeight > availHeight )
 				elide(treeHeight, availHeight);
 			layout(m_entryList,
-                    (int)Math.ceil(anchor.getY())+n.getBounds().height/2,
+                    (int)Math.ceil(anchor.getY()+n.getBounds().getHeight()/2),
                     (int)Math.ceil(anchor.getX()));
 		} else {
 			System.err.println("IndentedTreeLayout: Tree root not visible!");
@@ -126,7 +126,7 @@ public class IndentedTreeLayout extends TreeLayout {
 			entryList.add(entry);
 			
 			// increment height and recurse as necessary
-			height += n.getBounds().height;
+			height += n.getBounds().getHeight();
 			if ( isExpanded(n) ) {
 				Iterator childIter = n.getChildren();
 				while ( childIter.hasNext() ) {
@@ -164,7 +164,7 @@ public class IndentedTreeLayout extends TreeLayout {
 			if ( (run=elisionRun(elided, idx)) > 0 ) {
 				for ( int j = 0; j < run; j++ ) {
 					VisualItem item = ((LayoutEntry)m_entryList.get(idx+j)).nodeItem;
-					treeHeight -= item.getBounds().height;
+					treeHeight -= item.getBounds().getHeight();
 					
 					// if all children are elided, don't bother with aggregate
 //					DefaultTreeNode p = (DefaultTreeNode)item.getEntity();
@@ -275,7 +275,7 @@ public class IndentedTreeLayout extends TreeLayout {
 		VisualItem tmpAggr = null;
 		for ( int i = 0; i < entryList.size(); i++ ) {
 			LayoutEntry entry = (LayoutEntry)entryList.get(i);
-			VisualItem item;
+			NodeItem item;
 			if ( entry.hidden ) {
 				continue;
 			} else if ( entry.elided ) {
@@ -288,8 +288,9 @@ public class IndentedTreeLayout extends TreeLayout {
 			} else {
 				item = entry.nodeItem;
 			}			
-			setLocation(item, entry.depth*m_indent+xAnchor, height);
-			height += item.getBounds().height;
+			setLocation(item,(NodeItem)item.getParent(), 
+                    entry.depth*m_indent+xAnchor, height);
+			height += item.getBounds().getHeight();
 		}
 		return height;
 	} //
@@ -301,19 +302,19 @@ public class IndentedTreeLayout extends TreeLayout {
 	 * @param x the x-coordinate of the node
 	 * @param y the y-coordinate of the node
 	 */
-	protected void setLocation(VisualItem item, double x, double y) {
+	protected void setLocation(VisualItem item, VisualItem referer, 
+            double x, double y)
+    {
+        super.setLocation(item,referer,x,y);
 		List entities = null;
 		if ( item instanceof AggregateItem ) {
 			entities = ((AggregateItem)item).getEntities();
 		}
-		item.updateLocation(x,y);
-		item.setLocation(x,y);
 		if ( entities != null ) {
 			Iterator iter = entities.iterator();
 			while ( iter.hasNext() ) {
 				NodeItem nitem = m_registry.getNodeItem((TreeNode)iter.next());
-				nitem.updateLocation(x,y);
-				nitem.setLocation(x,y);
+				super.setLocation(nitem,item,x,y);
 			}
 		}
 	} //

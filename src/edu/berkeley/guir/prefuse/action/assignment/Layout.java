@@ -6,6 +6,7 @@ import java.awt.geom.Rectangle2D;
 
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
 
 /**
@@ -33,7 +34,8 @@ public abstract class Layout extends AbstractAction {
         Display d;
         if ( registry != null && (d=registry.getDisplay(0)) != null ) {
             Insets i = d.getInsets(m_insets);
-            m_bpts[0] = i.left; m_bpts[1] = i.top;
+            m_bpts[0] = i.left; 
+            m_bpts[1] = i.top;
             m_bpts[2] = d.getWidth()-i.right;
             m_bpts[3] = d.getHeight()-i.bottom;
             d.getInverseTransform().transform(m_bpts,0,m_bpts,0,2);
@@ -67,6 +69,19 @@ public abstract class Layout extends AbstractAction {
     
     public void setLayoutAnchor(Point2D a) {
         m_anchor = a;
+    } //
+    
+    protected void setLocation(VisualItem item, VisualItem referrer, 
+            double x, double y)
+    {
+        if ( Double.isNaN(item.getX()) ) {
+            if ( referrer != null )
+                item.setLocation(referrer.getStartLocation());
+            else
+                item.setLocation(0,0);
+        }
+        item.updateLocation(x,y);
+        item.setLocation(x,y);
     } //
     
     public abstract void run(ItemRegistry registry, double frac);

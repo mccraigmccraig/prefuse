@@ -6,7 +6,6 @@ import java.util.Iterator;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.assignment.TreeLayout;
-import edu.berkeley.guir.prefuse.graph.DefaultTree;
 
 /**
  * <p>Calculates a BalloonTree layout of a tree. This layout places children
@@ -26,21 +25,19 @@ public class BalloonTreeLayout extends TreeLayout {
     private ItemRegistry m_registry;
     private int m_minRadius = 2;
     
-    
     /**
      * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
      */
     public void run(ItemRegistry registry, double frac) {
         m_registry = registry;
         Point2D anchor = getLayoutAnchor(registry);
-        DefaultTree tree = (DefaultTree)registry.getGraph();
-        NodeItem n = registry.getNodeItem(tree.getRoot());
+        NodeItem n = getLayoutRoot(registry);
         layout(n,anchor.getX(),anchor.getY());
     } //
     
     public void layout(NodeItem n, double x, double y) {
         firstWalk(n);
-        secondWalk(n,x,y,1,0);
+        secondWalk(n,null,x,y,1,0);
     } //
     
     private void firstWalk(NodeItem n) {
@@ -114,14 +111,15 @@ public class BalloonTreeLayout extends TreeLayout {
             np.r = m_minRadius + 2*np.d;
     } //
     
-    private void secondWalk2(NodeItem n, double x, double y, double l, double t) {
+    private void secondWalk2(NodeItem n, NodeItem r, 
+            double x, double y, double l, double t)
+    {
         ParamBlock np = getParams(n);
         double cost = Math.cos(t);
         double sint = Math.sin(t);
         double nx = x + l*(np.rx*cost-np.ry*sint);
         double ny = y + l*(np.rx*sint+np.ry*cost);
-        n.updateLocation(nx,ny);
-        n.setLocation(nx,ny);
+        setLocation(n,r,nx,ny);
         double dd = l*np.d;
         double p  = Math.PI;
         double fs = np.f / (n.getChildCount()+1);
@@ -138,13 +136,14 @@ public class BalloonTreeLayout extends TreeLayout {
             double x2 = xx*cost - yy*sint;
             double y2 = xx*sint + yy*cost;
             pr = aa;
-            secondWalk(c, x+x2, y+y2, l*rr/cp.r, p);
+            secondWalk2(c, n, x+x2, y+y2, l*rr/cp.r, p);
         }
     } //
     
-    private void secondWalk(NodeItem n, double x, double y, double l, double t) {
-        n.updateLocation(x,y);
-        n.setLocation(x,y);
+    private void secondWalk(NodeItem n, NodeItem r,
+            double x, double y, double l, double t)
+    {
+        setLocation(n,r,x,y);
         ParamBlock np = getParams(n);
         int numChildren = n.getChildCount();
         double dd = l*np.d;
@@ -161,7 +160,7 @@ public class BalloonTreeLayout extends TreeLayout {
             double xx = (l*rr+dd)*Math.cos(p);
             double yy = (l*rr+dd)*Math.sin(p);
             pr = aa;
-            secondWalk(c, x+xx, y+yy, l*np.c/*l*rr/cp.r*/, p);
+            secondWalk(c, n, x+xx, y+yy, l*np.c/*l*rr/cp.r*/, p);
         }
     } //
     

@@ -24,7 +24,9 @@ import java.awt.geom.Rectangle2D;
  */
 public class FisheyeDistortion extends Distortion {
 
-    private double dx, dy; // distortion factors
+    private double  dx, dy;   // distortion factors
+    private boolean bx, by;   // is distortion enabled for this dimension?
+    private double  sz = 3.0; // size factor
     
     /**
      * Creates a new FisheyeDistortion with default distortion factor.
@@ -51,6 +53,8 @@ public class FisheyeDistortion extends Distortion {
     public FisheyeDistortion(double xfactor, double yfactor) {
         dx = xfactor;
         dy = yfactor;
+        bx = dx > 0;
+        by = dy > 0;
     } //
     
     /**
@@ -92,10 +96,11 @@ public class FisheyeDistortion extends Distortion {
     protected void transformPoint(Point2D o, Point2D p, 
             Point2D anchor, Rectangle2D bounds)
     {
-        double x = fisheye(o.getX(), anchor.getX(), dx,
-                bounds.getMinX(), bounds.getMaxX());
-        double y = fisheye(o.getY(), anchor.getY(), dy,
-                bounds.getMinY(), bounds.getMaxY());
+        double x = o.getX(), y = o.getY();
+        if ( bx )
+            x = fisheye(x,anchor.getX(),dx,bounds.getMinX(),bounds.getMaxX());
+        if ( by )
+            y = fisheye(y,anchor.getY(),dy,bounds.getMinY(),bounds.getMaxY());
         p.setLocation(x,y);
     } //
     
@@ -106,32 +111,42 @@ public class FisheyeDistortion extends Distortion {
      */
     protected double transformSize(Rectangle2D bbox, Point2D pf, 
             Point2D anchor, Rectangle2D bounds)
-    {
-        double ax = anchor.getX(), ay = anchor.getY();
-        double minX = bbox.getMinX(), maxX = bbox.getMaxX();
-        double minY = bbox.getMinY(), maxY = bbox.getMaxY();
-        double x = (Math.abs(minX-ax) > Math.abs(maxX-ax) ? minX : maxX);
-        double y = (Math.abs(minY-ay) > Math.abs(maxY-ay) ? minY : maxY);
-        if ( x < bounds.getMinX() || x > bounds.getMaxX() )
-            x = (x==minX ? maxX : minX);
-        if ( y < bounds.getMinY() || y > bounds.getMaxY() )
-            y = (y==minY ? maxY : minY);
+    {   
+        if ( !bx && !by ) return 1.;
+        double fx=1, fy=1;
+
+        if ( bx ) {
+            double ax = anchor.getX();
+            double minX = bbox.getX(), maxX = bbox.getMaxX();
+            double x = (Math.abs(minX-ax) > Math.abs(maxX-ax) ? minX : maxX);
+            if ( x < bounds.getMinX() || x > bounds.getMaxX() )
+                x = (x==minX ? maxX : minX);
+            fx = fisheye(x,ax,dx,bounds.getMinX(),bounds.getMaxX());
+            fx = Math.abs(pf.getX()-fx)/bbox.getWidth();
+        }
+
+        if ( by ) {
+            double ay = anchor.getY();
+            double minY = bbox.getY(), maxY = bbox.getMaxY();
+            double y = (Math.abs(minY-ay) > Math.abs(maxY-ay) ? minY : maxY);
+            if ( y < bounds.getMinY() || y > bounds.getMaxY() )
+                y = (y==minY ? maxY : minY);
+            fy = fisheye(y,ay,dy,bounds.getMinY(),bounds.getMaxY());
+            fy = Math.abs(pf.getY()-fy)/bbox.getHeight();
+        }
         
-        double fx = fisheye(x,ax,dx,bounds.getMinX(),bounds.getMaxX());
-        double fy = fisheye(y,ay,dy,bounds.getMinY(),bounds.getMaxY());
-        
-        double sf = Math.min(Math.abs(pf.getX()-fx),Math.abs(pf.getY()-fy));
-        sf = 3*sf / Math.max(bbox.getWidth(),bbox.getHeight());
-        return sf;
+        double sf = (!by ? fx : (!bx ? fy : Math.min(fx,fy)));
+        return sz*sf;
     } //
     
     private double fisheye(double x, double a, double d, double min, double max) {
         if ( d != 0 ) {
-            double v, m = (x<a ? a-min : max-a);
+            boolean left = x<a;
+            double v, m = (left ? a-min : max-a);
             if ( m == 0 ) m = max-min;
             v = Math.abs(x - a) / m;
             v = (d+1)/(d+(1/v));
-            return (x<a?-1:1)*m*v + a;
+            return (left?-1:1)*m*v + a;
         } else {
             return x;
         }

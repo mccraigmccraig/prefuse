@@ -3,13 +3,8 @@ package edu.berkeley.guir.prefuse.demos;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 
@@ -24,12 +19,9 @@ import javax.swing.JRadioButton;
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
-import edu.berkeley.guir.prefuse.VisualItem;
-import edu.berkeley.guir.prefuse.action.Action;
 import edu.berkeley.guir.prefuse.action.ActionMap;
 import edu.berkeley.guir.prefuse.action.ActionSwitch;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
-import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
 import edu.berkeley.guir.prefuse.action.assignment.Layout;
 import edu.berkeley.guir.prefuse.action.filter.GraphFilter;
 import edu.berkeley.guir.prefuse.activity.ActionList;
@@ -37,9 +29,7 @@ import edu.berkeley.guir.prefuse.activity.ActivityMap;
 import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.GraphLib;
 import edu.berkeley.guir.prefuse.graph.Node;
-import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
-import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
-import edu.berkeley.guir.prefuse.render.TextItemRenderer;
+import edu.berkeley.guir.prefusex.controls.AnchorUpdateControl;
 import edu.berkeley.guir.prefusex.controls.DragControl;
 import edu.berkeley.guir.prefusex.distortion.BifocalDistortion;
 import edu.berkeley.guir.prefusex.distortion.Distortion;
@@ -74,29 +64,15 @@ public class DistortionDemo extends JFrame {
         display.setBorder(BorderFactory.createEmptyBorder(50,50,50,50));
         display.addControlListener(new DragControl(false));
         
-        registry.setRendererFactory(new DefaultRendererFactory(
-            new TextItemRenderer() {
-                public int getRenderType() {
-                    return RENDER_TYPE_FILL;
-                } //
-            },
-            new DefaultEdgeRenderer(), 
-            null));
-        
         ActionList filter = new ActionList(registry);
         filter.add(new GraphFilter());
-        filter.add(new ColorFunction() {
-            public Paint getFillColor(VisualItem item) {
-                return Color.WHITE;
-            } //
-        });
         filter.add(new GridLayout());
         filter.add(new RepaintAction());
         
         ActionList distort = new ActionList(registry);
-        Action[] acts = new Action[] {
-            actionMap.put("distort1",new BifocalDistortion()),
-            actionMap.put("distort2",new FisheyeDistortion())
+        Distortion[] acts = new Distortion[] {
+            (Distortion)actionMap.put("distort1",new BifocalDistortion()),
+            (Distortion)actionMap.put("distort2",new FisheyeDistortion())
         };
         distort.add(actionMap.put("switch",new ActionSwitch(acts, 0)));
         distort.add(new RepaintAction());
@@ -112,9 +88,9 @@ public class DistortionDemo extends JFrame {
         filter.runNow();
         
         // enable distortion mouse-over
-        DistortionController dc = new DistortionController();
-        display.addMouseListener(dc);
-        display.addMouseMotionListener(dc);
+        AnchorUpdateControl auc = new AnchorUpdateControl(acts,distort);
+        display.addMouseListener(auc);
+        display.addMouseMotionListener(auc);
     } //
     
     class GridLayout extends Layout {
@@ -137,33 +113,10 @@ public class DistortionDemo extends JFrame {
                 NodeItem ni = registry.getNodeItem(nd);
                 double x = bx + w*((i%n)/(double)(n-1));
                 double y = by + h*((i/n)/(double)(m-1));
-                ni.updateLocation(x,y);
-                ni.setLocation(x,y);
+                setLocation(ni,null,x,y);
             }
         } //
     } // end of inner class GridLayout
-    
-    class DistortionController extends MouseAdapter implements MouseMotionListener {
-        Point2D tmp = new Point2D.Float();
-        public void mouseExited(MouseEvent e) {
-            ((Layout)actionMap.get("distort1")).setLayoutAnchor(null);
-            ((Layout)actionMap.get("distort2")).setLayoutAnchor(null);
-            activityMap.scheduleNow("distortion");
-        } //
-        public void mouseMoved(MouseEvent e) {
-            moveEvent(e);
-        } //
-        public void mouseDragged(MouseEvent e) {
-            moveEvent(e);
-        } //
-        public void moveEvent(MouseEvent e) {
-            Display d = (Display)e.getSource();
-            d.getAbsoluteCoordinate(e.getPoint(), tmp);
-            ((Layout)actionMap.get("distort1")).setLayoutAnchor(tmp);
-            ((Layout)actionMap.get("distort2")).setLayoutAnchor(tmp);
-            activityMap.scheduleNow("distortion");
-        } //
-    } // end of inner class DistortionController
     
     class SwitchPanel extends JPanel implements ActionListener {
         public static final String BIFOCAL = "Bifocal";
@@ -214,8 +167,8 @@ public class DistortionDemo extends JFrame {
                 activityMap.scheduleNow("distortion");
             } else if ( SIZES == cmd ) {
                 boolean s = ((JCheckBox)e.getSource()).isSelected();
-                ((Distortion)actionMap.get("distort1")).setTransformSize(s);
-                ((Distortion)actionMap.get("distort2")).setTransformSize(s);
+                ((Distortion)actionMap.get("distort1")).setSizeDistorted(s);
+                ((Distortion)actionMap.get("distort2")).setSizeDistorted(s);
                 activityMap.scheduleNow("distortion");
             }
         } //

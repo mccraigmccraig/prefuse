@@ -21,6 +21,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Iterator;
 
@@ -140,6 +141,7 @@ public class Display extends JComponent {
                 "debug", KeyStroke.getKeyStroke("ctrl D"), WHEN_FOCUSED);
         
         setItemRegistry(registry);
+        setSize(400,400); // set a default size
 	} //
 
     public void setUseCustomTooltips(boolean s) {
@@ -487,7 +489,7 @@ public class Display extends JComponent {
             while (items.hasNext()) {
                 VisualItem vi = (VisualItem) items.next();
                 Renderer renderer = vi.getRenderer();
-                Rectangle b = renderer.getBoundsRef(vi);
+                Rectangle2D b = renderer.getBoundsRef(vi);
                 if ( m_clip.intersects(b) )
                     renderer.render(g2D, vi);
             }
@@ -745,7 +747,8 @@ public class Display extends JComponent {
      */
     public void editText(VisualItem item, String attribute) {
         if ( m_editing ) { stopEditing(); }
-        Rectangle r = item.getBounds();
+        Rectangle2D b = item.getBounds();
+        Rectangle r = m_transform.createTransformedShape(b).getBounds();
         
         // hacky placement code that attempts to keep text in same place
         // configured under Windows XP and Java 1.4.2b
@@ -754,7 +757,7 @@ public class Display extends JComponent {
         } else {
             r.x += 3; r.y += 1; r.width -= 5; r.height -= 2;
         }
-        r = m_transform.createTransformedShape(r).getBounds();
+        
         Font f = getFont();
         int size = (int)Math.round(f.getSize()*m_transform.getScaleX());
         Font nf = new Font(f.getFontName(), f.getStyle(), size);

@@ -26,6 +26,7 @@ public class BifocalDistortion extends Distortion {
     
     private double rx, ry; // magnification ranges
     private double mx, my; // magnification factor
+    private boolean bx, by; // is distortion enabled for this dimension?
     
     /**
      * Create a new BifocalDistortion with default range and magnification.
@@ -77,6 +78,8 @@ public class BifocalDistortion extends Distortion {
         mx = xmag;
         ry = yrange;
         my = ymag;
+        bx = !(rx == 0 || mx == 1.0);
+        by = !(ry == 0 || my == 1.0);
     } //
     
     /**
@@ -85,10 +88,14 @@ public class BifocalDistortion extends Distortion {
     protected void transformPoint(Point2D o, Point2D p, 
             Point2D anchor, Rectangle2D bounds)
     {
-        double x = bifocal(o.getX(), anchor.getX(), rx, mx,
-                           bounds.getMinX(), bounds.getMaxX());
-        double y = bifocal(o.getY(), anchor.getY(), ry, my,
-                           bounds.getMinY(), bounds.getMaxY());
+        double x = o.getX();
+        if ( bx )
+            x = bifocal(x, anchor.getX(), rx, mx,
+                    bounds.getMinX(), bounds.getMaxX());
+        double y = o.getY();
+        if ( by )
+            y = bifocal(o.getY(), anchor.getY(), ry, my,
+                    bounds.getMinY(), bounds.getMaxY());
         p.setLocation(x,y);
     } //
     
@@ -100,33 +107,31 @@ public class BifocalDistortion extends Distortion {
             Point2D anchor, Rectangle2D bounds)
     {
         boolean xmag = false, ymag = false;
-        double x  = bbox.getCenterX(), y = bbox.getCenterY();
-        double ax = anchor.getX(), ay = anchor.getY();
-        double minX = bounds.getMinX(), maxX = bounds.getMaxX();
-        double minY = bounds.getMinY(), maxY = bounds.getMaxY();
         double m;
         
-        if ( !(rx == 0 || mx == 1.0) ) {
+        if ( bx ) {
+            double x = bbox.getCenterX(), ax = anchor.getX();
+            double minX = bounds.getMinX(), maxX = bounds.getMaxX();
             m = (x<ax ? ax-minX : maxX-ax);
             if ( m == 0 ) m = maxX-minX;
             if ( Math.abs(x-ax) <= rx*m )
                 xmag = true;
-        } else {
-            xmag = true;
         }
         
-        if ( !(ry == 0 || my == 1.0) ) {
+        if ( by ) {
+            double y = bbox.getCenterY(), ay = anchor.getY();
+            double minY = bounds.getMinY(), maxY = bounds.getMaxY();
             m = (y<ay ? ay-minY : maxY-ay);
             if ( m == 0 ) m = maxY-minY;
             if ( Math.abs(y-ay) <= ry*m )
                 ymag = true;
-        } else {
-            ymag = true;
         }
         
-        if ( xmag && ymag ) {
-            if ( rx == 0 || mx == 1.0 ) return my;
-            if ( ry == 0 || my == 1.0 ) return mx;
+        if ( xmag && !by ) {
+            return mx;
+        } else if ( ymag && !bx ) {
+            return my;
+        } else if ( xmag && ymag ) {
             return Math.min(mx,my);
         } else {
             return Math.min((1-rx*mx)/(1-rx), (1-ry*my)/(1-ry));
@@ -202,7 +207,7 @@ public class BifocalDistortion extends Distortion {
         return ry;
     } //
 
-     /**
+    /**
      * Sets the range of the focal area along the y-axis.
      * @param ry The focal range for the y-axis, a value between 0 and 1.
      */

@@ -3,12 +3,12 @@ package edu.berkeley.guir.prefuse.render;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
-import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import edu.berkeley.guir.prefuse.EdgeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
@@ -153,7 +153,7 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 					throw new IllegalStateException("Unknown edge type.");
 			}
 			VisualItem item2 = (VisualItem)e.getSecondNode();
-			Rectangle r = item2.getBounds();
+			Rectangle2D r = item2.getBounds();
 			int i = GeometryLib.intersectLineRectangle(start, end, r, m_isctPoints);
 			if ( i > 0 )
 				end = m_isctPoints[0];
@@ -231,8 +231,8 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	 * Helper method, which calculates the top-left co-ordinate of a rectangle
 	 * given the rectangle's alignment.
 	 */
-	protected static void getAlignedPoint(Point2D p, Rectangle r, int xAlign, int yAlign) {
-		double x = r.x, y = r.y, w = r.width, h = r.height;
+	protected static void getAlignedPoint(Point2D p, Rectangle2D r, int xAlign, int yAlign) {
+		double x = r.getX(), y = r.getY(), w = r.getWidth(), h = r.getHeight();
 		if ( xAlign == ALIGNMENT_CENTER ) {
 			x = x+(w/2);
 		} else if ( xAlign == ALIGNMENT_RIGHT ) {

@@ -136,7 +136,7 @@ public class ZoomingPanControl extends ControlAdapter {
             this.display = display;
             this.scale = display.getTransform().getScaleX();
             double z = (scale<1.0 ? 1/scale : scale);
-            setDuration((long)((400)*z)-400);
+            setDuration((long)(500+500*Math.log(1+z)));
         } //
         protected void run(long elapsedTime) {
             double f = getPace(elapsedTime);

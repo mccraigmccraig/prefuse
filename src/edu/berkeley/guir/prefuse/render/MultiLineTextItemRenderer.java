@@ -78,14 +78,13 @@ public class MultiLineTextItemRenderer extends TextItemRenderer {
 	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.VisualItem)
 	 */
 	protected Shape getRawShape(VisualItem item) {
-		if ( m_g == null ) { return null; }
 		
 		int w = 2*m_horizBorder;
 		int h = 2*m_vertBorder;
 		
 		for ( int i = 0; i < getNumEntries(); i++ ) {
 			Font font = getFont(item, i);
-			FontMetrics fm = m_g.getFontMetrics(font);
+			FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(font);
 			String  text = getText(item, i);
 			int maxlines = getMaxLines(i); 	
 			if ( text != null ) {
@@ -99,7 +98,6 @@ public class MultiLineTextItemRenderer extends TextItemRenderer {
 	} //
 	
 	public Rectangle getEntryBounds(VisualItem item, int entry) {
-		if ( m_g == null ) { return null; }
 		
 		int dy = m_vertBorder, ew = 0, eh = 0;
 		int w = 2*m_horizBorder;
@@ -107,7 +105,7 @@ public class MultiLineTextItemRenderer extends TextItemRenderer {
 
 		for ( int i = 0; i <= entry; i++ ) {
 			Font font = getFont(item, i);
-			FontMetrics fm = m_g.getFontMetrics(font);
+			FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(font);
 			String  text = getText(item, i);
 			int maxlines = getMaxLines(i);
 			if ( text != null ) {
@@ -156,7 +154,7 @@ public class MultiLineTextItemRenderer extends TextItemRenderer {
 			int h = r.y + m_vertBorder;
 			for ( int i = 0; i < getNumEntries(); i++ ) {
 				Font font = getFont(item, i);
-				FontMetrics fm = m_g.getFontMetrics(font);
+				FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(font);
 				String  text = getText(item, i);
 				int maxlines = getMaxLines(i);
 				if ( text != null ) {

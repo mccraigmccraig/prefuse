@@ -1,17 +1,14 @@
 package edu.berkeley.guir.prefuse.render;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
+
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.util.FontLib;
 
@@ -33,8 +30,7 @@ public class TextItemRenderer extends ShapeRenderer {
 	public static final int ALIGNMENT_BOTTOM = 1;
 	public static final int ALIGNMENT_TOP    = 0;
 
-	protected Graphics2D m_g;
-	protected BufferedImage m_buff;
+	//protected Graphics2D m_g;
 	protected String m_labelName = "label";
 	protected int m_xAlign = ALIGNMENT_CENTER;
 	protected int m_yAlign = ALIGNMENT_CENTER;
@@ -47,9 +43,6 @@ public class TextItemRenderer extends ShapeRenderer {
 	protected Point2D     m_tmpPoint = new Point2D.Float();
 
 	public TextItemRenderer() {
-		// TODO: this is hacky. Is there a better way to achieve this?
-		m_buff = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
-		m_g = (Graphics2D)m_buff.getGraphics();
 	} //
 
     /**
@@ -115,8 +108,6 @@ public class TextItemRenderer extends ShapeRenderer {
 	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.VisualItem)
 	 */
 	protected Shape getRawShape(VisualItem item) {
-		if ( m_g == null ) { return null; }
-		
 		String s = getText(item);
 		if ( s == null ) { s = ""; }
         m_font = item.getFont();
@@ -127,9 +118,9 @@ public class TextItemRenderer extends ShapeRenderer {
             m_font = FontLib.getFont(m_font.getName(), m_font.getStyle(),
                     (int)Math.round(size*m_font.getSize()));
         
-		FontMetrics fm = m_g.getFontMetrics(m_font);
-		int h = fm.getHeight() + 2*m_vertBorder;
-		int w = fm.stringWidth(s) + 2*m_horizBorder;
+		FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(m_font);
+		double h = fm.getHeight() + size*2*m_vertBorder;
+		double w = fm.stringWidth(s) + size*2*m_horizBorder;
 		getAlignedPoint(m_tmpPoint, item, w, h, m_xAlign, m_yAlign);
 		m_textBox.setFrame(m_tmpPoint.getX(),m_tmpPoint.getY(),w,h);
 		return m_textBox;
@@ -139,8 +130,10 @@ public class TextItemRenderer extends ShapeRenderer {
 	 * Helper method, which calculates the top-left co-ordinate of a node
 	 * given the node's alignment.
 	 */
-	protected static void getAlignedPoint(Point2D p, VisualItem item, int w, int h, int xAlign, int yAlign) {
-		double x = Math.round(item.getX()), y = Math.round(item.getY());
+	protected static void getAlignedPoint(Point2D p, VisualItem item, 
+            double w, double h, int xAlign, int yAlign)
+    {
+		double x = item.getX(), y = item.getY();
 		if ( xAlign == ALIGNMENT_CENTER ) {
 			x = x-(w/2);
 		} else if ( xAlign == ALIGNMENT_RIGHT ) {
@@ -158,45 +151,24 @@ public class TextItemRenderer extends ShapeRenderer {
 	 * @see edu.berkeley.guir.prefuse.render.Renderer#render(java.awt.Graphics2D, edu.berkeley.guir.prefuse.VisualItem)
 	 */
 	public void render(Graphics2D g, VisualItem item) {
-        // set up colors
-        Paint itemColor = item.getColor();
-        if ( itemColor == null ) itemColor = Color.BLACK;
-        Paint fillColor = item.getFillColor();
-        if ( fillColor == null ) fillColor = Color.LIGHT_GRAY;
+        Shape shape = getShape(item);
+        if ( shape != null ) {
+            super.drawShape(g, item, shape);
         
-        // render the shape
-		Shape shape = getShape(item);
-		if (shape != null) {
-			switch (getRenderType()) {
-				case RENDER_TYPE_DRAW :
-					g.setPaint(itemColor);
-					g.draw(shape);
-					break;
-				case RENDER_TYPE_FILL :
-					g.setPaint(fillColor);
-					g.fill(shape);
-					break;
-				case RENDER_TYPE_DRAW_AND_FILL :
-					g.setPaint(fillColor);
-					g.fill(shape);
-					g.setPaint(itemColor);
-					g.draw(shape);
-					break;
-			}
-
             // now render the text
 			String s = getText(item);
 			if ( s != null ) {			
-				Rectangle r = shape.getBounds();
-				g.setPaint(itemColor);
+				Rectangle2D r = shape.getBounds2D();
+				g.setPaint(item.getColor());
 				g.setFont(m_font);
 				FontMetrics fm = g.getFontMetrics();
-				g.drawString(s, r.x+m_horizBorder,
-                                r.y+m_vertBorder+fm.getAscent());
+                double size = item.getSize();
+                double x = r.getX() + size*m_horizBorder;
+                double y = r.getY() + size*m_vertBorder;
+				g.drawString(s, (float)x, (float)y+fm.getAscent());
 				if ( isHyperlink(item) ) {
-					int x = r.x + m_horizBorder;
-					int y = r.y + m_vertBorder + fm.getHeight() - 1;
-					g.drawLine(x, y, x + fm.stringWidth(s), y);
+                    int lx = (int)Math.round(x), ly = (int)Math.round(y);
+					g.drawLine(lx,ly,lx+fm.stringWidth(s),ly+fm.getHeight()-1);
 				}
 			}
 		}
@@ -238,4 +210,40 @@ public class TextItemRenderer extends ShapeRenderer {
 		m_yAlign = align;
 	} //
 	
+    /**
+     * Returns the amount of padding in pixels between text 
+     * and the border of this item along the horizontal dimension.
+     * @return the horizontal padding
+     */
+    public int getHorizontalPadding() {
+        return m_horizBorder;
+    } //
+    
+    /**
+     * Sets the amount of padding in pixels between text 
+     * and the border of this item along the horizontal dimension.
+     * @param xpad the horizontal padding to set
+     */
+    public void setHorizontalPadding(int xpad) {
+        m_horizBorder = xpad;
+    } //
+    
+    /**
+     * Returns the amount of padding in pixels between text 
+     * and the border of this item along the vertical dimension.
+     * @return the vertical padding
+     */
+    public int getVerticalPadding() {
+        return m_vertBorder;
+    } //
+    
+    /**
+     * Sets the amount of padding in pixels between text 
+     * and the border of this item along the vertical dimension.
+     * @param ypad the vertical padding
+     */
+    public void setVerticalPadding(int ypad) {
+        m_vertBorder = ypad;
+    } //
+    
 } // end of class TextItemRenderer

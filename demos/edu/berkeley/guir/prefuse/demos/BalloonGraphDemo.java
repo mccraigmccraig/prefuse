@@ -15,18 +15,17 @@ import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
+import edu.berkeley.guir.prefuse.action.animate.ColorAnimator;
+import edu.berkeley.guir.prefuse.action.animate.LocationAnimator;
 import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
-import edu.berkeley.guir.prefuse.action.filter.FisheyeTreeFilter;
-import edu.berkeley.guir.prefuse.action.interpolate.ColorInterpolator;
-import edu.berkeley.guir.prefuse.action.interpolate.LinearInterpolator;
+import edu.berkeley.guir.prefuse.action.filter.WindowedTreeFilter;
 import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.activity.SlowInSlowOutPacer;
 import edu.berkeley.guir.prefuse.collections.DOIItemComparator;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
-import edu.berkeley.guir.prefuse.graph.GraphLib;
+import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.graph.Tree;
-import edu.berkeley.guir.prefuse.graph.TreeNode;
 import edu.berkeley.guir.prefuse.graph.io.HDirTreeReader;
 import edu.berkeley.guir.prefuse.graph.io.TreeReader;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
@@ -58,7 +57,7 @@ public class BalloonGraphDemo {
 	public static ItemRegistry registry;
 	public static Tree tree;
 	public static Display display;
-    public static FisheyeTreeFilter feye;
+    public static WindowedTreeFilter feye;
     public static ActionList filter, update, animate;
     
     private static Font frameCountFont = new Font("SansSerif", Font.PLAIN, 14);
@@ -85,7 +84,7 @@ public class BalloonGraphDemo {
 					String s = item.getAttribute(m_labelName);
 					Font font = item.getFont();
 					if ( font == null ) { font = m_font; }
-					FontMetrics fm = m_g.getFontMetrics(font);
+					FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(font);
 					if ( fm.stringWidth(s) > maxWidth ) {
 						s = abbrev.abbreviate(s, 
 							StringAbbreviator.NAME, 
@@ -114,7 +113,8 @@ public class BalloonGraphDemo {
 			
             // initialize action lists
             filter  = new ActionList(registry);
-            filter.add((feye=new FisheyeTreeFilter(-4)));
+            //filter.add((feye=new FisheyeTreeFilter(-4)));
+            filter.add((feye=new WindowedTreeFilter(-4)));
             filter.add(new BalloonTreeLayout());
             filter.add(new DemoColorFunction(4));
             
@@ -124,8 +124,8 @@ public class BalloonGraphDemo {
             
             animate = new ActionList(registry, 1500, 20);
             animate.setPacingFunction(new SlowInSlowOutPacer());
-            animate.add(new LinearInterpolator());
-            animate.add(new ColorInterpolator());
+            animate.add(new LocationAnimator());
+            animate.add(new ColorAnimator());
             animate.add(new RepaintAction());
             
             // initialize display
@@ -143,11 +143,9 @@ public class BalloonGraphDemo {
                 public void focusChanged(FocusEvent e) {
                     if ( update.isScheduled() )
                         update.cancel();
-                    TreeNode node = (TreeNode)e.getFirstAdded();
+                    Node node = (Node)e.getFirstAdded();
                     if ( node != null ) {
-                        NodeItem item = registry.getNodeItem(node);
-                        Tree t = GraphLib.breadthFirstTree(item);
-                        registry.setFilteredGraph(t);
+                        feye.setTreeRoot(node);
                         filter.runNow();
                         animate.runNow();                    
                     }
@@ -220,8 +218,7 @@ public class BalloonGraphDemo {
         } //
         
         public Paint getColor(VisualItem item) {
-            Boolean hl = (Boolean)item.getVizAttribute("highlight");
-            if ( hl != null && hl.booleanValue() ) {
+            if ( item.isHighlighted() ) {
                 return Color.BLUE;
             } else if (item instanceof NodeItem) {
                 int d = ((NodeItem)item).getDepth();

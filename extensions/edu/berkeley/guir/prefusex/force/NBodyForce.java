@@ -33,29 +33,31 @@ public class NBodyForce extends AbstractForce {
 	 *   2 | 3    2 -> bottom left, 3 -> bottom right
 	 */
 
-    private static String[] pnames 
-        = new String[] { "GravitationalConstant", "BarnesHutTheta" };
+    private static String[] pnames = new String[] { "GravitationalConstant", 
+            "MinimumDistance", "BarnesHutTheta"  };
     
     public static final float DEFAULT_GRAV_CONSTANT = -0.4f;
+    public static final float DEFAULT_MIN_DISTANCE = -1f;
     public static final float DEFAULT_THETA = 0.9f;
     public static final int GRAVITATIONAL_CONST = 0;
-    public static final int BARNES_HUT_THETA = 1;
+    public static final int MIN_DISTANCE = 1;
+    public static final int BARNES_HUT_THETA = 2;
     
     private float xMin, xMax, yMin, yMax;
 	private QuadTreeNodeFactory factory = new QuadTreeNodeFactory();
 	private QuadTreeNode root;
-	
-    public NBodyForce(float gravConstant, float theta) {
-        params = new float[] { gravConstant, theta };
-        root = factory.getQuadTreeNode();
-    }
+
+    /**
+     * Construct a new empty NBodyForce simulation.
+     */
+    public NBodyForce() {
+        this(DEFAULT_GRAV_CONSTANT, DEFAULT_MIN_DISTANCE, DEFAULT_THETA);
+    } //
     
-	/**
-	 * Construct a new empty NBodyForce simulation.
-	 */
-	public NBodyForce() {
-        this(DEFAULT_GRAV_CONSTANT, DEFAULT_THETA);
-	} //
+    public NBodyForce(float gravConstant, float minDistance, float theta) {
+        params = new float[] { gravConstant, minDistance, theta };
+        root = factory.getQuadTreeNode();
+    } //
 
     public boolean isItemForce() {
         return true;
@@ -235,13 +237,15 @@ public class NBodyForce extends AbstractForce {
             r  = (float)Math.sqrt(dx*dx+dy*dy);
             same = true;
         }
+        boolean minDist = params[MIN_DISTANCE]>0f && r>params[MIN_DISTANCE];
 		
 		// the Barnes-Hut approximation criteria is if the ratio of the
 		// size of the quadtree box to the distance between the point and
 		// the box's center of mass is beneath some threshold theta.
 		if ( (!n.hasChildren && n.value != item) || 
-             (!same && (x2-x1)/r < params[1]) ) 
+             (!same && (x2-x1)/r < params[BARNES_HUT_THETA]) ) 
         {
+            if ( minDist ) return;
 			// either only 1 particle or we meet criteria
 			// for Barnes-Hut approximation, so calc force
 			float v = params[GRAVITATIONAL_CONST]*item.mass*n.mass 
@@ -259,6 +263,7 @@ public class NBodyForce extends AbstractForce {
 						(i==1||i==3?x2:splitx), (i>1?y2:splity));
 				}
 			}
+            if ( minDist ) return;
             if ( n.value != null && n.value != item ) {
                 float v = params[GRAVITATIONAL_CONST]*item.mass*n.value.mass
                             / (r*r*r);

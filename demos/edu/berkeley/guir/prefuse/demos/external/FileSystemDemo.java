@@ -1,4 +1,4 @@
-package edu.berkeley.guir.prefuse.graph.external;
+package edu.berkeley.guir.prefuse.demos.external;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -29,6 +29,8 @@ import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 import edu.berkeley.guir.prefuse.graph.event.GraphLoaderListener;
+import edu.berkeley.guir.prefuse.graph.external.FileSystemLoader;
+import edu.berkeley.guir.prefuse.graph.external.GraphLoader;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.TextItemRenderer;
@@ -85,7 +87,7 @@ public class FileSystemDemo extends JFrame {
         });
         
         ForceSimulator fsim = new ForceSimulator();
-        fsim.addForce(new NBodyForce(-0.4f, 0.9f));
+        fsim.addForce(new NBodyForce(-0.4f, -1f, 0.9f));
         fsim.addForce(new SpringForce(5E-5f, 150f));
         fsim.addForce(new DragForce(-0.005f));
         
@@ -112,7 +114,7 @@ public class FileSystemDemo extends JFrame {
                 }
             } //
         });
-        forces.add(new ForceDirectedLayout(fsim, false) {
+        forces.add(new ForceDirectedLayout(fsim, false, false) {
             protected float getSpringLength(NodeItem n1, NodeItem n2) {
                 if (n1.getEdgeCount() == 1 || n2.getEdgeCount() == 1)
                     return 75.f;
@@ -160,8 +162,7 @@ public class FileSystemDemo extends JFrame {
         private Color lightGray = new Color(220,220,255);
         public Paint getColor(VisualItem item) {
             if ( item instanceof EdgeItem ) {
-                Boolean h = (Boolean)item.getVizAttribute("highlight");
-                if ( h != null && h.booleanValue() )
+                if ( item.isHighlighted() )
                     return pastelOrange;
                 else
                     return Color.LIGHT_GRAY;
@@ -170,8 +171,7 @@ public class FileSystemDemo extends JFrame {
             }
         } //
         public Paint getFillColor(VisualItem item) {
-            Boolean h = (Boolean)item.getVizAttribute("highlight");
-            if ( h != null && h.booleanValue() )
+            if ( item.isHighlighted() )
                 return pastelOrange;
             else if ( item instanceof NodeItem ) {
                 if ( item.isFixed() )

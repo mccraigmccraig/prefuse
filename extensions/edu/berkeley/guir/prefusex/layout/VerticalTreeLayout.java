@@ -56,7 +56,7 @@ public class VerticalTreeLayout extends TreeLayout {
         NodeItem n = getLayoutRoot(registry);
 		if ( n != null && n.isVisible() ) {
 			countVisibleDescendants(n);
-			setLocation(n, anchor.getX(), anchor.getY());
+			setLocation(n, null, anchor.getX(), anchor.getY());
 			layout(n, (int)anchor.getY()+m_heightInc, b.getX(), b.getX()+b.getWidth());
 			m_counts.clear();			
 		} else {
@@ -123,21 +123,10 @@ public class VerticalTreeLayout extends TreeLayout {
 		while ( childIter.hasNext() ) {
 			NodeItem c = (NodeItem)childIter.next();
 			double frac = ((double)getVisibleDescendants(c))/numDescendants;
-			setLocation(c, x1 + f*dx + frac*dx2, h);
+			setLocation(c, n, x1 + f*dx + frac*dx2, h);
 			layout(c, h+m_heightInc, x1 + f*dx, x1 + (f+frac)*dx);
 			f += frac;
 		}
-	} //
-
-	/**
-	 * Set the (x,y) co-ordinates of the given node
-	 * @param n
-	 * @param x
-	 * @param y
-	 */
-	protected void setLocation(NodeItem n, double x, double y) {
-		n.updateLocation(x,y);
-		n.setLocation(x,y);
 	} //
 
 } // end of class RadialTreeLayout

@@ -97,7 +97,7 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
             m_startTheta = calcStartingTheta(n, p);
             m_endTheta = m_startTheta + TWO_PI;
         }                           
-        setLocation(n, m_origin.getX(), m_origin.getY());
+        setLocation(n, null, m_origin.getX(), m_origin.getY());
         np.angle = m_endTheta-m_startTheta;
         layout(n, m_radiusInc, m_startTheta, m_endTheta);
         m_prevParent = null;
@@ -181,17 +181,6 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
     } //
 
     /**
-     * Set the (x,y) co-ordinates of the given node
-     * @param n
-     * @param x
-     * @param y
-     */
-    protected void setLocation(NodeItem n, double x, double y) {
-        n.updateLocation(x,y);
-        n.setLocation(x,y);
-    } //
-
-    /**
      * Set the position of the given node, given in polar co-ordinates.
      * @param n
      * @param r
@@ -200,8 +189,7 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
     protected void setPolarLocation(NodeItem n, double r, double theta) {
         double x = m_origin.getX() + r*Math.cos(theta);
         double y = m_origin.getY() + r*Math.sin(theta);
-        n.updateLocation(x,y);
-        n.setLocation(x,y);
+        super.setLocation(n,(NodeItem)n.getParent(),x,y);
     } //
     
     public void focusChanged(FocusEvent e) {

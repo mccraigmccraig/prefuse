@@ -1,5 +1,6 @@
 package edu.berkeley.guir.prefusex.layout;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 
@@ -23,22 +24,40 @@ import edu.berkeley.guir.prefusex.force.SpringForce;
  */
 public class ForceDirectedLayout extends Layout {
 
+    protected ItemRegistry registry; // temp member variable
+    
     private ForceSimulator m_fsim;
-    private ItemRegistry registry;
     private long m_lasttime = -1L;
-    private int m_preruns = 0;
+    private boolean m_runonce;
+    private int m_iterations = 100;
     private boolean m_enforceBounds;
     
     public ForceDirectedLayout(boolean enforceBounds) {
+        this(enforceBounds, false);
+    } //
+    
+    public ForceDirectedLayout(boolean enforceBounds, boolean runonce) {
         m_enforceBounds = enforceBounds;
+        m_runonce = runonce;
         m_fsim = new ForceSimulator();
         m_fsim.addForce(new NBodyForce());
         m_fsim.addForce(new SpringForce());
         m_fsim.addForce(new DragForce());
     } //
     
-    public ForceDirectedLayout(ForceSimulator fsim, boolean enforceBounds) {
+    public ForceDirectedLayout(ForceSimulator fsim, 
+            boolean enforceBounds, boolean runonce)
+    {
         m_enforceBounds = enforceBounds;
+        m_runonce = runonce;
+        m_fsim = fsim;
+    } //
+    
+    public ForceSimulator getForceSimulator() {
+        return m_fsim;
+    } //
+    
+    public void setForceSimulator(ForceSimulator fsim) {
         m_fsim = fsim;
     } //
     
@@ -47,33 +66,35 @@ public class ForceDirectedLayout extends Layout {
      */
     public void run(ItemRegistry registry, double frac) {
         this.registry = registry;
-        // first time running through ?
-//        if ( m_lasttime == -1 ) {
-//            m_lasttime = System.currentTimeMillis();
-//            Point2D anchor = getAnchor();
-//            Iterator iter = registry.getNodeItems();
-//            while ( iter.hasNext() ) {
-//                NodeItem  nitem = (NodeItem)iter.next();
-//                nitem.setLocation(anchor);
-//            }
-//            for ( int i = 0; i < m_preruns; i++ ) {
-//                initSimulator();
-//                m_fsim.runSimulator(50);
-//                updateNodePositions();
-//            }
-//        }
-        
-        // get timestep
-        if ( m_lasttime == -1 )
-            m_lasttime = System.currentTimeMillis()-20;
-        long time = System.currentTimeMillis();
-        long timestep = time - m_lasttime;
-        m_lasttime = time;
-        
-        // run force simulator
-        initSimulator();
-        m_fsim.runSimulator(timestep);
-        updateNodePositions();
+        // perform different actions if this is a run-once or
+        // run-continuously layout
+        if ( m_runonce ) {
+            Point2D anchor = getLayoutAnchor(registry);
+            Iterator iter = registry.getNodeItems();
+            while ( iter.hasNext() ) {
+                NodeItem  nitem = (NodeItem)iter.next();
+                nitem.setLocation(anchor);
+            }
+            m_fsim.clear();
+            initSimulator(registry, m_fsim);
+            for ( int i = 0; i < m_iterations; i++ )
+                m_fsim.runSimulator(50);
+            updateNodePositions();
+        } else {
+            // get timestep
+            if ( m_lasttime == -1 )
+                m_lasttime = System.currentTimeMillis()-20;
+            long time = System.currentTimeMillis();
+            long timestep = time - m_lasttime;
+            m_lasttime = time;
+            
+            // run force simulator
+            m_fsim.clear();
+            initSimulator(registry, m_fsim);
+            m_fsim.runSimulator(timestep);
+            updateNodePositions();
+        }
+        // clear temp member variable
         this.registry = null;
     } //
 
@@ -98,8 +119,7 @@ public class ForceDirectedLayout extends Layout {
                 if ( y > y2 ) y = y2;
                 if ( y < y1 ) y = y1;
             }
-            nitem.updateLocation(x,y);
-            nitem.setLocation(x,y);
+            setLocation(nitem,null,x,y);
         }
     } //
     
@@ -118,8 +138,10 @@ public class ForceDirectedLayout extends Layout {
         m_lasttime = -1L;
     } //
     
-    private void initSimulator() {
-       m_fsim.clear();
+    /**
+     * Loads the simulator with all relevant force items and springs.
+     */
+    protected void initSimulator(ItemRegistry registry, ForceSimulator fsim) {
        Iterator iter = registry.getNodeItems();
        while ( iter.hasNext() ) {
            NodeItem nitem = (NodeItem)iter.next();
@@ -128,9 +150,11 @@ public class ForceDirectedLayout extends Layout {
                fitem = new ForceItem();
                nitem.setVizAttribute("forceItem", fitem);
            }
-           fitem.location[0] = (float)nitem.getEndLocation().getX();
-           fitem.location[1] = (float)nitem.getEndLocation().getY();
-           m_fsim.addItem(fitem);
+           double x = nitem.getEndLocation().getX();
+           double y = nitem.getEndLocation().getY();
+           fitem.location[0] = (Double.isNaN(x) ? 0f : (float)x);
+           fitem.location[1] = (Double.isNaN(y) ? 0f : (float)y);
+           fsim.addItem(fitem);
        }
        iter = registry.getEdgeItems();
        while ( iter.hasNext() ) {
@@ -140,7 +164,7 @@ public class ForceDirectedLayout extends Layout {
            NodeItem  n2 = (NodeItem)e.getSecondNode();
            ForceItem f2 = (ForceItem)n2.getVizAttribute("forceItem");
            float slen = getSpringLength(n1, n2);
-           m_fsim.addSpring(f1, f2, (slen>=0 ? slen : -1.f));
+           fsim.addSpring(f1, f2, (slen>=0 ? slen : -1.f));
        }      
     } //
     

@@ -439,7 +439,7 @@ public class GraphEditor extends JFrame {
 				VisualItem item = addNode(xCur, yCur);
 				item.setAttribute(nameField,String.valueOf(c));
 				editing = true;
-				Rectangle r = item.getBounds();
+				Rectangle r = item.getBounds().getBounds();
 				r.width = 52; r.height += 2;
 				r.x -= 1+r.width/2; r.y -= 1; 
                 activeItem = item;

@@ -12,19 +12,11 @@ import edu.berkeley.guir.prefuse.event.ControlAdapter;
 
 /**
  * <p>
- * A ControlListener that sets the visualization attribute "highlight" to
- * true for nodes neighboring the node currently under the mouse pointer. The
- * "highlight" flag can then be used by a color function to change node
- * appearance as desired.
- * </p>
- * 
- * <p>
- * To test whether not an item has been highlighted, use the method call
- * {@link edu.berkeley.guir.prefuse.VisualItem#getVizAttribute(String)
- * item.getVizAttribute("highlight")}. The result will either be 
- * <code>null</code> or an object of type <code>Boolean</code> indicating
- * whether or not the item is highlighted (a value of <code>null</code>
- * indicates no highlighting).
+ * A ControlListener that sets the highlighted status (using the
+ * {@link edu.berkeley.guir.prefuse.VisualItem#setHighlighted(boolean)
+ * VisualItem.setHighlighted} method) for nodes neighboring the node 
+ * currently under the mouse pointer. The highlight flag can then be used
+ * by a color function to change node appearance as desired.
  * </p>
  *
  * @version 1.0
@@ -38,6 +30,7 @@ public class NeighborHighlightControl extends ControlAdapter {
      * Creates a new highlight control.
      */
     public NeighborHighlightControl() {
+        this(null);
     } //
     
     /**
@@ -66,14 +59,13 @@ public class NeighborHighlightControl extends ControlAdapter {
     
     public void setNeighborHighlight(NodeItem n, boolean state) {
         ItemRegistry registry = n.getItemRegistry();
-        Boolean val = state ? Boolean.TRUE : null;
         synchronized ( registry ) {
             Iterator iter = n.getEdges();
             while ( iter.hasNext() ) {
                 EdgeItem eitem = (EdgeItem)iter.next();
                 NodeItem nitem = (NodeItem)eitem.getAdjacentNode(n);
-                eitem.setVizAttribute("highlight", val);
-                nitem.setVizAttribute("highlight", val);
+                eitem.setHighlighted(state);
+                nitem.setHighlighted(state);
             }
         }
         if ( update != null )

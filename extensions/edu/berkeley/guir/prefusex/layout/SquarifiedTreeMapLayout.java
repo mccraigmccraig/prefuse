@@ -187,11 +187,9 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
         while ( rowIter.hasNext() ) {
             NodeItem n = (NodeItem)rowIter.next();
             if ( horiz ) {
-                n.updateLocation(x+d,y);
-                n.setLocation(x+d,y);
+                setLocation(n,(NodeItem)n.getParent(),x+d,y);
             } else {
-                n.updateLocation(x,y+d);
-                n.setLocation(x,y+d);
+                setLocation(n,(NodeItem)n.getParent(),x,y+d);
             }
             double nw = n.getSize()/h;
             if ( horiz ) {

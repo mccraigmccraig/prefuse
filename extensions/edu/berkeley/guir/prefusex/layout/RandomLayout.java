@@ -25,8 +25,7 @@ public class RandomLayout extends Layout {
             VisualItem item = (VisualItem)nodeIter.next();
             x = b.getX() + Math.random()*w;
             y = b.getY() + Math.random()*h;
-            item.updateLocation(x,y);
-            item.setLocation(x,y);
+            setLocation(item,null,x,y);
         }
     } //
 

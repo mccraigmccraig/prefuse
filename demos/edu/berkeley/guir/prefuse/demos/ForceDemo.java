@@ -129,7 +129,7 @@ public class ForceDemo extends Display {
     private ActionList initActionList() {
         ActionList actionList = new ActionList(m_registry,-1,20);
         actionList.add(new GraphFilter());
-        actionList.add(new ForceDirectedLayout(m_fsim, false));
+        actionList.add(new ForceDirectedLayout(m_fsim, false, false));
         actionList.add(new DemoColorFunction());
         actionList.add(new RepaintAction());
         return actionList;
@@ -149,7 +149,7 @@ public class ForceDemo extends Display {
             +g.getNodeCount()+" nodes, "+g.getEdgeCount()+" edges");
         
         ForceSimulator fsim = new ForceSimulator();
-        fsim.addForce(new NBodyForce(-0.4f, 0.9f));
+        fsim.addForce(new NBodyForce(-0.4f, -1f, 0.9f));
         fsim.addForce(new SpringForce(4E-5f, 75f));
         fsim.addForce(new DragForce(-0.005f));
         
@@ -163,8 +163,7 @@ public class ForceDemo extends Display {
         private Color lightGray = new Color(220,220,255);
         public Paint getColor(VisualItem item) {
             if ( item instanceof EdgeItem ) {
-                Boolean h = (Boolean)item.getVizAttribute("highlight");
-                if ( h != null && h.booleanValue() )
+                if ( item.isHighlighted() )
                     return pastelOrange;
                 else
                     return Color.LIGHT_GRAY;
@@ -173,8 +172,7 @@ public class ForceDemo extends Display {
             }
         } //
         public Paint getFillColor(VisualItem item) {
-            Boolean h = (Boolean)item.getVizAttribute("highlight");
-            if ( h != null && h.booleanValue() )
+            if ( item.isHighlighted() )
                 return pastelOrange;
             else if ( item instanceof NodeItem ) {
                 if ( item.isFixed() )

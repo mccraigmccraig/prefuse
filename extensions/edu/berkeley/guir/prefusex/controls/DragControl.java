@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
+import edu.berkeley.guir.prefuse.activity.Activity;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 
 /**
@@ -23,6 +24,7 @@ import edu.berkeley.guir.prefuse.event.ControlAdapter;
 public class DragControl extends ControlAdapter {
 
     private VisualItem activeItem;
+    private Activity update;
     private Point2D down = new Point2D.Double();
     private Point2D tmp = new Point2D.Double();
     private boolean wasFixed, dragged, fixOnMouseOver;
@@ -45,6 +47,11 @@ public class DragControl extends ControlAdapter {
      */
     public DragControl(boolean repaint) {
         this.repaint = repaint;
+    } //
+    
+    public DragControl(Activity update) {
+        this.repaint = false;
+        this.update = update;
     } //
     
     /**
@@ -110,6 +117,8 @@ public class DragControl extends ControlAdapter {
         down.setLocation(tmp);
         if ( repaint )
             item.getItemRegistry().repaint();
+        if ( update != null )
+            update.runNow();
     } //
     
 } // end of class DragControl

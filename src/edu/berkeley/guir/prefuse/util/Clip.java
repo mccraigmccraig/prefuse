@@ -1,7 +1,7 @@
 package edu.berkeley.guir.prefuse.util;
 
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 /**
  * Represents a clipping rectangle in a prefuse <code>Display</code>.
@@ -23,10 +23,10 @@ public class Clip {
         System.arraycopy(c.clip, 0, clip, 0, 4);
     } //
     
-    public void setClip(Rectangle r) {
-        clip[0] = r.x; clip[1] = r.y;
-        clip[2] = r.x+r.width;
-        clip[3] = r.y+r.height;
+    public void setClip(Rectangle2D r) {
+        clip[0] = r.getX(); clip[1] = r.getY();
+        clip[2] = clip[0]+r.getWidth();
+        clip[3] = clip[1]+r.getHeight();
     } //
     
     public void transform(AffineTransform at) {
@@ -43,18 +43,18 @@ public class Clip {
         clip[3] = Math.min(clip[3],h);
     } //
     
-    public boolean intersects(Rectangle r) {
-        int tw = (int)Math.ceil(clip[2]-clip[0]);
-        int th = (int)Math.ceil(clip[3]-clip[1]);
-        int rw = r.width;
-        int rh = r.height;
+    public boolean intersects(Rectangle2D r) {
+        double tw = clip[2]-clip[0];
+        double th = clip[3]-clip[1];
+        double rw = r.getWidth();
+        double rh = r.getHeight();
         if (rw < 0 || rh < 0 || tw < 0 || th < 0) {
             return false;
         }
-        int tx = (int)Math.floor(clip[0]);
-        int ty = (int)Math.floor(clip[1]);
-        int rx = r.x;
-        int ry = r.y;
+        double tx = clip[0];
+        double ty = clip[1];
+        double rx = r.getX();
+        double ry = r.getY();
         rw += rx;
         rh += ry;
         tw += tx;
@@ -73,27 +73,27 @@ public class Clip {
         clip[3] = Math.max(clip[3], c.clip[3]);
     } //
     
-    public void union(Rectangle r) {
-        clip[0] = Math.min(clip[0], r.x-1);
-        clip[1] = Math.min(clip[1], r.y-1);
-        clip[2] = Math.max(clip[2], r.x+r.width+1);
-        clip[3] = Math.max(clip[3], r.y+r.height+1);
+    public void union(Rectangle2D r) {
+        clip[0] = Math.min(clip[0], r.getX()-1);
+        clip[1] = Math.min(clip[1], r.getY()-1);
+        clip[2] = Math.max(clip[2], r.getX()+r.getWidth()+1);
+        clip[3] = Math.max(clip[3], r.getX()+r.getHeight()+1);
     } //
     
-    public int getX() {
-        return (int)Math.floor(clip[0]);
+    public double getX() {
+        return clip[0];
     } //
     
-    public int getY() {
-        return (int)Math.floor(clip[1]);
+    public double getY() {
+        return clip[1];
     } //
     
-    public int getWidth() {
-        return (int)Math.ceil(clip[2]-clip[0]);
+    public double getWidth() {
+        return clip[2]-clip[0];
     } //
     
-    public int getHeight() {
-        return (int)Math.ceil(clip[3]-clip[1]);
+    public double getHeight() {
+        return clip[3]-clip[1];
     } //
     
 } // end of inner class Clip

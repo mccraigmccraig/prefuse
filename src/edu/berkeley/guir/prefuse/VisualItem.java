@@ -3,8 +3,8 @@ package edu.berkeley.guir.prefuse;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
-import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,15 +82,16 @@ public abstract class VisualItem implements Entity {
     protected Font m_endFont;
     // fix the position of this item?
     protected boolean m_fixed = false;
+    protected boolean m_highlight = false;
     
 	/**
 	 * Default constructor.
 	 */
 	public VisualItem() {
 	    m_attrs         = new HashMap(5,0.9f);
-		m_location      = new Point2D.Float();
-		m_startLocation = new Point2D.Float();
-		m_endLocation   = new Point2D.Float();
+		m_location      = new Point2D.Float(Float.NaN, Float.NaN);
+		m_startLocation = new Point2D.Float(Float.NaN, Float.NaN);
+		m_endLocation   = new Point2D.Float(Float.NaN, Float.NaN);
 	} //
 	
     /**
@@ -123,9 +124,9 @@ public abstract class VisualItem implements Entity {
         // general viz attributes
         m_attrs.clear();
         // location
-        m_location.setLocation(0,0);
-        m_startLocation.setLocation(0,0);
-        m_endLocation.setLocation(0,0);
+        m_location.setLocation(Float.NaN, Float.NaN);
+        m_startLocation.setLocation(Float.NaN, Float.NaN);
+        m_endLocation.setLocation(Float.NaN, Float.NaN);
         // colors
         m_color          = Color.BLACK;
         m_startColor     = Color.BLACK;
@@ -378,7 +379,7 @@ public abstract class VisualItem implements Entity {
 	 * Returns the bounding box of this VisualItem, determined by it's renderer.
 	 * @return a Rectangle representing the bounding box for this VisualItem
 	 */
-	public Rectangle getBounds() {
+	public Rectangle2D getBounds() {
 		return getRenderer().getBoundsRef(this);
 	} //
 
@@ -391,6 +392,14 @@ public abstract class VisualItem implements Entity {
     
     public void setFixed(boolean s) {
         m_fixed = s;
+    } //
+    
+    public boolean isHighlighted() {
+        return m_highlight;
+    } //
+    
+    public void setHighlighted(boolean s) {
+        m_highlight = s;
     } //
     
 	public double getDOI() { return m_doi; } //

@@ -1,4 +1,4 @@
-package edu.berkeley.guir.prefuse.action.interpolate;
+package edu.berkeley.guir.prefuse.action.animate;
 
 import java.awt.Font;
 import java.util.Iterator;
@@ -18,7 +18,7 @@ import edu.berkeley.guir.prefuse.util.FontLib;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class FontInterpolator extends AbstractAction {
+public class FontAnimator extends AbstractAction {
 
 	/**
 	 * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
@@ -32,4 +32,4 @@ public class FontInterpolator extends AbstractAction {
 		}
 	} //
 
-} // end of class FontInterpolator
+} // end of class FontAnimator

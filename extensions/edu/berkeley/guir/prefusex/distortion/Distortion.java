@@ -18,16 +18,33 @@ import edu.berkeley.guir.prefuse.action.assignment.Layout;
 public abstract class Distortion extends Layout {
 
     private Point2D m_tmp = new Point2D.Double();
-    private boolean m_transformSize = true;
+    private boolean m_sizeDistorted = true;
     
-    public void setTransformSize(boolean s) {
-        m_transformSize = s;
+    /**
+     * Controls whether item sizes are distorted 
+     * along with the item locations.
+     * @param s true to distort size, false to distort positions only
+     */
+    public void setSizeDistorted(boolean s) {
+        m_sizeDistorted = s;
     } //
     
+    /**
+     * Indicates whether the item sizes are distorted 
+     * along with the item locations.
+     * @return true if item sizes are distorted by this action, false otherwise
+     */
+    public boolean isSizeDistorted() {
+        return m_sizeDistorted;
+    } //
+    
+    /**
+     * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
+     */
     public void run(ItemRegistry registry, double frac) {
         Rectangle2D bounds = getLayoutBounds(registry);
         Point2D anchor = correct(getLayoutAnchor(), bounds);
-        Iterator iter = registry.getItems();
+        Iterator iter = registry.getNodeItems();
         while ( iter.hasNext() ) {
             VisualItem item = (VisualItem)iter.next();
             if ( item.isFixed() ) continue;
@@ -41,12 +58,13 @@ public abstract class Distortion extends Layout {
                 Rectangle2D bbox = item.getBounds();
                 Point2D loc = item.getLocation();
                 transformPoint(item.getEndLocation(), 
-                               loc, anchor, bounds);
-                if ( m_transformSize ) {
+                        loc, anchor, bounds);
+                if ( m_sizeDistorted ) {
                     double sz = transformSize(bbox, loc, anchor, bounds);
                     item.setSize(sz*item.getEndSize());
                 }
             }
+            
         }
     } //
     

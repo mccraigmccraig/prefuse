@@ -125,6 +125,22 @@ public class GraphLib {
     // == GRAPH CREATION ROUTINES =============================================
     
     /**
+     * Builds a completely unconnected (edge-free) graph with the given 
+     * number of nodes
+     * @param n the number of nodes
+     * @return a graph with n nodes and no edges
+     */
+    public static Graph getNodes(int n) {
+        Graph g = new DefaultGraph();
+        for ( int i=0; i < n; i++ ) {
+            Node nn = new DefaultTreeNode();
+            nn.setAttribute("label",String.valueOf(i));
+            g.addNode(nn);
+        }
+        return g;
+    } //
+    
+    /**
      * Builds a "star" graph with one central hub connected to the given
      * number of satellite nodes.
      * @param n the number of points of the star

@@ -1,4 +1,4 @@
-package edu.berkeley.guir.prefuse.action.interpolate;
+package edu.berkeley.guir.prefuse.action.animate;
 
 import java.awt.geom.Point2D;
 import java.util.HashSet;
@@ -23,7 +23,7 @@ import edu.berkeley.guir.prefuse.graph.TreeNode;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class PolarInterpolator extends AbstractAction implements FocusListener {
+public class PolarLocationAnimator extends AbstractAction implements FocusListener {
 
 	private static final double TWO_PI = 2*Math.PI;
 	
@@ -131,4 +131,4 @@ public class PolarInterpolator extends AbstractAction implements FocusListener {
         }
     } //
 
-} // end of class PolarInterpolator
+} // end of class PolarLocationAnimator

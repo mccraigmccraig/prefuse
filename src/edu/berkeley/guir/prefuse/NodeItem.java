@@ -1,6 +1,5 @@
 package edu.berkeley.guir.prefuse;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -34,25 +33,6 @@ public class NodeItem extends VisualItem implements TreeNode {
 			throw new IllegalArgumentException("NodeItem can only represent an Entity of type Node.");				
 		}
 		super.init(registry, itemClass, entity);
-			
-		/// XXX TODO: this is ugly. fix this later.
-		if ( entity instanceof TreeNode ) 
-		    setLocationToParent((TreeNode)entity, this);
-	} //
-	
-	/**
-	 * XXX TODO: find somewhere to put this such that things are clean!
-	 * @param node
-	 * @param item
-	 */
-	private void setLocationToParent(TreeNode node, VisualItem item) {
-		TreeNode parent = node.getParent();
-		if ( parent == null ) { return; }
-		NodeItem pitem  = m_registry.getNodeItem(parent);
-		if ( pitem == null ) { return; }
-        Point2D loc = pitem.getLocation();
-        item.updateLocation(loc);
-		item.setLocation(loc);
 	} //
 	
     /**

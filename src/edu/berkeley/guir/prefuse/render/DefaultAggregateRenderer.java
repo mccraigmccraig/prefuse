@@ -82,7 +82,7 @@ public class DefaultAggregateRenderer implements Renderer {
     /**
      * @see edu.berkeley.guir.prefuse.render.Renderer#getBoundsRef(edu.berkeley.guir.prefuse.VisualItem)
      */
-	public Rectangle getBoundsRef(VisualItem item) {
+	public Rectangle2D getBoundsRef(VisualItem item) {
 		AggregateItem aItem = (AggregateItem) item;
 		Image image = m_imageFactory.getImage(aItem);
 		if ( image == null ) { return new Rectangle(-1,-1,0,0);	}
