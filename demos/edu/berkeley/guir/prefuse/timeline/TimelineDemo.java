@@ -57,7 +57,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
     private final int timeline_start = 0;
     private final int timeline_end = 2005;
     private final int timelineSpan = timeline_end - timeline_start;
-    private final ActionList initialArrange;
+    final ActionList initialArrange;
 
     private final int timelineLength = appWidth * 9 / 10; // this factor ought to be
                                                  // shared across all
@@ -92,7 +92,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
                 nodeRenderer, new DefaultEdgeRenderer(), null));
 
         final Display display = new Display(registry);
-        display.setUseCustomTooltips(true);
+        //display.setUseCustomTooltips(true);
         display.setSize(appWidth, appHeight);
         display.addControlListener(new MultiSelectFocusControl(registry));
         display.addControlListener(new YAxisDragControl());
@@ -134,7 +134,8 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         initialArrange = new ActionList(registry);
         initialArrange.add(new TimelineGraphFilter());
         initialArrange.add(new MusicHistoryColorFunction());
-        initialArrange.add(new MusicHistoryLayout(timeline_start, timeline_end, timelineLength, numNotches));
+        initialArrange.add(new RandomTimelineLayout(timeline_start, timeline_end, timelineLength, numNotches));
+        //initialArrange.add(new TimelineLayout(timelineLength, numNotches));
         initialArrange.add(new SetBoundsFunction()); // after layout
         initialArrange.add(new RepaintAction());
         initialArrange.runNow();
@@ -200,125 +201,16 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
 
     
     // (( INNER CLASSES )) \\
-    private static class MusicHistoryLayout extends TimelineLayout {
-    	private final int start;
-    	private final int end;
-    	
-    	/**
-    	 * 
-    	 * @param start
-    	 * @param end
-    	 * @param m_timelineLength
-    	 * @param m_numDivisions
-    	 */
-        public MusicHistoryLayout(final int start, final int end,
-        		final int m_timelineLength, final int m_numDivisions) {
-            super(m_timelineLength, m_numDivisions);
-            this.start = start;
-            this.end = end;
-        }
-
-        private double getNodePosition(final int startYear, final int endYear, final double leftOffset) {
-            final int yearsFromLeft = startYear - start;
-            final double centerCorrection = ((double) endYear - startYear) / (end - start) * m_timelineLength / 2;
-            final double fractionFromLeft = (double) yearsFromLeft / (end - start); // horn or not?
-            return leftOffset + centerCorrection + (fractionFromLeft * m_timelineLength);
-        }
-
-        public void run(final ItemRegistry registry, final double frac) {
-            final Iterator nodeItems = registry.getFilteredGraph().getNodes();//getNodeItems();
-            final Dimension displaySize = registry.getDisplay(0).getSize();
-            final double leftOffset = (displaySize.getWidth() - m_timelineLength) / 2;
-            VisualItem node;
-            while (nodeItems.hasNext()) {
-                node = (VisualItem) nodeItems.next();
-                if (node.getAttribute(NODE_TYPE).equals(NOTCH_TYPE)) {
-                    layoutNotchNode(displaySize, leftOffset, node);
-                } else { // regular data node
-                    final Rectangle2D bounds = getLayoutBounds(registry);
-                    layoutDataNode(leftOffset, bounds, node);
-                }
-            }
-        }
-
-		/**
-		 * @param leftOffset
-		 * @param bounds
-		 * @param node
-		 */
-		private void layoutDataNode(final double leftOffset, final Rectangle2D bounds, VisualItem node) {
-			final String startYearString = node.getAttribute(START_YEAR);
-			final String endYearString = node.getAttribute(END_YEAR);
-
-			final int startYear, endYear;
-			if (startYearString.equals(TIMELINE_START)) {
-				startYear = start;
-			} else {
-				startYear = new Integer(startYearString).intValue(); // whoever gets children's hsopital
-			}
-			if (endYearString.equals(TIMELINE_END)) {
-				endYear = end;
-			} else {
-				endYear = new Integer(endYearString).intValue();
-			}
-			final double x = getNodePosition(startYear, endYear, leftOffset);
-			final double yOffset;
-			final String nodeType = node.getAttribute(NODE_TYPE);
-			if (nodeType.equals(PERIOD_TYPE)) {
-			    yOffset = 1.0 / 6;
-			} else if (nodeType.equals(EVENT_TYPE)) {
-			    yOffset = 2.0 / 5;
-			} else if (nodeType.equals(PERSON_TYPE)) {
-			    yOffset = 3.0 / 5;
-			} else if (nodeType.equals(PIECE_TYPE)) {
-			    yOffset = 4.0 / 5;
-			} else {
-			    yOffset = 1.0;
-			}
-			//final double y = bounds.getY() + Math.random()*bounds.getHeight();
-			final double y = bounds.getY() + yOffset * bounds.getHeight()
-					+ Math.random() / 8 * bounds.getHeight();
-			setLocation(node, null, x, y);
-		}
-
-		/**
-		 * @param displaySize
-		 * @param leftOffset
-		 * @param node
-		 */
-		private void layoutNotchNode(final Dimension displaySize, final double leftOffset, VisualItem node) {
-			final String notchIndexString = getNotchIndex(node
-			        .getAttribute(XMLGraphReader.XMLGraphHandler.ID));
-			final double y = displaySize.getHeight() / 3;
-			final double x;
-			if (notchIndexString.equals(START)) {
-			    x = leftOffset;
-			    //node.setFixed(true);
-			} else if (notchIndexString.equals(END)) {
-			    x = leftOffset + m_timelineLength;
-			    //node.setFixed(true);
-			} else { // a regular notch node
-			    final int notchIndex = new Integer(notchIndexString)
-			            .intValue();
-			    x = leftOffset
-			            + ((double) notchIndex / m_numDivisions * m_timelineLength);
-			}
-			setLocation(node, null, x, y);
-		}
-    } // end of class MusicHistoryLayout
-    
-
-    
     private class CheckBoxFilters extends JPanel {
-        private final TimelineGraphFilter filter;
+        //private final TimelineGraphFilter filter;
         
         public CheckBoxFilters(final TimelineGraphFilter filter) {
             super();
-            this.filter = filter;
+            //this.filter = filter;
             setLayout(new FlowLayout()); // 
             for (final Iterator it = filter.getRegisteredTypes().iterator(); it.hasNext();) {
                 final TTypeWrapper type = (TTypeWrapper) it.next();
-                System.out.println("name: "+type.toString()+" ;  isShown: "+type.isShown());
+                //System.out.println("name: "+type.toString()+" ;  isShown: "+type.isShown());
                 final JCheckBox checkBox = new JCheckBox(type.toString());//, type.isShown());
                 checkBox.setModel(new TTypeCheckBoxModel(type));
                 checkBox.addActionListener(new ActionListener() {
