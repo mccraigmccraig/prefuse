@@ -16,25 +16,16 @@ import edu.berkeley.guir.prefuse.action.Layout;
  */
 public class RandomLayout extends Layout {
 
-    private int m_margin = 0;
-    
-    public RandomLayout() {
-    } //
-    
-    public RandomLayout(int margin) {
-        m_margin = margin;
-    } //
-    
     public void run(ItemRegistry registry, double frac) {
         Rectangle2D b = getLayoutBounds(registry);
         double x, y;
-        double w = b.getWidth() - 2*m_margin;
-        double h = b.getHeight() - 2*m_margin;
+        double w = b.getWidth();
+        double h = b.getHeight();
         Iterator nodeIter = registry.getNodeItems();
         while ( nodeIter.hasNext() ) {
             GraphItem item = (GraphItem)nodeIter.next();
-            x = m_margin + Math.random()*w;
-            y = m_margin + Math.random()*h;
+            x = b.getX() + Math.random()*w;
+            y = b.getY() + Math.random()*h;
             item.updateLocation(x,y);
             item.setLocation(x,y);
         }
