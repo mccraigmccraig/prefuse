@@ -32,6 +32,7 @@ public class PrefuseEventLogger implements ControlListener,
 	public static final int LOG_INTERFACE = 1;
 	public static final int LOG_FOCUS     = 2;
 	public static final int LOG_REGISTRY  = 4;
+	public static final int LOG_ALL       = 4|2|1;
 	
 	public static final String ITEM_DRAGGED          = "ITEM-DRAGGED";
 	public static final String ITEM_MOVED            = "ITEM-MOVED";
@@ -59,7 +60,7 @@ public class PrefuseEventLogger implements ControlListener,
 	public static final String REGISTRY_ITEM_ADDED   = "REGISTRY-ITEM-ADDED";
 	public static final String REGISTRY_ITEM_REMOVED = "REGISTRY-ITEM-REMOVED";
 	public static final String WINDOW_POSITION       = "WINDOW-POSITION";
-
+	
 	private ItemRegistry m_registry;
 	private Display      m_display;
 	private String       m_label;
@@ -147,24 +148,32 @@ public class PrefuseEventLogger implements ControlListener,
 	} //
 	
 	public void logMouseEvent(String msg, MouseEvent e) {
-		msg = msg+"\t[("+e.getX()+","+e.getY()+"),button="+e.getButton()
-		    +",clickCount="+e.getClickCount()+",modifiers="
-			+MouseEvent.getMouseModifiersText(e.getModifiers())+"]";
+		msg = msg+"\t[id="+e.getID()
+			+",x="+e.getX()+",y="+e.getY()
+			+",button="+e.getButton()
+		    +",clickCount="+e.getClickCount()
+			+",modifiers="+e.getModifiers()+"]";
 		log(e.getWhen(), msg);
 	} //
 	
 	public void logMouseWheelEvent(String msg, MouseWheelEvent e) {
-		msg = msg+"\t[("+e.getX()+","+e.getY()+"),button="+e.getButton()
-		    +",clickCount="+e.getClickCount()+",modifiers="
-			+MouseEvent.getMouseModifiersText(e.getModifiers())
+		msg = msg+"\t[id="+e.getID()
+			+",x="+e.getX()+",y="+e.getY()
+			+",button="+e.getButton()
+		    +",clickCount="+e.getClickCount()
+			+",modifiers="+e.getModifiers()
+			+",scrollType="+e.getScrollType()
+			+",scrollAmount="+e.getScrollAmount()
 			+",wheelRotation="+e.getWheelRotation()+"]";
 		log(e.getWhen(), msg);
 	} //
 	
 	public void logKeyEvent(String msg, KeyEvent e) {
-		msg = msg+"\t[keyCode="+e.getKeyCode()+","+"keyChar="+e.getKeyChar()
-			+",keyText="+KeyEvent.getKeyText(e.getKeyCode())+",modifiers="
-			+KeyEvent.getKeyModifiersText(e.getModifiers())+"]";
+		msg = msg+"\t[id="+e.getID()
+			+",keyCode="+e.getKeyCode()
+			+",keyChar="+e.getKeyChar()
+			+",modifiers="+e.getModifiers()
+			+",keyText="+KeyEvent.getKeyText(e.getKeyCode())+"]";
 		log(e.getWhen(), msg);
 	} //
     
