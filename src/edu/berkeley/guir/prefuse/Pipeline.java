@@ -65,6 +65,14 @@ public class Pipeline {
 		m_manager = manager;
 		m_manager.init(this);
 	} //
+    
+    /**
+     * Gets the pipeline manager used to oversee pipeline execution.
+     * @return the pipeline manager
+     */
+    public PipelineManager getPipelineManager() {
+        return m_manager;
+    } //
 	
 	/**
 	 * Runs the processing pipeline
