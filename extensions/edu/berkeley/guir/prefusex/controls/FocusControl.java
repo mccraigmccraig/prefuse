@@ -6,10 +6,11 @@ import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
 
 import edu.berkeley.guir.prefuse.Display;
-import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.FocusManager;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
+import edu.berkeley.guir.prefuse.util.FocusSet;
 
 /**
  * Sets the current focus (according to the ItemRegistry's default focus
@@ -23,6 +24,7 @@ import edu.berkeley.guir.prefuse.event.ControlAdapter;
  */
 public class FocusControl extends ControlAdapter {
 
+    private Object focusSetKey = FocusManager.DEFAULT_KEY;
     private int ccount;
     
     /**
@@ -43,13 +45,26 @@ public class FocusControl extends ControlAdapter {
         ccount = clicks;
     } //
     
+    /**
+     * Creates a new FocusControl that changes the focus when an item is 
+     * clicked the specified number of times. A click value of zero indicates
+     * that the focus shoudl be changed in response to mouse-over events.
+     * @param clicks the number of clicks needed to switch the focus.
+     * @param focusSetKey the key corresponding to the focus set to use
+     */
+    public FocusControl(int clicks, Object focusSetKey) {
+        ccount = clicks;
+        this.focusSetKey = focusSetKey;
+    } //
+    
     public void itemEntered(VisualItem item, MouseEvent e) {
         if ( item instanceof NodeItem ) {
             Display d = (Display)e.getSource();
             d.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             if ( ccount == 0 ) {
-                ItemRegistry registry = item.getItemRegistry();
-                registry.getDefaultFocusSet().set(item.getEntity());
+                FocusManager fm = item.getItemRegistry().getFocusManager();
+                FocusSet fs = fm.getFocusSet(focusSetKey);
+                fs.set(item.getEntity());
             }
         }
     } //
@@ -58,6 +73,11 @@ public class FocusControl extends ControlAdapter {
         if ( item instanceof NodeItem ) {
             Display d = (Display)e.getSource();
             d.setCursor(Cursor.getDefaultCursor());
+            if ( ccount == 0 ) {
+                FocusManager fm = item.getItemRegistry().getFocusManager();
+                FocusSet fs = fm.getFocusSet(focusSetKey);
+                fs.remove(item.getEntity());
+            }
         }
     } //
     
@@ -66,8 +86,9 @@ public class FocusControl extends ControlAdapter {
              SwingUtilities.isLeftMouseButton(e)    && 
              e.getClickCount() == ccount )
         {
-            ItemRegistry registry = item.getItemRegistry();
-            registry.getDefaultFocusSet().set(item.getEntity());
+            FocusManager fm = item.getItemRegistry().getFocusManager();
+            FocusSet fs = fm.getFocusSet(focusSetKey);
+            fs.set(item.getEntity());
         }
     } //
     
