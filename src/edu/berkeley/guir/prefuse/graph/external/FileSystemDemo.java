@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.EdgeItem;
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
@@ -20,7 +20,6 @@ import edu.berkeley.guir.prefuse.action.FisheyeGraphFilter;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.action.TreeEdgeFilter;
 import edu.berkeley.guir.prefuse.activity.ActionPipeline;
-import edu.berkeley.guir.prefuse.activity.ActivityManager;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
@@ -74,14 +73,14 @@ public class FileSystemDemo extends JFrame {
             int unloaded = 0;
             public void entityLoaded(GraphLoader loader, Entity e) {
                 forces.cancel();
-                ActivityManager.scheduleNow(filter);
-                ActivityManager.scheduleNow(forces);
+                filter.runNow();
+                forces.runNow();
             } //
             public void entityUnloaded(GraphLoader loader, Entity e) {
                 System.out.println((++unloaded)+" unloaded - "+e);
                 forces.cancel();
-                ActivityManager.scheduleNow(filter);
-                ActivityManager.scheduleNow(forces);
+                filter.runNow();
+                forces.runNow();
             } //
         });
         
@@ -125,7 +124,7 @@ public class FileSystemDemo extends JFrame {
         forces.add(new RepaintAction());
         
         Display display = new Display();
-        display.setRegistry(registry);
+        display.setItemRegistry(registry);
         display.setSize(800,700);
         display.pan(350,350);
         display.addControlListener(new FocusControl(2));
@@ -138,7 +137,7 @@ public class FileSystemDemo extends JFrame {
             public void focusChanged(FocusEvent e) {
                 NodeItem n = registry.getNodeItem((Node)e.getFirstRemoved());
                 if ( n != null ) n.setFixed(false);
-                ActivityManager.scheduleNow(filter);
+                filter.runNow();
             } //
         });
         registry.getDefaultFocusSet().set(root);
@@ -151,15 +150,15 @@ public class FileSystemDemo extends JFrame {
         
         // wait until graphics are available
         while ( display.getGraphics() == null );
-        ActivityManager.scheduleNow(filter);
-        ActivityManager.scheduleNow(forces);
+        filter.runNow();
+        forces.runNow();
     }
     
     public class DemoColorFunction extends ColorFunction {
         private Color pastelRed = new Color(255,125,125);
         private Color pastelOrange = new Color(255,200,125);
         private Color lightGray = new Color(220,220,255);
-        public Paint getColor(GraphItem item) {
+        public Paint getColor(VisualItem item) {
             if ( item instanceof EdgeItem ) {
                 Boolean h = (Boolean)item.getVizAttribute("highlight");
                 if ( h != null && h.booleanValue() )
@@ -170,7 +169,7 @@ public class FileSystemDemo extends JFrame {
                 return Color.BLACK;
             }
         } //
-        public Paint getFillColor(GraphItem item) {
+        public Paint getFillColor(VisualItem item) {
             Boolean h = (Boolean)item.getVizAttribute("highlight");
             if ( h != null && h.booleanValue() )
                 return pastelOrange;
@@ -192,18 +191,18 @@ public class FileSystemDemo extends JFrame {
         
         private boolean wasFixed = false;
         
-        public void itemEntered(GraphItem item, MouseEvent e) {
+        public void itemEntered(VisualItem item, MouseEvent e) {
             ((Display)e.getSource()).setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             wasFixed = item.isFixed();
             item.setFixed(true);
         } //
         
-        public void itemExited(GraphItem item, MouseEvent e) {
+        public void itemExited(VisualItem item, MouseEvent e) {
             ((Display)e.getSource()).setCursor(Cursor.getDefaultCursor());
             item.setFixed(wasFixed);
         } //
         
-        public void itemReleased(GraphItem item, MouseEvent e) {
+        public void itemReleased(VisualItem item, MouseEvent e) {
             item.setFixed(wasFixed);
         } //
         

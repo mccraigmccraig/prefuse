@@ -14,7 +14,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
+import edu.berkeley.guir.prefuse.util.FontLib;
 
 /**
  * Renders an item as an image and a text string.
@@ -85,7 +86,7 @@ public class TextImageItemRenderer extends ShapeRenderer {
 	 * @param item the item to represent as a <code>String</code>
 	 * @return a <code>String</code> to draw
 	 */
-	protected String getText(GraphItem item) {
+	protected String getText(VisualItem item) {
 		return (String)item.getAttribute(m_labelName);
 	} //
 	
@@ -111,37 +112,44 @@ public class TextImageItemRenderer extends ShapeRenderer {
 	 * @param item the item for which to select an image to draw
 	 * @return an <code>Image</code> to draw
 	 */
-	protected String getImageLocation(GraphItem item) {
+	protected String getImageLocation(VisualItem item) {
 		return item.getAttribute(m_imageName);
 	} //
 	
-	protected Image getImage(GraphItem item) {
+	protected Image getImage(VisualItem item) {
 		String imageLoc = getImageLocation(item);
 		return ( imageLoc == null ? null : m_images.getImage(imageLoc) );
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.VisualItem)
 	 */
-	protected Shape getRawShape(GraphItem item) {
+	protected Shape getRawShape(VisualItem item) {
 		if ( m_g == null ) { return null; }
 		
+        double size = item.getSize();
+        
 		// get image dimensions
 		Image img = getImage(item);
-		int ih = ( img == null ? 0 : img.getHeight(null) );
-		int iw = ( img == null ? 0 : img.getWidth(null) );
+		double ih = (img==null ? 0 : size*img.getHeight(null));
+		double iw = (img==null ? 0 : size*img.getWidth(null));
 		
 		// get text dimensions
-		Font font = item.getFont();
-		if ( font == null ) { font = m_font; }
+		m_font = item.getFont();
+        if ( size != 1 )
+          m_font = FontLib.getFont(m_font.getName(), m_font.getStyle(),
+                      (int)Math.round(size*m_font.getSize()));
+        
 		String s = getText(item);
 		if ( s == null ) { s = ""; }
-		FontMetrics fm = m_g.getFontMetrics(font);
+		
+        FontMetrics fm = m_g.getFontMetrics(m_font);
 		int th = fm.getHeight();
 		int tw = fm.stringWidth(s);
 		
-		int w = 2*m_horizBorder + tw + iw + (tw>0 && iw>0 ? m_imageMargin : 0);
-		int h = 2*m_vertBorder + Math.max(th, ih);
+		double w = tw + iw + 
+                size*(2*m_horizBorder + (tw>0 && iw>0 ? m_imageMargin : 0));
+		double h = Math.max(th, ih) + size*2*m_vertBorder;
 		
 		getAlignedPoint(m_tmpPoint, item, w, h, m_xAlign, m_yAlign);
 		m_imageBox.setRect(m_tmpPoint.getX(),m_tmpPoint.getY(),w,h);
@@ -152,7 +160,9 @@ public class TextImageItemRenderer extends ShapeRenderer {
 	 * Helper method, which calculates the top-left co-ordinate of a node
 	 * given the node's alignment.
 	 */
-	protected static void getAlignedPoint(Point2D p, GraphItem item, int w, int h, int xAlign, int yAlign) {
+	protected static void getAlignedPoint(Point2D p, VisualItem item, 
+            double w, double h, int xAlign, int yAlign)
+    {
 		double x = item.getX(), y = item.getY();
 		if ( xAlign == ALIGNMENT_CENTER ) {
 			x = x-(w/2);
@@ -168,9 +178,9 @@ public class TextImageItemRenderer extends ShapeRenderer {
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.render.Renderer#render(java.awt.Graphics2D, edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.render.Renderer#render(java.awt.Graphics2D, edu.berkeley.guir.prefuse.VisualItem)
 	 */
-	public void render(Graphics2D g, GraphItem item) {
+	public void render(Graphics2D g, VisualItem item) {
 		Paint fillColor = item.getFillColor();
 		Paint itemColor = item.getColor();
 		Shape shape = getShape(item);
@@ -198,13 +208,13 @@ public class TextImageItemRenderer extends ShapeRenderer {
 				return;
 						
 			Rectangle r = shape.getBounds();
-			int x = r.x + m_horizBorder;
+            double size = item.getSize();
+			double x = size*(r.x + m_horizBorder);
 			
 			if ( img != null ) {
-				int y = r.y+(r.height-img.getHeight(null))/2;
 				Composite comp = g.getComposite();
-				if ( itemColor != null && itemColor instanceof Color) {
-					int alpha = ((Color)itemColor).getAlpha();
+				if ( itemColor != null && fillColor instanceof Color) {
+					int alpha = ((Color)fillColor).getAlpha();
 					if ( alpha < 255 ) {
 						AlphaComposite alphaComp = 
 							AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 
@@ -212,19 +222,26 @@ public class TextImageItemRenderer extends ShapeRenderer {
 						g.setComposite(alphaComp);
 					}
 				}
-				g.drawImage(img, x, y, null);
-				x += img.getWidth(null) + (s!=null ? m_imageMargin : 0);
+                
+                double w = size*img.getWidth(null);
+                double h = size*img.getHeight(null);
+                double y = r.y + (r.height-h)/2;
+                
+                int ix = (int)Math.round(x), iy = (int)Math.round(y);
+                if ( size == 1 )
+                    g.drawImage(img, ix, iy, null);
+                else
+                    g.drawImage(img, ix, iy, (int)Math.round(w), 
+                            (int)Math.round(h), null);
+				x += w + (s!=null ? size*m_imageMargin : 0);
 				g.setComposite(comp);
 			}
 			if ( s != null ) {
 				g.setPaint(itemColor);
-				Font font = item.getFont();
-				if ( font == null ) { font = m_font; }
-				g.setFont(font);
-				
-				FontMetrics fm = m_g.getFontMetrics(font);
-				int y = r.y+(r.height-fm.getHeight())/2+fm.getAscent();
-				g.drawString(s, x, y);
+				g.setFont(m_font);
+				FontMetrics fm = m_g.getFontMetrics(m_font);
+				int y = r.y + (r.height-fm.getHeight())/2+fm.getAscent();
+				g.drawString(s, Math.round(x), y);
 			}
 		}
 	} //

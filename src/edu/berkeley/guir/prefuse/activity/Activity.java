@@ -74,6 +74,54 @@ public abstract class Activity {
     } //
     
     /**
+     * Schedules this Activity with the ActivityManager. The Activity will
+     * begin at the time indicated by this Activity's {@link #getStartTime()
+     * getStartTime} method.
+     */
+    public void run() {
+        ActivityManager.schedule(this);
+    } //
+    
+    /**
+     * Schedules this Activity to start immediately, overwriting the
+     * Activity's currently set <code>startTime</code>.
+     * @see #setStartTime(long)
+     */
+    public void runNow() {
+        ActivityManager.scheduleNow(this);
+    } //
+    
+    /**
+     * Schedules this Activity for the specified startTime, overwriting the
+     * Activity's currently set startTime.
+     * @param startTime the time at which the activity should run
+     */
+    public void runAt(long startTime) {
+        ActivityManager.scheduleAt(this,startTime);
+    } //
+    
+    /**
+     * Schedules this Activity to start immediately after another Activity.
+     * This Activity will be scheduled to start immediately after the
+     * first one finishes, overwriting any previously set startTime. If the
+     * first Activity is cancelled, this one will not run.
+     * 
+     * This functionality is provided by using an ActivityListener to monitor
+     * the first Activity. The listener is removed upon completion or
+     * cancellation of the first Activity.
+     * 
+     * This method does not in any way affect the scheduling of the first 
+     * Activity. If the first Activity is never scheduled, this Activity
+     * will correspondingly never be run unless scheduled by a separate
+     * scheduling call.
+     * @param before the first Activity to run
+     * @param after the Activity to run immediately after the first
+     */
+    public void runAfter(Activity before) {
+        ActivityManager.scheduleAfter(before, this);
+    } //
+    
+    /**
      * Run this activity one step. Subclasses should override this method to
      * specify the actions this activity should perform.
      * @param elapsedTime the time elapsed since the start of the activity.
@@ -89,7 +137,7 @@ public abstract class Activity {
      * @return the time (in milliseconds) when this activity should be
      *  run again. A return value of -1 indicates this activity is finished.
      */
-    public long runActivity(long currentTime) {
+    long runActivity(long currentTime) {
         if (currentTime < m_startTime) {
             return m_startTime - currentTime;  
         }
@@ -150,7 +198,7 @@ public abstract class Activity {
     
     /**
      * Indicates if this activity is currently scheduled 
-     *  with an ActivityManager
+     *  with the ActivityManager
      * @return true if scheduled, false otherwise
      */
     public synchronized boolean isScheduled() {

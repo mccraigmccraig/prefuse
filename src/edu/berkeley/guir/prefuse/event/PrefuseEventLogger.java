@@ -14,7 +14,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 
 import edu.berkeley.guir.prefuse.Display;
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.graph.Entity;
 
@@ -189,7 +189,7 @@ public class PrefuseEventLogger implements ControlListener,
         return (entity == null ? "NULL" : entity.getAttribute(m_label));
     } //
     
-	protected String getItemString(GraphItem item) {
+	protected String getItemString(VisualItem item) {
 		return (item == null ? "NULL" : getEntityString(item.getEntity()));
 	} //
 
@@ -208,79 +208,79 @@ public class PrefuseEventLogger implements ControlListener,
 	// == CALLBACKS ===========================================================
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemDragged(edu.berkeley.guir.prefuse.GraphItem, java.awt.event.MouseEvent)
+	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemDragged(edu.berkeley.guir.prefuse.VisualItem, java.awt.event.MouseEvent)
 	 */
-	public void itemDragged(GraphItem item, MouseEvent e) {
+	public void itemDragged(VisualItem item, MouseEvent e) {
 		logMouseEvent(ITEM_DRAGGED+"\t"+getItemString(item), e);
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemMoved(edu.berkeley.guir.prefuse.GraphItem, java.awt.event.MouseEvent)
+	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemMoved(edu.berkeley.guir.prefuse.VisualItem, java.awt.event.MouseEvent)
 	 */
-	public void itemMoved(GraphItem item, MouseEvent e) {
+	public void itemMoved(VisualItem item, MouseEvent e) {
 		logMouseEvent(ITEM_MOVED+"\t"+getItemString(item), e);
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemWheelMoved(edu.berkeley.guir.prefuse.GraphItem, java.awt.event.MouseWheelEvent)
+	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemWheelMoved(edu.berkeley.guir.prefuse.VisualItem, java.awt.event.MouseWheelEvent)
 	 */
-	public void itemWheelMoved(GraphItem item, MouseWheelEvent e) {
+	public void itemWheelMoved(VisualItem item, MouseWheelEvent e) {
 		logMouseWheelEvent(ITEM_WHEEL_MOVED+"\t"+getItemString(item),e);
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemClicked(edu.berkeley.guir.prefuse.GraphItem, java.awt.event.MouseEvent)
+	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemClicked(edu.berkeley.guir.prefuse.VisualItem, java.awt.event.MouseEvent)
 	 */
-	public void itemClicked(GraphItem item, MouseEvent e) {
+	public void itemClicked(VisualItem item, MouseEvent e) {
 		logMouseEvent(ITEM_CLICKED+"\t"+getItemString(item), e);
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemPressed(edu.berkeley.guir.prefuse.GraphItem, java.awt.event.MouseEvent)
+	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemPressed(edu.berkeley.guir.prefuse.VisualItem, java.awt.event.MouseEvent)
 	 */
-	public void itemPressed(GraphItem item, MouseEvent e) {
+	public void itemPressed(VisualItem item, MouseEvent e) {
 		logMouseEvent(ITEM_PRESSED+"\t"+getItemString(item), e);
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemReleased(edu.berkeley.guir.prefuse.GraphItem, java.awt.event.MouseEvent)
+	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemReleased(edu.berkeley.guir.prefuse.VisualItem, java.awt.event.MouseEvent)
 	 */
-	public void itemReleased(GraphItem item, MouseEvent e) {
+	public void itemReleased(VisualItem item, MouseEvent e) {
 		logMouseEvent(ITEM_RELEASED+"\t"+getItemString(item), e);
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemEntered(edu.berkeley.guir.prefuse.GraphItem, java.awt.event.MouseEvent)
+	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemEntered(edu.berkeley.guir.prefuse.VisualItem, java.awt.event.MouseEvent)
 	 */
-	public void itemEntered(GraphItem item, MouseEvent e) {
+	public void itemEntered(VisualItem item, MouseEvent e) {
 		logMouseEvent(ITEM_ENTERED+"\t"+getItemString(item), e);
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemExited(edu.berkeley.guir.prefuse.GraphItem, java.awt.event.MouseEvent)
+	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemExited(edu.berkeley.guir.prefuse.VisualItem, java.awt.event.MouseEvent)
 	 */
-	public void itemExited(GraphItem item, MouseEvent e) {
+	public void itemExited(VisualItem item, MouseEvent e) {
 		logMouseEvent(ITEM_EXITED+"\t"+getItemString(item), e);
 	}
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemKeyPressed(edu.berkeley.guir.prefuse.GraphItem, java.awt.event.KeyEvent)
+	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemKeyPressed(edu.berkeley.guir.prefuse.VisualItem, java.awt.event.KeyEvent)
 	 */
-	public void itemKeyPressed(GraphItem item, KeyEvent e) {
+	public void itemKeyPressed(VisualItem item, KeyEvent e) {
 		logKeyEvent(ITEM_KEY_PRESSED+"\t"+getItemString(item), e);
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemKeyReleased(edu.berkeley.guir.prefuse.GraphItem, java.awt.event.KeyEvent)
+	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemKeyReleased(edu.berkeley.guir.prefuse.VisualItem, java.awt.event.KeyEvent)
 	 */
-	public void itemKeyReleased(GraphItem item, KeyEvent e) {
+	public void itemKeyReleased(VisualItem item, KeyEvent e) {
 		logKeyEvent(ITEM_KEY_RELEASED+"\t"+getItemString(item), e);
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemKeyTyped(edu.berkeley.guir.prefuse.GraphItem, java.awt.event.KeyEvent)
+	 * @see edu.berkeley.guir.prefuse.event.ControlListener#itemKeyTyped(edu.berkeley.guir.prefuse.VisualItem, java.awt.event.KeyEvent)
 	 */
-	public void itemKeyTyped(GraphItem item, KeyEvent e) {
+	public void itemKeyTyped(VisualItem item, KeyEvent e) {
 		logKeyEvent(ITEM_KEY_TYPED+"\t"+getItemString(item), e);
 	} //
 
@@ -362,17 +362,17 @@ public class PrefuseEventLogger implements ControlListener,
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.ItemRegistryListener#registryItemAdded(edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.event.ItemRegistryListener#registryItemAdded(edu.berkeley.guir.prefuse.VisualItem)
 	 */
-	public void registryItemAdded(GraphItem item) {
+	public void registryItemAdded(VisualItem item) {
 		log(REGISTRY_ITEM_ADDED+"\t"+item.getItemClass()
 			+"\t"+item.getAttribute(m_label));
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.ItemRegistryListener#registryItemRemoved(edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.event.ItemRegistryListener#registryItemRemoved(edu.berkeley.guir.prefuse.VisualItem)
 	 */
-	public void registryItemRemoved(GraphItem item) {
+	public void registryItemRemoved(VisualItem item) {
 		log(REGISTRY_ITEM_REMOVED+"\t"+item.getItemClass()
 			+"\t"+item.getAttribute(m_label));
 	} //

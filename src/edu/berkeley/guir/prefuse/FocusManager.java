@@ -17,7 +17,7 @@ import edu.berkeley.guir.prefuse.util.FocusSet;
  * the storage, retrieval, and monitoring of such focus items and sets. Because
  * potential focus items may not yet be visualized, focus sets store
  * {@link edu.berkeley.guir.prefuse.graph.Entity Entity}
- * instances rather than {@link GraphItem GraphItem} instances.
+ * instances rather than {@link VisualItem VisualItem} instances.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

@@ -1,5 +1,6 @@
 package edu.berkeley.guir.prefuse.render;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -11,7 +12,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
+import edu.berkeley.guir.prefuse.util.FontLib;
 
 /**
  * Renders an item as a text string. The text string used by default is the
@@ -41,6 +43,7 @@ public class TextItemRenderer extends ShapeRenderer {
 	
 	protected RectangularShape m_textBox  = new Rectangle2D.Float();
 	protected Font m_font = new Font("SansSerif", Font.PLAIN, 10);
+    
 	protected Point2D     m_tmpPoint = new Point2D.Float();
 
 	public TextItemRenderer() {
@@ -51,7 +54,7 @@ public class TextItemRenderer extends ShapeRenderer {
 
     /**
      * Sets the default font used by this Renderer. If calling getFont() on
-     * a GraphItem returns a non-null value, the returned Font will be used
+     * a VisualItem returns a non-null value, the returned Font will be used
      * instead of this default one.
      * @param f the default font to use.
      */
@@ -99,26 +102,32 @@ public class TextItemRenderer extends ShapeRenderer {
 	 * @param item the item to represent as a <code>String</code>
 	 * @return a <code>String</code> to draw
 	 */
-	protected String getText(GraphItem item) {
+	protected String getText(VisualItem item) {
 		return (String)item.getAttribute(m_labelName);
 	} //
 	
-	protected boolean isHyperlink(GraphItem item) {
+	protected boolean isHyperlink(VisualItem item) {
 		Boolean b = (Boolean)item.getVizAttribute(m_labelName + "_LINK");
 		return ( b != null && Boolean.TRUE.equals(b) );
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.VisualItem)
 	 */
-	protected Shape getRawShape(GraphItem item) {
+	protected Shape getRawShape(VisualItem item) {
 		if ( m_g == null ) { return null; }
 		
 		String s = getText(item);
 		if ( s == null ) { s = ""; }
-        Font font = item.getFont();
-        if ( font == null ) { font = m_font; }
-		FontMetrics fm = m_g.getFontMetrics(font);
+        m_font = item.getFont();
+        
+        // make renderer size-aware
+        double size = item.getSize();
+        if ( size != 1 )
+            m_font = FontLib.getFont(m_font.getName(), m_font.getStyle(),
+                    (int)Math.round(size*m_font.getSize()));
+        
+		FontMetrics fm = m_g.getFontMetrics(m_font);
 		int h = fm.getHeight() + 2*m_vertBorder;
 		int w = fm.stringWidth(s) + 2*m_horizBorder;
 		getAlignedPoint(m_tmpPoint, item, w, h, m_xAlign, m_yAlign);
@@ -130,7 +139,7 @@ public class TextItemRenderer extends ShapeRenderer {
 	 * Helper method, which calculates the top-left co-ordinate of a node
 	 * given the node's alignment.
 	 */
-	protected static void getAlignedPoint(Point2D p, GraphItem item, int w, int h, int xAlign, int yAlign) {
+	protected static void getAlignedPoint(Point2D p, VisualItem item, int w, int h, int xAlign, int yAlign) {
 		double x = Math.round(item.getX()), y = Math.round(item.getY());
 		if ( xAlign == ALIGNMENT_CENTER ) {
 			x = x-(w/2);
@@ -146,11 +155,16 @@ public class TextItemRenderer extends ShapeRenderer {
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.render.Renderer#render(java.awt.Graphics2D, edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.render.Renderer#render(java.awt.Graphics2D, edu.berkeley.guir.prefuse.VisualItem)
 	 */
-	public void render(Graphics2D g, GraphItem item) {
-		Paint fillColor = item.getFillColor();
-		Paint itemColor = item.getColor();
+	public void render(Graphics2D g, VisualItem item) {
+        // set up colors
+        Paint itemColor = item.getColor();
+        if ( itemColor == null ) itemColor = Color.BLACK;
+        Paint fillColor = item.getFillColor();
+        if ( fillColor == null ) fillColor = Color.LIGHT_GRAY;
+        
+        // render the shape
 		Shape shape = getShape(item);
 		if (shape != null) {
 			switch (getRenderType()) {
@@ -170,15 +184,15 @@ public class TextItemRenderer extends ShapeRenderer {
 					break;
 			}
 
+            // now render the text
 			String s = getText(item);
 			if ( s != null ) {			
 				Rectangle r = shape.getBounds();
 				g.setPaint(itemColor);
-				Font font = item.getFont();
-				if ( font == null ) { font = m_font; }
-				g.setFont(font);
+				g.setFont(m_font);
 				FontMetrics fm = g.getFontMetrics();
-				g.drawString(s, r.x+m_horizBorder, r.y+m_vertBorder+fm.getAscent());
+				g.drawString(s, r.x+m_horizBorder,
+                                r.y+m_vertBorder+fm.getAscent());
 				if ( isHyperlink(item) ) {
 					int x = r.x + m_horizBorder;
 					int y = r.y + m_vertBorder + fm.getHeight() - 1;

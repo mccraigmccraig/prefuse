@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Factory class for {@link GraphItem GraphItem} instances. This allows object
+ * Factory class for {@link VisualItem VisualItem} instances. This allows object
  * initialization to be consolidated in a single location and allocated objects
  * to be re-used by maintaining a pool of item references.
  * 
@@ -68,18 +68,18 @@ public class ItemFactory {
     /**
      * Get an item from an item pool. Create a new item if the pool is empty.
      */
-	public GraphItem getItem(String itemClass) {
+	public VisualItem getItem(String itemClass) {
 		FactoryEntry fentry = (FactoryEntry)m_entryMap.get(itemClass);
 		if ( fentry != null ) {
-			GraphItem item = null;
+			VisualItem item = null;
 			if ( fentry.itemList.isEmpty() ) {
 				try {
-					item = (GraphItem)fentry.type.newInstance();
+					item = (VisualItem)fentry.type.newInstance();
 				} catch ( Exception e ) {
 					e.printStackTrace();
 				}
 			} else {
-				item = (GraphItem)fentry.itemList.remove(0);
+				item = (VisualItem)fentry.itemList.remove(0);
 			}
 			return item;
 		} else {
@@ -93,9 +93,9 @@ public class ItemFactory {
 	 * costs. If maximum pool sizes are reached, this item will not be
 	 * reclaimed. In this case it should have NO remaining references, allowing
 	 * it to be garbage collected.
-	 * @param item the GraphItem to reclaim
+	 * @param item the VisualItem to reclaim
 	 */
-	public void reclaim(GraphItem item) {
+	public void reclaim(VisualItem item) {
 		String itemClass    = item.getItemClass();
 		FactoryEntry fentry = (FactoryEntry)m_entryMap.get(itemClass);
 		

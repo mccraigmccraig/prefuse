@@ -134,10 +134,10 @@ public class ForceDirectedLayout extends Layout {
        }
        iter = registry.getEdgeItems();
        while ( iter.hasNext() ) {
-           EdgeItem e = (EdgeItem)iter.next();
-           NodeItem n1 = e.getFirstNode();
+           EdgeItem  e  = (EdgeItem)iter.next();
+           NodeItem  n1 = (NodeItem)e.getFirstNode();
            ForceItem f1 = (ForceItem)n1.getVizAttribute("forceItem");
-           NodeItem n2 = e.getSecondNode();
+           NodeItem  n2 = (NodeItem)e.getSecondNode();
            ForceItem f2 = (ForceItem)n2.getVizAttribute("forceItem");
            float slen = getSpringLength(n1, n2);
            m_fsim.addSpring(f1, f2, (slen>=0 ? slen : -1.f));

@@ -6,8 +6,9 @@ import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
 
 import edu.berkeley.guir.prefuse.Display;
-import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.NodeItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 
 /**
@@ -41,18 +42,24 @@ public class FocusControl extends ControlAdapter {
         ccount = clicks;
     } //
     
-    public void itemEntered(GraphItem item, MouseEvent e) {
-        Display d = (Display)e.getSource();
-        d.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    public void itemEntered(VisualItem item, MouseEvent e) {
+        if ( item instanceof NodeItem ) {
+            Display d = (Display)e.getSource();
+            d.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        }
     } //
     
-    public void itemExited(GraphItem item, MouseEvent e) {
-        Display d = (Display)e.getSource();
-        d.setCursor(Cursor.getDefaultCursor());
+    public void itemExited(VisualItem item, MouseEvent e) {
+        if ( item instanceof NodeItem ) {
+            Display d = (Display)e.getSource();
+            d.setCursor(Cursor.getDefaultCursor());
+        }
     } //
     
-    public void itemClicked(GraphItem item, MouseEvent e) {
-        if ( SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == ccount ) {
+    public void itemClicked(VisualItem item, MouseEvent e) {
+        if ( item instanceof NodeItem && SwingUtilities.isLeftMouseButton(e) 
+                && e.getClickCount() == ccount )
+        {
             ItemRegistry registry = item.getItemRegistry();
             registry.getDefaultFocusSet().set(item.getEntity());
         }

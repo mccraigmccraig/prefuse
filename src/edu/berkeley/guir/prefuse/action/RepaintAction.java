@@ -1,8 +1,5 @@
 package edu.berkeley.guir.prefuse.action;
 
-import java.util.Iterator;
-
-import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 
 /**
@@ -18,10 +15,7 @@ public class RepaintAction extends AbstractAction {
      * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
      */
     public void run(ItemRegistry registry, double frac) {
-        Iterator iter = registry.getDisplaysRef().iterator();
-        while ( iter.hasNext() ) {
-            ((Display)iter.next()).repaint();
-        }
+        registry.repaint();
     } //
 
 } // end of class RepaintAction

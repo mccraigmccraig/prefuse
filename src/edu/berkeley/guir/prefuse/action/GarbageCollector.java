@@ -2,7 +2,7 @@ package edu.berkeley.guir.prefuse.action;
 
 /**
  * Signals the <code>ItemRegistry</code> to perform a garbage collection 
- * operation. The class type of the <code>GraphItem</code> to garbage
+ * operation. The class type of the <code>VisualItem</code> to garbage
  * collect must be specified through the constructor and/or 
  * <code>addItemClass()</code> method.
  * 

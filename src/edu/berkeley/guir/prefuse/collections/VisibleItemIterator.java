@@ -3,7 +3,7 @@ package edu.berkeley.guir.prefuse.collections;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 
 /**
  * Provides an iterator over only the currently visible items in a graph.
@@ -16,11 +16,11 @@ import edu.berkeley.guir.prefuse.GraphItem;
 public class VisibleItemIterator implements Iterator {
 
 	private Iterator  m_iter;
-	private GraphItem m_item;
+	private VisualItem m_item;
 
 	/**
 	 * Constructor
-	 * @param items the list of GraphItems over which to iterate
+	 * @param items the list of VisualItems over which to iterate
 	 * @param reverse if true, will traverse list in reverse order
 	 */
 	public VisibleItemIterator(List items, boolean reverse) {
@@ -28,7 +28,7 @@ public class VisibleItemIterator implements Iterator {
 			m_item = null;
 		} else {
 			m_iter = ( reverse ? new ReverseListIterator(items) : items.iterator() );
-			while ( m_iter.hasNext() && !(m_item=(GraphItem)m_iter.next()).isVisible() );
+			while ( m_iter.hasNext() && !(m_item=(VisualItem)m_iter.next()).isVisible() );
 			if ( !m_item.isVisible() ) {
 				m_item = null;
 			}
@@ -47,8 +47,8 @@ public class VisibleItemIterator implements Iterator {
 	 */
 	public Object next() {
 		if ( m_item != null ) {
-			GraphItem retval = m_item;
-			while ( m_iter.hasNext() && !(m_item=(GraphItem)m_iter.next()).isVisible() );
+			VisualItem retval = m_item;
+			while ( m_iter.hasNext() && !(m_item=(VisualItem)m_iter.next()).isVisible() );
 			if ( !m_iter.hasNext() && (m_item == retval || !m_item.isVisible()) ) {
 				m_item = null;
 			}

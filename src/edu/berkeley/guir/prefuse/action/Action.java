@@ -12,7 +12,7 @@ public interface Action {
     
     /**
      * Runs this action, performing desired graph processing
-     * @param registry the ItemRegistry housing the GraphItems to process
+     * @param registry the ItemRegistry housing the VisualItems to process
      * @param frac a fraction indicating the current progress of this
      *  action if it persists over time. For actions that are only run once,
      *  a value of 0 is used.

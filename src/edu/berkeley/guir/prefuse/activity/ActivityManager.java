@@ -5,16 +5,22 @@ import java.util.ArrayList;
 import edu.berkeley.guir.prefuse.event.ActivityAdapter;
 
 /**
- * The ActivityManager is responsible for scheduling and running timed 
- * activities that perform graph processing and animation.
+ * <p>The ActivityManager is responsible for scheduling and running timed 
+ * activities that perform graph processing and animation.</p>
  * 
- * The AcivityManager runs in its own separate thread of execution, and
+ * <p>The AcivityManager runs in its own separate thread of execution, and
  * one instance is used to schedule activities from any number of currently
  * active visualizations. The class is implemented as a singleton; the single
- * instance of this class is interacted with through static methods.
+ * instance of this class is interacted with through static methods. These
+ * methods are called by an Activity's run methods, and so are made only
+ * package visible here.</p>
  * 
- * Activity instances can be scheduled to run using the schedule(), 
- * scheduleAt(), scheduleNow(), and scheduleAfter() methods.
+ * <p>Activity instances can be scheduled by using their 
+ * {@link Activity.run() run()}, {@link Activity.runNow() runNow()},
+ * {@link Activity.runAt(long) runAt()}, and 
+ * {@link Activity.runAfter(Activity) runAfter()}, 
+ * methods. These will automatically call the
+ * appropriate methods with the ActivityManager.</p>
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
@@ -54,7 +60,7 @@ public class ActivityManager extends Thread {
      * Schedules an Activity with the manager.
      * @param a the Activity to schedule
      */
-    public static void schedule(Activity a) {
+    static void schedule(Activity a) {
         getInstance()._schedule(a);
     } //
     
@@ -63,7 +69,7 @@ public class ActivityManager extends Thread {
      * Activity's currently set startTime.
      * @param a the Activity to schedule
      */
-    public static void scheduleNow(Activity a) {
+    static void scheduleNow(Activity a) {
         getInstance()._scheduleNow(a);
     } //
     
@@ -73,7 +79,7 @@ public class ActivityManager extends Thread {
      * @param a the Activity to schedule
      * @param startTime the time at which the activity should run
      */
-    public static void scheduleAt(Activity a, long startTime) {
+    static void scheduleAt(Activity a, long startTime) {
         getInstance()._scheduleAt(a,startTime);
     } //
     
@@ -91,7 +97,7 @@ public class ActivityManager extends Thread {
      * @param before the first Activity to run
      * @param after the Activity to run immediately after the first
      */
-    public static void scheduleAfter(Activity before, Activity after) {
+    static void scheduleAfter(Activity before, Activity after) {
         getInstance()._scheduleAfter(before, after);
     } //
     

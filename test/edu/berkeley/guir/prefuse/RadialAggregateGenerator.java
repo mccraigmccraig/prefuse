@@ -106,10 +106,10 @@ public class RadialAggregateGenerator {
 					synchronized ( m_registry ) {
 					  Iterator items = m_registry.getItems();
 					  while (items.hasNext()) {
-						GraphItem gi = (GraphItem) items.next();
-						Renderer renderer = gi.getRenderer();
+						VisualItem vi = (VisualItem) items.next();
+						Renderer renderer = vi.getRenderer();
 						g2D.setTransform(baseTransform);
-						renderer.render(g2D, gi);
+						renderer.render(g2D, vi);
 					  }
 					}
 	

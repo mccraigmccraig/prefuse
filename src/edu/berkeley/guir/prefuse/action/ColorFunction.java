@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Paint;
 import java.util.Iterator;
 
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 
 /**
@@ -21,7 +21,7 @@ public class ColorFunction extends AbstractAction {
 	public void run(ItemRegistry registry, double frac) {
 		Iterator itemIter = registry.getItems();
 		while ( itemIter.hasNext() ) {
-			GraphItem item = (GraphItem)itemIter.next();
+			VisualItem item = (VisualItem)itemIter.next();
             Paint c = getColor(item), o = item.getColor();
 			if ( o == null ) item.setColor(getInitialColor(item));			
 			item.updateColor(c);			
@@ -34,27 +34,20 @@ public class ColorFunction extends AbstractAction {
 		}
 	} //
 
-	protected Paint getInitialColor(GraphItem item) {
+	protected Paint getInitialColor(VisualItem item) {
 		return getColor(item);
 	} //
 	
-	protected Paint getInitialFillColor(GraphItem item) {
+	protected Paint getInitialFillColor(VisualItem item) {
 		return getFillColor(item);
 	} //
 
-	public Paint getColor(GraphItem item) {
+	public Paint getColor(VisualItem item) {
 		return Color.BLACK;
 	} //
 
-	public Paint getFillColor(GraphItem item) {
+	public Paint getFillColor(VisualItem item) {
 		return Color.GRAY;
 	} //
-    
-    public static Color calcIntermediateColor(Color c1, Color c2, double frac) {
-        return new Color(
-                (int)Math.round(frac*c2.getRed()   + (1-frac)*c1.getRed()),
-                (int)Math.round(frac*c2.getGreen() + (1-frac)*c1.getGreen()),
-                (int)Math.round(frac*c2.getBlue()  + (1-frac)*c1.getBlue()));
-    } //
 
 } // end of class ColorFunction

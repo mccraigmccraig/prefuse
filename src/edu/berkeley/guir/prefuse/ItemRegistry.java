@@ -31,20 +31,20 @@ import edu.berkeley.guir.prefuse.util.FocusSet;
  * {@link edu.berkeley.guir.prefuse.graph.Edge Edges}) and their visual 
  * representations (e.g., {@link NodeItem NodeItems} and 
  * {@link EdgeItem EdgeItems}). The ItemRegistry maintains rendering queues 
- * of all visualized {@link GraphItem GraphItems}, a comparator for ordering
+ * of all visualized {@link VisualItem VisualItems}, a comparator for ordering
  * these queues (and thus controlling rendering order), references to all
  * displays that render the contents of this registry, and a focus manager
  * keeping track of focus sets of {@link edu.berkeley.guir.prefuse.graph.Entity
  * Entity} instances. In addition, the ItemRegistry supports garbage 
- * collection of <code>GraphItems</code> across interaction
+ * collection of <code>VisualItems</code> across interaction
  * cycles of a visualization, allowing visual representations of graph
  * elements to pass in and out of existence as necessary.
  * </p>
  *
  * <p>
- * <code>GraphItems</code> are not instantiated directly, instead they are 
+ * <code>VisualItems</code> are not instantiated directly, instead they are 
  * created by the <code>ItemRegistry</code> as visual representations for 
- * abstract graph data. To create a new <code>GraphItem</code> or retrieve 
+ * abstract graph data. To create a new <code>VisualItem</code> or retrieve 
  * an existing one, use the provided <code>ItemRegistry</code> methods 
  * (e.g., <code>getItem()</code>, <code>getNodeItem</code>, etc). These are the
  * methods used by the various filters in the 
@@ -54,12 +54,12 @@ import edu.berkeley.guir.prefuse.util.FocusSet;
  * 
  * <p>
  * For convenience, the <code>ItemRegistry</code> creates entries for three types 
- * of <code>GraphItems</code>: {@link NodeItem NodeItems}, {@link EdgeItem 
+ * of <code>VisualItems</code>: {@link NodeItem NodeItems}, {@link EdgeItem 
  * EdgeItems}, and {@link AggregateItem AggregateItems}. The mappings and
  * rendering queues for these entries can be accessed through convenience
  * methods such as <code>getNodeItem()</code>, <code>getEdgeItems()</code>, 
  * etc. More generally, separate entries with their own mappings and 
- * rendering queue can be made for any type of <code>GraphItem</code> by 
+ * rendering queue can be made for any type of <code>VisualItem</code> by 
  * using the {@link #addItemClass(String,Class) addItemClass()} methods. For 
  * example, if there are more than two different types of aggregates used 
  * (e.g., subtree aggregates and aggregates of other nodes) it may facilitate
@@ -79,7 +79,7 @@ public class ItemRegistry {
 	
 	/**
 	 * Wrapper class that holds all the data structures for managing
-	 * a class of GraphItems.
+	 * a class of VisualItems.
 	 */
 	public class ItemEntry {
 		ItemEntry(String itemClass, Class classType, int dirty) {
@@ -113,7 +113,8 @@ public class ItemRegistry {
 	private List m_entryList; // list of ItemEntry instances
 	private Map  m_entryMap;  // maps from item class names to ItemEntry instances
 	private Map  m_entityMap; // maps from items back to their entities
-	
+	private int  m_size;      // the number of items in this registry
+    
 	private Comparator m_comparator;
   
   	private ItemRegistryListener m_registryListener;
@@ -219,7 +220,7 @@ public class ItemRegistry {
      */
     public synchronized boolean removeDisplay(Display d) {
         boolean rv = m_displays.remove(d);
-        if ( rv ) d.setRegistry(null);
+        if ( rv ) d.setItemRegistry(null);
         return rv;
     } //
     
@@ -234,13 +235,23 @@ public class ItemRegistry {
     } //
     
     /**
-     * Returns a reference to the backing list of Displays for this
-     * ItemRegistry. Be careful about modifying the contents of this
-     * list!!
-     * @return this ItemRegistry's backing list of Displays
+     * Issues repaint requests to all Displays associated with this
+     * ItemRegistry.
      */
-    public synchronized List getDisplaysRef() {
-        return m_displays;
+    public synchronized void repaint() {
+        Iterator iter = m_displays.iterator();
+        while ( iter.hasNext() )
+            ((Display)iter.next()).repaint();
+    } //
+    
+    /**
+     * Returns a list of the Displays registered with this ItemRegistry.
+     * @return a list of the Displays registered with this ItemRegistry
+     */
+    public synchronized List getDisplays() {
+        ArrayList copy = new ArrayList(m_displays.size());
+        copy.addAll(m_displays);
+        return copy;
     } //
     
     /**
@@ -266,7 +277,7 @@ public class ItemRegistry {
 	/**
 	 * Return the renderer factory for this registry's items. The
 	 * renderer factory determines which renderer components should be
-	 * used to draw GraphItems in the visualization.
+	 * used to draw VisualItems in the visualization.
 	 * @return the current renderer factory
 	 */
 	public synchronized RendererFactory getRendererFactory() {
@@ -276,7 +287,7 @@ public class ItemRegistry {
 	/**
 	 * Set the renderer factory for this registry's items. The
 	 * renderer factory determines which renderer components should be
-	 * used to draw GraphItems in the visualization. By using this method,
+	 * used to draw VisualItems in the visualization. By using this method,
 	 * one can set custom renderer factories to control the rendering 
 	 * behavior of all visualized items.
 	 * @param factory the renderer factory to use
@@ -295,7 +306,7 @@ public class ItemRegistry {
 	
 	/**
 	 * Sets the item comparator used to determine rendering order. This
-	 * method can be used to install custom comparators for GraphItems,
+	 * method can be used to install custom comparators for VisualItems,
 	 * allowing fine grained control over the order items are processed
 	 * in the rendering loop.
 	 * 
@@ -310,9 +321,27 @@ public class ItemRegistry {
 		m_comparator = comparator;
 	} //
 
+    /**
+     * Returns the total number of VisualItems in the given item class.
+     * @param itemClass the item class to look up the size for
+     * @return the total number of VisualItems in the given item class
+     */
+    public synchronized int size(String itemClass) {
+        ItemEntry ie = (ItemEntry)m_entryMap.get(itemClass);
+        return (ie==null ? -1 : ie.itemList.size());
+    } //
+    
+    /**
+     * Returns the total number of VisualItems in the ItemRegistry.
+     * @return the total number of VisualItems
+     */
+    public synchronized int size() {
+        return m_size;
+    } //
+    
 	// ========================================================================
 	// == REGISTRY METHODS ====================================================
-
+    
     /**
      * Runs the garbage collector on items of the specified itemClass. This 
      * method is typically invoked by an appropriate {@link 
@@ -338,7 +367,7 @@ public class ItemRegistry {
 		entry.modified = true;
         Iterator iter = entry.itemList.iterator();
         while ( iter.hasNext() ) {
-            GraphItem item = (GraphItem)iter.next();
+            VisualItem item = (VisualItem)iter.next();
             int dirty = item.getDirty()+1;
             item.setDirty(dirty);
             if ( entry.maxDirty > -1 && dirty > entry.maxDirty ) {
@@ -372,7 +401,7 @@ public class ItemRegistry {
 	} //
 
     /**
-     * Clears the ItemRegistry, removing all visualized GraphItems.
+     * Clears the ItemRegistry, removing all visualized VisualItems.
      */
 	public synchronized void clear() {
 		Iterator iter = m_entryList.iterator();
@@ -382,23 +411,23 @@ public class ItemRegistry {
 	} //
 
     /**
-     * Clears the given ItemEntry, removing all visualized GraphItems.
+     * Clears the given ItemEntry, removing all visualized VisualItems.
      * @param entry the ItemEntry to clear
      */
 	private synchronized void clear(ItemEntry entry) {
 		entry.modified = true;
 		while ( entry.itemList.size() > 0 ) {
-			GraphItem item = (GraphItem)entry.itemList.get(0);
+			VisualItem item = (VisualItem)entry.itemList.get(0);
 			this.removeItem(entry, item, true);
 		}
 	} //
 
 	/**
-	 * Returns all the visible GraphItems in the registry. The order items 
+	 * Returns all the visible VisualItems in the registry. The order items 
 	 * are returned will determine their rendering order. This order is 
 	 * determined by the item comparator. The setItemComparator() method can
 	 * be used to control this ordering.
-	 * @return iterator over all visible GraphItems, in rendering order
+	 * @return iterator over all visible VisualItems, in rendering order
 	 */
 	public synchronized Iterator getItems() {
 		Iterator entryIter = m_entryList.iterator();
@@ -413,10 +442,10 @@ public class ItemRegistry {
 	} //
 
 	/**
-	 * Returns all the visible GraphItems in the registry in <i>reversed</i>
+	 * Returns all the visible VisualItems in the registry in <i>reversed</i>
 	 * rendering order. This is used by Display instances to determine
      * which items are being manipulated during user interface events.
-	 * @return iterator over all visible GraphItems, in reverse rendering order
+	 * @return iterator over all visible VisualItems, in reverse rendering order
 	 */
 	public synchronized Iterator getItemsReversed() {
 		Iterator entryIter = m_entryList.iterator();
@@ -431,13 +460,13 @@ public class ItemRegistry {
 	} //
 
     /**
-     * Returns all GraphItems in the specified item class, optionally screening
+     * Returns all VisualItems in the specified item class, optionally screening
      * for only currently visible items. Items are returned in rendering order.
      * @param itemClass the item class for which to return an iterator 
-     *  of GraphItems
+     *  of VisualItems
      * @param visibleOnly indicates whether or not only currently visible items
      *  should be included in the iteration.
-     * @return an Iterator over the requested GraphItems, in rendering order
+     * @return an Iterator over the requested VisualItems, in rendering order
      */
 	public synchronized Iterator getItems(String itemClass, boolean visibleOnly) {
 		ItemEntry entry = (ItemEntry)m_entryMap.get(itemClass);
@@ -555,14 +584,14 @@ public class ItemRegistry {
 	} //
 	
 	/**
-	 * Returns the entity associated with the given GraphItem, if any.
-	 * If multiple entities are associated with an input GraphItem of
+	 * Returns the entity associated with the given VisualItem, if any.
+	 * If multiple entities are associated with an input VisualItem of
 	 * type AggregateItem, the first one is returned. To get all entities
 	 * in such cases use the getEntities() method instead.
 	 * @param item
 	 * @return Entity
 	 */
-	public synchronized Entity getEntity(GraphItem item) {
+	public synchronized Entity getEntity(VisualItem item) {
 		Object o = m_entityMap.get(item);
 		if ( o == null ) {
 			return null;
@@ -574,11 +603,11 @@ public class ItemRegistry {
 	} //
 	
 	/**
-	 * Returns the entities associated with the given GraphItem, if any.
+	 * Returns the entities associated with the given VisualItem, if any.
 	 * @param item
 	 * @return Entity
 	 */
-	public synchronized List getEntities(GraphItem item) {
+	public synchronized List getEntities(VisualItem item) {
 		Object o = m_entityMap.get(item);
 		List list;
 		if ( o instanceof Entity ) {
@@ -599,20 +628,20 @@ public class ItemRegistry {
 	} //
 	
     /**
-     * Requests a GraphItem of the specified item class corresponding to a
-     * given Entity, optionally creating the GraphItem if it doesn't already
+     * Requests a VisualItem of the specified item class corresponding to a
+     * given Entity, optionally creating the VisualItem if it doesn't already
      * exist.
-     * @param itemClass the item class from which the GraphItem should be taken
-     * @param entity the Entity that this GraphItem is visualizing
-     * @param create indicates whether or not the GraphItem should be created
+     * @param itemClass the item class from which the VisualItem should be taken
+     * @param entity the Entity that this VisualItem is visualizing
+     * @param create indicates whether or not the VisualItem should be created
      *  if it doesn't already exist.
-     * @return the requested GraphItem, or null if the GraphItem wasn't found
+     * @return the requested VisualItem, or null if the VisualItem wasn't found
      *  and the create parameter is false.
      */
-	public synchronized GraphItem getItem(String itemClass, Entity entity, boolean create) {
+	public synchronized VisualItem getItem(String itemClass, Entity entity, boolean create) {
 		ItemEntry entry = (ItemEntry)m_entryMap.get(itemClass);
 		if ( entry != null ) {
-			GraphItem item = (GraphItem)entry.itemMap.get(entity);
+			VisualItem item = (VisualItem)entry.itemMap.get(entity);
 			if ( !create ) {
 				return item;
 			} else if ( item == null ) {
@@ -701,9 +730,9 @@ public class ItemRegistry {
 	 * Add a mapping between the given entity and item, this means that
 	 * the entity is part of the aggregation represented by the item.
 	 * @param entity the Entity (e.g. Node or Edge) to add
-	 * @param item the GraphItem
+	 * @param item the VisualItem
 	 */	
-	public synchronized void addMapping(Entity entity, GraphItem item) {
+	public synchronized void addMapping(Entity entity, VisualItem item) {
 		String itemClass = item.getItemClass();
 		ItemEntry entry = (ItemEntry)m_entryMap.get(itemClass);
 		if ( entry != null ) {
@@ -718,9 +747,9 @@ public class ItemRegistry {
 	 * Add a mapping between the given entity and the item within the
 	 *  given item class
 	 * @param entity the graph Entity to add
-	 * @param item the GraphItem corresponding to the entity
+	 * @param item the VisualItem corresponding to the entity
 	 */
-	private synchronized void addMapping(ItemEntry entry, Entity entity, GraphItem item) {
+	private synchronized void addMapping(ItemEntry entry, Entity entity, VisualItem item) {
 		entry.itemMap.put(entity, item);
 		if ( m_entityMap.containsKey(item) ) {
 			Object o = m_entityMap.get(item);
@@ -741,7 +770,7 @@ public class ItemRegistry {
 	 * Removes all extraneous mappings from an item 
 	 * @param item the item to strip of all mappings
 	 */
-	public synchronized void removeMappings(GraphItem item) {
+	public synchronized void removeMappings(VisualItem item) {
 		ItemEntry entry = (ItemEntry)m_entryMap.get(item.getItemClass());
 		if ( entry != null ) {
 			removeMappings(entry, item);
@@ -751,7 +780,7 @@ public class ItemRegistry {
 		}
 	} //
 	
-	private synchronized void removeMappings(ItemEntry entry, GraphItem item) {
+	private synchronized void removeMappings(ItemEntry entry, VisualItem item) {
 		if ( m_entityMap.containsKey(item) ) {
 			Object o = m_entityMap.get(item);
 			m_entityMap.remove(item);
@@ -770,11 +799,11 @@ public class ItemRegistry {
 	 * Add a graph item to the visualization queue, and add a mapping
 	 * between the given entity and the item.
 	 * @param entity the graph Entity to add
-	 * @param item the GraphItem corresponding to the entity
+	 * @param item the VisualItem corresponding to the entity
 	 */
-	private synchronized void addItem(ItemEntry entry, Entity entity, GraphItem item) {
+	private synchronized void addItem(ItemEntry entry, Entity entity, VisualItem item) {
 		addItem(entry, item);
-		addMapping(entry, entity, item);		
+		addMapping(entry, entity, item);
 	} //
 
 	/**
@@ -782,12 +811,12 @@ public class ItemRegistry {
 	 * mappings.
 	 * @param item the item to add the the visualization queue
 	 */
-	private synchronized void addItem(ItemEntry entry, GraphItem item) {
+	private synchronized void addItem(ItemEntry entry, VisualItem item) {
 		entry.itemList.add(item);
 		entry.modified = true;
-		if ( m_registryListener != null ) {
+        m_size++;
+		if ( m_registryListener != null )
     		m_registryListener.registryItemAdded(item);
-		}
 	} //
 	
 	/**
@@ -798,12 +827,12 @@ public class ItemRegistry {
      *  rendering queue. This option is available to avoid errors that
      *  arise when removing items coming from a currently active Iterator.
 	 */
-	private synchronized void removeItem(ItemEntry entry, GraphItem item, boolean lr) {
+	private synchronized void removeItem(ItemEntry entry, VisualItem item, boolean lr) {
 		removeMappings(entry, item);
 		if (lr) entry.itemList.remove(item);
-		if ( m_registryListener != null ) {
+        m_size--;
+		if ( m_registryListener != null )
 			m_registryListener.registryItemRemoved(item);
-		}
 		m_ifactory.reclaim(item);
 	} //
 
@@ -811,7 +840,7 @@ public class ItemRegistry {
 	 * Remove an item from the visualization queue.
 	 * @param item the item to remove from the visualization queue
 	 */
-	public synchronized void removeItem(GraphItem item) {
+	public synchronized void removeItem(VisualItem item) {
 		ItemEntry entry = (ItemEntry)m_entryMap.get(item.getItemClass());
 		if ( entry != null ) {
 			removeItem(entry, item, true);

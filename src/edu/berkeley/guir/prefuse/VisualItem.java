@@ -1,5 +1,6 @@
 package edu.berkeley.guir.prefuse;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
 import java.awt.Rectangle;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 import edu.berkeley.guir.prefuse.graph.Entity;
 import edu.berkeley.guir.prefuse.render.Renderer;
+import edu.berkeley.guir.prefuse.util.FontLib;
 
 /**
  * Abstract class for a visual representation of a graph element. Subclasses
@@ -17,7 +19,7 @@ import edu.berkeley.guir.prefuse.render.Renderer;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public abstract class GraphItem {
+public abstract class VisualItem implements Entity {
     
     // TODO: abstract the various properties into the attributes map?
 	
@@ -29,31 +31,40 @@ public abstract class GraphItem {
 	protected boolean m_visible;
 	protected boolean m_newlyVisible;
 	
+    // all non-standard viz attributes go here
 	protected Map m_attrs;
+    // degree-of-interest of ths item
 	protected double  m_doi;
+    // location attributes
 	protected Point2D m_location;
 	protected Point2D m_startLocation;
 	protected Point2D m_endLocation;
-	protected Paint   m_color;
-	protected Paint   m_startColor;
-	protected Paint   m_endColor;
-	protected Paint   m_fillColor;
-	protected Paint   m_startFillColor;
-	protected Paint   m_endFillColor;
+    // color attributes
+	protected Paint m_color;
+	protected Paint m_startColor;
+	protected Paint m_endColor;
+	protected Paint m_fillColor;
+	protected Paint m_startFillColor;
+	protected Paint m_endFillColor;
+    // size attributes
+    protected double m_size;
+	protected double m_startSize;
+	protected double m_endSize;
+    // font attributes
+    protected Font m_startFont;
+	protected Font m_font;
+    protected Font m_endFont;
+    // fix the position of this item?
     protected boolean m_fixed = false;
-	protected double m_size = 1.;
-	protected double m_startSize = 1.;
-	protected double m_endSize = 1.;
-	protected Font   m_font;
-	
+    
 	/**
 	 * Default constructor.
 	 */
-	public GraphItem() {
-			m_attrs         = new HashMap(5);
-			m_location      = new Point2D.Float();
-			m_startLocation = new Point2D.Float();
-			m_endLocation   = new Point2D.Float();
+	public VisualItem() {
+	    m_attrs         = new HashMap(5,0.9f);
+		m_location      = new Point2D.Float();
+		m_startLocation = new Point2D.Float();
+		m_endLocation   = new Point2D.Float();
 	} //
 	
 	public String toString() {
@@ -61,10 +72,10 @@ public abstract class GraphItem {
 	} //
 	
 	/**
-	 * Initialize this GraphItem, binding it to the given
+	 * Initialize this VisualItem, binding it to the given
 	 * ItemRegistry and Entity.
-	 * @param registry the ItemRegistry monitoring this GraphItem
-	 * @param entity the Entity represented by this GraphItem
+	 * @param registry the ItemRegistry monitoring this VisualItem
+	 * @param entity the Entity represented by this VisualItem
 	 */
 	public void init(ItemRegistry registry, String itemClass, Entity entity) {
 		m_itemClass = itemClass;
@@ -75,35 +86,44 @@ public abstract class GraphItem {
 		m_newlyVisible = false;
 		m_doi = Integer.MIN_VALUE;
 		
-		/// XXX DEBUG
-		//System.out.println("Initializing Item: " + this.getClass().getName()
-		//	 + " - " + this.getAttribute("Text"));
+		initAttributes();
 	} //
 	
+    protected void initAttributes() {
+        // general viz attributes
+        m_attrs.clear();
+        // location
+        m_location.setLocation(0,0);
+        m_startLocation.setLocation(0,0);
+        m_endLocation.setLocation(0,0);
+        // colors
+        m_color          = Color.BLACK;
+        m_startColor     = Color.BLACK;
+        m_endColor       = Color.BLACK;
+        m_fillColor      = Color.LIGHT_GRAY;
+        m_startFillColor = Color.LIGHT_GRAY;
+        m_endFillColor   = Color.LIGHT_GRAY;
+        // sizes
+        m_size      = 1;
+        m_startSize = 1;
+        m_endSize   = 1;
+        // fonts
+        m_startFont = FontLib.getFont("SansSerif",Font.PLAIN,10);
+        m_font      = m_startFont;
+        m_endFont   = m_startFont;
+    }
+    
 	/**
-	 * Clear the state of this GraphItem.
+	 * Clear the state of this VisualItem.
 	 */
 	public void clear() {
 		m_registry = null;
 		m_entity   = null;
-		m_attrs.clear();
-		
-		m_location.setLocation(0,0);
-		m_startLocation.setLocation(0,0);
-		m_endLocation.setLocation(0,0);
-		m_color = null;
-		m_startColor = null;
-		m_endColor = null;
-		m_fillColor = null;
-		m_startFillColor = null;
-		m_endFillColor = null;
-		m_size = 1;
-		m_startSize = 1;
-		m_endSize = 1;
+        initAttributes();
 	} //
 
 	/**
-	 * Return the ItemRegistry associated with this GraphItem.
+	 * Return the ItemRegistry associated with this VisualItem.
 	 * @return the ItemRegistry
 	 */
 	public ItemRegistry getItemRegistry() {
@@ -119,7 +139,7 @@ public abstract class GraphItem {
 	} //
 
 	/**
-	 * Return the Entity this GraphItem represents.
+	 * Return the Entity this VisualItem represents.
 	 * @return the Entity
 	 */
 	public Entity getEntity() {
@@ -151,6 +171,27 @@ public abstract class GraphItem {
 			m_entity.setAttribute(name, value);
 		}		
 	} //
+    
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Entity#getAttributes()
+     */
+    public Map getAttributes() {
+        return m_entity.getAttributes();
+    } //
+
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Entity#setAttributes(java.util.Map)
+     */
+    public void setAttributes(Map attrMap) {
+        m_entity.setAttributes(attrMap);
+    } //
+
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Entity#clearAttributes()
+     */
+    public void clearAttributes() {
+        m_entity.clearAttributes();
+    } //
 	
 	/**
 	 * Get a visualization attribute for this item.
@@ -232,7 +273,7 @@ public abstract class GraphItem {
 	} //
 
 	/**
-	 * Indicates if this GraphItem is currently visible in the visualization.
+	 * Indicates if this VisualItem is currently visible in the visualization.
 	 * @return true if visible, false otherwise
 	 */
 	public boolean isVisible() {
@@ -240,7 +281,7 @@ public abstract class GraphItem {
 	} //
 
 	/**
-	 * Sets the visible status of this GraphItem. If set false, this item will
+	 * Sets the visible status of this VisualItem. If set false, this item will
 	 * not be visited by the rendering loop.
 	 * @param s the new visibility status of this item.
 	 */
@@ -255,7 +296,7 @@ public abstract class GraphItem {
     } //
     
 	/**
-	 * Get the renderer for drawing this GraphItem.
+	 * Get the renderer for drawing this VisualItem.
 	 * @return this item's Renderer
 	 */
 	public Renderer getRenderer() {
@@ -269,17 +310,17 @@ public abstract class GraphItem {
 	} //
 	
 	/**
-	 * Returns true if the given point is contained within this GraphItem.
+	 * Returns true if the given point is contained within this VisualItem.
 	 * @param point the point to test for containment
-	 * @return true if the point is within this GraphItem
+	 * @return true if the point is within this VisualItem
 	 */
 	public boolean locatePoint(Point2D point) {
 		return getRenderer().locatePoint(point, this);
 	} //
 	
 	/**
-	 * Returns the bounding box of this GraphItem, determined by it's renderer.
-	 * @return a Rectangle representing the bounding box for this GraphItem
+	 * Returns the bounding box of this VisualItem, determined by it's renderer.
+	 * @return a Rectangle representing the bounding box for this VisualItem
 	 */
 	public Rectangle getBounds() {
 		return getRenderer().getBoundsRef(this);
@@ -425,12 +466,33 @@ public abstract class GraphItem {
 		m_endSize = size;
 	} //
 	
-	public Font getFont() {
-		return m_font;
+	public Font getStartFont() {
+		return m_startFont;
 	} //
 	
-	public void setFont(Font f) {
-		m_font = f;
+	public void setStartFont(Font f) {
+		m_startFont = f;
 	} //
+    
+    public Font getFont() {
+        return m_font;
+    } //
+    
+    public void setFont(Font f) {
+        m_font = f;
+    } //
+    
+    public Font getEndFont() {
+        return m_endFont;
+    } //
+    
+    public void setEndFont(Font f) {
+        m_endFont = f;
+    } //
+    
+    public void updateFont(Font f) {
+        m_startFont = m_font;
+        m_endFont = f;
+    } //
 
-} // end of abstract class GraphItem
+} // end of abstract class VisualItem

@@ -2,7 +2,7 @@ package edu.berkeley.guir.prefuse.render;
 
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 
 /**
  * A default implementation of a node renderer that draws itself as a circle.
@@ -14,7 +14,7 @@ public class DefaultNodeRenderer extends ShapeRenderer {
 
 	private int m_radius = 5;
 	private Ellipse2D m_circle =
-		new Ellipse2D.Float(0, 0, 2 * m_radius, 2 * m_radius);
+		new Ellipse2D.Double(0, 0, 2 * m_radius, 2 * m_radius);
 
     /**
      * Creates a new DefaultNodeRenderer with default base
@@ -49,11 +49,12 @@ public class DefaultNodeRenderer extends ShapeRenderer {
     } //
     
 	/**
-	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.VisualItem)
 	 */
-	protected Shape getRawShape(GraphItem item) {
-        double r = m_radius*item.getSize();
-        m_circle.setFrame(item.getX()-r,item.getY()-r,2*r,2*r);
+	protected Shape getRawShape(VisualItem item) {
+        double r = m_radius * item.getSize();
+        double x = item.getX(), y = item.getY();
+        m_circle.setFrameFromCenter(x,y,x+r,y+r);
 		return m_circle;
 	} //
 

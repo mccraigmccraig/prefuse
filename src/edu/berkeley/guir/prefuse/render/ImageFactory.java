@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import edu.berkeley.guir.prefuse.AggregateItem;
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.graph.Entity;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
@@ -193,12 +193,12 @@ public class ImageFactory {
 	 * Preloads images for use in a visualization. Images to load are
 	 * determined by taking objects from the given iterator and retrieving
 	 * the attribute of the specified value. The items in the iterator must
-	 * be instances of either <code>Entity</code> or <code>GraphItem</code>.
+	 * be instances of either <code>Entity</code> or <code>VisualItem</code>.
 	 * Images are loaded in the order specified by the iterator until the
 	 * the iterator is empty or the maximum image cache size is met. Thus
 	 * higher priority images should appear sooner in the iteration.
 	 * @param iter an Iterator of <code>Entity</code> and/or 
-	 *  <code>GraphItem</code> instances
+	 *  <code>VisualItem</code> instances
 	 * @param attr the attribute that contains the image location
 	 */
 	public void preloadImages(Iterator iter, String attr) {
@@ -208,8 +208,8 @@ public class ImageFactory {
 			Object o = iter.next();
 			if ( o instanceof Entity ) {
 				loc = ((Entity)o).getAttribute(attr);
-			} else if ( o instanceof GraphItem ) {
-				loc = ((GraphItem)o).getAttribute(attr);
+			} else if ( o instanceof VisualItem ) {
+				loc = ((VisualItem)o).getAttribute(attr);
 			}
 			if ( loc != null ) {
 				getImage(loc);

@@ -13,9 +13,9 @@ import javax.swing.JFrame;
 import edu.berkeley.guir.prefuse.AggregateItem;
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.EdgeItem;
-import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.ColorFunction;
 import edu.berkeley.guir.prefuse.action.ColorInterpolator;
 import edu.berkeley.guir.prefuse.action.FisheyeTreeFilter;
@@ -24,13 +24,12 @@ import edu.berkeley.guir.prefuse.action.LinearInterpolator;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.action.TreeEdgeFilter;
 import edu.berkeley.guir.prefuse.activity.ActionPipeline;
-import edu.berkeley.guir.prefuse.activity.ActivityManager;
 import edu.berkeley.guir.prefuse.activity.SlowInSlowOutPacer;
 import edu.berkeley.guir.prefuse.collections.DOIItemComparator;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
+import edu.berkeley.guir.prefuse.graph.GraphLib;
 import edu.berkeley.guir.prefuse.graph.Tree;
-import edu.berkeley.guir.prefuse.graph.TreeLib;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 import edu.berkeley.guir.prefuse.graph.io.HDirTreeReader;
 import edu.berkeley.guir.prefuse.graph.io.TreeReader;
@@ -41,12 +40,12 @@ import edu.berkeley.guir.prefuse.render.RendererFactory;
 import edu.berkeley.guir.prefuse.render.TextItemRenderer;
 import edu.berkeley.guir.prefuse.util.ColorMap;
 import edu.berkeley.guir.prefuse.util.StringAbbreviator;
-import edu.berkeley.guir.prefusex.layout.BalloonTreeLayout;
 import edu.berkeley.guir.prefusex.controls.FocusControl;
 import edu.berkeley.guir.prefusex.controls.NeighborHighlightControl;
 import edu.berkeley.guir.prefusex.controls.PanControl;
 import edu.berkeley.guir.prefusex.controls.SubtreeDragControl;
 import edu.berkeley.guir.prefusex.controls.ZoomControl;
+import edu.berkeley.guir.prefusex.layout.BalloonTreeLayout;
 
 /**
  * Visualizes a tree structure using a balloon tree layout.
@@ -86,7 +85,7 @@ public class BalloonGraphDemo {
 				private StringAbbreviator abbrev = 
 					new StringAbbreviator(null, null);
 					
-				protected String getText(GraphItem item) {
+				protected String getText(VisualItem item) {
 					String s = item.getAttribute(m_labelName);
 					Font font = item.getFont();
 					if ( font == null ) { font = m_font; }
@@ -101,7 +100,7 @@ public class BalloonGraphDemo {
 			};
             Renderer nodeRenderer2 = new DefaultNodeRenderer();
 			Renderer edgeRenderer = new DefaultEdgeRenderer() {
-				protected int getLineWidth(GraphItem item) {
+				protected int getLineWidth(VisualItem item) {
 					String w = item.getAttribute("weight");
 					if ( w != null ) {
 						try {
@@ -136,7 +135,7 @@ public class BalloonGraphDemo {
             animate.add(new RepaintAction());
             
             // initialize display
-            display.setRegistry(registry);
+            display.setItemRegistry(registry);
             display.setSize(700,700);
             display.setBackground(Color.WHITE);
             display.addControlListener(new FocusControl());
@@ -152,10 +151,10 @@ public class BalloonGraphDemo {
                         update.cancel();
                     TreeNode node = (TreeNode)e.getFirstAdded();
                     if ( node != null && !node.equals(tree.getRoot()) ) {                           
-                        tree = TreeLib.breadthFirstTree(node);
+                        tree = GraphLib.breadthFirstTree(node);
                         registry.setGraph(tree);
-                        ActivityManager.scheduleNow(filter);
-                        ActivityManager.scheduleNow(animate);                      
+                        filter.runNow();
+                        animate.runNow();                    
                     }
                 } //
             });
@@ -168,11 +167,9 @@ public class BalloonGraphDemo {
 			frame.pack();
 			frame.setVisible(true);
 			
-			// because awt doesn't always give us 
-			// our graphics context right away...
-			while ( display.getGraphics() == null );
-            ActivityManager.scheduleNow(filter);
-            ActivityManager.scheduleNow(animate);
+			// run filter and perform initial animation
+            filter.runNow();
+            animate.runNow();
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}	
@@ -188,7 +185,7 @@ public class BalloonGraphDemo {
             nodeRenderer2 = nr2;
             edgeRenderer = er;
         } //
-        public Renderer getRenderer(GraphItem item) {
+        public Renderer getRenderer(VisualItem item) {
             if ( item instanceof NodeItem ) {
                 int d = ((NodeItem)item).getDepth();
                 if ( d > 1 ) {
@@ -258,7 +255,7 @@ public class BalloonGraphDemo {
                 ColorMap.getInterpolatedMap(Color.RED, Color.BLACK),0,thresh);
         } //
         
-        public Paint getFillColor(GraphItem item) {
+        public Paint getFillColor(VisualItem item) {
             if ( item instanceof NodeItem ) {
                 return Color.WHITE;
             } else if ( item instanceof AggregateItem ) {
@@ -270,7 +267,7 @@ public class BalloonGraphDemo {
             }
         } //
         
-        public Paint getColor(GraphItem item) {
+        public Paint getColor(VisualItem item) {
             Boolean hl = (Boolean)item.getVizAttribute("highlight");
             if ( hl != null && hl.booleanValue() ) {
                 return Color.BLUE;
@@ -281,8 +278,8 @@ public class BalloonGraphDemo {
                 EdgeItem e = (EdgeItem) item;
                 if ( e.isTreeEdge() ) {
                     int d, d1, d2;
-                    d1 = e.getFirstNode().getDepth();
-                    d2 = e.getSecondNode().getDepth();
+                    d1 = ((NodeItem)e.getFirstNode()).getDepth();
+                    d2 = ((NodeItem)e.getSecondNode()).getDepth();
                     d = Math.max(d1, d2);
                     return cmap.getColor(d);
                 } else {

@@ -2,14 +2,14 @@ package edu.berkeley.guir.prefuse.action;
 
 import java.awt.Color;
 import java.awt.Paint;
-import java.util.HashMap;
 import java.util.Iterator;
 
-import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.VisualItem;
+import edu.berkeley.guir.prefuse.util.ColorLib;
 
 /**
- * Linearly interpolates between starting and ending colors for GraphItems
+ * Linearly interpolates between starting and ending colors for VisualItems
  * during an animation. Custom color interpolators can be written by 
  * subclassing this class and overriding the 
  * <code>getInterpolatedColor()</code> method.
@@ -18,12 +18,6 @@ import edu.berkeley.guir.prefuse.ItemRegistry;
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class ColorInterpolator extends AbstractAction {
-    
-	private HashMap m_colorCache;
-	
-	public ColorInterpolator() {
-		m_colorCache = new HashMap();		
-	} //
 
 	/**
 	 * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
@@ -31,37 +25,23 @@ public class ColorInterpolator extends AbstractAction {
 	public void run(ItemRegistry registry, double frac) {
 		Iterator iter = registry.getItems();
 		while ( iter.hasNext() ) {
-			GraphItem item = (GraphItem)iter.next();
+			VisualItem item = (VisualItem)iter.next();
 			
-            Paint c1 = item.getStartColor(), c2 = item.getEndColor();
-			item.setColor(getInterpolatedColor((Color)c1,(Color)c2,frac));
+            Paint p1 = item.getStartColor(), p2 = item.getEndColor();
+            if ( p1 instanceof Color && p2 instanceof Color ) {
+                Color c1 = (Color)p1, c2 = (Color)p2;
+                item.setColor(ColorLib.getIntermediateColor(c1,c2,frac));
+            } else {
+                throw new IllegalStateException("Can't interpolate Paint"
+                        + " instances that are not of type Color");
+            }
 			
 			Paint f1 = item.getStartFillColor(), f2 = item.getEndFillColor();
-			item.setFillColor(getInterpolatedColor((Color)f1,(Color)f2,frac));
+            if ( f1 instanceof Color && f2 instanceof Color ) {
+                Color c1 = (Color)f1, c2 = (Color)f2;
+                item.setFillColor(ColorLib.getIntermediateColor(c1,c2,frac));
+            }
 		}
-		m_colorCache.clear();
-	} //
-	
-	protected Color getInterpolatedColor(Color c1, Color c2, double frac) {
-		String key = c1.toString() + c2.toString();
-		Color ic;
-		if ( c1.equals(c2) ) {
-			ic = c1;
-		} else {			
-			ic = (Color)m_colorCache.get(key);
-			if ( ic == null ) {				
-				ic = getIntermediateColor(c1,c2,frac);
-				m_colorCache.put(key, ic);
-			}
-		}
-		return ic;
-	} //
-	
-	protected Color getIntermediateColor(Color c1, Color c2, double frac) {
-		return new Color((int)Math.round(frac*c2.getRed()   + (1-frac)*c1.getRed()),
-					     (int)Math.round(frac*c2.getGreen() + (1-frac)*c1.getGreen()),
-					     (int)Math.round(frac*c2.getBlue()  + (1-frac)*c1.getBlue()),
-					     (int)Math.round(frac*c2.getAlpha() + (1-frac)*c1.getAlpha()));
 	} //
 
 } // end of class ColorInterpolator

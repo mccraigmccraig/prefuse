@@ -3,7 +3,7 @@ package edu.berkeley.guir.prefusex.layout;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.action.Layout;
 
@@ -22,7 +22,7 @@ public class RandomLayout extends Layout {
         double h = b.getHeight();
         Iterator nodeIter = registry.getNodeItems();
         while ( nodeIter.hasNext() ) {
-            GraphItem item = (GraphItem)nodeIter.next();
+            VisualItem item = (VisualItem)nodeIter.next();
             x = b.getX() + Math.random()*w;
             y = b.getY() + Math.random()*h;
             item.updateLocation(x,y);

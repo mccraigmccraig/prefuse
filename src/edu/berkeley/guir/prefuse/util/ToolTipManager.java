@@ -165,6 +165,8 @@ public class ToolTipManager implements MouseMotionListener {
      * Performs timing for controlling the display of tooltips.
      */
     public class ToolTipTimer implements Runnable {
+        int DEFAULT_X_OFFSET = 15;
+        int DEFAULT_Y_OFFSET = 10;
         boolean visible = false;
         boolean show = false, squit = true, hquit = true, hide = false;
         int x, y;
@@ -208,9 +210,21 @@ public class ToolTipManager implements MouseMotionListener {
             m_display.repaintImmediate();
             Dimension  d = m_tooltip.getPreferredSize();
             Graphics2D g = (Graphics2D)m_display.getGraphics();
+            
+            int offsetX = x+DEFAULT_X_OFFSET;
+            int offsetY = y+DEFAULT_Y_OFFSET;
+            if (offsetX+d.getWidth() > m_display.getWidth() &&
+                    d.getWidth() < m_display.getWidth()) {
+                offsetX = x-((int)d.getWidth())-DEFAULT_X_OFFSET;
+            }
+            if (offsetY+d.getHeight() > m_display.getHeight() &&
+                    d.getHeight() < m_display.getHeight()) {
+                offsetY = y-((int)d.getHeight())-DEFAULT_Y_OFFSET;      
+            }
+
             // TODO: move to avoid display boundary
             SwingUtilities.paintComponent(g,m_tooltip,m_display,
-                                          x,y,d.width,d.height);
+                    offsetX,offsetY,d.width,d.height);
         } //
         public void unpaint() {
             m_display.repaintImmediate();
@@ -264,7 +278,7 @@ public class ToolTipManager implements MouseMotionListener {
     
     private void moveEvent(MouseEvent e) {
         if ( getToolTipText() != null ) {
-            this.showToolTip(e.getX()+15, e.getY()+10);
+            this.showToolTip(e.getX(), e.getY());
         } else {
             this.hideToolTip();
         }

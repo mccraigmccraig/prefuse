@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 import edu.berkeley.guir.prefuse.AggregateItem;
 import edu.berkeley.guir.prefuse.EdgeItem;
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.NodeItem;
 
 /**
@@ -21,12 +21,12 @@ public class DefaultItemComparator implements Comparator {
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
 	public int compare(Object o1, Object o2) {
-		if ( !(o1 instanceof GraphItem && o2 instanceof GraphItem) ) {
+		if ( !(o1 instanceof VisualItem && o2 instanceof VisualItem) ) {
 			throw new IllegalArgumentException();
 		}
 		
-		GraphItem item1 = (GraphItem)o1;
-		GraphItem item2 = (GraphItem)o2;
+		VisualItem item1 = (VisualItem)o1;
+		VisualItem item2 = (VisualItem)o2;
         
 		boolean f1 = item1.isFocus();
 		boolean f2 = item2.isFocus();

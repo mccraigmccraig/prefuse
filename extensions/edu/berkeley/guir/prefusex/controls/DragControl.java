@@ -3,16 +3,17 @@ package edu.berkeley.guir.prefusex.controls;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.util.Iterator;
+
+import javax.swing.SwingUtilities;
 
 import edu.berkeley.guir.prefuse.Display;
-import edu.berkeley.guir.prefuse.GraphItem;
-import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.NodeItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 
 /**
- * Changes an item's location when dragged on screen. Other effects
- * include fixing a nodes position when the mouse if over it, and
+ * Changes a node's location when dragged on screen. Other effects
+ * include fixing a node's position when the mouse if over it, and
  * changing the mouse cursor to a hand when the mouse passes over an
  * item.
  *
@@ -21,10 +22,10 @@ import edu.berkeley.guir.prefuse.event.ControlAdapter;
  */
 public class DragControl extends ControlAdapter {
 
-    private GraphItem activeItem;
+    private VisualItem activeItem;
     private Point2D down = new Point2D.Double();
     private Point2D tmp = new Point2D.Double();
-    private boolean wasFixed, dragged;
+    private boolean wasFixed, dragged, fixOnMouseOver;
     private boolean repaint = true;
     
     /**
@@ -46,15 +47,28 @@ public class DragControl extends ControlAdapter {
         this.repaint = repaint;
     } //
     
-    public void itemEntered(GraphItem item, MouseEvent e) {
+    /**
+     * Determines whether or not an item should have it's position fixed
+     * when the mouse moves over it.
+     * @param s whether or not item position should become fixed upon
+     *  mouse over.
+     */
+    public void setFixPositionOnMouseOver(boolean s) {
+        fixOnMouseOver = s;
+    } //
+    
+    public void itemEntered(VisualItem item, MouseEvent e) {
+        if (!(item instanceof NodeItem)) return;
         Display d = (Display)e.getSource();
         d.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         activeItem = item;
         wasFixed = item.isFixed();
-        item.setFixed(true);
+        if ( fixOnMouseOver )
+            item.setFixed(true);
     } //
     
-    public void itemExited(GraphItem item, MouseEvent e) {
+    public void itemExited(VisualItem item, MouseEvent e) {
+        if (!(item instanceof NodeItem)) return;
         if ( activeItem == item ) {
             activeItem = null;
             item.setFixed(wasFixed);
@@ -63,13 +77,18 @@ public class DragControl extends ControlAdapter {
         d.setCursor(Cursor.getDefaultCursor());
     } //
     
-    public void itemPressed(GraphItem item, MouseEvent e) {
+    public void itemPressed(VisualItem item, MouseEvent e) {
+        if (!(item instanceof NodeItem)) return;
+        if (!SwingUtilities.isLeftMouseButton(e)) return;
+        item.setFixed(true);
         dragged = false;
         Display d = (Display)e.getComponent();
         down = d.getAbsoluteCoordinate(e.getPoint(), down);
     } //
     
-    public void itemReleased(GraphItem item, MouseEvent e) {
+    public void itemReleased(VisualItem item, MouseEvent e) {
+        if (!(item instanceof NodeItem)) return;
+        if (!SwingUtilities.isLeftMouseButton(e)) return;
         if ( dragged ) {
             activeItem = null;
             item.setFixed(wasFixed);
@@ -77,7 +96,9 @@ public class DragControl extends ControlAdapter {
         }
     } //
     
-    public void itemDragged(GraphItem item, MouseEvent e) {
+    public void itemDragged(VisualItem item, MouseEvent e) {
+        if (!(item instanceof NodeItem)) return;
+        if (!SwingUtilities.isLeftMouseButton(e)) return;
         dragged = true;
         Display d = (Display)e.getComponent();
         tmp = d.getAbsoluteCoordinate(e.getPoint(), tmp);
@@ -87,13 +108,8 @@ public class DragControl extends ControlAdapter {
         item.updateLocation(p.getX()+dx,p.getY()+dy);
         item.setLocation(p.getX()+dx,p.getY()+dy);
         down.setLocation(tmp);
-        if ( repaint ) {
-            ItemRegistry registry = item.getItemRegistry();
-            Iterator iter = registry.getDisplaysRef().iterator();
-            while ( iter.hasNext() ) {
-                ((Display)iter.next()).repaint();
-            }
-        }
+        if ( repaint )
+            item.getItemRegistry().repaint();
     } //
     
 } // end of class DragControl

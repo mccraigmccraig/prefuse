@@ -29,7 +29,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 import edu.berkeley.guir.prefuse.Display;
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.ActionMap;
@@ -121,7 +121,7 @@ public class GraphEditor extends JFrame {
 			// initialize renderers
 			Renderer nodeRenderer = new TextImageItemRenderer();
 			Renderer edgeRenderer = new DefaultEdgeRenderer() {
-				protected int getLineWidth(GraphItem item) {
+				protected int getLineWidth(VisualItem item) {
 					try {
 						String wstr = item.getAttribute("weight");
 						return Integer.parseInt(wstr);
@@ -134,7 +134,7 @@ public class GraphEditor extends JFrame {
 				nodeRenderer, edgeRenderer, null));
 			
 			// initialize display
-			display.setRegistry(registry);
+			display.setItemRegistry(registry);
 			display.setSize(600,600);
 			display.setBackground(Color.WHITE);
             display.setBorder(BorderFactory.createEmptyBorder(30,30,30,30));
@@ -147,7 +147,7 @@ public class GraphEditor extends JFrame {
             filter.add(new GraphNodeFilter());
             filter.add(new GraphEdgeFilter());
             filter.add(actionMap.put("font", new FontFunction() {
-                public Font getFont(GraphItem item) {
+                public Font getFont(VisualItem item) {
                     return curFont;
                 } //
             }));
@@ -303,26 +303,26 @@ public class GraphEditor extends JFrame {
 		private boolean drag     = false;
 		private boolean editing  = false;
 		
-		private GraphItem activeItem;
-		private GraphItem edgeItem;
+		private VisualItem activeItem;
+		private VisualItem edgeItem;
 		
 		private boolean edited   = false;
 		private File    saveFile = null;
 		
-		public void itemEntered(GraphItem item, MouseEvent e) {
+		public void itemEntered(VisualItem item, MouseEvent e) {
             if ( item instanceof NodeItem ) {
                 e.getComponent().setCursor(
                         Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
 		} //
 		
-		public void itemExited(GraphItem item, MouseEvent e) {
+		public void itemExited(VisualItem item, MouseEvent e) {
             if ( item instanceof NodeItem ) {
                 e.getComponent().setCursor(Cursor.getDefaultCursor());
             }
 		} //
 		
-		public void itemPressed(GraphItem item, MouseEvent e) {
+		public void itemPressed(VisualItem item, MouseEvent e) {
 			if ( item instanceof NodeItem ) {
 			    xDown = e.getX();
 			    yDown = e.getY();
@@ -333,7 +333,7 @@ public class GraphEditor extends JFrame {
             }
 		} //
 		
-		public void itemReleased(GraphItem item, MouseEvent e) {
+		public void itemReleased(VisualItem item, MouseEvent e) {
             if (!editing)
                 item.setFixed(false);
             if ( !(item instanceof NodeItem) )
@@ -372,7 +372,7 @@ public class GraphEditor extends JFrame {
                 activityMap.scheduleNow("update");
 		} //
 		
-		public void itemDragged(GraphItem item, MouseEvent e) {
+		public void itemDragged(VisualItem item, MouseEvent e) {
             if ( !(item instanceof NodeItem) )
                 return;
             
@@ -388,7 +388,7 @@ public class GraphEditor extends JFrame {
 			setEdited(true);
 		} //
 		
-		public void itemKeyTyped(GraphItem item, KeyEvent e) {
+		public void itemKeyTyped(VisualItem item, KeyEvent e) {
 			if ( e.getKeyChar() == '\b' ) {				
 				if (item == activeItem) activeItem = null;
 				removeNode(item);
@@ -440,7 +440,7 @@ public class GraphEditor extends JFrame {
                (KeyEvent.ALT_MASK | KeyEvent.CTRL_MASK)) > 0; 
 			if ( Character.isLetterOrDigit(c) && !modded && 
 				src == display && activeItem == null ) {
-				GraphItem item = addNode(xCur, yCur);
+				VisualItem item = addNode(xCur, yCur);
 				item.setAttribute(nameField,String.valueOf(c));
 				editing = true;
 				Rectangle r = item.getBounds();
@@ -476,7 +476,7 @@ public class GraphEditor extends JFrame {
 			return item;
 		} //
 		
-		private void addEdge(GraphItem item1, GraphItem item2) {
+		private void addEdge(VisualItem item1, VisualItem item2) {
 			Node n1 = (Node)item1.getEntity();
 			Node n2 = (Node)item2.getEntity();
 			if ( n1.getIndex(n2) < 0 ) {
@@ -487,7 +487,7 @@ public class GraphEditor extends JFrame {
 			}
 		} //
 		
-		private void removeNode(GraphItem item) {
+		private void removeNode(VisualItem item) {
             Node n = (Node)item.getEntity();
 			g.removeNode(n);
 		} //

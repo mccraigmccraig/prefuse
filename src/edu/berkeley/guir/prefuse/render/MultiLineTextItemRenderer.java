@@ -8,7 +8,7 @@ import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.util.ArrayList;
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.render.TextItemRenderer;
 
 /**
@@ -50,11 +50,11 @@ public class MultiLineTextItemRenderer extends TextItemRenderer {
 	 * causes an exception to be generated.
 	 * @throws UnsupportedOperationException if called.
 	 */
-	protected String getText(GraphItem item) {
+	protected String getText(VisualItem item) {
 		throw new UnsupportedOperationException();
 	} //
 	
-	protected String getText(GraphItem item, int entry) {
+	protected String getText(VisualItem item, int entry) {
 		String name = ((TextEntry)m_attrList.get(entry)).name;
 		return item.getAttribute(name);
 	} //
@@ -67,7 +67,7 @@ public class MultiLineTextItemRenderer extends TextItemRenderer {
 		return ((TextEntry)m_attrList.get(entry)).maxlines;
 	} //
 	
-	protected Font getFont(GraphItem item, int entry) {
+	protected Font getFont(VisualItem item, int entry) {
 		Font f = ((TextEntry)m_attrList.get(entry)).font;
 		if ( f == null ) { f = item.getFont();	}
 		if ( f == null ) { f = m_font; }
@@ -75,9 +75,9 @@ public class MultiLineTextItemRenderer extends TextItemRenderer {
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.VisualItem)
 	 */
-	protected Shape getRawShape(GraphItem item) {
+	protected Shape getRawShape(VisualItem item) {
 		if ( m_g == null ) { return null; }
 		
 		int w = 2*m_horizBorder;
@@ -98,7 +98,7 @@ public class MultiLineTextItemRenderer extends TextItemRenderer {
 		return m_textBox;
 	} //
 	
-	public Rectangle getEntryBounds(GraphItem item, int entry) {
+	public Rectangle getEntryBounds(VisualItem item, int entry) {
 		if ( m_g == null ) { return null; }
 		
 		int dy = m_vertBorder, ew = 0, eh = 0;
@@ -127,9 +127,9 @@ public class MultiLineTextItemRenderer extends TextItemRenderer {
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.render.Renderer#render(java.awt.Graphics2D, edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.render.Renderer#render(java.awt.Graphics2D, edu.berkeley.guir.prefuse.VisualItem)
 	 */
-	public void render(Graphics2D g, GraphItem item) {
+	public void render(Graphics2D g, VisualItem item) {
 		Paint fillColor = item.getFillColor();
 		Paint itemColor = item.getColor();
 		Shape shape = getShape(item);

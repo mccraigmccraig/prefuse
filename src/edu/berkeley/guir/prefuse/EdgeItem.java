@@ -10,7 +10,7 @@ import edu.berkeley.guir.prefuse.graph.Node;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class EdgeItem extends GraphItem {
+public class EdgeItem extends VisualItem implements Edge {
 
 	protected NodeItem m_node1;
 	protected NodeItem m_node2;
@@ -18,8 +18,8 @@ public class EdgeItem extends GraphItem {
 	/**
 	 * Initialize this EdgeItem, binding it to the
      *  given ItemRegistry and Entity.
-	 * @param registry the ItemRegistry monitoring this GraphItem
-	 * @param entity the Entity represented by this GraphItem
+	 * @param registry the ItemRegistry monitoring this VisualItem
+	 * @param entity the Entity represented by this VisualItem
 	 */
 	public void init(ItemRegistry registry, String itemClass, Entity entity) {
 		if ( entity != null && !(entity instanceof Edge) ) {
@@ -40,6 +40,12 @@ public class EdgeItem extends GraphItem {
 	protected NodeItem getItem(Node n) {
 		return m_registry.getNodeItem(n);
 	} //
+    
+    private void nodeItemCheck(Node n) {
+        if ( !(n instanceof NodeItem) )
+            throw new IllegalArgumentException(
+                "Node must be an instance of NodeItem");
+    } //
 
     /**
      * Indicates whether or not this edge is a directed edge.
@@ -65,36 +71,39 @@ public class EdgeItem extends GraphItem {
      * @throws IllegalArgumentException if the provided NodeItem is not
      *  incident on this edge.
      */
-    public NodeItem getAdjacentNode(NodeItem nitem) {
-        if ( m_node1 == nitem )
+    public Node getAdjacentNode(Node n) {
+        nodeItemCheck(n);
+        if ( m_node1 == n )
             return m_node2;
-        else if ( m_node2 == nitem )
+        else if ( m_node2 == n )
             return m_node1;
         else
-            throw new IllegalArgumentException("Input NodeItem is incident on this Edge.");
+            throw new IllegalArgumentException(
+               "The given node is not incident on this Edge.");
     } //
     
 	/**
-	 * Return the GraphItem representing the first (source) node in the edge.
-	 * @return the first (source) GraphItem
+	 * Return the VisualItem representing the first (source) node in the edge.
+	 * @return the first (source) VisualItem
 	 */
-	public NodeItem getFirstNode() {
+	public Node getFirstNode() {
 		return m_node1;
 	} //
 	
 	/**
-	 * Set the GraphItem representing the first (source) node in the edge.
-	 * @param item the first (source) GraphItem
+	 * Set the VisualItem representing the first (source) node in the edge.
+	 * @param item the first (source) VisualItem
 	 */
-	public void setFirstNode(NodeItem item) {
-		m_node1 = item;
+	public void setFirstNode(Node item) {
+        nodeItemCheck(item);
+        m_node1 = (NodeItem)item;
 	} //
 	
 	/**
-	 * Return the GraphItem representing the second (target) node in the edge.
-	 * @return the second (target) GraphItem
+	 * Return the VisualItem representing the second (target) node in the edge.
+	 * @return the second (target) VisualItem
 	 */
-	public NodeItem getSecondNode() {
+	public Node getSecondNode() {
 		return m_node2;
 	} //
 	
@@ -102,8 +111,16 @@ public class EdgeItem extends GraphItem {
 	 * Set the NodeItem representing the second (target) node in the edge.
 	 * @param item the second (target) NodeItem
 	 */
-	public void setSecondNode(NodeItem item) {
-		m_node2 = item;
+	public void setSecondNode(Node item) {
+        nodeItemCheck(item);
+		m_node2 = (NodeItem)item;
 	} //
+
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Edge#isIncident(edu.berkeley.guir.prefuse.graph.Node)
+     */
+    public boolean isIncident(Node n) {
+        return (n == m_node1 || n == m_node2);
+    } //
 
 } // end of class EdgeItem

@@ -136,19 +136,21 @@ public class DefaultGraph extends AbstractGraph {
 	 * @param e the <code>Edge</code> to add
 	 */
 	public boolean addEdge(Edge e) {
-		Node n1 = (Node)e.getFirstNode();
-		Node n2 = (Node)e.getSecondNode();
-		if ( n1.isNeighbor(n2) || n2.isNeighbor(n1) ) {
-			return false;
-		}
 		if ( m_directed ^ e.isDirected() ) {
 			throw new IllegalStateException(
 				"Directedness of edge and graph differ");
 		}
+        Node n1 = (Node)e.getFirstNode();
+        Node n2 = (Node)e.getSecondNode();
+        if ( m_edges.contains(e) || n1.isNeighbor(n2) || 
+             (!m_directed && n2.isNeighbor(n1)) ) {
+            return false;
+        }
 		n1.addEdge(e);
 		if ( !m_directed ) {
 			n2.addEdge(e);
 		}
+        m_edges.add(e);
 		fireEdgeAdded(e);
         return true;
 	} //

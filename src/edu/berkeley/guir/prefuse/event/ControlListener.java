@@ -9,7 +9,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.EventListener;
 
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 
 /**
  * Listener interface for processing user interface events on 
@@ -23,68 +23,68 @@ public interface ControlListener extends
     EventListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
 {
 	
-	//// == Actions performed on GraphItems ===================================
+	//// == Actions performed on VisualItems ===================================
 
 	/**
-	 * Invoked when a mouse button is pressed on a GraphItem and then dragged.
+	 * Invoked when a mouse button is pressed on a VisualItem and then dragged.
 	 */
-	public void itemDragged(GraphItem item, MouseEvent e);
+	public void itemDragged(VisualItem item, MouseEvent e);
 	
 	/**
-	 * Invoked when the mouse cursor has been moved onto a GraphItem but
+	 * Invoked when the mouse cursor has been moved onto a VisualItem but
 	 *  no buttons have been pushed.
 	 */
-	public void itemMoved(GraphItem item, MouseEvent e);
+	public void itemMoved(VisualItem item, MouseEvent e);
 	
 	/**
 	 * Invoked when the mouse wheel is rotated while the mouse is over a
-	 *  GraphItem.
+	 *  VisualItem.
 	 */
-	public void itemWheelMoved(GraphItem item, MouseWheelEvent e);
+	public void itemWheelMoved(VisualItem item, MouseWheelEvent e);
 	
 	/**
 	 * Invoked when the mouse button has been clicked (pressed and released) on
-	 *  a GraphItem.
+	 *  a VisualItem.
 	 */
-	public void itemClicked(GraphItem item, MouseEvent e);
+	public void itemClicked(VisualItem item, MouseEvent e);
 	
 	/**
-	 * Invoked when a mouse button has been pressed on a GraphItem.
+	 * Invoked when a mouse button has been pressed on a VisualItem.
 	 */
-	public void itemPressed(GraphItem item, MouseEvent e);
+	public void itemPressed(VisualItem item, MouseEvent e);
 	
 	/**
-	 * Invoked when a mouse button has been released on a GraphItem.
+	 * Invoked when a mouse button has been released on a VisualItem.
 	 */
-	public void itemReleased(GraphItem item, MouseEvent e);
+	public void itemReleased(VisualItem item, MouseEvent e);
 	
 	/**
-	 * Invoked when the mouse enters a GraphItem.
+	 * Invoked when the mouse enters a VisualItem.
 	 */
-	public void itemEntered(GraphItem item, MouseEvent e);
+	public void itemEntered(VisualItem item, MouseEvent e);
 	
 	/**
-	 * Invoked when the mouse exits a GraphItem.
+	 * Invoked when the mouse exits a VisualItem.
 	 */
-	public void itemExited(GraphItem item, MouseEvent e);
+	public void itemExited(VisualItem item, MouseEvent e);
 	
 	/**
 	 * Invoked when a key has been pressed, while the mouse is over
-	 * 	a GraphItem.
+	 * 	a VisualItem.
 	 */
-	public void itemKeyPressed(GraphItem item, KeyEvent e);
+	public void itemKeyPressed(VisualItem item, KeyEvent e);
 	
 	/**
 	 * Invoked when a key has been released, while the mouse is over
-	 *  a GraphItem.
+	 *  a VisualItem.
 	 */
-	public void itemKeyReleased(GraphItem item, KeyEvent e);
+	public void itemKeyReleased(VisualItem item, KeyEvent e);
 	
 	/**
 	 * Invoked when a key has been typed, while the mouse is over
-	 *  a GraphItem.
+	 *  a VisualItem.
 	 */
-	public void itemKeyTyped(GraphItem item, KeyEvent e);
+	public void itemKeyTyped(VisualItem item, KeyEvent e);
 	
 	
 	//// == Actions performed on the Display ==================================
@@ -101,55 +101,55 @@ public interface ControlListener extends
 	
 	/**
 	 * Invoked when a mouse button has been pressed on the Display but NOT
-	 *  on a GraphItem.
+	 *  on a VisualItem.
 	 */
 	public void mousePressed(MouseEvent e);
 	
 	/**
 	 * Invoked when a mouse button has been released on the Display but NOT
-	 *  on a GraphItem.
+	 *  on a VisualItem.
 	 */
 	public void mouseReleased(MouseEvent e);
 	
 	/**
 	 * Invoked when the mouse button has been clicked (pressed and released) on
-	 *  the Display, but NOT on a GraphItem.
+	 *  the Display, but NOT on a VisualItem.
 	 */
 	public void mouseClicked(MouseEvent e);
 	
 	/**
 	 * Invoked when a mouse button is pressed on the Display (but NOT a 
-	 *  GraphItem) and then dragged.
+	 *  VisualItem) and then dragged.
 	 */
 	public void mouseDragged(MouseEvent e);
 	
 	/**
 	 * Invoked when the mouse cursor has been moved on the Display (but NOT a
-	 * GraphItem) and no buttons have been pushed.
+	 * VisualItem) and no buttons have been pushed.
 	 */
 	public void mouseMoved(MouseEvent e);
 	
 	/**
 	 * Invoked when the mouse wheel is rotated while the mouse is over the
-	 *  Display (but NOT a GraphItem).
+	 *  Display (but NOT a VisualItem).
 	 */
 	public void mouseWheelMoved(MouseWheelEvent e);
 	
 	/**
 	 * Invoked when a key has been pressed, while the mouse is NOT 
-	 *  over a GraphItem.
+	 *  over a VisualItem.
 	 */
 	public void keyPressed(KeyEvent e);
 	
 	/**
 	 * Invoked when a key has been released, while the mouse is NOT
-	 *  over a GraphItem.
+	 *  over a VisualItem.
 	 */
 	public void keyReleased(KeyEvent e);
 	
 	/**
 	 * Invoked when a key has been typed, while the mouse is NOT
-	 *  over a GraphItem.
+	 *  over a VisualItem.
 	 */
 	public void keyTyped(KeyEvent e);
 

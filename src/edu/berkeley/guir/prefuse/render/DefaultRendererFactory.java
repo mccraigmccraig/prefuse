@@ -2,11 +2,11 @@ package edu.berkeley.guir.prefuse.render;
 
 import edu.berkeley.guir.prefuse.AggregateItem;
 import edu.berkeley.guir.prefuse.EdgeItem;
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.NodeItem;
 
 /**
- * Default factory from which to retrieve GraphItem renderers. Assumes only one
+ * Default factory from which to retrieve VisualItem renderers. Assumes only one
  * type of renderer each for NodeItems, EdgeItems, and AggregateItems.
  * 
  * @version 1.0
@@ -19,7 +19,7 @@ public class DefaultRendererFactory implements RendererFactory {
 	private Renderer m_aggrRenderer;
 
 	/**
-	 * Default constructor. Assumes default renderers for each GraphItem type.
+	 * Default constructor. Assumes default renderers for each VisualItem type.
 	 */
 	public DefaultRendererFactory() {
 		this(new DefaultNodeRenderer(),
@@ -43,9 +43,9 @@ public class DefaultRendererFactory implements RendererFactory {
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.render.RendererFactory#getRenderer(edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.render.RendererFactory#getRenderer(edu.berkeley.guir.prefuse.VisualItem)
 	 */
-	public Renderer getRenderer(GraphItem item) {
+	public Renderer getRenderer(VisualItem item) {
 		if ( item instanceof NodeItem ) {
 			return m_nodeRenderer;
 		} else if ( item instanceof EdgeItem ) {			

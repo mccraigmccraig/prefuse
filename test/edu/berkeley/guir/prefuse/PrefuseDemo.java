@@ -84,20 +84,20 @@ public class PrefuseDemo {
 			display.setSize(600,600);
 			display.setBackground(Color.WHITE);
 			display.addControlListener(new ControlAdapter() {
-				public void itemEntered(GraphItem item, MouseEvent e) {
+				public void itemEntered(VisualItem item, MouseEvent e) {
 					if ( item instanceof NodeItem ) {
 						display.drawItem(item);
 						display.repaintImmediate();
 					}
           			e.getComponent().setCursor(new Cursor(Cursor.HAND_CURSOR));
 				} //
-				public void itemExited(GraphItem item, MouseEvent e) {
+				public void itemExited(VisualItem item, MouseEvent e) {
 					if ( item instanceof NodeItem ) {
 						//System.out.println(((NodeItem)item).getDOI() + ": Exited: " + item.getAttribute(nameField));
 					}
           			e.getComponent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				} //
-				public void itemClicked(GraphItem item, MouseEvent e) {
+				public void itemClicked(VisualItem item, MouseEvent e) {
 					System.out.println("Clicked: " + item.getAttribute(nameField));
 					if ( item instanceof NodeItem ) {
 						TreeNode node = (TreeNode)registry.getEntity(item);
@@ -225,7 +225,7 @@ public class PrefuseDemo {
 	   						 (int)Math.round(frac*c2.getBlue()  + (1-frac)*c1.getBlue()));
 	   	} //
 	   
-		public Paint getFillColor(GraphItem item) {
+		public Paint getFillColor(VisualItem item) {
 			if ( item instanceof NodeItem ) {
 				return Color.WHITE;
 			} else if ( item instanceof AggregateItem ) {
@@ -235,7 +235,7 @@ public class PrefuseDemo {
 			}
 		} //
 	   
-	   	public Paint getColor(GraphItem item) {
+	   	public Paint getColor(VisualItem item) {
         	if ( item instanceof NodeItem ) {
 		   		int doi = (int)(-1*((NodeItem)item).getDOI());
 		   		if ( doi > thresh-1 ) { doi = thresh-1; }

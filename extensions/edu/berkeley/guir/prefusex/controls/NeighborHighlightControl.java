@@ -4,11 +4,10 @@ import java.awt.event.MouseEvent;
 import java.util.Iterator;
 
 import edu.berkeley.guir.prefuse.EdgeItem;
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.activity.Activity;
-import edu.berkeley.guir.prefuse.activity.ActivityManager;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 
 /**
@@ -21,7 +20,7 @@ import edu.berkeley.guir.prefuse.event.ControlAdapter;
  * 
  * <p>
  * To test whether not an item has been highlighted, use the method call
- * {@link edu.berkeley.guir.prefuse.GraphItem#getVizAttribute(String)
+ * {@link edu.berkeley.guir.prefuse.VisualItem#getVizAttribute(String)
  * item.getVizAttribute("highlight")}. The result will either be 
  * <code>null</code> or an object of type <code>Boolean</code> indicating
  * whether or not the item is highlighted (a value of <code>null</code>
@@ -50,16 +49,19 @@ public class NeighborHighlightControl extends ControlAdapter {
         this.update = update;
     } //
     
-    public void itemEntered(GraphItem item, MouseEvent e) {
-        setNeighborHighlight((NodeItem)item, true);
+    public void itemEntered(VisualItem item, MouseEvent e) {
+        if ( item instanceof NodeItem )
+            setNeighborHighlight((NodeItem)item, true);
     } //
     
-    public void itemExited(GraphItem item, MouseEvent e) {
-        setNeighborHighlight((NodeItem)item, false);
+    public void itemExited(VisualItem item, MouseEvent e) {
+        if ( item instanceof NodeItem )
+            setNeighborHighlight((NodeItem)item, false);
     } //
     
-    public void itemReleased(GraphItem item, MouseEvent e) {
-        setNeighborHighlight((NodeItem)item, false);
+    public void itemReleased(VisualItem item, MouseEvent e) {
+        if ( item instanceof NodeItem )
+            setNeighborHighlight((NodeItem)item, false);
     } //
     
     public void setNeighborHighlight(NodeItem n, boolean state) {
@@ -69,13 +71,13 @@ public class NeighborHighlightControl extends ControlAdapter {
             Iterator iter = n.getEdges();
             while ( iter.hasNext() ) {
                 EdgeItem eitem = (EdgeItem)iter.next();
-                NodeItem nitem = eitem.getAdjacentNode(n);
+                NodeItem nitem = (NodeItem)eitem.getAdjacentNode(n);
                 eitem.setVizAttribute("highlight", val);
                 nitem.setVizAttribute("highlight", val);
             }
         }
         if ( update != null )
-            ActivityManager.scheduleNow(update);
+            update.runNow();
     } //
     
 } // end of class NeighborHighlightControl

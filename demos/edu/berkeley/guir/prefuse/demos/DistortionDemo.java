@@ -16,14 +16,15 @@ import java.util.Iterator;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import edu.berkeley.guir.prefuse.Display;
-import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.Action;
 import edu.berkeley.guir.prefuse.action.ActionMap;
 import edu.berkeley.guir.prefuse.action.ActionSwitch;
@@ -33,16 +34,16 @@ import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
 import edu.berkeley.guir.prefuse.action.Layout;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.activity.ActionPipeline;
-import edu.berkeley.guir.prefuse.activity.ActivityManager;
 import edu.berkeley.guir.prefuse.activity.ActivityMap;
 import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.GraphLib;
 import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
-import edu.berkeley.guir.prefuse.render.DefaultNodeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
+import edu.berkeley.guir.prefuse.render.TextItemRenderer;
 import edu.berkeley.guir.prefusex.controls.DragControl;
 import edu.berkeley.guir.prefusex.distortion.BifocalDistortion;
+import edu.berkeley.guir.prefusex.distortion.Distortion;
 import edu.berkeley.guir.prefusex.distortion.FisheyeDistortion;
 
 /**
@@ -69,17 +70,17 @@ public class DistortionDemo extends JFrame {
         registry = new ItemRegistry(g);
 
         Display display = new Display();
-        display.setRegistry(registry);
+        display.setItemRegistry(registry);
         display.setSize(600,600);
         display.setBorder(BorderFactory.createEmptyBorder(50,50,50,50));
         display.addControlListener(new DragControl(false));
         
         registry.setRendererFactory(new DefaultRendererFactory(
-            new DefaultNodeRenderer() {
+            new TextItemRenderer() {
                 public int getRenderType() {
                     return RENDER_TYPE_FILL;
                 } //
-            }, 
+            },
             new DefaultEdgeRenderer(), 
             null));
         
@@ -87,8 +88,8 @@ public class DistortionDemo extends JFrame {
         filter.add(new GraphNodeFilter());
         filter.add(new GraphEdgeFilter());
         filter.add(new ColorFunction() {
-            public Paint getFillColor(GraphItem item) {
-                return Color.BLACK;
+            public Paint getFillColor(VisualItem item) {
+                return Color.WHITE;
             } //
         });
         filter.add(new GridLayout());
@@ -109,9 +110,8 @@ public class DistortionDemo extends JFrame {
         pack();
         setVisible(true);
         
-        // wait until graphics are available
-        while ( display.getGraphics() == null );
-        ActivityManager.scheduleNow(filter);
+        // run filter and layout
+        filter.runNow();
         
         // enable distortion mouse-over
         DistortionController dc = new DistortionController();
@@ -170,6 +170,7 @@ public class DistortionDemo extends JFrame {
     class SwitchPanel extends JPanel implements ActionListener {
         public static final String BIFOCAL = "Bifocal";
         public static final String FISHEYE = "Fisheye";
+        public static final String SIZES   = "Transform Sizes";
         public SwitchPanel() {
             setBackground(Color.WHITE);
             initUI();
@@ -181,20 +182,29 @@ public class DistortionDemo extends JFrame {
             fb.setActionCommand(FISHEYE);
             bb.setSelected(true);
             
+            JCheckBox cb = new JCheckBox(SIZES);
+            cb.setActionCommand(SIZES);
+            cb.setSelected(true);
+            
             bb.setBackground(Color.WHITE);
             fb.setBackground(Color.WHITE);
+            cb.setBackground(Color.WHITE);
             
             Font f = new Font("SanSerif",Font.PLAIN,24);
             bb.setFont(f);
             fb.setFont(f);
+            cb.setFont(f);
             
             bb.addActionListener(this);
             fb.addActionListener(this);
+            cb.addActionListener(this);
             
             ButtonGroup bg = new ButtonGroup();
             bg.add(bb); this.add(bb);
-            this.add(Box.createHorizontalStrut(50));
+            this.add(Box.createHorizontalStrut(20));
             bg.add(fb); this.add(fb);
+            this.add(Box.createHorizontalStrut(20));
+            this.add(cb);
         } //
         public void actionPerformed(ActionEvent e) {
             String cmd = e.getActionCommand();
@@ -203,6 +213,11 @@ public class DistortionDemo extends JFrame {
                 activityMap.scheduleNow("distortion");
             } else if ( FISHEYE == cmd ) {
                 ((ActionSwitch)actionMap.get("switch")).setSwitchValue(1);
+                activityMap.scheduleNow("distortion");
+            } else if ( SIZES == cmd ) {
+                boolean s = ((JCheckBox)e.getSource()).isSelected();
+                ((Distortion)actionMap.get("distort1")).setTransformSize(s);
+                ((Distortion)actionMap.get("distort2")).setTransformSize(s);
                 activityMap.scheduleNow("distortion");
             }
         } //

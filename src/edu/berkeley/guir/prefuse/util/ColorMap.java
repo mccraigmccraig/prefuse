@@ -3,8 +3,6 @@ package edu.berkeley.guir.prefuse.util;
 import java.awt.Color;
 import java.awt.Paint;
 
-import edu.berkeley.guir.prefuse.action.ColorFunction;
-
 /**
  * A color map provides a mapping from numeric values to specific colors.
  * This useful for assigning colors to visualized items. The numeric values
@@ -131,7 +129,7 @@ public class ColorMap {
         Paint[] cm = new Paint[size];
         for ( int i=0; i<size; i++ ) {
             float g = ((float)i)/(size-1);
-            cm[i] = new Color(g,g,g);
+            cm[i] = ColorLib.getColor(g,g,g,1.f);
         }
         return cm;
     } //
@@ -159,7 +157,7 @@ public class ColorMap {
         Paint[] cm = new Paint[size];
         for ( int i=0; i<size; i++ ) {
             float f = ((float)i)/(size-1);
-            cm[i] = ColorFunction.calcIntermediateColor(c1,c2,f);
+            cm[i] = ColorLib.getIntermediateColor(c1,c2,f);
         }
         return cm;
     } //
@@ -186,7 +184,7 @@ public class ColorMap {
         Paint[] cm = new Paint[size];
         for ( int i=0; i<size; i++ ) {
             float h = ((float)i)/(size-1);
-            cm[i] = new Color(Color.HSBtoRGB(h,s,b));
+            cm[i] = ColorLib.getColor(Color.HSBtoRGB(h,s,b));
         }
         return cm;
     } //
@@ -213,7 +211,7 @@ public class ColorMap {
             float r = ( i<n ? ((float)(i+1))/n : 1.f );
             float g = ( i<n ? 0.f : ( i<2*n ? ((float)(i-n))/n : 1.f ));
             float b = ( i<2*n ? 0.f : ((float)(i-2*n))/(size-2*n) );
-            cm[i] = new Color(r,g,b);
+            cm[i] = ColorLib.getColor(r,g,b,1.0f);
         }
         return cm;
     } //
@@ -237,7 +235,7 @@ public class ColorMap {
         Paint[] cm = new Paint[size];
         for( int i=0; i<size; i++ ) {
             float r = ((float)i) / Math.max(size-1,1.f);
-            cm[i] = new Color(r,1-r,1.f);
+            cm[i] = ColorLib.getColor(r,1-r,1.f,1.f);
         }
         return cm;
     } //

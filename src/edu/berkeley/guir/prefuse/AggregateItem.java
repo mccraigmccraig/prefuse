@@ -24,8 +24,8 @@ public class AggregateItem extends NodeItem {
 	/**
 	 * Initialize this AggregateItem, binding it to the given
 	 * ItemRegistry and Entity.
-	 * @param registry the ItemRegistry monitoring this GraphItem
-	 * @param entity the Entity represented by this GraphItem
+	 * @param registry the ItemRegistry monitoring this VisualItem
+	 * @param entity the Entity represented by this VisualItem
 	 */
 	public void init(ItemRegistry registry, String itemClass, Entity entity) {
 		if (entity != null && !(entity instanceof Node)) {
@@ -33,7 +33,7 @@ public class AggregateItem extends NodeItem {
 		}
 		super.init(registry, itemClass, entity);
 		
-		GraphItem item = null;
+		VisualItem item = null;
 		if ( entity instanceof Node ) {
 			item = m_registry.getNodeItem((Node)entity);
 		} else if ( entity instanceof Edge ) {

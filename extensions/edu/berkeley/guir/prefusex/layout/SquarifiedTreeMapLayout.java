@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.TreeLayout;
@@ -39,8 +39,8 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
 
     private static Comparator s_cmp = new Comparator() {
         public int compare(Object o1, Object o2) {
-            double s1 = ((GraphItem)o1).getSize();
-            double s2 = ((GraphItem)o2).getSize();
+            double s1 = ((VisualItem)o1).getSize();
+            double s2 = ((VisualItem)o2).getSize();
             return ( s1>s2 ? 1 : (s1<s2 ? -1 : 0));
         } //
     };
@@ -164,7 +164,7 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
         double rmax = Double.MIN_VALUE, rmin = Double.MAX_VALUE, s = 0.0;
         Iterator iter = rlist.iterator();
         while ( iter.hasNext() ) {
-            double r = ((GraphItem)iter.next()).getSize();
+            double r = ((VisualItem)iter.next()).getSize();
             rmin = Math.min(rmin, r);
             rmax = Math.max(rmax, r);
             s += r;
@@ -177,7 +177,7 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
         double s = 0; // sum of row areas
         Iterator rowIter = row.iterator();
         while ( rowIter.hasNext() )
-            s += ((GraphItem)rowIter.next()).getSize();
+            s += ((VisualItem)rowIter.next()).getSize();
         double x = r.getX(), y = r.getY(), d = 0;
         double h = s/w;
         boolean horiz = (w == r.getWidth());

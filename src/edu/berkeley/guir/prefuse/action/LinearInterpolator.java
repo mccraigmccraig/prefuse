@@ -3,7 +3,7 @@ package edu.berkeley.guir.prefuse.action;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 
 /**
@@ -21,7 +21,7 @@ public class LinearInterpolator extends AbstractAction {
 		
 		Iterator itemIter = registry.getItems();
 		while ( itemIter.hasNext() ) {
-			GraphItem item = (GraphItem)itemIter.next();
+			VisualItem item = (VisualItem)itemIter.next();
 			Point2D startLoc = item.getStartLocation();
 			Point2D endLoc   = item.getEndLocation();
 						

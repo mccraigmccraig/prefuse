@@ -16,16 +16,15 @@ import java.util.Iterator;
 import javax.swing.JFrame;
 
 import edu.berkeley.guir.prefuse.Display;
-import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
 import edu.berkeley.guir.prefuse.action.ColorFunction;
 import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.action.TreeEdgeFilter;
 import edu.berkeley.guir.prefuse.activity.ActionPipeline;
-import edu.berkeley.guir.prefuse.activity.ActivityManager;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.io.HDirTreeReader;
@@ -62,15 +61,15 @@ public class TreeMapDemo extends JFrame {
             // occlusion from parent node boxes
             registry.setItemComparator(new Comparator() {
                 public int compare(Object o1, Object o2) {
-                    double s1 = ((GraphItem)o1).getSize();
-                    double s2 = ((GraphItem)o2).getSize();
+                    double s1 = ((VisualItem)o1).getSize();
+                    double s2 = ((VisualItem)o2).getSize();
                     return ( s1>s2 ? -1 : (s1<s2 ? 1 : 0));
                 } //
             });
             
             // initialize our display
             Display display = new Display();
-            display.setRegistry(registry);
+            display.setItemRegistry(registry);
             display.setUseCustomTooltips(true);
             PanControl  pH = new PanControl();
             ZoomControl zH = new ZoomControl();
@@ -79,11 +78,11 @@ public class TreeMapDemo extends JFrame {
             display.addMouseListener(zH);
             display.addMouseMotionListener(zH);
             display.addControlListener(new ControlAdapter() {
-               public void itemEntered(GraphItem item, MouseEvent e) {
+               public void itemEntered(VisualItem item, MouseEvent e) {
                    Display d = (Display)e.getSource();
                    d.setToolTipText(item.getAttribute("label"));
                } //
-               public void itemExited(GraphItem item, MouseEvent e) {
+               public void itemExited(VisualItem item, MouseEvent e) {
                    Display d = (Display)e.getSource();
                    d.setToolTipText(null);
                } //
@@ -109,10 +108,8 @@ public class TreeMapDemo extends JFrame {
             pack();
             setVisible(true);
             
-            // because awt doesn't always give us 
-            // our graphics context right away...
-            while ( display.getGraphics() == null );
-            ActivityManager.scheduleNow(filter);
+            // filter graph and perform layout
+            filter.runNow();
             
         } catch ( Exception e ) {
             e.printStackTrace();
@@ -127,10 +124,10 @@ public class TreeMapDemo extends JFrame {
         Color c1 = new Color(0.5f,0.5f,0.f);
         Color c2 = new Color(0.5f,0.5f,1.f);
         ColorMap cmap = new ColorMap(ColorMap.getInterpolatedMap(10,c1,c2),0,9);
-        public Paint getColor(GraphItem item) {
+        public Paint getColor(VisualItem item) {
             return Color.WHITE;
         } //
-        public Paint getFillColor(GraphItem item) {
+        public Paint getFillColor(VisualItem item) {
             double v = (item instanceof NodeItem ? ((NodeItem)item).getDepth():0);
             return cmap.getColor(v);
         } //
@@ -144,7 +141,8 @@ public class TreeMapDemo extends JFrame {
                 NodeItem n = (NodeItem)iter.next();
                 if ( n.getChildCount() == 0 ) {
                     n.setSize(1.0);
-                    for (NodeItem p=n.getParent(); p!=null; p=p.getParent())
+                    NodeItem p = (NodeItem)n.getParent();
+                    for (; p!=null; p=(NodeItem)p.getParent())
                         p.setSize(1.0+p.getSize());
                     leafCount++;
                 }
@@ -165,7 +163,7 @@ public class TreeMapDemo extends JFrame {
     
     public class NodeRenderer extends ShapeRenderer {
         private Rectangle2D bounds = new Rectangle2D.Double();
-        protected Shape getRawShape(GraphItem item) {
+        protected Shape getRawShape(VisualItem item) {
             Point2D d = (Point2D)item.getVizAttribute("dimension");
             bounds.setRect(item.getX(),item.getY(),d.getX(),d.getY());
             return bounds;

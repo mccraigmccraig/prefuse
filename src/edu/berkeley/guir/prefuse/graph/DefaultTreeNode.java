@@ -152,7 +152,7 @@ public class DefaultTreeNode extends DefaultNode implements TreeNode {
             return Collections.EMPTY_LIST.iterator();
         } else {
             int pidx = ( m_parent == null ? 0 : 
-                TreeLib.nearestIndex(this, m_parent) % m_children.size() );
+                GraphLib.nearestIndex(this, m_parent) % m_children.size() );
             if ( pidx == 0 ) {
                 return m_children.iterator();
             } else {

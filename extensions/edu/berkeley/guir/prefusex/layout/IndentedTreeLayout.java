@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import edu.berkeley.guir.prefuse.AggregateItem;
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.TreeLayout;
@@ -36,7 +36,7 @@ public class IndentedTreeLayout extends TreeLayout {
 			index    = -1;
 			depth    = d;
 		} //
-		GraphItem nodeItem, aggrItem;
+		VisualItem nodeItem, aggrItem;
 		boolean elided, hidden;
 		int index, depth;
 	} //
@@ -52,8 +52,8 @@ public class IndentedTreeLayout extends TreeLayout {
 	private Comparator m_comp  = new Comparator() {
 		Comparator comp = new DOIItemComparator();
 		public int compare(Object o1, Object o2) {
-			GraphItem item1 = ((LayoutEntry)o1).nodeItem;
-			GraphItem item2 = ((LayoutEntry)o2).nodeItem;
+			VisualItem item1 = ((LayoutEntry)o1).nodeItem;
+			VisualItem item2 = ((LayoutEntry)o2).nodeItem;
 			return comp.compare(item1, item2);
 		} //
 	};
@@ -158,12 +158,12 @@ public class IndentedTreeLayout extends TreeLayout {
 		while ( nodeIter.hasNext() && treeHeight > availHeight ) {
 			// get the next node, set node item as elided, calculate space savings
 			LayoutEntry entry = (LayoutEntry)nodeIter.next();
-			GraphItem nitem = entry.nodeItem;
+			VisualItem nitem = entry.nodeItem;
 			int run, idx = entry.index;
 			elided[idx] = true;
 			if ( (run=elisionRun(elided, idx)) > 0 ) {
 				for ( int j = 0; j < run; j++ ) {
-					GraphItem item = ((LayoutEntry)m_entryList.get(idx+j)).nodeItem;
+					VisualItem item = ((LayoutEntry)m_entryList.get(idx+j)).nodeItem;
 					treeHeight -= item.getBounds().height;
 					
 					// if all children are elided, don't bother with aggregate
@@ -187,7 +187,7 @@ public class IndentedTreeLayout extends TreeLayout {
 			if ( (aitem != null && elided[i]) || 
 				 (i < elided.length-1 && elided[i] && elided[i+1]) ) {
 				LayoutEntry entry = ((LayoutEntry)m_entryList.get(i));
-				GraphItem item = entry.nodeItem;
+				VisualItem item = entry.nodeItem;
 				TreeNode n = (TreeNode)item.getEntity();
 				if ( aitem == null ) {
 					// get the new aggregate item when needed
@@ -231,7 +231,7 @@ public class IndentedTreeLayout extends TreeLayout {
 	 * Copy attributes from one item to another. Used for initializing
 	 * aggregate items.
 	 */
-	private void copyAttributes(GraphItem item1, GraphItem item2) {
+	private void copyAttributes(VisualItem item1, VisualItem item2) {
 		item2.setLocation(item1.getLocation());
 		item2.setEndLocation(item1.getEndLocation());
 		item2.setSize(item1.getSize());
@@ -248,7 +248,7 @@ public class IndentedTreeLayout extends TreeLayout {
 	protected void updateStartLocations(List entryList) {
 		for ( int i = 0; i < entryList.size(); i++ ) {
 			LayoutEntry entry = (LayoutEntry)entryList.get(i);
-			GraphItem item;
+			VisualItem item;
 			item = entry.nodeItem;
 					
 			// added set start position for newly visible nodes -- jheer
@@ -260,7 +260,7 @@ public class IndentedTreeLayout extends TreeLayout {
 				} else {
 					TreeNode p = node.getParent();
 					if ( p != null ) {
-						GraphItem pitem = m_registry.getNodeItem(p);
+						VisualItem pitem = m_registry.getNodeItem(p);
 						item.setLocation(pitem.getEndLocation());
 					}
 				}
@@ -272,10 +272,10 @@ public class IndentedTreeLayout extends TreeLayout {
 	 * Compute the layout.
 	 */
 	protected int layout(List entryList, int xAnchor, int height) {
-		GraphItem tmpAggr = null;
+		VisualItem tmpAggr = null;
 		for ( int i = 0; i < entryList.size(); i++ ) {
 			LayoutEntry entry = (LayoutEntry)entryList.get(i);
-			GraphItem item;
+			VisualItem item;
 			if ( entry.hidden ) {
 				continue;
 			} else if ( entry.elided ) {
@@ -301,7 +301,7 @@ public class IndentedTreeLayout extends TreeLayout {
 	 * @param x the x-coordinate of the node
 	 * @param y the y-coordinate of the node
 	 */
-	protected void setLocation(GraphItem item, double x, double y) {
+	protected void setLocation(VisualItem item, double x, double y) {
 		List entities = null;
 		if ( item instanceof AggregateItem ) {
 			entities = ((AggregateItem)item).getEntities();
@@ -321,7 +321,7 @@ public class IndentedTreeLayout extends TreeLayout {
 	/**
 	 * Indicates whether or not a node has been manually expanded.
 	 */
-	private boolean isExpanded(GraphItem item) {
+	private boolean isExpanded(VisualItem item) {
 		Boolean b = ((Boolean)item.getVizAttribute(ATTR_EXPANDED));
 		return ( b == null ? false : b.booleanValue() );
 	} //

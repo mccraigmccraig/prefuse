@@ -2,7 +2,7 @@ package edu.berkeley.guir.prefuse.event;
 
 import java.util.EventListener;
 
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 
 /**
  * A listener interface through which components can be notified
@@ -15,15 +15,15 @@ import edu.berkeley.guir.prefuse.GraphItem;
 public interface ItemRegistryListener extends EventListener {
   
   /**
-   * Indicates a binding to a new GraphItem has been established.
-   * @param item the new GraphItem
+   * Indicates a binding to a new VisualItem has been established.
+   * @param item the new VisualItem
    */
-  public void registryItemAdded(GraphItem item);
+  public void registryItemAdded(VisualItem item);
   
   /**
-   * Indicates a binding to a GraphItem has been removed.
-   * @param item the removed GraphItem
+   * Indicates a binding to a VisualItem has been removed.
+   * @param item the removed VisualItem
    */
-  public void registryItemRemoved(GraphItem item);
+  public void registryItemRemoved(VisualItem item);
   
 } // end of class ItemRegistryListener

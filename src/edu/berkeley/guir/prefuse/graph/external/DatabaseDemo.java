@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.EdgeItem;
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
@@ -21,7 +21,6 @@ import edu.berkeley.guir.prefuse.action.FisheyeGraphFilter;
 import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.activity.ActionPipeline;
-import edu.berkeley.guir.prefuse.activity.ActivityManager;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.event.ItemRegistryListener;
@@ -75,8 +74,8 @@ public class DatabaseDemo extends JFrame {
         Graph g = new DefaultGraph();
         registry = new ItemRegistry(g);
         registry.addItemRegistryListener(new ItemRegistryListener() {
-            public void registryItemAdded(GraphItem item) {}
-            public void registryItemRemoved(GraphItem item) {
+            public void registryItemAdded(VisualItem item) {}
+            public void registryItemRemoved(VisualItem item) {
                 //System.out.println("registry remove: "+item);
             }
         });
@@ -113,14 +112,14 @@ public class DatabaseDemo extends JFrame {
             public void entityLoaded(GraphLoader loader, Entity e) {
                 System.out.println("loaded - "+e);
                 forces.cancel();
-                ActivityManager.scheduleNow(filter);
-                ActivityManager.scheduleNow(forces);
+                filter.runNow();
+                forces.runNow();
             } //
             public void entityUnloaded(GraphLoader loader, Entity e) {
                 System.out.println((++unloaded)+" unloaded - "+e);
                 forces.cancel();
-                ActivityManager.scheduleNow(filter);
-                ActivityManager.scheduleNow(forces);
+                filter.runNow();
+                forces.runNow();
             } //
         });
         
@@ -173,7 +172,7 @@ public class DatabaseDemo extends JFrame {
         
         // initialize the display
         Display display = new Display();
-        display.setRegistry(registry);
+        display.setItemRegistry(registry);
         display.setSize(800,700);
         display.pan(350,350);
         display.addControlListener(new FocusControl(2));
@@ -185,7 +184,7 @@ public class DatabaseDemo extends JFrame {
             public void focusChanged(FocusEvent e) {
                 NodeItem n = registry.getNodeItem((Node)e.getFirstRemoved());
                 if ( n != null ) n.setFixed(false);
-                ActivityManager.scheduleNow(filter);
+                filter.runNow();
             } //
         });
         registry.getDefaultFocusSet().set(root);
@@ -198,8 +197,8 @@ public class DatabaseDemo extends JFrame {
         
         // wait until graphics are available
         while ( display.getGraphics() == null );
-        ActivityManager.scheduleNow(filter);
-        ActivityManager.scheduleNow(forces);
+        filter.runNow();
+        forces.runNow();
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -209,7 +208,7 @@ public class DatabaseDemo extends JFrame {
         private Color pastelRed = new Color(255,125,125);
         private Color pastelOrange = new Color(255,200,125);
         private Color lightGray = new Color(220,220,255);
-        public Paint getColor(GraphItem item) {
+        public Paint getColor(VisualItem item) {
             if ( item instanceof EdgeItem ) {
                 Boolean h = (Boolean)item.getVizAttribute("highlight");
                 if ( h != null && h.booleanValue() )
@@ -220,7 +219,7 @@ public class DatabaseDemo extends JFrame {
                 return Color.BLACK;
             }
         } //
-        public Paint getFillColor(GraphItem item) {
+        public Paint getFillColor(VisualItem item) {
             Boolean h = (Boolean)item.getVizAttribute("highlight");
             if ( h != null && h.booleanValue() )
                 return pastelOrange;

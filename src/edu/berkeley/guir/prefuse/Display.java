@@ -9,6 +9,8 @@ import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -25,12 +27,15 @@ import java.util.Iterator;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 
-import edu.berkeley.guir.prefuse.event.ControlListener;
 import edu.berkeley.guir.prefuse.event.ControlEventMulticaster;
+import edu.berkeley.guir.prefuse.event.ControlListener;
 import edu.berkeley.guir.prefuse.render.Renderer;
 import edu.berkeley.guir.prefuse.util.Clip;
+import edu.berkeley.guir.prefuse.util.ColorLib;
+import edu.berkeley.guir.prefuse.util.FontLib;
 import edu.berkeley.guir.prefuse.util.ToolTipManager;
 
 /**
@@ -58,7 +63,7 @@ import edu.berkeley.guir.prefuse.util.ToolTipManager;
  * 
  * <p>Additionally, each Display instance also supports use of a text editor
  * to facilitate direct editing of text. See the various
- * {@link #editText(edu.berkeley.guir.prefuse.GraphItem, String) editItem}
+ * {@link #editText(edu.berkeley.guir.prefuse.VisualItem, String) editItem}
  * methods.</p>
  * 
  * @version 1.0
@@ -72,28 +77,42 @@ public class Display extends JComponent {
 	protected ItemRegistry    m_registry;
 	protected ControlListener m_listener;
 	protected BufferedImage   m_offscreen;
-    protected Clip            m_clip, m_pclip, m_cclip;
+    protected Clip            m_clip = new Clip();
     
     protected AffineTransform m_transform  = new AffineTransform();
     protected AffineTransform m_itransform = new AffineTransform();
     protected Point2D m_tmpPoint = new Point2D.Double();
     
+    // frame count and debugging output
     protected double frameRate;
     protected int  nframes = 0;
     private int  sampleInterval = 10;
     private long mark = -1L;
+    private boolean m_showDebug = false;
     
     private JTextComponent m_editor;
     private boolean        m_editing;
-    private GraphItem      m_editItem;
+    private VisualItem      m_editItem;
     private String         m_editAttribute;
     
     private ToolTipManager m_ttipManager;
 	
-	/**
-	 * Constructor. Creates a new display instance.
+    /**
+	 * Constructor. Creates a new display instance. You will need to
+	 * associate this Display with an ItemRegistry for it to display
+	 * anything.
 	 */
-	public Display() {
+    public Display() {
+    	this(null);
+    } //
+    
+	/**
+	 * Creates a new display instance associated with the given
+	 * ItemRegistry.
+	 * @param registry the ItemRegistry from which this Display
+	 *  should get the items to visualize.
+	 */
+	public Display(ItemRegistry registry) {
         setDoubleBuffered(false);
         setBackground(Color.WHITE);
         
@@ -111,9 +130,16 @@ public class Display extends JComponent {
 		addMouseWheelListener(iec);
 		addKeyListener(iec);
         
-        m_clip  = new Clip();
-        m_pclip = new Clip();
-        m_cclip = new Clip();
+        // add debugging output control
+        registerKeyboardAction(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        m_showDebug = !m_showDebug;
+                    }
+                },
+                "debug", KeyStroke.getKeyStroke("ctrl D"), WHEN_FOCUSED);
+        
+        setItemRegistry(registry);
 	} //
 
     public void setUseCustomTooltips(boolean s) {
@@ -198,7 +224,7 @@ public class Display extends JComponent {
      *  A value of null associates this Display with no ItemRegistry
      *  at all.
      */
-    public void setRegistry(ItemRegistry registry) {
+    public void setItemRegistry(ItemRegistry registry) {
         if ( m_registry == registry ) {
             // nothing need be done
             return;
@@ -391,6 +417,25 @@ public class Display extends JComponent {
 			RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 	} //
 	
+    /**
+     * Returns a string showing debugging info such as number of visualized
+     * items and the current frame rate.
+     * @return the debug string
+     */
+    protected String getDebugString() {
+        StringBuffer sb = new StringBuffer();
+        float fr = Math.round(frameRate*100f)/100f;
+        sb.append("frame rate: ").append(fr).append("fps - ");
+        sb.append(m_registry.size()).append(" items (");
+        sb.append(m_registry.size(ItemRegistry.DEFAULT_NODE_CLASS));
+        sb.append(" nodes, ");
+        sb.append(m_registry.size(ItemRegistry.DEFAULT_EDGE_CLASS));
+        sb.append(" edges) fontCache(").append(FontLib.getCacheMissCount());
+        sb.append(") colorCache(");
+        sb.append(ColorLib.getCacheMissCount()).append(')');
+        return sb.toString();
+    } //
+    
 	/**
 	 * Paint routine called <i>before</i> items are drawn. Subclasses should
 	 * override this method to perform custom drawing.
@@ -423,6 +468,13 @@ public class Display extends JComponent {
 		g2D.setColor(getBackground());
 		Dimension d = this.getSize();
 		g2D.fillRect(0, 0, d.width, d.height);
+        
+        // show debugging info?
+		if ( m_showDebug ) {
+            g2D.setFont(getFont());
+            g2D.setColor(Color.BLACK);
+            g2D.drawString(getDebugString(), 5, 15);     
+        }
 
 		prepareGraphics(g2D);
 		prePaint(g2D);
@@ -431,32 +483,13 @@ public class Display extends JComponent {
 		synchronized (m_registry) {
             m_clip.setClip(0,0,getWidth(),getHeight());
             m_clip.transform(m_itransform);
-            //m_clip.limit(0,0,getWidth(),getHeight());
-//            m_cclip.setClip(Integer.MAX_VALUE, Integer.MAX_VALUE,
-//                            Integer.MIN_VALUE, Integer.MIN_VALUE);
-//            int count = 0;
-//            Iterator items = m_registry.getItems();
-//            while (items.hasNext()) {
-//                GraphItem gi = (GraphItem) items.next();
-//                Rectangle b = gi.getBounds();
-//                m_cclip.union(b);
-//                count++;
-//            }
-//            // update clipping region
-//            if ( count == 0 )
-//                m_cclip.setClip(0,0,getWidth(),getHeight());
-//            m_cclip.transform(m_transform);
-//            m_clip.setClip(m_cclip);
-//            m_clip.union(m_pclip);
-//            m_clip.limit(0,0,getWidth(),getHeight());
-//            m_pclip.setClip(m_cclip);
             Iterator items = m_registry.getItems();
             while (items.hasNext()) {
-                GraphItem gi = (GraphItem) items.next();
-                Renderer renderer = gi.getRenderer();
-                Rectangle b = renderer.getBoundsRef(gi);
+                VisualItem vi = (VisualItem) items.next();
+                Renderer renderer = vi.getRenderer();
+                Rectangle b = renderer.getBoundsRef(vi);
                 if ( m_clip.intersects(b) )
-                    renderer.render(g2D, gi);
+                    renderer.render(g2D, vi);
             }
 		}
 
@@ -500,7 +533,7 @@ public class Display extends JComponent {
 	 * method to have these changes directly propagate to the screen.
 	 * @param item
 	 */
-	public void drawItem(GraphItem item) {
+	public void drawItem(VisualItem item) {
 		Graphics2D g2D = (Graphics2D) m_offscreen.getGraphics();
 		if (g2D != null) {
             prepareGraphics(g2D);
@@ -512,7 +545,7 @@ public class Display extends JComponent {
     // == CONTROL LISTENER METHODS ============================================
     
 	/**
-	 * Adds a ControlListener to receive all input events on GraphItems.
+	 * Adds a ControlListener to receive all input events on VisualItems.
 	 * @param cl the listener to add.
 	 */
 	public void addControlListener(ControlListener cl) {
@@ -528,20 +561,20 @@ public class Display extends JComponent {
 	} //
     
 	/**
-	 * Returns the GraphItem located at the given point.
+	 * Returns the VisualItem located at the given point.
 	 * @param p the Point at which to look
-	 * @return the GraphItem located at the given point, if any
+	 * @return the VisualItem located at the given point, if any
 	 */
-	public GraphItem findItem(Point p) {
+	public VisualItem findItem(Point p) {
         Point2D p2 = (m_itransform==null ? p : 
                         m_itransform.transform(p, m_tmpPoint));
 		synchronized (m_registry) {
 			Iterator items = m_registry.getItemsReversed();
 			while (items.hasNext()) {
-				GraphItem gi = (GraphItem) items.next();
-				Renderer r = gi.getRenderer();
-				if (r != null && r.locatePoint(p2, gi)) {
-					return gi;
+				VisualItem vi = (VisualItem) items.next();
+				Renderer r = vi.getRenderer();
+				if (r != null && r.locatePoint(p2, vi)) {
+					return vi;
 				}
 			}
 		}
@@ -550,18 +583,18 @@ public class Display extends JComponent {
     
 	/**
 	 * Captures all mouse and key events on the display, detects relevant 
-	 * GraphItems, and informs ControlListeners.
+	 * VisualItems, and informs ControlListeners.
 	 */
 	public class InputEventCapturer
 		implements MouseMotionListener, MouseWheelListener, MouseListener, KeyListener {
 
-		private GraphItem activeGI = null;
+		private VisualItem activeVI = null;
 		private boolean mouseDown = false;
         private boolean itemDrag = false;
 
 		public void mouseDragged(MouseEvent e) {
-            if (m_listener != null && activeGI != null) {
-				m_listener.itemDragged(activeGI, e);
+            if (m_listener != null && activeVI != null) {
+				m_listener.itemDragged(activeVI, e);
 			} else if ( m_listener != null ) {
 				m_listener.mouseDragged(e);
 			}
@@ -570,37 +603,37 @@ public class Display extends JComponent {
 		public void mouseMoved(MouseEvent e) {
 			boolean earlyReturn = false;
 			//check if we've gone over any item
-			GraphItem g = findItem(e.getPoint());
-			if (m_listener != null && activeGI != null && activeGI != g) {
-				m_listener.itemExited(activeGI, e);
+			VisualItem vi = findItem(e.getPoint());
+			if (m_listener != null && activeVI != null && activeVI != vi) {
+				m_listener.itemExited(activeVI, e);
 				earlyReturn = true;
 			}
-			if (m_listener != null && g != null && g != activeGI) {
-				m_listener.itemEntered(g, e);
+			if (m_listener != null && vi != null && vi != activeVI) {
+				m_listener.itemEntered(vi, e);
 				earlyReturn = true;
 			}
-			activeGI = g;
+			activeVI = vi;
 			if ( earlyReturn ) return;
 			
-			if ( m_listener != null && g != null && g == activeGI ) {
-				m_listener.itemMoved(g, e);
+			if ( m_listener != null && vi != null && vi == activeVI ) {
+				m_listener.itemMoved(vi, e);
 			}
-			if ( m_listener != null && g == null ) {
+			if ( m_listener != null && vi == null ) {
 				m_listener.mouseMoved(e);
 			}
 		} //
 
 		public void mouseWheelMoved(MouseWheelEvent e) {
-			if (m_listener != null && activeGI != null) {
-				m_listener.itemWheelMoved(activeGI, e);
+			if (m_listener != null && activeVI != null) {
+				m_listener.itemWheelMoved(activeVI, e);
 			} else if ( m_listener != null ) {
 				m_listener.mouseWheelMoved(e);
 			}
 		} //
 
 		public void mouseClicked(MouseEvent e) {
-			if (m_listener != null && activeGI != null) {
-				m_listener.itemClicked(activeGI, e);
+			if (m_listener != null && activeVI != null) {
+				m_listener.itemClicked(activeVI, e);
 			} else if ( m_listener != null ) {
 				m_listener.mouseClicked(e);
 			}
@@ -608,26 +641,26 @@ public class Display extends JComponent {
 
 		public void mousePressed(MouseEvent e) {
 		    mouseDown = true;
-			if (m_listener != null && activeGI != null) {
-				m_listener.itemPressed(activeGI, e);
+			if (m_listener != null && activeVI != null) {
+				m_listener.itemPressed(activeVI, e);
 			} else if ( m_listener != null ) {
 				m_listener.mousePressed(e);
 			}
 		} //
 
 		public void mouseReleased(MouseEvent e) {
-			if (m_listener != null && activeGI != null) {
-				m_listener.itemReleased(activeGI, e);
+			if (m_listener != null && activeVI != null) {
+				m_listener.itemReleased(activeVI, e);
 			} else if ( m_listener != null ) {
 				m_listener.mouseReleased(e);
 			}
-            if ( m_listener != null && activeGI != null 
+            if ( m_listener != null && activeVI != null 
                     && mouseDown && isOffComponent(e) )
             {
                 // mouse was dragged off of the component, 
                 // then released, so register an exit
-                m_listener.itemExited(activeGI, e);
-                activeGI = null;
+                m_listener.itemExited(activeVI, e);
+                activeVI = null;
             }
             mouseDown = false;
 		} //
@@ -639,11 +672,11 @@ public class Display extends JComponent {
 		} //
 
 		public void mouseExited(MouseEvent e) {
-			if (m_listener != null && !mouseDown && activeGI != null) {
+			if (m_listener != null && !mouseDown && activeVI != null) {
                 // we've left the component and an item 
                 // is active but not being dragged, deactivate it
-                m_listener.itemExited(activeGI, e);
-                activeGI = null;
+                m_listener.itemExited(activeVI, e);
+                activeVI = null;
 			}
 			if ( m_listener != null ) {
 				m_listener.mouseExited(e);
@@ -651,24 +684,24 @@ public class Display extends JComponent {
 		} //
 
 		public void keyPressed(KeyEvent e) {
-			if (m_listener != null && activeGI != null) {
-				m_listener.itemKeyPressed(activeGI, e);
+			if (m_listener != null && activeVI != null) {
+				m_listener.itemKeyPressed(activeVI, e);
 			} else if ( m_listener != null ) {
 				m_listener.keyPressed(e);
 			}
 		} //
 
 		public void keyReleased(KeyEvent e) {
-			if (m_listener != null && activeGI != null) {
-				m_listener.itemKeyReleased(activeGI, e);
+			if (m_listener != null && activeVI != null) {
+				m_listener.itemKeyReleased(activeVI, e);
 			} else if ( m_listener != null ) {
 				m_listener.keyReleased(e);
 			}
 		} //
 
 		public void keyTyped(KeyEvent e) {
-			if (m_listener != null && activeGI != null) {
-				m_listener.itemKeyTyped(activeGI, e);
+			if (m_listener != null && activeVI != null) {
+				m_listener.itemKeyTyped(activeVI, e);
 			} else if ( m_listener != null ) {
 				m_listener.keyTyped(e);
 			}
@@ -703,14 +736,14 @@ public class Display extends JComponent {
     } //
     
     /**
-     * Edit text for the given GraphItem and attribute. Presents a text
+     * Edit text for the given VisualItem and attribute. Presents a text
      * editing widget spaning the item's bounding box. Use stopEditing()
      * to hide the text widget. When stopEditing() is called, the attribute
-     * will automatically be updated with the GraphItem.
-     * @param item the GraphItem to edit
+     * will automatically be updated with the VisualItem.
+     * @param item the VisualItem to edit
      * @param attribute the attribute to edit
      */
-    public void editText(GraphItem item, String attribute) {
+    public void editText(VisualItem item, String attribute) {
         if ( m_editing ) { stopEditing(); }
         Rectangle r = item.getBounds();
         
@@ -731,16 +764,16 @@ public class Display extends JComponent {
     } //
     
     /**
-     * Edit text for the given GraphItem and attribute. Presents a text
+     * Edit text for the given VisualItem and attribute. Presents a text
      * editing widget spaning the given bounding box. Use stopEditing()
      * to hide the text widget. When stopEditing() is called, the attribute
-     * will automatically be updated with the GraphItem.
-     * @param item the GraphItem to edit
+     * will automatically be updated with the VisualItem.
+     * @param item the VisualItem to edit
      * @param attribute the attribute to edit
      * @param r Rectangle representing the desired bounding box of the text
      *  editing widget
      */
-    public void editText(GraphItem item, String attribute, Rectangle r) {
+    public void editText(VisualItem item, String attribute, Rectangle r) {
         if ( m_editing ) { stopEditing(); }
         String txt = item.getAttribute(attribute);
         m_editItem = item;
@@ -774,8 +807,8 @@ public class Display extends JComponent {
     
     /**
      * Stops text editing on the display, hiding the text editing widget. If
-     * the text editor was associated with a specific GraphItem (ie one of the
-     * editText() methods which include a GraphItem as an argument was called),
+     * the text editor was associated with a specific VisualItem (ie one of the
+     * editText() methods which include a VisualItem as an argument was called),
      * the item is updated with the edited text.
      */
     public void stopEditing() {

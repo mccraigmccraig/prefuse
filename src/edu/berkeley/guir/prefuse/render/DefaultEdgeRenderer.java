@@ -1,5 +1,6 @@
 package edu.berkeley.guir.prefuse.render;
 
+import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -10,8 +11,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
 import edu.berkeley.guir.prefuse.EdgeItem;
-import edu.berkeley.guir.prefuse.GraphItem;
-import edu.berkeley.guir.prefuse.graph.DefaultEdge;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.util.GeometryLib;
 
 /**
@@ -39,7 +39,6 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	public static final int ALIGNMENT_TOP    = 0;
 	
 	protected Line2D       m_line  = new Line2D.Float();
-	protected Polygon      m_fline = new Polygon();
 	protected CubicCurve2D m_cubic = new CubicCurve2D.Float();
 
 	protected int     m_edgeType = EDGE_TYPE_LINE;
@@ -72,10 +71,8 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	/**
 	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRenderType()
 	 */
-	public int getRenderType() { 
-		if ( m_edgeType == EDGE_TYPE_LINE && m_curWidth > 1 ) {
-			return RENDER_TYPE_FILL;
-		} else if ( m_directed ) {
+	public int getRenderType() {
+		if ( m_directed ) {
 			return RENDER_TYPE_DRAW_AND_FILL;
 		} else {
 			return RENDER_TYPE_DRAW;
@@ -83,12 +80,12 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	} //
   	
   	/**
-  	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.GraphItem)
+  	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.VisualItem)
   	 */
-	protected Shape getRawShape(GraphItem item) {
+	protected Shape getRawShape(VisualItem item) {
 		EdgeItem   edge = (EdgeItem)item;
-		GraphItem item1 = edge.getFirstNode();
-		GraphItem item2 = edge.getSecondNode();
+		VisualItem item1 = (VisualItem)edge.getFirstNode();
+		VisualItem item2 = (VisualItem)edge.getSecondNode();
 		
 		String stype = (String)edge.getVizAttribute(EDGE_TYPE);
 		int type = m_edgeType;
@@ -109,15 +106,9 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 		m_curWidth = getLineWidth(item);
 		
 		switch ( type ) {
-			case EDGE_TYPE_LINE:
-				if ( m_curWidth > 1 ) {
-					m_fline.reset();
-					getLine(m_fline, n1x, n1y, n2x, n2y, m_curWidth);
-					return m_fline;		
-				} else {				
-					m_line.setLine(n1x, n1y, n2x, n2y);
-					return m_line;
-				}
+			case EDGE_TYPE_LINE:			
+				m_line.setLine(n1x, n1y, n2x, n2y);
+				return m_line;
 			case EDGE_TYPE_CURVE:
 				getCurveControlPoints(edge, m_ctrlPoints,n1x,n1y,n2x,n2y);
 				m_cubic.setCurve(n1x, n1y,
@@ -126,16 +117,17 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 								n2x,n2y);
 				return m_cubic;
 			default:
-				throw new IllegalStateException("Unknown edge type.");
+				throw new IllegalStateException("Unknown edge type");
 		}	
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.render.Renderer#render(java.awt.Graphics2D, edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.render.Renderer#render(java.awt.Graphics2D, edu.berkeley.guir.prefuse.VisualItem)
 	 */
-	public void render(Graphics2D g, GraphItem item) {
+	public void render(Graphics2D g, VisualItem item) {
 		super.render(g, item);
-		if ( ((DefaultEdge)((EdgeItem)item).getEntity()).isDirected() ) {
+        EdgeItem e = (EdgeItem)item;
+		if ( e.isDirected() ) {
 			Point2D start = null, end = null;
 			int width;
 			
@@ -144,7 +136,7 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 			if ( stype != null ) {
 				try {
 					type = Integer.parseInt(stype);
-				} catch ( Exception e ) {}
+				} catch ( Exception ex ) {}
 			}
 			switch ( type ) {
 				case EDGE_TYPE_LINE:
@@ -160,7 +152,7 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 				default:
 					throw new IllegalStateException("Unknown edge type.");
 			}
-			GraphItem item2 = ((EdgeItem)item).getSecondNode();
+			VisualItem item2 = (VisualItem)e.getSecondNode();
 			Rectangle r = item2.getBounds();
 			int i = GeometryLib.intersectLineRectangle(start, end, r, m_isctPoints);
 			if ( i > 0 )
@@ -189,23 +181,30 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getGraphicsSpaceTransform(edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getTransform(edu.berkeley.guir.prefuse.VisualItem)
 	 */
-	protected AffineTransform getGraphicsSpaceTransform(GraphItem item) {
+	protected AffineTransform getTransform(VisualItem item) {
 		return null;
 	} //
 
 	/**
-	 * Returns the line width to be used for this GraphItem. By default,
+	 * Returns the line width to be used for this VisualItem. By default,
 	 * returns the value set using the <code>setWidth</code> method.
 	 * Subclasses should override this method to perform custom line
 	 * width determination.
-	 * @param item the GraphItem for which to determine the line width
+	 * @param item the VisualItem for which to determine the line width
 	 * @return the desired line width, in pixels
 	 */
-	protected int getLineWidth(GraphItem item) {
+	protected int getLineWidth(VisualItem item) {
 		return m_width;
 	} //
+    
+    /**
+     * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getStroke(edu.berkeley.guir.prefuse.VisualItem)
+     */
+    protected BasicStroke getStroke(VisualItem item) {
+        return (m_curWidth == 1 ? null : new BasicStroke(m_curWidth));
+    } //
 
 	/**
 	 * Determines the control points to use for cubic (Bezier) curve edges. 
@@ -245,42 +244,6 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 			y = y+h;
 		}
 		p.setLocation(x,y);
-	} //
-
-	/**
-	 * Returns a line of the desired thickness between the two given points.
-	 */
-	protected static void getLine(Polygon p, double x1, double y1, double x2, double y2, int width) {
-		double xdelta, phi, theta, xoff, yoff, x3, y3, x4, y4;
-		
-		xdelta = x2 - x1;
-		phi = 0.;
-		if (Math.abs(xdelta) >= .5) phi = Math.atan(Math.abs(y2-y1)/ Math.abs(xdelta));
-		theta = Math.PI / 2. - Math.abs(phi);
-		xoff = width/2.0 * Math.cos(theta);
-		yoff = width/2.0 * Math.sin(theta);
-		
-		x4 = Math.round(x2 + xoff);
-		x3 = Math.round(x1 + xoff);
-		x2 = Math.round(x2 - xoff);
-		x1 = Math.round(x1 - xoff);
-		if (((x1 < x2) && (y1 < y2)) || ((x2 < x1) && (y2 < y1))) {
-			y4 = Math.round(y2 - yoff);
-			y3 = Math.round(y1 - yoff);	
-			y2 = Math.round(y2 + yoff);
-			y1 = Math.round(y1 + yoff);		
-		} else {
-			y4 = Math.round(y2 + yoff);
-			y3 = Math.round(y1 + yoff);
-			y2 = Math.round(y2 - yoff);
-			y1 = Math.round(y1 - yoff);		
-		}
-		
-		p.addPoint((int)x1, (int)y1);
-		p.addPoint((int)x2, (int)y2);
-		p.addPoint((int)x4, (int)y4);
-		p.addPoint((int)x3, (int)y3);
-		p.addPoint((int)x1, (int)y1);
 	} //
 
 	/**

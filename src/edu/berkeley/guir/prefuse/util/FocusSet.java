@@ -12,7 +12,7 @@ import edu.berkeley.guir.prefuse.graph.Entity;
  * search results. As these various entities may not yet be visualized
  * when they are added to the set, the FocusSet manages collections
  * of abstract graph Entity instances, rather than their visualized
- * GraphItem analogues.
+ * VisualItem analogues.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

@@ -4,7 +4,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.TreeLayout;
@@ -109,7 +109,7 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
     } //
 
     private NodeItem getPrevParent(NodeItem f, NodeItem pf) {
-        for ( ; pf != null && pf.getParent() != f; pf = pf.getParent() );
+        for (; pf!=null && pf.getParent()!=f; pf=(NodeItem)pf.getParent());
         return pf;
     } //
     
@@ -125,7 +125,7 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
         int pD = getParams(p).numDescendants;
         int cD = 0;
         for ( int i = 0; i < pidx; i++ )
-            cD += getParams(n.getChild(i)).numDescendants;
+            cD += getParams((NodeItem)n.getChild(i)).numDescendants;
         double f = (cD + ((double)pD) / 2.0) / ((double)nD);    
         return ptheta - f*TWO_PI;       
     } //
@@ -217,7 +217,7 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
         }
     } //
     
-    private RadialParams getParams(GraphItem item) {
+    private RadialParams getParams(VisualItem item) {
         RadialParams rp = (RadialParams)item.getVizAttribute("radialParams");
         if ( rp == null ) {
             rp = new RadialParams();

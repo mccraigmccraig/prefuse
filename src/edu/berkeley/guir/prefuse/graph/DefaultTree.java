@@ -67,7 +67,7 @@ public class DefaultTree extends AbstractGraph implements Tree {
             Edge e = p.getChildEdge(cidx);
             p.removeAsChild(cidx);
             p.setParentEdge(e);
-            c.setAsChild(TreeLib.nearestIndex(c,p), p);		
+            c.setAsChild(GraphLib.nearestIndex(c,p), p);		
 			p = c;
 		}
 		m_root = root;

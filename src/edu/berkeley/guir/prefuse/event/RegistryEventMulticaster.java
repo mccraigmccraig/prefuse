@@ -2,7 +2,7 @@ package edu.berkeley.guir.prefuse.event;
 
 import java.util.EventListener;
 
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 
 /**
  * Manages a list of listeners for prefuse item registry events.
@@ -25,12 +25,12 @@ public class RegistryEventMulticaster extends EventMulticaster
 		return (ItemRegistryListener) removeInternal(l, oldl);
 	} //
 
-	public void registryItemAdded(GraphItem item) {
+	public void registryItemAdded(VisualItem item) {
 		((ItemRegistryListener) a).registryItemAdded(item);
 		((ItemRegistryListener) b).registryItemAdded(item);
 	} //
 
-	public void registryItemRemoved(GraphItem item) {
+	public void registryItemRemoved(VisualItem item) {
 		((ItemRegistryListener) a).registryItemRemoved(item);
 		((ItemRegistryListener) b).registryItemRemoved(item);
 	} //

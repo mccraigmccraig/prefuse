@@ -2,11 +2,11 @@ package edu.berkeley.guir.prefuse.action;
 
 import java.util.Iterator;
 
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 
 /**
- * Linearly interpolates the size of a GraphItem.
+ * Linearly interpolates the size of a VisualItem.
  * 
  * @version 1.0
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
@@ -23,7 +23,7 @@ public class SizeInterpolator extends AbstractAction {
 		
 		Iterator itemIter = registry.getItems();
 		while ( itemIter.hasNext() ) {
-			GraphItem item = (GraphItem)itemIter.next();
+			VisualItem item = (VisualItem)itemIter.next();
 			ss = item.getStartSize();
 			es = item.getEndSize();						
 			s = ss + frac * (es - ss);						

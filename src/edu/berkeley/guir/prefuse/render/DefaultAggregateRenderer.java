@@ -9,7 +9,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.PixelGrabber;
 
 import edu.berkeley.guir.prefuse.AggregateItem;
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 
 /**
  * Renders AggregateItems as images retrieved from the ImageFactory.
@@ -28,7 +28,7 @@ public class DefaultAggregateRenderer implements Renderer {
 	/**
 	 * override render() to draw an image.
 	 */
-	public void render(Graphics2D g, GraphItem item) {
+	public void render(Graphics2D g, VisualItem item) {
 		AggregateItem aItem = (AggregateItem) item;
 		Image image = m_imageFactory.getImage(aItem);
 		if ( image != null )
@@ -55,9 +55,9 @@ public class DefaultAggregateRenderer implements Renderer {
 	} //
 
     /**
-     * @see edu.berkeley.guir.prefuse.render.Renderer#locatePoint(java.awt.geom.Point2D, edu.berkeley.guir.prefuse.GraphItem)
+     * @see edu.berkeley.guir.prefuse.render.Renderer#locatePoint(java.awt.geom.Point2D, edu.berkeley.guir.prefuse.VisualItem)
      */
-	public boolean locatePoint(Point2D p, GraphItem item) {
+	public boolean locatePoint(Point2D p, VisualItem item) {
 		AggregateItem aItem = (AggregateItem) item;
 		Image image = m_imageFactory.getImage(aItem);
 		if ( image == null ) { return false; }
@@ -80,9 +80,9 @@ public class DefaultAggregateRenderer implements Renderer {
 	} //
 	
     /**
-     * @see edu.berkeley.guir.prefuse.render.Renderer#getBoundsRef(edu.berkeley.guir.prefuse.GraphItem)
+     * @see edu.berkeley.guir.prefuse.render.Renderer#getBoundsRef(edu.berkeley.guir.prefuse.VisualItem)
      */
-	public Rectangle getBoundsRef(GraphItem item) {
+	public Rectangle getBoundsRef(VisualItem item) {
 		AggregateItem aItem = (AggregateItem) item;
 		Image image = m_imageFactory.getImage(aItem);
 		if ( image == null ) { return new Rectangle(-1,-1,0,0);	}

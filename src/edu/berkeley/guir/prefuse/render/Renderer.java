@@ -4,10 +4,10 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 
-import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 
 /**
- * Interface for rendering GraphItems. Supports drawing as well as location
+ * Interface for rendering VisualItems. Supports drawing as well as location
  * and bounding box routines.
  * 
  * @author newbergr
@@ -20,7 +20,7 @@ public interface Renderer {
    * @param g the Graphics2D context
    * @param item the item to draw
    */
-  public void render(Graphics2D g, GraphItem item);
+  public void render(Graphics2D g, VisualItem item);
 
   /**
    * Returns true if the Point is located inside coordinates of the item.
@@ -28,13 +28,13 @@ public interface Renderer {
    * @param item the item to test containment against
    * @return true if the point is contained within the the item, else false
    */
-  public boolean locatePoint(Point2D p, GraphItem item);
+  public boolean locatePoint(Point2D p, VisualItem item);
   
   /**
    * Returns a reference to the bounding rectangle for the item.
    * @param item the item to compute the bounding box for
    * @return the item's bounding box as a Rectangle
    */
-  public Rectangle getBoundsRef(GraphItem item);  
+  public Rectangle getBoundsRef(VisualItem item);  
   
 } // end of interface Renderer
