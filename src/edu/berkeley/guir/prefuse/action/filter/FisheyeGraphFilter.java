@@ -111,9 +111,11 @@ public class FisheyeGraphFilter extends Filter {
             NodeItem fitem = registry.getNodeItem(fnode);
 
             boolean recurse = false;
-            recurse = ( fitem==null ||  fitem.getDirty()>0 || fitem.getDOI()<0 );
+            recurse = ( fitem==null || fitem.getDirty()>0 || fitem.getDOI()<0 );
             
-            fitem = registry.getNodeItem(fnode, true);
+            if (fitem==null || fitem.getDirty() > 0)
+                fitem = registry.getNodeItem(fnode, true);
+            
             fgraph.addNode(fitem);
             
             if ( !recurse )
@@ -121,13 +123,13 @@ public class FisheyeGraphFilter extends Filter {
             
             fitem.setDOI(0);
             m_queue.add(fitem);
-        
+            
             while ( !m_queue.isEmpty() ) {
                 NodeItem ni = (NodeItem)m_queue.remove(0);
                 Node n = (Node)ni.getEntity();
                 
                 double doi = ni.getDOI()-1;
-                if ( doi >= m_minDOI ) {					
+                if ( doi >= m_minDOI ) {                    
                     Iterator niter = n.getNeighbors();
                     int i = 0;
                     while ( niter.hasNext() ) {
@@ -135,7 +137,8 @@ public class FisheyeGraphFilter extends Filter {
                         NodeItem nni = registry.getNodeItem(nn);
                         
                         recurse = ( nni==null ||  nni.getDirty()>0 || nni.getDOI()<doi );
-                        nni = registry.getNodeItem(nn, true);
+                        if ( nni == null || nni.getDirty() > 0)
+                            nni = registry.getNodeItem(nn, true);
                         fgraph.addNode(nni);
                         
                         if ( recurse ) {
@@ -151,12 +154,14 @@ public class FisheyeGraphFilter extends Filter {
         Iterator nodeIter = registry.getNodeItems();
         while ( nodeIter.hasNext() ) {
             NodeItem nitem  = (NodeItem)nodeIter.next();
+            if ( nitem.getDirty() > 0 ) continue;
             Node node = (Node)nitem.getEntity();
             Iterator edgeIter = node.getEdges();
             while ( edgeIter.hasNext() ) {
                 Edge edge = (Edge)edgeIter.next();
                 Node n = edge.getAdjacentNode(node);
-                if ( registry.isVisible(n) ) {
+                NodeItem item = registry.getNodeItem(n);
+                if ( item != null && item.getDirty()==0 ) {
                     EdgeItem eitem = registry.getEdgeItem(edge, true);
                     fgraph.addEdge(eitem);
                     if ( !m_edgesVisible ) eitem.setVisible(false);
