@@ -28,7 +28,6 @@ import edu.berkeley.guir.prefuse.graph.io.XMLGraphReader;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.TextItemRenderer;
-import edu.berkeley.guir.prefusex.controls.AnchorUpdateControl;
 import edu.berkeley.guir.prefusex.controls.DragControl;
 import edu.berkeley.guir.prefusex.distortion.FisheyeDistortion;
 
@@ -123,9 +122,10 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         distort.add(new RepaintAction());
         
         // enable distortion mouse-over
-        final AnchorUpdateControl auc = new AnchorUpdateControl(feye, distort);
-        display.addMouseListener(auc);
-        display.addMouseMotionListener(auc);
+        final TimelineInteractionListener mouseOverUpdates = 
+            new TimelineInteractionListener(feye, distort, 10);
+        display.addMouseListener(mouseOverUpdates);
+        display.addMouseMotionListener(mouseOverUpdates);
 
         // set up this JFrame
         final JFrame frame = new JFrame(TITLE);
@@ -164,6 +164,19 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
     
     // (( INNER CLASSES )) \\
     private static class MusicHistoryColorFunction extends ColorFunction {
+        private Color pastelOrange = new Color(255,200,125);
+
+        public Paint getColor(VisualItem item) {
+            if ( item instanceof NodeItem ) {
+                if ( item.isHighlighted() )
+                    return pastelOrange;
+                else
+                    return Color.BLACK;//Color.LIGHT_GRAY;
+            } else {
+                return Color.BLACK;
+            }
+        }
+        
         public Paint getFillColor(VisualItem item) {
             if (item instanceof NodeItem) {
                 final String nodeType = item.getAttribute(NODE_TYPE);
@@ -178,8 +191,9 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
                 } else {
                     return Color.MAGENTA;
                 }
+            } else {
+                return super.getFillColor(item);
             }
-            return super.getFillColor(item);
         }
     } // end of class MusicHistoryColorFunction
 
