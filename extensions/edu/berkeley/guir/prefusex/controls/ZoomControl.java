@@ -25,6 +25,8 @@ public class ZoomControl extends ControlAdapter {
     private int yLast;
     private Point2D down = new Point2D.Float();
     private boolean repaint = true;
+    private double minScale = 1E-4;
+    private double maxScale = 75;
     
     /**
      * Creates a new zooming control that issues repaint requests as an item
@@ -59,10 +61,27 @@ public class ZoomControl extends ControlAdapter {
     public void mouseDragged(MouseEvent e) {
         if ( SwingUtilities.isRightMouseButton(e) ) {
             Display display = (Display)e.getComponent();
+            double scale = display.getScale();
+            
             int x = e.getX(), y = e.getY();
             int dy = y-yLast;
             double zoom = 1 + ((double)dy) / 100;
+            double result = scale*zoom;
+            if ( result < minScale ) {
+                zoom = minScale/scale;
+                display.setCursor(
+                        Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            } else if ( result > maxScale ){
+                zoom = maxScale/scale;
+                display.setCursor(
+                        Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            } else {
+                display.setCursor(
+                        Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
+            }
+            
             display.zoomAbs(down, zoom);
+            
             yLast = y;
             if ( repaint )
                 display.repaint();
@@ -74,5 +93,37 @@ public class ZoomControl extends ControlAdapter {
             e.getComponent().setCursor(Cursor.getDefaultCursor());
         }
     } //
-
+    
+    /**
+     * Gets the maximum scale value allowed by this zoom control
+     * @return the maximum scale value 
+     */
+    public double getMaxScale() {
+        return maxScale;
+    } //
+    
+    /**
+     * Sets the maximum scale value allowed by this zoom control
+     * @return the maximum scale value 
+     */
+    public void setMaxScale(double maxScale) {
+        this.maxScale = maxScale;
+    } //
+    
+    /**
+     * Gets the minimum scale value allowed by this zoom control
+     * @return the minimum scale value 
+     */
+    public double getMinScale() {
+        return minScale;
+    } //
+    
+    /**
+     * Sets the minimum scale value allowed by this zoom control
+     * @return the minimum scale value 
+     */
+    public void setMinScale(double minScale) {
+        this.minScale = minScale;
+    } //
+    
 } // end of class ZoomControl
