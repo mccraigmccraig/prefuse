@@ -33,6 +33,7 @@ public class Spring {
                 Spring s = (Spring)springs.remove(springs.size()-1);
                 s.item1 = f1;
                 s.item2 = f2;
+                s.length = length;
                 return s;
             } else {
                 return new Spring(f1,f2,length);
