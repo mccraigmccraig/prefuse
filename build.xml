@@ -181,7 +181,7 @@
   </target>
 
   <!-- =================================================================== -->
-  <!-- Creates the prefuse.jar in ./build                                 -->
+  <!-- Creates the prefusex.jar in ./build                                 -->
   <!-- =================================================================== -->
   <target name="ext" depends="compile-ext">
     <jar jarfile="${build.dir}/${name}x.jar"
@@ -206,10 +206,10 @@
   <!-- =================================================================== -->
   <!-- Creates the API documentation in ./doc/api/                         -->
   <!-- =================================================================== -->
-  <target name="api" depends="prepare-prefuse, prepare-ext">
+  <target name="api" depends="prepare-prefuse, prepare-ext, prepare-demos">
     <mkdir dir="${doc.apidocs}"/>
     <javadoc packagenames="${packages}"
-             sourcepath="${build.prefuse.src};${build.ext.src}"
+             sourcepath="${build.prefuse.src};${build.ext.src};${build.demos.src}"
              destdir="${doc.apidocs}"
              author="true"
              version="true"
@@ -218,9 +218,9 @@
              splitindex="true"
              noindex="false"
              windowtitle="${Name} API Documentation"
-             doctitle="${Name}"
+             doctitle="&lt;font face='Verdana,Arial,Helvetica,Sans-Serif'>the ${Name} graph visualization toolkit&lt;/font>"
              overview="${build.prefuse.src}/edu/berkeley/guir/prefuse/overview.html"
-             bottom="Copyright &#169; ${year} by University of California, Berkeley."             
+             bottom="Copyright &#169; ${year} University of California, Berkeley."             
     />
   </target>
 
