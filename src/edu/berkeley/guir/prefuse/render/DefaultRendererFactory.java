@@ -24,7 +24,7 @@ public class DefaultRendererFactory implements RendererFactory {
 	public DefaultRendererFactory() {
 		this(new DefaultNodeRenderer(),
 		     new DefaultEdgeRenderer(),
-		     new DefaultAggregateRenderer());
+		     null);
 	} //
 	
 	/**
