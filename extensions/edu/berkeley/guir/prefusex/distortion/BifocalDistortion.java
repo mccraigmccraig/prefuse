@@ -92,6 +92,36 @@ public class BifocalDistortion extends Distortion {
         p.setLocation(x,y);
     } //
     
+
+    /**
+     * @see edu.berkeley.guir.prefusex.distortion.Distortion#transformSize(java.awt.geom.Rectangle2D, java.awt.geom.Point2D, java.awt.geom.Point2D, java.awt.geom.Rectangle2D)
+     */
+    protected double transformSize(Rectangle2D bbox, Point2D pf, 
+            Point2D anchor, Rectangle2D bounds)
+    {
+        boolean xmag = false, ymag = false;
+        double x  = bbox.getCenterX(), y = bbox.getCenterY();
+        double ax = anchor.getX(), ay = anchor.getY();
+        double minX = bounds.getMinX(), maxX = bounds.getMaxX();
+        double minY = bounds.getMinY(), maxY = bounds.getMaxY();
+        
+        double m = (x<ax ? ax-minX : maxX-ax);
+        if ( m == 0 ) m = maxX-minX;
+        if ( Math.abs(x-ax) <= rx*m )
+            xmag = true;
+        
+        m = (y<ay ? ay-minY : maxY-ay);
+        if ( m == 0 ) m = maxY-minY;
+        if ( Math.abs(y-ay) <= ry*m )
+            ymag = true;
+        
+        if ( xmag && ymag ) {
+            return Math.min(mx,my);
+        } else {
+            return Math.min((1-rx*mx)/(1-rx), (1-ry*my)/(1-ry));
+        }
+    } //
+    
     private double bifocal(double x, double a, double r, double mag, double min, double max) {
         double m = (x<a ? a-min : max-a);
         if ( m == 0 ) m = max-min;

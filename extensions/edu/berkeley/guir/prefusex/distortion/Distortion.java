@@ -4,8 +4,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 
-import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.Layout;
 
 /**
@@ -17,26 +17,47 @@ import edu.berkeley.guir.prefuse.action.Layout;
  */
 public abstract class Distortion extends Layout {
 
-    Point2D m_tmp = new Point2D.Double();
+    private Point2D m_tmp = new Point2D.Double();
+    private boolean m_transformSize = true;
+    
+    public void setTransformSize(boolean s) {
+        m_transformSize = s;
+    } //
     
     public void run(ItemRegistry registry, double frac) {
         Rectangle2D bounds = getLayoutBounds(registry);
         Point2D anchor = correct(getLayoutAnchor(), bounds);
         Iterator iter = registry.getItems();
         while ( iter.hasNext() ) {
-            GraphItem item = (GraphItem)iter.next();
+            VisualItem item = (VisualItem)iter.next();
             if ( item.isFixed() ) continue;
             
+            // reset distorted values
+            item.getLocation().setLocation(item.getEndLocation());
+            item.setSize(item.getEndSize());
+            
+            // compute distortion if we have a distortion focus
             if ( anchor != null ) {
+                Rectangle2D bbox = item.getBounds();
+                Point2D loc = item.getLocation();
                 transformPoint(item.getEndLocation(), 
-                               item.getLocation(), 
-                               anchor, bounds);
-            } else {
-                item.getLocation().setLocation(item.getEndLocation());
+                               loc, anchor, bounds);
+                if ( m_transformSize ) {
+                    double sz = transformSize(bbox, loc, anchor, bounds);
+                    item.setSize(sz*item.getEndSize());
+                }
             }
         }
     } //
     
+    /**
+     * Corrects the anchor position, such that if the anchor is outside the
+     * layout bounds, the anchor is adjusted to be the nearest point on the
+     * edge of the bounds.
+     * @param anchor the un-corrected anchor point
+     * @param bounds the layout bounds
+     * @return the corrected anchor point
+     */
     private Point2D correct(Point2D anchor, Rectangle2D bounds) {
         if ( anchor == null ) return anchor;
         double x = anchor.getX(), y = anchor.getY();
@@ -59,6 +80,18 @@ public abstract class Distortion extends Layout {
      * @param bounds the layout bounds
      */
     protected abstract void transformPoint(Point2D o, Point2D p, 
+            Point2D anchor, Rectangle2D bounds);
+    
+    /**
+     * Returns the scaling factor by which to transform the size of an 
+     * undistorted item to a distorted item.
+     * @param bbox the bounding box of the undistorted item
+     * @param pf the location of the distorted item
+     * @param anchor the anchor or focus point of the display
+     * @param bounds the layout bounds
+     * @return
+     */
+    protected abstract double transformSize(Rectangle2D bbox, Point2D pf, 
             Point2D anchor, Rectangle2D bounds);
 
 } // end of abstract class Distortion

@@ -87,6 +87,7 @@ public class FisheyeDistortion extends Distortion {
     
     /**
      * Calculates a Cartesian graphical fisheye distortion.
+     * @see edu.berkeley.guir.prefusex.distortion.Distortion#transformPoint(java.awt.geom.Point2D, java.awt.geom.Point2D, java.awt.geom.Point2D, java.awt.geom.Rectangle2D)
      */
     protected void transformPoint(Point2D o, Point2D p, 
             Point2D anchor, Rectangle2D bounds)
@@ -96,6 +97,32 @@ public class FisheyeDistortion extends Distortion {
         double y = fisheye(o.getY(), anchor.getY(), dy,
                 bounds.getMinY(), bounds.getMaxY());
         p.setLocation(x,y);
+    } //
+    
+    /**
+     * Calculates the size scaling factor for a Cartesian 
+     *  graphical fisheye distortion.
+     * @see edu.berkeley.guir.prefusex.distortion.Distortion#transformSize(java.awt.geom.Rectangle2D, java.awt.geom.Point2D, java.awt.geom.Point2D, java.awt.geom.Rectangle2D)
+     */
+    protected double transformSize(Rectangle2D bbox, Point2D pf, 
+            Point2D anchor, Rectangle2D bounds)
+    {
+        double ax = anchor.getX(), ay = anchor.getY();
+        double minX = bbox.getMinX(), maxX = bbox.getMaxX();
+        double minY = bbox.getMinY(), maxY = bbox.getMaxY();
+        double x = (Math.abs(minX-ax) > Math.abs(maxX-ax) ? minX : maxX);
+        double y = (Math.abs(minY-ay) > Math.abs(maxY-ay) ? minY : maxY);
+        if ( x < bounds.getMinX() || x > bounds.getMaxX() )
+            x = (x==minX ? maxX : minX);
+        if ( y < bounds.getMinY() || y > bounds.getMaxY() )
+            y = (y==minY ? maxY : minY);
+        
+        double fx = fisheye(x,ax,dx,bounds.getMinX(),bounds.getMaxX());
+        double fy = fisheye(y,ay,dy,bounds.getMinY(),bounds.getMaxY());
+        
+        double sf = Math.min(Math.abs(pf.getX()-fx),Math.abs(pf.getY()-fy));
+        sf = 3*sf / Math.max(bbox.getWidth(),bbox.getHeight());
+        return sf;
     } //
     
     private double fisheye(double x, double a, double d, double min, double max) {
