@@ -28,6 +28,7 @@ public class ForceDirectedLayout extends Layout {
     
     private ForceSimulator m_fsim;
     private long m_lasttime = -1L;
+    private long m_maxstep = 100L;
     private boolean m_runonce;
     private int m_iterations = 100;
     private boolean m_enforceBounds;
@@ -85,7 +86,7 @@ public class ForceDirectedLayout extends Layout {
             if ( m_lasttime == -1 )
                 m_lasttime = System.currentTimeMillis()-20;
             long time = System.currentTimeMillis();
-            long timestep = time - m_lasttime;
+            long timestep = Math.min(m_maxstep, time - m_lasttime);
             m_lasttime = time;
             
             // run force simulator
