@@ -168,11 +168,9 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 			if ( i > 0 )
 				end = m_isctPoints[0];
 			AffineTransform at = getArrowTrans(start, end, width);
-			AffineTransform tmp = g.getTransform();
-			g.setTransform(at);
+            Shape arrowHead = at.createTransformedShape(m_arrowHead);
 			g.setColor(item.getFillColor());
-			g.fill(m_arrowHead);
-			g.setTransform(tmp);
+			g.fill(arrowHead);
 		}
 	} //
 

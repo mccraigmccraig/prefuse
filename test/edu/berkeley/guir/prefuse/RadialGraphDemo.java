@@ -39,6 +39,7 @@ import edu.berkeley.guir.prefuse.pipeline.PolarInterpolator;
 import edu.berkeley.guir.prefuse.pipeline.RadialNodePerturber;
 import edu.berkeley.guir.prefuse.pipeline.RadialTreeLayout;
 import edu.berkeley.guir.prefuse.pipeline.SlowInSlowOutAnimator;
+import edu.berkeley.guir.prefuse.pipeline.TreeEdgeFilter;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.Renderer;
@@ -125,7 +126,7 @@ public class RadialGraphDemo {
 				} //
 			};
 			Renderer aggrRenderer = null;
-			//((DefaultEdgeRenderer)edgeRenderer).setEdgeType(DefaultEdgeRenderer.EDGE_TYPE_CURVE);
+			((DefaultEdgeRenderer)edgeRenderer).setEdgeType(DefaultEdgeRenderer.EDGE_TYPE_CURVE);
 
 			// initialize item registry
 			registry = pipeline.getItemRegistry();
@@ -141,6 +142,7 @@ public class RadialGraphDemo {
 			
 			// initialize pipeline	
 			Filter            nodeFilter    = new FisheyeTreeFilter();
+            Filter            edgeFilter1   = new TreeEdgeFilter();
 			                  layout        = new RadialTreeLayout();
 			PipelineComponent perturber     = new RadialNodePerturber();
 			Filter            edgeFilter    = new GraphEdgeFilter();
@@ -150,7 +152,7 @@ public class RadialGraphDemo {
 			Interpolator      cInterpolator = new ColorInterpolator();
 			
 			pipeline.addComponent(nodeFilter);
-			pipeline.addComponent(edgeFilter);
+			pipeline.addComponent(edgeFilter1);
             pipeline.addComponent(layout);
             pipeline.addComponent(perturber);
 			pipeline.addComponent(colorFunction);

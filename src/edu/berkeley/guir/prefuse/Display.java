@@ -15,6 +15,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.Iterator;
 
@@ -37,6 +40,9 @@ public class Display extends Canvas {
 	protected ControlListener m_listener;
 	protected BufferedImage   m_offscreen;
     
+    protected AffineTransform m_transform, m_itransform;
+    protected Point2D m_tmpPoint = new Point2D.Double();
+    
     protected double frameRate;
     private int  nframes = 0;
     private int  sampleInterval = 10;
@@ -51,6 +57,12 @@ public class Display extends Canvas {
 		addMouseMotionListener(mec);
 		addMouseWheelListener(mec);
 		addKeyListener(mec);
+        // XXX DEBUG
+//        try {
+//            setTransform(AffineTransform.getRotateInstance(Math.PI/6));
+//        } catch ( Exception e ) {
+//            e.printStackTrace();
+//        }
 	} //
 
 	/**
@@ -88,6 +100,21 @@ public class Display extends Canvas {
 		m_itemRegistry = pipeline.getItemRegistry();
 	} //
 
+    public void setTransform(AffineTransform transform) 
+        throws NoninvertibleTransformException
+    {
+        m_transform = transform;
+        m_itransform = m_transform.createInverse();
+    } //
+    
+    public AffineTransform getTransform() {
+        return m_transform;
+    } //
+    
+    public AffineTransform getInverseTransform() {
+        return m_itransform;
+    } //
+    
 	/**
 	 * Returns the offscreen buffer used by this component for 
 	 *  double-buffering.
@@ -120,6 +147,12 @@ public class Display extends Canvas {
 		}
 	} //
 
+    protected void prepareGraphics(Graphics2D g) {
+        if ( m_transform != null )
+            g.setTransform(m_transform);
+        setRenderingHints(g);
+    } //
+    
 	/**
 	 * Sets the rendering hints that should be used while drawing
 	 * the visualization to the screem.
@@ -166,15 +199,9 @@ public class Display extends Canvas {
 		Dimension d = this.getSize();
 		g2D.fillRect(0, 0, d.width, d.height);
 
-		setRenderingHints(g2D);
+		prepareGraphics(g2D);
 		prePaint(g2D);
-
-		/// XXX DEBUG
-		//System.out.println("--- START rendering loop!");
-		//System.out.println("bufsize = " + m_offscreen.getWidth()
-		//					+ " x " + m_offscreen.getHeight());
-		//int drawn = 0;
-
+        
 		g2D.setColor(Color.BLACK);
 		synchronized (m_itemRegistry) {
 			Iterator items = m_itemRegistry.getItems();
@@ -182,16 +209,8 @@ public class Display extends Canvas {
 				GraphItem gi = (GraphItem) items.next();
 				Renderer renderer = gi.getRenderer();
 				renderer.render(g2D, gi);
-				
-				/// XXX DEBUG
-				//System.out.println(gi.getAttribute("FullName") + "\t-\t" 
-				//	+ gi.getClass().getName());
-				//drawn++;
 			}
 		}
-		
-		/// XXX DEBUG
-		//System.out.println("--- END rendering loop: drew " + drawn + " items.");
 
 		postPaint(g2D);
 
@@ -228,7 +247,7 @@ public class Display extends Canvas {
 	public void drawItem(GraphItem item) {
 		Graphics2D g2D = (Graphics2D) m_offscreen.getGraphics();
 		if (g2D != null) {
-			setRenderingHints(g2D);
+            prepareGraphics(g2D);
 			item.getRenderer().render(g2D, item);
 		}
 	} //
@@ -256,12 +275,14 @@ public class Display extends Canvas {
 	 * @return the GraphItem located at (x,y), if any
 	 */
 	public GraphItem findItem(Point p) {
+        Point2D p2 = (m_itransform==null ? p : 
+                        m_itransform.transform(p, m_tmpPoint));
 		synchronized (m_itemRegistry) {
 			Iterator items = m_itemRegistry.getItemsReversed();
 			while (items.hasNext()) {
 				GraphItem gi = (GraphItem) items.next();
 				Renderer r = gi.getRenderer();
-				if (r != null && r.locatePoint(p, gi)) {
+				if (r != null && r.locatePoint(p2, gi)) {
 					return gi;
 				}
 			}
