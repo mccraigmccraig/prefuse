@@ -99,7 +99,6 @@
   <!-- =================================================================== -->
   <target name="prepare-ext" depends="prepare">
     <mkdir dir="${build.ext.src}"/>
-    <mkdir dir="${build.ext.dest}"/>
 
     <copy todir="${build.ext.src}">
       <fileset dir="${ext.dir}"/>
@@ -140,15 +139,15 @@
   <!-- =================================================================== -->
   <!-- Compiles the extensions directory                                   -->
   <!-- =================================================================== -->
-  <target name="compile-ext" depends="prepare-ext, prefuse">
+  <target name="compile-ext" depends="compile-prefuse, prepare-ext">
     <!-- copy resource files -->
     <copy todir="${build.ext.dest}">
       <fileset dir="${build.ext.src}" excludes="**/*.java"/>
     </copy>
 
     <javac srcdir="${build.ext.src}"
-           destdir="${build.ext.dest}"
-		   classpath="${build.dir}/${name}.jar"
+           destdir="${build.prefuse.dest}"
+		   classpath="${build.prefuse.dest}"
            debug="${debug}"
            deprecation="${deprecation}"
            optimize="${optimize}"/>
@@ -157,7 +156,7 @@
   <!-- =================================================================== -->
   <!-- Compiles the demos directory                                        -->
   <!-- =================================================================== -->
-  <target name="compile-demos" depends="prepare-demos, ext">
+  <target name="compile-demos" depends="prepare-demos, prefuse">
     <!-- copy resource files -->
     <copy todir="${build.demos.dest}">
       <fileset dir="${build.demos.src}" excludes="**/*.java"/>
@@ -165,7 +164,7 @@
 
     <javac srcdir="${build.demos.src}"
            destdir="${build.demos.dest}"
-		   classpath="${build.dir}/${name}x.jar;${build.dir}/${name}.jar"
+		   classpath="${build.dir}/${name}.jar"
            debug="${debug}"
            deprecation="${deprecation}"
            optimize="${optimize}"/>
@@ -174,18 +173,9 @@
   <!-- =================================================================== -->
   <!-- Creates the prefuse.jar in ./build                                  -->
   <!-- =================================================================== -->
-  <target name="prefuse" depends="compile-prefuse">
+  <target name="prefuse" depends="compile-prefuse, compile-ext">
     <jar jarfile="${build.dir}/${name}.jar"
          basedir="${build.prefuse.dest}"
-         includes="**"/>
-  </target>
-
-  <!-- =================================================================== -->
-  <!-- Creates the prefusex.jar in ./build                                 -->
-  <!-- =================================================================== -->
-  <target name="ext" depends="compile-ext">
-    <jar jarfile="${build.dir}/${name}x.jar"
-         basedir="${build.ext.dest}"
          includes="**"/>
   </target>
 
@@ -201,7 +191,7 @@
   <!-- =================================================================== -->
   <!-- Build all jars in ./build                                           -->
   <!-- =================================================================== -->
-  <target name="all" depends="prefuse, ext, demos"/>
+  <target name="all" depends="prefuse, demos"/>
 
   <!-- =================================================================== -->
   <!-- Creates the API documentation in ./doc/api/                         -->
