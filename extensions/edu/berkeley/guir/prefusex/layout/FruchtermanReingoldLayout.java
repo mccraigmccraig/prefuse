@@ -28,6 +28,22 @@ public class FruchtermanReingoldLayout extends Layout {
     private static final double EPSILON = 0.000001D;
     private static final double ALPHA = 0.1;
     
+    public FruchtermanReingoldLayout() {
+        this(700);
+    } //
+    
+    public FruchtermanReingoldLayout(int maxIter) {
+        this.maxIter = maxIter;
+    } //
+    
+    public int getMaxIterations() {
+        return maxIter;
+    } //
+    
+    public void setMaxIterations(int maxIter) {
+        this.maxIter = maxIter;
+    } //
+    
     /**
      * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
      */

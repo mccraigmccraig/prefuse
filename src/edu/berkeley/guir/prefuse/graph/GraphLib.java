@@ -19,6 +19,22 @@ import edu.berkeley.guir.prefuse.collections.EdgeNodeComparator;
  */
 public class GraphLib {
 
+    // ========================================================================
+    // == GRAPH SEARCH METHODS ================================================
+    
+    public static Node[] search(Graph g, String attr, String value) {
+        ArrayList nodes = new ArrayList();
+        Iterator iter = g.getNodes();
+        while ( iter.hasNext() ) {
+            Node n = (Node)iter.next();
+            String val = n.getAttribute(attr);
+            if ( val != null && val.equals(value) ) {
+                nodes.add(n);
+            }
+        }
+        return (Node[])nodes.toArray(new Node[nodes.size()]);
+    } //
+    
     public static Node[] getMostConnectedNodes(Graph g) {
         ArrayList nodes = new ArrayList();
         int size = -1, c;
@@ -221,5 +237,5 @@ public class GraphLib {
         }
         return g;
     } //
-
+    
 } // end of class GraphLib
