@@ -21,6 +21,14 @@ public class FontFunction extends AbstractAction {
 
     protected Font defaultFont = FontLib.getFont("SansSerif",Font.PLAIN,10);
     
+    public FontFunction() {
+        // do nothing
+    } //
+    
+    public FontFunction(Font defaultFont) {
+        this.defaultFont = defaultFont;
+    } //
+    
 	public void run(ItemRegistry registry, double frac) {
 		Iterator itemIter = registry.getItems();
 		while ( itemIter.hasNext() ) {

@@ -56,6 +56,8 @@ public abstract class VisualItem implements Entity {
 
 	protected boolean m_visible;
 	protected boolean m_newlyVisible;
+	// if this item can be interacted with
+	protected boolean m_interactive;
 	
     // all non-standard viz attributes go here
 	protected Map m_attrs;
@@ -82,13 +84,13 @@ public abstract class VisualItem implements Entity {
     protected Font m_endFont;
     // fix the position of this item?
     protected boolean m_fixed = false;
+    protected boolean m_wasFixed = false;
     protected boolean m_highlight = false;
     
 	/**
 	 * Default constructor.
 	 */
 	public VisualItem() {
-	    m_attrs         = new HashMap(5,0.9f);
 		m_location      = new Point2D.Float(Float.NaN, Float.NaN);
 		m_startLocation = new Point2D.Float(Float.NaN, Float.NaN);
 		m_endLocation   = new Point2D.Float(Float.NaN, Float.NaN);
@@ -118,13 +120,18 @@ public abstract class VisualItem implements Entity {
 		m_visible  = false;
 		m_newlyVisible = false;
 		m_doi = Integer.MIN_VALUE;
-		
+		m_interactive = true;
+		// fixation and highlighting
+        m_fixed = false;
+        m_wasFixed = false;
+        m_highlight = false;
 		initAttributes();
 	} //
 	
     protected void initAttributes() {
         // general viz attributes
-        m_attrs.clear();
+        if ( m_attrs != null )
+            m_attrs.clear();
         // location
         m_location.setLocation(Float.NaN, Float.NaN);
         m_startLocation.setLocation(Float.NaN, Float.NaN);
@@ -144,7 +151,11 @@ public abstract class VisualItem implements Entity {
         m_startFont = FontLib.getFont("SansSerif",Font.PLAIN,10);
         m_font      = m_startFont;
         m_endFont   = m_startFont;
-    }
+    } //
+    
+    private void initVizAttributes() {
+	    m_attrs = new HashMap(5,0.9f);
+    } //
     
 	/**
 	 * Clears the state of this VisualItem.
@@ -242,7 +253,11 @@ public abstract class VisualItem implements Entity {
 	 * @return String
 	 */
 	public Object getVizAttribute(String name) {
-		return m_attrs.get(name);
+		if ( m_attrs != null ) {
+		    return m_attrs.get(name);
+		} else {
+		    return null;
+		}
 	} //
 	
 	/**
@@ -251,7 +266,10 @@ public abstract class VisualItem implements Entity {
 	 * @param value
 	 */
 	public void setVizAttribute(String name, Object value) {
-		m_attrs.put(name, value);
+		if ( m_attrs == null ) {
+		    initVizAttributes();
+		}
+	    m_attrs.put(name, value);
 	} //
 	
 	/**
@@ -259,7 +277,8 @@ public abstract class VisualItem implements Entity {
 	 * @param name the name of the attribute
 	 */
 	public void removeVizAttribute(String name) {
-		m_attrs.remove(name);
+		if ( m_attrs != null )
+		    m_attrs.remove(name);
 	} //
 	
 	/**
@@ -393,7 +412,16 @@ public abstract class VisualItem implements Entity {
     } //
     
     public void setFixed(boolean s) {
+        m_wasFixed = m_fixed;
         m_fixed = s;
+    } //
+    
+    public boolean wasFixed() {
+        return m_wasFixed;
+    } //
+    
+    public void setWasFixed(boolean s) {
+        m_wasFixed = s;
     } //
     
     public boolean isHighlighted() {
@@ -562,4 +590,12 @@ public abstract class VisualItem implements Entity {
         m_endFont = f;
     } //
 
+    public boolean isInteractive() {
+        return m_interactive;
+    } //
+    
+    public void setInteractive(boolean interactive) {
+        this.m_interactive = interactive;
+    } //
+    
 } // end of abstract class VisualItem

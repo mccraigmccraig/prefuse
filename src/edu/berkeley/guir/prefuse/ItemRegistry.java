@@ -858,10 +858,12 @@ public class ItemRegistry {
 	 * mappings.
 	 * @param item the item to add the the visualization queue
 	 */
-	protected synchronized void addItem(ItemEntry entry, VisualItem item) {
-		entry.itemList.add(item);
-		entry.modified = true;
-        m_size++;
+	protected void addItem(ItemEntry entry, VisualItem item) {
+	    synchronized ( this ) {
+			entry.itemList.add(item);
+			entry.modified = true;
+	        m_size++;
+	    }
 		if ( m_registryListener != null )
     		m_registryListener.registryItemAdded(item);
 	} //
@@ -874,13 +876,17 @@ public class ItemRegistry {
      *  rendering queue. This option is available to avoid errors that
      *  arise when removing items coming from a currently active Iterator.
 	 */
-	protected synchronized void removeItem(ItemEntry entry, VisualItem item, boolean lr) {
-		removeMappings(entry, item);
-		if (lr) entry.itemList.remove(item);
-        m_size--;
+	protected void removeItem(ItemEntry entry, VisualItem item, boolean lr) {
+		synchronized ( this ) {
+		    removeMappings(entry, item);
+			if (lr) entry.itemList.remove(item);
+	        m_size--;
+		}
 		if ( m_registryListener != null )
 			m_registryListener.registryItemRemoved(item);
-		m_ifactory.reclaim(item);
+		synchronized ( this ) {
+		    m_ifactory.reclaim(item);
+		}
 	} //
 
 	/**

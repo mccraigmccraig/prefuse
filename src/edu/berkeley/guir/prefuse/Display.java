@@ -490,6 +490,20 @@ public class Display extends JComponent {
         m_transact.zoom(p,scale,duration);
     } //
     
+    public void animatePanAndZoomTo(final Point2D p, double scale, long duration) {
+        Point2D pp = new Point2D.Double();
+        m_itransform.transform(p,pp);
+        animatePanAndZoomToAbs(pp,scale,duration);
+    } //
+    
+    public void animatePanAndZoomToAbs(final Point2D p, double scale, long duration) {
+        m_transact.panAndZoom(p,scale,duration);
+    } //
+    
+    public boolean isTranformInProgress() {
+        return m_transact.isRunning();
+    } //
+    
     /**
      * TODO: clean this up to be more general...
      * TODO: change mechanism so that multiple transform
@@ -512,6 +526,29 @@ public class Display extends JComponent {
                 m_at.setTransform(m_transform);
             return m_at;
         } //
+        public void panAndZoom(final Point2D p, double scale, long duration) {
+            AffineTransform at = getTransform();
+            this.cancel();
+            setDuration(duration);
+            
+            m_tmpPoint.setLocation(0,0);
+            m_itransform.transform(m_tmpPoint,m_tmpPoint);
+            double x = p.getX(); x = (Double.isNaN(x) ? 0 : x);
+            double y = p.getY(); y = (Double.isNaN(y) ? 0 : y);
+            double w = ((double)getWidth()) /(2*m_transform.getScaleX());
+            double h = ((double)getHeight())/(2*m_transform.getScaleY());
+            double dx = w-x+m_tmpPoint.getX();
+            double dy = h-y+m_tmpPoint.getY();
+            at.translate(dx,dy);
+
+            at.translate(p.getX(), p.getY());
+            at.scale(scale,scale);
+            at.translate(-p.getX(), -p.getY());
+            
+            at.getMatrix(dst);
+            m_transform.getMatrix(src);
+            this.runNow();
+        }
         public void pan(double dx, double dy, long duration) {
             AffineTransform at = getTransform();
             this.cancel();
@@ -583,10 +620,10 @@ public class Display extends JComponent {
 	        Graphics2D g = (Graphics2D)img.getGraphics();
 	        Point2D p = new Point2D.Double(0,0);
 	        zoom(p, scale);
-	        //boolean q = isHighQuality();
-	        //setHighQuality(true);
+	        boolean q = isHighQuality();
+	        setHighQuality(true);
 	        paintDisplay(g,d);
-	        //setHighQuality(q);
+	        setHighQuality(q);
 	        zoom(p, 1/scale);
 	        ImageIO.write(img,format,output);
 	        return true;
@@ -692,7 +729,21 @@ public class Display extends JComponent {
         sb.append(" mem(");
         sb.append(tm).append("M / ");
         sb.append(mm).append("M)");
+        sb.append(" (x:").append(numberString(m_transform.getTranslateX(),2));
+        sb.append(", y:").append(numberString(m_transform.getTranslateY(),2));
+        sb.append(", z:").append(numberString(getScale(),5)).append(")");
         return sb.toString();
+    } //
+    
+    private String numberString(double number, int decimalPlaces) {
+        String s = String.valueOf(number);
+        int idx = s.indexOf(".");
+        if ( idx == -1 ) {
+            return s;
+        } else {
+            int end = Math.min(s.length(),idx+1+decimalPlaces);
+            return s.substring(0,end);
+        }
     } //
     
 	/**
@@ -857,7 +908,8 @@ public class Display extends JComponent {
 			while (items.hasNext()) {
 				VisualItem vi = (VisualItem) items.next();
 				Renderer r = vi.getRenderer();
-				if (r != null && r.locatePoint(p2, vi)) {
+				if (r != null && vi.isInteractive()
+				       && r.locatePoint(p2, vi)) {
 					return vi;
 				}
 			}
