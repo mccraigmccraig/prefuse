@@ -149,10 +149,12 @@ public class Display extends JComponent {
                     }
                 },
                 "debug info", KeyStroke.getKeyStroke("ctrl D"), WHEN_FOCUSED);
-        // add image output control
-        registerKeyboardAction(
+        // add image output control, if this is not an applet
+        try {
+            registerKeyboardAction(
                 new ExportDisplayAction(this),
                 "export display", KeyStroke.getKeyStroke("ctrl E"), WHEN_FOCUSED);
+        } catch ( SecurityException se )  {}
         
         setItemRegistry(registry);
         setSize(400,400); // set a default size
