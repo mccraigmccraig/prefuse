@@ -921,7 +921,7 @@ public class Display extends JComponent {
         
         private boolean isOffComponent(MouseEvent e) {
             int x = e.getX(), y = e.getY();
-            return ( x<0 || x>getWidth() || y<0 || y>getWidth() );
+            return ( x<0 || x>getWidth() || y<0 || y>getHeight() );
         } //
 	} // end of inner class MouseEventCapturer
     

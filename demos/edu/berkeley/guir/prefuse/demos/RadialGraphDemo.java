@@ -34,6 +34,7 @@ import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.Renderer;
 import edu.berkeley.guir.prefuse.render.TextItemRenderer;
 import edu.berkeley.guir.prefuse.util.ColorLib;
+import edu.berkeley.guir.prefuse.util.DefaultFocusSet;
 import edu.berkeley.guir.prefuse.util.StringAbbreviator;
 import edu.berkeley.guir.prefusex.controls.DragControl;
 import edu.berkeley.guir.prefusex.controls.FocusControl;
@@ -139,10 +140,13 @@ public class RadialGraphDemo extends JFrame {
             display.setSize(700,700);
             display.setBackground(Color.WHITE);
             display.addControlListener(new FocusControl());
+            display.addControlListener(new FocusControl(0,"MouseOver"));
             display.addControlListener(new DragControl());
             display.addControlListener(new PanControl());
             display.addControlListener(new ZoomControl());
             display.addControlListener(new NeighborHighlightControl(update));
+            
+            registry.getFocusManager().putFocusSet("MouseOver", new DefaultFocusSet());
             
 			// set up initial focus and focus listener
             registry.getDefaultFocusSet().addFocusListener(new FocusListener() {

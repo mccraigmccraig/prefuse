@@ -68,11 +68,7 @@ public class MultiSelectFocusControl extends ControlAdapter {
 					focusSet.add(node);
 				}
 			} else { // mode: doing something cool/resetting focus
-				if (focusManager.isFocus(focusKey, node)) {
-					System.out.println("a selected item has been clicked"+item);
-					// bring up comparison pane
-					//addComparisonPane(focusSet);
-				} else {
+				if (!focusManager.isFocus(focusKey, node)) {
 					focusSet.set(node);
 				}
 			}

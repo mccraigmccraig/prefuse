@@ -1,7 +1,15 @@
 package edu.berkeley.guir.prefusex.layout;
 
+import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
+
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.NodeItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.assignment.TreeLayout;
+import edu.berkeley.guir.prefuse.graph.Graph;
+import edu.berkeley.guir.prefuse.graph.GraphLib;
+import edu.berkeley.guir.prefuse.graph.Tree;
 
 /**
  * Implements the Reingold-Tilford tree layout algorithm.
@@ -11,54 +19,136 @@ import edu.berkeley.guir.prefuse.action.assignment.TreeLayout;
  */
 public class TopDownTreeLayout extends TreeLayout {
 
-    /**
-     * The algorithm (Walker, S P & E 20 (7), 685-705, 1990).
-     * First look at the situation (FirstWalk):
-     * <ul>
-     * <li> Leaf ?
-     *    <ul>
-     *    <li> Has left brother ?
-     *    <p> No -> Set Preliminary coord to 0
-     *    <p> Yes -> Set Preliminary coord according to left brother and minimal distance.
-     *    <p> In both cases -> Set modifier to 0
-     * </li>
-     * <li> Apex ?
-     *    <ul>
-     *    <li> Has left brother ?
-     *    <p> No -> Set preliminary position to center of children's coord -> Set modifier field to 0
-     *    <p> Yes -> Set Preliminary position to minimal distance with left brother
-     *     -> Set modifier to preliminary position - (average of kids coord)
-     *    <p> For Apex (with left brother): need to look for overlap with an already positioned
-     *    tree on the left. In this case, compute how much the tree needs to be translated
-     *    (to the right) and adjust both preliminary coord AND modifier fields.
-     *    <p> After those adjustments are made, need to evenly place kids.
-     *    Go over the kids coord and evenly distribute them (according to their left brother
-     *    coord and the average distance to be put in between nodes) -- actually not done.
-     *
-     * </li>
-     * </ul>
-     *
-     * Second walk: go through nodes root first, then from left to right
-     * and compute absolute coord by recursively applying modifier fields
-     * to preliminary coords.
-     * <p>
-     * Vertical positioning: nodes are positioned root at the top. The default case
-     * is tolayer nodes according to their depth in the tree (LayerMetric).
-     * However, the algorithm first looks whether nodes have a property called
-     * VERTICAL_POSITION (a check is done on each node -- if only some of them share this propert,
-     * strange results must be expected). 
-     * <p>
-     * As the layout can be used as the super layout of a compound layout, it checks whether there
-     * is a context to get node sizes from. If so, then vertical positioning must be defined
-     * according to the size of the metanodes.
-     */
+    private int ySep = 20;
+    private int minXSep = 2;
     
     /**
      * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
      */
     public void run(ItemRegistry registry, double frac) {
-        // TODO Auto-generated method stub
-
+        Graph g = registry.getFilteredGraph();
+        if ( !(g instanceof Tree) ) {
+            throw new IllegalStateException("This layout only works with a tree!");
+        }
+        Tree t = (Tree)g;
+        NodeItem root = (NodeItem)t.getRoot();
+        int height = GraphLib.getTreeHeight(t);
+        
+        TDEdge left = new TDEdge(height);
+        TDEdge right = new TDEdge(height);
+        layout(root, height, ySep, left, right);
+        
+        // assign final positions
+        Iterator nodeIter = t.getNodes();
+        while ( nodeIter.hasNext() ) {
+            NodeItem n = (NodeItem)nodeIter.next();
+            TDParams np = getParams(n);
+            this.setLocation(n,(NodeItem)n.getParent(),np.x,np.y);
+        }
     }
+    
+    private void layout(NodeItem n, int height, int yPosition, TDEdge left, TDEdge right) {
+        int centre, i, j, overlap;
+        TDEdge[] leftOutline, rightOutline;
 
-}
+        Rectangle2D b = n.getBounds();
+        int nh = (int)Math.round(b.getHeight());
+        int nw = (int)Math.round(b.getWidth());
+        int childCount = n.getChildCount();
+        
+        if ( childCount == 0) {
+            left.yloc = yPosition + nh - 1;
+            right.yloc = yPosition + nh - 1;
+        } else {
+            leftOutline  = new TDEdge[childCount];
+            rightOutline = new TDEdge[childCount];
+            
+            Iterator childIter = n.getChildren();
+            for (i=0; childIter.hasNext(); i++) {
+                leftOutline[i]  = new TDEdge(height);
+                rightOutline[i] = new TDEdge(height);
+                layout((NodeItem)childIter.next(), height, yPosition+nh+ySep,
+                        leftOutline[i], rightOutline[i]);
+            }
+              		
+            left = leftOutline[0];
+            right = rightOutline[0];
+
+            childIter = n.getChildren();
+            NodeItem c = (NodeItem)childIter.next();
+            TDParams cp = getParams(c);
+            cp.x = 0;
+            for (i=1; childIter.hasNext(); i++) {
+                c = (NodeItem)childIter.next();
+                cp = getParams(c);
+                overlap = 0;
+                
+                for (j = yPosition + nh + ySep;
+                	 j <= Math.min(leftOutline[i].yloc, right.yloc);
+                	 j++) {
+                    overlap = Math.max(overlap, leftOutline[i].offset[j] + right.offset[j]);
+                }
+
+                // push branches apart
+                cp.x = overlap + minXSep;
+
+                // Adjust left outline
+                for (j = left.yloc+1; j <= leftOutline[i].yloc; j++)
+                    left.offset[j] = leftOutline[i].offset[j] - cp.x;
+                left.yloc = Math.max(left.yloc, leftOutline[i].yloc);
+  	
+                // Adjust right outline
+                for (j = yPosition; j <= rightOutline[i].yloc; j++)
+                    right.offset[j] = rightOutline[i].offset[j] + cp.x;
+                right.yloc = Math.max(right.yloc, rightOutline[i].yloc);
+            }
+
+            if ( childCount > 1) {
+                // position branches relative to the centre
+                c = (NodeItem)n.getChild(childCount-1);
+                cp = getParams(c);
+                centre = cp.x / 2;
+                
+                for (i = 0; i < childCount; i++);
+                    cp.x -= centre;
+                for (i = yPosition; i <= left.yloc; i++)
+                    left.offset[i] += centre;
+                for (i = yPosition; i <= right.yloc; i++)
+                    right.offset[i] -= centre;
+            }
+            
+            leftOutline = rightOutline = null;
+        }
+
+        for (i = yPosition - ySep; i < yPosition+nh; i++) {
+            left.offset[i] = nw/2;
+            right.offset[i] = (nw+1)/2;
+        }
+
+        TDParams np = getParams(n);
+        np.y = yPosition;
+    } //
+
+    private TDParams getParams(VisualItem item) {
+        TDParams tp = (TDParams)item.getVizAttribute("tdParams");
+        if ( tp == null ) {
+            tp = new TDParams();
+            item.setVizAttribute("tdParams", tp);
+        }
+        return tp;
+    } //
+    
+    public class TDParams {
+        int x, y;
+    }
+    
+    public class TDEdge {
+        int yloc;
+        int[] offset;
+        public TDEdge() {}
+        public TDEdge(int height) {
+            offset = new int[height];
+        }
+    } //
+    
+} // end of class TopDownTreeLayout

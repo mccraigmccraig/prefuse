@@ -6,8 +6,6 @@ import java.awt.Dimension;
 import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Comparator;
@@ -97,11 +95,7 @@ public class TreeMapDemo extends JFrame {
             filter.add(new RepaintAction());
             
             // create and display application window
-            addWindowListener(new WindowAdapter() {
-                public void windowClosing(WindowEvent e) {
-                    System.exit(0);
-                }
-            });
+            this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             getContentPane().add(display, BorderLayout.CENTER);
             pack();
             setVisible(true);

@@ -121,6 +121,24 @@ public class GraphLib {
         return n.getChildCount();       
     } //
     
+    public static int getTreeHeight(Tree t) {
+        TreeNode r = t.getRoot();
+        return getTreeHeightHelper(r,0);
+    } //
+    
+    private static int getTreeHeightHelper(TreeNode n, int height) {
+        int h = height;
+        if ( n.getChildCount() > 0 ) {
+            Iterator childIter = n.getChildren();
+            while ( childIter.hasNext() ) {
+                TreeNode c = (TreeNode)childIter.next();
+                h = Math.max(h, getTreeHeightHelper(c,height+1));
+            }
+        }
+        return h;
+    } //
+    
+    
     // ========================================================================
     // == GRAPH CREATION ROUTINES =============================================
     

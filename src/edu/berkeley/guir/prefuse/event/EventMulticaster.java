@@ -8,29 +8,9 @@ import java.util.EventListener;
  * @author newbergr
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class EventMulticaster implements EventListener {
+public abstract class EventMulticaster implements EventListener {
 
 	protected final EventListener a, b;
-
-	/** 
-	 * Returns the resulting multicast listener from adding listener-a
-	 * and listener-b together.  
-	 * If listener-a is null, it returns listener-b;  
-	 * If listener-b is null, it returns listener-a
-	 * If neither are null, then it creates and returns
-	 * a new EventMulticaster instance which chains a with b.
-	 * @param a event listener-a
-	 * @param b event listener-b
-	 */
-	protected static EventListener addInternal(
-	    EventListener a, EventListener b)
-    {
-		if (a == null)
-			return b;
-		if (b == null)
-			return a;
-		return new EventMulticaster(a, b);
-	} //
 
 	/** 
 	 * Returns the resulting multicast listener after removing the
@@ -60,18 +40,7 @@ public class EventMulticaster implements EventListener {
 		this.b = b;
 	} //
 
-	protected EventListener remove(EventListener oldl) {
-		if (oldl == a)
-			return b;
-		if (oldl == b)
-			return a;
-		EventListener a2 = removeInternal(a, oldl);
-		EventListener b2 = removeInternal(b, oldl);
-		if (a2 == a && b2 == b) {
-			return this; // it's not here
-		}
-		return addInternal(a2, b2);
-	} //
+	protected abstract EventListener remove(EventListener oldl);
 
 	private static int getListenerCount(EventListener l) {
 		if (l instanceof EventMulticaster) {

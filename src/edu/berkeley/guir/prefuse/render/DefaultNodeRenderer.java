@@ -54,6 +54,8 @@ public class DefaultNodeRenderer extends ShapeRenderer {
 	protected Shape getRawShape(VisualItem item) {
         double r = m_radius * item.getSize();
         double x = item.getX(), y = item.getY();
+        if ( Double.isNaN(x) ) x = 0.0;
+        if ( Double.isNaN(y) ) y = 0.0;
         m_circle.setFrameFromCenter(x,y,x+r,y+r);
 		return m_circle;
 	} //

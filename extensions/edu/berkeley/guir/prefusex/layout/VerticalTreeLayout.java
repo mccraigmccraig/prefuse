@@ -41,7 +41,7 @@ public class VerticalTreeLayout extends TreeLayout {
         double x = 0, y = 0;
         if ( b != null ) {
             x = b.getX()+b.getWidth()/2;
-            y = b.getY();
+            y = b.getY()+20;
         }
         return new Point2D.Double(x,y);
     } //
