@@ -1,9 +1,12 @@
 package edu.berkeley.guir.prefuse.graph.external;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.SimpleGraph;
 import edu.berkeley.guir.prefuse.graph.event.GraphLoaderListener;
@@ -27,9 +30,16 @@ public abstract class GraphLoader implements Runnable {
     protected Graph m_graph;
     protected ItemRegistry m_registry;
     
+    protected String m_keyField;
+    protected LinkedHashMap m_cache = new LinkedHashMap(200, 0.75f, true) {
+        public boolean removeEldestEntry(Map.Entry eldest) {
+            return evict();
+        }
+    };
     protected GraphLoaderListener m_listener;
     
-    public GraphLoader(ItemRegistry registry) {
+    public GraphLoader(ItemRegistry registry, String keyField) {
+        m_keyField = keyField;
         m_registry = registry;
         m_graph = registry.getGraph();
         Thread t = new Thread(this);
@@ -91,18 +101,24 @@ public abstract class GraphLoader implements Runnable {
         return (m_queue.isEmpty() ? null : (Job)m_queue.remove(0));
     } //
     
-    protected void foundNode(int type, ExternalNode n1, ExternalNode n2) {
-        if ( /*n2 is already loaded*/ false ) {
-            // switch n2 reference to original loaded version
-        }
-        n2.setLoader(this);
+    protected void foundNode(int type, ExternalNode src, ExternalNode n, Edge e) {
+        String key = n.getAttribute(m_keyField);
+        if ( m_cache.containsKey(key) )
+            // switch n reference to original loaded version 
+            n = (ExternalNode)m_cache.get(key);
+        else
+            m_cache.put(key, n);
+        
+        n.setLoader(this);
+        
         synchronized ( m_registry ) {
-            ((SimpleGraph)m_graph).addNode(n2);
-            if ( n1 != null )
-                ((SimpleGraph)m_graph).addEdge(n1,n2);
+            ((SimpleGraph)m_graph).addNode(n);
+            if ( src != null )
+                ((SimpleGraph)m_graph).addEdge(src,n);
         }
+        
         if ( m_listener != null )
-            m_listener.entityLoaded(n2);
+            m_listener.entityLoaded(n);
     } //
     
     protected abstract void getNeighbors(ExternalNode n);

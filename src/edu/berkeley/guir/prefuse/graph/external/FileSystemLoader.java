@@ -15,7 +15,7 @@ import edu.berkeley.guir.prefuse.ItemRegistry;
 public class FileSystemLoader extends GraphLoader {
 
     public FileSystemLoader(ItemRegistry registry) {
-        super(registry);
+        super(registry, "filename");
     } //
     
     /**
@@ -27,18 +27,14 @@ public class FileSystemLoader extends GraphLoader {
         File f = new File(filename);
         
         File p = f.getParentFile();
-        if ( p != null ) {
-            nn = buildNode(p);
-            this.foundNode(LOAD_NEIGHBORS, n, nn);
-        }
+        if ( p != null )
+            loadNode(n, p);
         
         File[] fl = f.listFiles();
         if ( fl == null ) return;
         for ( int i=0; i<fl.length; i++ ) {
-            nn = buildNode(fl[i]);
-            foundNode(LOAD_NEIGHBORS, n, nn);
+            loadNode(n, fl[i]);
         }
-        
     } //
 
     /**
@@ -48,18 +44,28 @@ public class FileSystemLoader extends GraphLoader {
         
     } //
     
-    public ExternalNode buildNode(File f) {
+    public ExternalNode loadNode(ExternalNode o, File f) {
+        ExternalNode n = null;
         try {
-            ExternalNode n = new ExternalNode();
             f = f.getCanonicalFile();
-            n.setAttribute("label", f.getName());
-            n.setAttribute("filename", f.getPath());
-            n.setAttribute("size", String.valueOf(f.length()));
-            return n;
-        } catch ( IOException e ) {
-            e.printStackTrace();
+            String filename = f.getName();
+            
+            if ( m_cache.containsKey(filename) ) {
+                // node already loaded
+                n = (ExternalNode)m_cache.get(filename);
+            } else {
+                // need to load the node
+                n = new ExternalNode();
+                String name = f.getName();
+                n.setAttribute("label",(name.equals("") ? f.getPath() : name));
+                n.setAttribute("filename", f.getPath());
+                n.setAttribute("size", String.valueOf(f.length()));
+            }
+            foundNode(LOAD_NEIGHBORS, o, n, null);
+        } catch ( IOException ie ) {
+            ie.printStackTrace();
         }
-        return null;
+        return n;
     } //
 
 } // end of class FileSystemLoader

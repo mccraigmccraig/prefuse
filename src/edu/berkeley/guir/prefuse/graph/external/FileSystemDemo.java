@@ -62,9 +62,7 @@ public class FileSystemDemo extends JFrame {
         registry = new ItemRegistry(g);
         
         loader = new FileSystemLoader(registry);
-        ExternalNode root = loader.buildNode(new File("."));
-        root.setLoader(loader);
-        g.addNode(root);
+        ExternalNode root = loader.loadNode(null, new File("."));
         
         loader.addGraphLoaderListener(new GraphLoaderListener() {
             public void entityLoaded(Entity e) {
@@ -78,7 +76,7 @@ public class FileSystemDemo extends JFrame {
         
         ForceSimulator fsim = new ForceSimulator();
         fsim.addForce(new NBodyForce(-0.4f, 0.9f));
-        fsim.addForce(new SpringForce(4E-5f, 75f));
+        fsim.addForce(new SpringForce(1E-5f, 150f));
         fsim.addForce(new DragForce(-0.005f));
         
         TextItemRenderer    nodeRenderer = new TextItemRenderer() {
@@ -93,18 +91,22 @@ public class FileSystemDemo extends JFrame {
                 nodeRenderer, edgeRenderer, null));
         
         filter = new ActionPipeline(registry);
-        //filter.add(new GraphNodeFilter());
-        filter.add(new FisheyeGraphFilter(-1));
+        filter.add(new FisheyeGraphFilter(-2));
         filter.add(new GraphEdgeFilter());
         
         forces = new ActionPipeline(registry,-1,20);
-        forces.add(new ForceDirectedLayout(fsim, false));
+        forces.add(new ForceDirectedLayout(fsim, false) {
+            protected float getSpringLength(NodeItem n1, NodeItem n2) {
+                double doi = Math.max(n1.getDOI(), n2.getDOI());
+                return 200.f/Math.abs((float)doi-1);
+            } //
+        });
         forces.add(new DemoColorFunction());
         forces.add(new RepaintAction());
         
         Display display = new Display();
         display.setRegistry(registry);
-        display.setSize(700,700);
+        display.setSize(800,700);
         display.pan(350,350);
         display.addControlListener(new FocusControl(2));
         display.addControlListener(new NeighborHighlightControl());

@@ -127,12 +127,11 @@ public class SimpleGraph extends AbstractGraph {
 	 * Add an edge to this graph.
 	 * @param e the <code>Edge</code> to add
 	 */
-	public void addEdge(Edge e) {
+	public boolean addEdge(Edge e) {
 		Node n1 = (Node)e.getFirstNode();
 		Node n2 = (Node)e.getSecondNode();
 		if ( n1.isNeighbor(n2) || n2.isNeighbor(n1) ) {
-			throw new IllegalStateException(
-				"An edge already exists between these nodes");
+			return false;
 		}
 		if ( m_directed ^ e.isDirected() ) {
 			throw new IllegalStateException(
@@ -143,6 +142,7 @@ public class SimpleGraph extends AbstractGraph {
 			n2.addEdge(e);
 		}
 		fireEdgeAdded(e);
+        return true;
 	} //
 
 	/**
