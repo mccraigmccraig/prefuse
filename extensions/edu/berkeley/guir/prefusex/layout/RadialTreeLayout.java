@@ -33,6 +33,7 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
     
     protected Point2D m_origin;
     protected TreeNode m_prevParent;
+    protected NodeItem m_pfocus, m_focus;
     protected ItemRegistry m_registry;
     
     public RadialTreeLayout() {
@@ -89,8 +90,8 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
         countVisibleDescendants(n, 0);
         
         if ( m_autoScale ) setScale(getLayoutBounds(registry));
-        if ( !m_setTheta && m_prevParent != null ) {
-            NodeItem p = registry.getNodeItem(m_prevParent);
+        if ( !m_setTheta && m_pfocus != null ) {
+            NodeItem p = getPrevParent(m_focus, m_pfocus);
             m_startTheta = calcStartingTheta(n, p);
             m_endTheta = m_startTheta + TWO_PI;
         }                           
@@ -106,6 +107,11 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
             m_radiusInc = (r-40)/m_maxDepth;
     } //
 
+    private NodeItem getPrevParent(NodeItem f, NodeItem pf) {
+        for ( ; pf != null && pf.getParent() != f; pf = pf.getParent() );
+        return pf;
+    } //
+    
     private double calcStartingTheta(NodeItem n, NodeItem p) {
         if ( p == null ) { return 0; }
         
@@ -113,18 +119,14 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
         Point2D nloc = n.getLocation();
         
         double ptheta = Math.atan2(ploc.getY()-nloc.getY(), ploc.getX()-nloc.getX());
-        
         int pidx = n.getChildIndex(p);
         int nD = getParams(n).numDescendants;
         int pD = getParams(p).numDescendants;
         int cD = 0;
-        for ( int i = 0; i < pidx; i++ ) {
+        for ( int i = 0; i < pidx; i++ )
             cD += getParams(n.getChild(i)).numDescendants;
-        }
         double f = (cD + ((double)pD) / 2.0) / ((double)nD);    
-        double theta = ptheta - f*TWO_PI;
-        
-        return theta;       
+        return ptheta - f*TWO_PI;       
     } //
 
     /**
@@ -203,12 +205,14 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
     public void focusChanged(FocusEvent e) {
         if ( e.getEventType() != FocusEvent.FOCUS_SET )
             return;
-        Entity focus, fprev;
-        if ( (focus=e.getFirstAdded())   instanceof TreeNode && 
-             (fprev=e.getFirstRemoved()) instanceof TreeNode ) {
-            TreeNode prev = (TreeNode)fprev;
-            for ( ; prev != null && prev.getParent() != focus; prev = prev.getParent() );
-            m_prevParent = prev;
+        Entity focus  = e.getFirstAdded();
+        Entity pfocus = e.getFirstRemoved();
+        if ( focus instanceof TreeNode && pfocus instanceof TreeNode ) {
+            m_focus = m_registry.getNodeItem((TreeNode)focus);
+            m_pfocus = m_registry.getNodeItem((TreeNode)pfocus);
+        } else {
+            m_pfocus = m_focus;
+            m_focus = null;
         }
     } //
     
