@@ -38,11 +38,10 @@ public class SaveImageAction extends AbstractAction {
         // save image
         boolean success = false;
         try {
-            //OutputStream out = new BufferedOutputStream(new FileOutputStream(f));
+            OutputStream out = new BufferedOutputStream(new FileOutputStream(f));
             //System.out.print("Saving image "+f.getName()+"...");
-            //success = display.saveImage(out, format, scale);
+            success = display.saveImage(out, format, scale);
             //System.out.println("\tDONE");
-            success = display.saveImage2();
         } catch ( Exception e ) {
             success = false;
         }

@@ -33,9 +33,6 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 
-import org.freehep.graphics2d.VectorGraphics;
-import org.freehep.util.export.ExportDialog;
-
 import edu.berkeley.guir.prefuse.activity.Activity;
 import edu.berkeley.guir.prefuse.activity.SlowInSlowOutPacer;
 import edu.berkeley.guir.prefuse.event.ControlEventMulticaster;
@@ -595,17 +592,6 @@ public class Display extends JComponent {
 	        e.printStackTrace();
 	        return false;
 	    }
-	} //
-	
-	public boolean saveImage2() {
-	    Dimension d = new Dimension(getWidth(),getHeight());
-        BufferedImage img = (BufferedImage) createImage(d.width, d.height);
-        Graphics2D g = (Graphics2D)img.getGraphics();
-        VectorGraphics vg = VectorGraphics.create(g);
-        paintDisplay(vg,d);
-        ExportDialog export = new ExportDialog();
-        export.showExportDialog(this, "Export view as ...", this, "export");
-        return true;
 	} //
 	
     /**
