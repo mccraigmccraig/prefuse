@@ -56,7 +56,7 @@ public class Node extends AbstractEntity {
 	 * @return true if the node is a neighbor, false otherwise
 	 */
 	public boolean isNeighbor(Node n) {
-		return ( getNeighborIndex(n) > -1 );
+		return ( m_neighbors.indexOf(n) > -1 );
 	} //
 
 	/**
