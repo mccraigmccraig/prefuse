@@ -1,8 +1,12 @@
 package edu.berkeley.guir.prefuse.event;
 
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.EventListener;
 
 import edu.berkeley.guir.prefuse.GraphItem;
@@ -15,7 +19,9 @@ import edu.berkeley.guir.prefuse.GraphItem;
  * @author newbergr
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
  */
-public interface ControlListener extends EventListener {
+public interface ControlListener extends 
+    EventListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener
+{
 	
 	//// == Actions performed on GraphItems ===================================
 
