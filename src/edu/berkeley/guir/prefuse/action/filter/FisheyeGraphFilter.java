@@ -50,6 +50,7 @@ public class FisheyeGraphFilter extends Filter {
 
 	private int m_minDOI;
     private boolean m_edgesVisible = true;
+    private boolean m_edgesInteractive = true;
     private List m_queue = new LinkedList();
     
     // ========================================================================
@@ -165,6 +166,7 @@ public class FisheyeGraphFilter extends Filter {
                     EdgeItem eitem = registry.getEdgeItem(edge, true);
                     fgraph.addEdge(eitem);
                     if ( !m_edgesVisible ) eitem.setVisible(false);
+                    if ( !m_edgesInteractive ) eitem.setInteractive(false);
                 }
             }
         }
@@ -192,4 +194,12 @@ public class FisheyeGraphFilter extends Filter {
 		m_minDOI = minDOI;
 	} //
 	
+    public boolean isEdgesInteractive() {
+        return m_edgesInteractive;
+    } //
+    
+    public void setEdgesInteractive(boolean interactive) {
+        m_edgesInteractive = interactive;
+    } //
+    
 } // end of class FisheyeGraphFilter
