@@ -44,10 +44,20 @@ public class TimelineGraphFilter extends GraphFilter implements TimelineConstant
         
         // filter the nodes
         Iterator nodeIter = graph.getNodes();
+        int i = 0;
         while ( nodeIter.hasNext() ) {
-            NodeItem item = registry.getNodeItem((Node)nodeIter.next(), true);
+            final Node node = (Node)nodeIter.next();
+            final NodeItem item;
+            // XXX Gotta switch back later
+/*            if (node.getAttribute(NODE_TYPE).equals(NOTCH_TYPE)) {
+                item = (NodeItem) registry.getItem(NOTCH_NODE_TYPE, node, true);
+            } else {
+                item = (NodeItem) registry.getItem(NOTNOTCH_NODE_TYPE, node, true);
+            }*/
+            item = registry.getNodeItem(node, true);
             if (item.getAttribute(NODE_TYPE).equals(NOTCH_TYPE)) {
                 fgraph.addNode(item);
+                //System.out.println(i++);
             }
         }
         
@@ -71,7 +81,7 @@ public class TimelineGraphFilter extends GraphFilter implements TimelineConstant
         registry.setFilteredGraph(fgraph);
         
         // optional garbage collection
-        super.run(registry, frac);
+        //super.run(registry, frac);
 	}
 	
 	public static void main(String[] args) {
