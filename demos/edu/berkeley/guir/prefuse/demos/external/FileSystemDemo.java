@@ -1,9 +1,7 @@
 package edu.berkeley.guir.prefuse.demos.external;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Paint;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.Iterator;
 
@@ -11,16 +9,15 @@ import javax.swing.JFrame;
 
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.EdgeItem;
-import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
 import edu.berkeley.guir.prefuse.action.filter.FisheyeGraphFilter;
 import edu.berkeley.guir.prefuse.action.filter.TreeEdgeFilter;
 import edu.berkeley.guir.prefuse.activity.ActionList;
-import edu.berkeley.guir.prefuse.event.ControlAdapter;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.graph.DefaultTree;
@@ -132,7 +129,6 @@ public class FileSystemDemo extends JFrame {
         display.addControlListener(new FocusControl(2));
         display.addControlListener(new NeighborHighlightControl());
         display.addControlListener(new DragControl(false));
-        display.addControlListener(new MouseOverControl());
         display.addControlListener(new PanControl(false));
         display.addControlListener(new ZoomControl(false));
         registry.getDefaultFocusSet().addFocusListener(new FocusListener() {
@@ -183,29 +179,5 @@ public class FileSystemDemo extends JFrame {
             }
         } //        
     } // end of inner class DemoColorFunction
-    
-    /**
-     * Tags and fixes the node under the mouse pointer.
-     */
-    public class MouseOverControl extends ControlAdapter {
-        
-        private boolean wasFixed = false;
-        
-        public void itemEntered(VisualItem item, MouseEvent e) {
-            ((Display)e.getSource()).setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            wasFixed = item.isFixed();
-            item.setFixed(true);
-        } //
-        
-        public void itemExited(VisualItem item, MouseEvent e) {
-            ((Display)e.getSource()).setCursor(Cursor.getDefaultCursor());
-            item.setFixed(wasFixed);
-        } //
-        
-        public void itemReleased(VisualItem item, MouseEvent e) {
-            item.setFixed(wasFixed);
-        } //
-        
-    } // end of inner class FocusControl
     
 } // end of class FileSystemDemo

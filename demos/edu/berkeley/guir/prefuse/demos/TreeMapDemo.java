@@ -1,11 +1,9 @@
 package edu.berkeley.guir.prefuse.demos;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Paint;
 import java.awt.Shape;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Comparator;
@@ -22,13 +20,13 @@ import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
 import edu.berkeley.guir.prefuse.action.filter.TreeFilter;
 import edu.berkeley.guir.prefuse.activity.ActionList;
-import edu.berkeley.guir.prefuse.event.ControlAdapter;
 import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.io.HDirTreeReader;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.ShapeRenderer;
 import edu.berkeley.guir.prefuse.util.ColorMap;
 import edu.berkeley.guir.prefusex.controls.PanControl;
+import edu.berkeley.guir.prefusex.controls.ToolTipControl;
 import edu.berkeley.guir.prefusex.controls.ZoomControl;
 import edu.berkeley.guir.prefusex.layout.SquarifiedTreeMapLayout;
 
@@ -52,8 +50,7 @@ public class TreeMapDemo extends JFrame {
             // load graph and initialize the item registry
             Graph g = (new HDirTreeReader()).loadTree(TREE_CHI);
             registry = new ItemRegistry(g);
-            registry.setRendererFactory(new DefaultRendererFactory(
-                new NodeRenderer(), null, null));
+            registry.setRendererFactory(new DefaultRendererFactory(new RectangleRenderer()));
             // make sure we draw from larger->smaller to prevent
             // occlusion from parent node boxes
             registry.setItemComparator(new Comparator() {
@@ -74,29 +71,20 @@ public class TreeMapDemo extends JFrame {
             display.addMouseMotionListener(pH);
             display.addMouseListener(zH);
             display.addMouseMotionListener(zH);
-            display.addControlListener(new ControlAdapter() {
-               public void itemEntered(VisualItem item, MouseEvent e) {
-                   Display d = (Display)e.getSource();
-                   d.setToolTipText(item.getAttribute("label"));
-               } //
-               public void itemExited(VisualItem item, MouseEvent e) {
-                   Display d = (Display)e.getSource();
-                   d.setToolTipText(null);
-               } //
-            });
+            display.addControlListener(new ToolTipControl());
             display.setSize(700,700);
             
             // create the single filtering and layout action list
             ActionList filter = new ActionList(registry);
-            filter.add(new TreeFilter(false));
+            filter.add(new TreeFilter(false, false));
             filter.add(new TreeMapSizeFunction());
             filter.add(new SquarifiedTreeMapLayout(4));
             filter.add(new TreeMapColorFunction());
             filter.add(new RepaintAction());
             
             // create and display application window
-            this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            getContentPane().add(display, BorderLayout.CENTER);
+            setDefaultCloseOperation(EXIT_ON_CLOSE);
+            getContentPane().add(display);
             pack();
             setVisible(true);
             
@@ -153,7 +141,7 @@ public class TreeMapDemo extends JFrame {
         } //
     } // end of inner class TreeMapSizeFunction
     
-    public class NodeRenderer extends ShapeRenderer {
+    public class RectangleRenderer extends ShapeRenderer {
         private Rectangle2D bounds = new Rectangle2D.Double();
         protected Shape getRawShape(VisualItem item) {
             Point2D d = (Point2D)item.getVizAttribute("dimension");

@@ -47,8 +47,7 @@ public class FisheyeMenuDemo extends JFrame {
         nodeRenderer.setHorizontalPadding(0);
         nodeRenderer.setVerticalPadding(1);
         nodeRenderer.setHorizontalAlignment(TextItemRenderer.ALIGNMENT_LEFT);
-        registry.setRendererFactory(new DefaultRendererFactory(
-            nodeRenderer, null, null));
+        registry.setRendererFactory(new DefaultRendererFactory(nodeRenderer));
         
         Display display = new Display(registry);
         display.setSize(100,470);

@@ -173,7 +173,7 @@ public class ForceDemo extends Display {
             if ( item.isHighlighted() )
                 return pastelOrange;
             else if ( item instanceof NodeItem ) {
-                if ( item.isFixed() )
+                if ( item.isFocus() )
                     return pastelRed;
                 else
                     return lightGray;

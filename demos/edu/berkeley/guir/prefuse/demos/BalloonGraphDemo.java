@@ -2,8 +2,6 @@ package edu.berkeley.guir.prefuse.demos;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Paint;
 
 import javax.swing.JFrame;
@@ -22,9 +20,6 @@ import edu.berkeley.guir.prefuse.action.filter.WindowedTreeFilter;
 import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.activity.SlowInSlowOutPacer;
 import edu.berkeley.guir.prefuse.collections.DOIItemComparator;
-import edu.berkeley.guir.prefuse.event.FocusEvent;
-import edu.berkeley.guir.prefuse.event.FocusListener;
-import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.io.HDirTreeReader;
 import edu.berkeley.guir.prefuse.graph.io.TreeReader;
@@ -48,127 +43,87 @@ import edu.berkeley.guir.prefusex.layout.BalloonTreeLayout;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class BalloonGraphDemo {
+public class BalloonGraphDemo extends JFrame {
 
 	public static final String TREE_CHI = "../prefuse/etc/chitest.hdir";
-
-	public static final String nameField = "label";
-		
-	public static ItemRegistry registry;
-	public static Tree tree;
-	public static Display display;
-    public static WindowedTreeFilter feye;
-    public static ActionList filter, update, animate;
     
-    private static Font frameCountFont = new Font("SansSerif", Font.PLAIN, 14);
-		
-	public static void main(String[] args) {
+	public static void main(String argv[]) {
+	    String datafile = TREE_CHI;
+	    if ( argv.length > 0 ) {
+	        datafile = argv[0];
+	    }
+	    new BalloonGraphDemo(datafile);
+	} //
+	
+    public BalloonGraphDemo(String inputFile) {
+        super("BalloonTree Demo");
 		try {
 			// load graph
-			String inputFile = TREE_CHI;
 			TreeReader tr = new HDirTreeReader();
-			tree = tr.loadTree(inputFile);
+			Tree tree = tr.loadTree(inputFile);
 			
 			// create display and filter
-            registry = new ItemRegistry(tree);
+            ItemRegistry registry = new ItemRegistry(tree);
             registry.setItemComparator(new DOIItemComparator());
-            display = new Display();
+            Display display = new Display();
 
 			// initialize renderers
-			Renderer nodeRenderer = new TextItemRenderer() {
-				private int maxWidth = 75;
-				private StringAbbreviator abbrev = 
-					new StringAbbreviator(null, null);
-					
-				protected String getText(VisualItem item) {
-					String s = item.getAttribute(m_labelName);
-					Font font = item.getFont();
-					if ( font == null ) { font = m_font; }
-					FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(font);
-					if ( fm.stringWidth(s) > maxWidth ) {
-						s = abbrev.abbreviate(s, 
-							StringAbbreviator.NAME, 
-							fm, maxWidth);			
-					}
-					return s;
-				} //
-			};
-            Renderer nodeRenderer2 = new DefaultNodeRenderer();
-			Renderer edgeRenderer = new DefaultEdgeRenderer() {
-				protected int getLineWidth(VisualItem item) {
-					String w = item.getAttribute("weight");
-					if ( w != null ) {
-						try {
-							return Integer.parseInt(w);
-						} catch ( Exception e ) {}
-					}
-					return m_width;
-				} //
-			};
-            ((TextItemRenderer)nodeRenderer).setRoundedCorner(8,8);
+			TextItemRenderer nodeRenderer = new TextItemRenderer();
+			nodeRenderer.setMaxTextWidth(75);
+			nodeRenderer.setAbbrevType(StringAbbreviator.NAME);
+            nodeRenderer.setRoundedCorner(8,8);
 			
-			// initialize item registry
+			Renderer nodeRenderer2 = new DefaultNodeRenderer();
+			Renderer edgeRenderer = new DefaultEdgeRenderer();
+			
 			registry.setRendererFactory(new DemoRendererFactory(
 				nodeRenderer, nodeRenderer2, edgeRenderer));
 			
             // initialize action lists
-            filter  = new ActionList(registry);
-            //filter.add((feye=new FisheyeTreeFilter(-4)));
-            filter.add((feye=new WindowedTreeFilter(-4)));
+			ActionList filter = new ActionList(registry);
+            filter.add(new WindowedTreeFilter(-4,true));
             filter.add(new BalloonTreeLayout());
             filter.add(new DemoColorFunction(4));
             
-            update = new ActionList(registry);
+            ActionList update = new ActionList(registry);
             update.add(new DemoColorFunction(4));
             update.add(new RepaintAction());
             
-            animate = new ActionList(registry, 1500, 20);
+            ActionList animate = new ActionList(registry, 1500, 20);
             animate.setPacingFunction(new SlowInSlowOutPacer());
             animate.add(new LocationAnimator());
             animate.add(new ColorAnimator());
             animate.add(new RepaintAction());
+            animate.alwaysRunAfter(filter);
             
             // initialize display
             display.setItemRegistry(registry);
             display.setSize(700,700);
             display.setBackground(Color.WHITE);
-            display.addControlListener(new FocusControl());
+            display.addControlListener(new FocusControl(filter));
             display.addControlListener(new SubtreeDragControl());
             display.addControlListener(new PanControl());
             display.addControlListener(new ZoomControl());
             display.addControlListener(new NeighborHighlightControl(update));
-            			
-			// set up initial focus and focus listener
-            registry.getDefaultFocusSet().addFocusListener(new FocusListener() {
-                public void focusChanged(FocusEvent e) {
-                    if ( update.isScheduled() )
-                        update.cancel();
-                    Node node = (Node)e.getFirstAdded();
-                    if ( node != null ) {
-                        feye.setTreeRoot(node);
-                        filter.runNow();
-                        animate.runNow();                    
-                    }
-                } //
-            });
             
 			// create and display application window
-			JFrame frame = new JFrame("BalloonTree");
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.getContentPane().add(display, BorderLayout.CENTER);
-			frame.pack();
-			frame.setVisible(true);
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			getContentPane().add(display, BorderLayout.CENTER);
+			pack();
+			setVisible(true);
 			
 			// run filter and perform initial animation
             filter.runNow();
-            animate.runNow();
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}	
 	} //
 	
-	
-    static class DemoRendererFactory implements RendererFactory {
+    /**
+     * A RendererFactory instance that assigns node renderers of varying size
+     * in response to a node's depth in the tree.
+     */
+    public class DemoRendererFactory implements RendererFactory {
         private Renderer nodeRenderer1;
         private Renderer nodeRenderer2;
         private Renderer edgeRenderer;
@@ -195,7 +150,7 @@ public class BalloonGraphDemo {
         } //
     } // end of inner class DemoRendererFactory
 	
-    static public class DemoColorFunction extends ColorFunction {
+    public class DemoColorFunction extends ColorFunction {
         private Color graphEdgeColor = Color.LIGHT_GRAY;
         private Color highlightColor = Color.BLUE;
         private ColorMap cmap; 

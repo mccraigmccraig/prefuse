@@ -67,10 +67,10 @@ public class DatabaseDemo extends JFrame {
     private static final String pQuery = "select nodes.* from nodes, edges where edges.id2 = ? AND nodes.id = edges.id1";
     
     public static void main(String[] argv) {
-        new DatabaseDemo();
+        new DatabaseDemo(argv[0], argv[1]);
     } //
     
-    public DatabaseDemo() {
+    public DatabaseDemo(String user, String password) {
         super("DatabaseDemo");
         try {
         
@@ -110,7 +110,7 @@ public class DatabaseDemo extends JFrame {
         loader.setChildrenQuery(cQuery);
         loader.setParentQuery(pQuery);
         loader.connect("com.mysql.jdbc.Driver",
-            "jdbc:mysql://localhost/trial","jheer","msql-121");
+            "jdbc:mysql://localhost/trial",user,password);
         loader.addGraphLoaderListener(new GraphLoaderListener() {
             int unloaded = 0;
             public void entityLoaded(GraphLoader loader, Entity e) {

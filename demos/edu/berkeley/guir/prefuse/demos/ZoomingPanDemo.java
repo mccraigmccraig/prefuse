@@ -9,7 +9,6 @@ import javax.swing.JFrame;
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
-import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.ActionMap;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
@@ -17,13 +16,12 @@ import edu.berkeley.guir.prefuse.action.assignment.Layout;
 import edu.berkeley.guir.prefuse.action.filter.GraphFilter;
 import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.activity.ActivityMap;
-import edu.berkeley.guir.prefuse.event.FocusEvent;
-import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.GraphLib;
 import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
+import edu.berkeley.guir.prefuse.render.Renderer;
 import edu.berkeley.guir.prefuse.render.TextItemRenderer;
 import edu.berkeley.guir.prefusex.controls.DragControl;
 import edu.berkeley.guir.prefusex.controls.FocusControl;
@@ -53,24 +51,12 @@ public class ZoomingPanDemo extends JFrame {
         Graph g = GraphLib.getGrid(30,30);
         registry = new ItemRegistry(g);
 
-        Display display = new Display();
-        display.setItemRegistry(registry);
-        display.setSize(600,600);
-        display.setBorder(BorderFactory.createEmptyBorder(50,50,50,50));
-        display.addControlListener(new DragControl());
-        display.addControlListener(new NeighborHighlightControl());
-        display.addControlListener(new FocusControl(0));
-        display.addControlListener(new ZoomingPanControl());
+        TextItemRenderer nodeR = new TextItemRenderer();
+        nodeR.setRenderType(TextItemRenderer.RENDER_TYPE_FILL);
+        Renderer edgeR = new DefaultEdgeRenderer();
         
-        registry.setRendererFactory(new DefaultRendererFactory(
-            new TextItemRenderer() {
-                public int getRenderType(VisualItem item) {
-                    return RENDER_TYPE_FILL;
-                } //
-            },
-            new DefaultEdgeRenderer(), 
-            null));
-        
+        registry.setRendererFactory(new DefaultRendererFactory(nodeR, edgeR));
+            
         ActionList filter = new ActionList(registry);
         filter.add(new GraphFilter());
         filter.add(actionMap.put("grid", new GridLayout()));
@@ -82,18 +68,19 @@ public class ZoomingPanDemo extends JFrame {
         ((Layout)actionMap.get("grid")).setLayoutBounds(
                 new Rectangle2D.Double(-1200,-1200,2400,2400));
         
+        Display display = new Display();
+        display.setItemRegistry(registry);
+        display.setSize(600,600);
+        display.setBorder(BorderFactory.createEmptyBorder(50,50,50,50));
+        display.addControlListener(new DragControl());
+        display.addControlListener(new NeighborHighlightControl());
+        display.addControlListener(new FocusControl(0, update));
+        display.addControlListener(new ZoomingPanControl());
+        
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         getContentPane().add(display);
         pack();
         setVisible(true);
-        
-        registry.getDefaultFocusSet().addFocusListener(
-            new FocusListener() {
-                public void focusChanged(FocusEvent e) {
-                    update.runNow();
-                } //  
-            }
-        );
         
         // run filter and layout
         filter.runNow(); update.runNow();
