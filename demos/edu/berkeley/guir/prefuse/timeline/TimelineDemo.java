@@ -28,7 +28,6 @@ import edu.berkeley.guir.prefuse.graph.io.XMLGraphReader;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.TextItemRenderer;
-import edu.berkeley.guir.prefusex.controls.DragControl;
 import edu.berkeley.guir.prefusex.distortion.FisheyeDistortion;
 
 /**
@@ -117,7 +116,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         display.setUseCustomTooltips(true);
         display.setSize(appWidth, appHeight);
         
-        display.addControlListener(new DragControl());
+        display.addControlListener(new YAxisDragControl());
 /*        display.addControlListener(new ControlAdapter() {
             private Point2D  m_tmp = new Point2D.Float();
             
