@@ -23,7 +23,7 @@ public class GraphFilter extends Filter {
         {ItemRegistry.DEFAULT_NODE_CLASS, ItemRegistry.DEFAULT_EDGE_CLASS};
     
     // determines if filtered edges are visible by default
-    private boolean m_edgesVisible; 
+    protected boolean m_edgesVisible; 
     
     /**
      * Creates a new GraphFilter.
