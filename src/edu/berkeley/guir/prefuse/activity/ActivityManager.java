@@ -51,10 +51,12 @@ public class ActivityManager extends Thread {
      * Create a new ActivityManger.
      */
     private ActivityManager() {
-        super("prefuse-activity-manager");
+        super("prefuse_ActivityManager");
         m_activities = new ArrayList();
         m_tmp = new ArrayList();
         m_nextTime = Long.MAX_VALUE;
+        
+        this.setDaemon(true);
         this.start();
     } //
     
