@@ -44,6 +44,28 @@ public class GraphLib {
         return new SimpleGraph(al);
     } //
     
+    public static Graph getGrid(int m, int n) {
+        ArrayList nodes = new ArrayList();
+        for ( int i = 0; i < m*n; i++ ) {
+            TreeNode node = new TreeNode();
+            node.setAttribute("label", "n"+i);
+            nodes.add(node);
+            if ( i >= m ) {
+                TreeNode above = (TreeNode)nodes.get(i-m);
+                Edge e = new Edge(above, node);
+                node.addEdge(e);
+                above.addEdge(e);
+            }
+            if ( i % m != 0 ) {
+                TreeNode bfor = (TreeNode)nodes.get(i-1);
+                Edge e = new Edge(bfor, node);
+                node.addEdge(e);
+                bfor.addEdge(e);
+            }
+        }
+        return new SimpleGraph(nodes);
+    } //
+    
 	public static final int SEARCH_NODES = 0;
 	public static final int SEARCH_EDGES = 1;
 	public static final int SEARCH_ALL   = 2;
