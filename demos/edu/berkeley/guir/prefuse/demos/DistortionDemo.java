@@ -1,23 +1,31 @@
 package edu.berkeley.guir.prefuse.demos;
 
-import java.awt.Rectangle;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
+import edu.berkeley.guir.prefuse.action.Action;
 import edu.berkeley.guir.prefuse.action.ActionMap;
+import edu.berkeley.guir.prefuse.action.ActionSwitch;
 import edu.berkeley.guir.prefuse.action.ColorFunction;
-import edu.berkeley.guir.prefuse.action.DistortionLayout;
 import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
 import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
 import edu.berkeley.guir.prefuse.action.Layout;
@@ -32,8 +40,12 @@ import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultNodeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefusex.controls.DragControl;
+import edu.berkeley.guir.prefusex.distortion.BifocalDistortion;
+import edu.berkeley.guir.prefusex.distortion.FisheyeDistortion;
 
 /**
+ * Demonstration illustrating the use of distortion transformations on
+ *  a visualization.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
@@ -53,21 +65,18 @@ public class DistortionDemo extends JFrame {
         
         Graph g = GraphLib.getGrid(20,20);
         registry = new ItemRegistry(g);
-        
-        DistortionController dc = new DistortionController();
-        
+
         Display display = new Display();
         display.setRegistry(registry);
         display.setSize(600,600);
-        display.addControlListener(new DragControl());
-        display.addMouseListener(dc);
-        display.addMouseMotionListener(dc);
+        display.setBorder(BorderFactory.createEmptyBorder(50,50,50,50));
+        display.addControlListener(new DragControl(false));
         
         registry.setRendererFactory(new DefaultRendererFactory(
             new DefaultNodeRenderer() {
                 public int getRenderType() {
                     return RENDER_TYPE_FILL;
-                }
+                } //
             }, 
             new DefaultEdgeRenderer(), 
             null));
@@ -75,30 +84,33 @@ public class DistortionDemo extends JFrame {
         ActionPipeline filter = new ActionPipeline(registry);
         filter.add(new GraphNodeFilter());
         filter.add(new GraphEdgeFilter());
-        filter.add(new ColorFunction());
-        filter.add(actionMap.put("grid",new GridLayout()));
+        filter.add(new ColorFunction()); // make everything black
+        filter.add(new GridLayout());
         filter.add(new RepaintAction());
         
-        ((Layout)actionMap.get("grid"))
-            .setLayoutBounds(new Rectangle(100,100,400,400));
+        ActionPipeline distort = new ActionPipeline(registry);
+        Action[] acts = new Action[] {
+            actionMap.put("distort1",new BifocalDistortion()),
+            actionMap.put("distort2",new FisheyeDistortion())
+        };
+        distort.add(actionMap.put("switch",new ActionSwitch(acts, 0)));
+        distort.add(new RepaintAction());
+        activityMap.put("distortion",distort);
         
-        ActionPipeline bifocal = new ActionPipeline(registry);
-        bifocal.add(actionMap.put("distort",new DistortionLayout()));
-        bifocal.add(new RepaintAction());
-        activityMap.put("bifocal",bifocal);
-        
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
-        getContentPane().add(display);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        getContentPane().add(display, BorderLayout.CENTER);
+        getContentPane().add(new SwitchPanel(), BorderLayout.SOUTH);
         pack();
         setVisible(true);
         
         // wait until graphics are available
         while ( display.getGraphics() == null );
         ActivityManager.scheduleNow(filter);
+        
+        // enable distortion mouse-over
+        DistortionController dc = new DistortionController();
+        display.addMouseListener(dc);
+        display.addMouseMotionListener(dc);
     } //
     
     class GridLayout extends Layout {
@@ -119,8 +131,8 @@ public class DistortionDemo extends JFrame {
             for ( int i=0; iter.hasNext(); i++ ) {
                 Node nd = (Node)iter.next();
                 NodeItem ni = registry.getNodeItem(nd);
-                double x = bx + w*((i%n)+0.5)/(double)n;
-                double y = by + h*((i/n)+0.5)/(double)m;
+                double x = bx + w*((i%n)/(double)(n-1));
+                double y = by + h*((i/n)/(double)(m-1));
                 ni.updateLocation(x,y);
                 ni.setLocation(x,y);
             }
@@ -130,9 +142,9 @@ public class DistortionDemo extends JFrame {
     class DistortionController extends MouseAdapter implements MouseMotionListener {
         Point2D tmp = new Point2D.Float();
         public void mouseExited(MouseEvent e) {
-            Layout distort = (Layout)actionMap.get("distort");
-            distort.setLayoutAnchor(null);
-            activityMap.scheduleNow("bifocal");
+            ((Layout)actionMap.get("distort1")).setLayoutAnchor(null);
+            ((Layout)actionMap.get("distort2")).setLayoutAnchor(null);
+            activityMap.scheduleNow("distortion");
         } //
         public void mouseMoved(MouseEvent e) {
             moveEvent(e);
@@ -143,10 +155,51 @@ public class DistortionDemo extends JFrame {
         public void moveEvent(MouseEvent e) {
             Display d = (Display)e.getSource();
             d.getAbsoluteCoordinate(e.getPoint(), tmp);
-            Layout distort = (Layout)actionMap.get("distort");
-            distort.setLayoutAnchor(tmp);
-            activityMap.scheduleNow("bifocal");
+            ((Layout)actionMap.get("distort1")).setLayoutAnchor(tmp);
+            ((Layout)actionMap.get("distort2")).setLayoutAnchor(tmp);
+            activityMap.scheduleNow("distortion");
         } //
     } // end of inner class DistortionController
+    
+    class SwitchPanel extends JPanel implements ActionListener {
+        public static final String BIFOCAL = "Bifocal";
+        public static final String FISHEYE = "Fisheye";
+        public SwitchPanel() {
+            setBackground(Color.WHITE);
+            initUI();
+        } //
+        private void initUI() {
+            JRadioButton bb = new JRadioButton(BIFOCAL);
+            JRadioButton fb = new JRadioButton(FISHEYE);
+            bb.setActionCommand(BIFOCAL);
+            fb.setActionCommand(FISHEYE);
+            bb.setSelected(true);
+            
+            bb.setBackground(Color.WHITE);
+            fb.setBackground(Color.WHITE);
+            
+            Font f = new Font("SanSerif",Font.PLAIN,24);
+            bb.setFont(f);
+            fb.setFont(f);
+            
+            bb.addActionListener(this);
+            fb.addActionListener(this);
+            
+            ButtonGroup bg = new ButtonGroup();
+            bg.add(bb); this.add(bb);
+            this.add(Box.createHorizontalStrut(50));
+            bg.add(fb); this.add(fb);
+        } //
+        public void actionPerformed(ActionEvent e) {
+            String cmd = e.getActionCommand();
+            if ( BIFOCAL == cmd ) {
+                ((ActionSwitch)actionMap.get("switch")).setSwitchValue(0);
+                activityMap.scheduleNow("distortion");
+            } else if ( FISHEYE == cmd ) {
+                ((ActionSwitch)actionMap.get("switch")).setSwitchValue(1);
+                activityMap.scheduleNow("distortion");
+            }
+        } //
+    } // end of inner class SwitchPanel
     
 } // end of class DistortionDemo
