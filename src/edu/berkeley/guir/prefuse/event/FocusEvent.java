@@ -31,7 +31,7 @@ public class FocusEvent extends EventObject {
         m_when = System.currentTimeMillis();
         m_type = type;
         m_added = (added == null ? EMPTY : added);
-        m_removed = (removed == null ? EMPTY : added);
+        m_removed = (removed == null ? EMPTY : removed);
     } //
     
     public long getWhen() {
