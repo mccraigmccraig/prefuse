@@ -58,6 +58,9 @@ public class TreeEdgeFilter extends Filter {
                 }
             }
 		}
+        
+        // optionally perform garbage collection
+        super.run(registry, frac);
 	} //
 
 } // end of class TreeEdgeFilter

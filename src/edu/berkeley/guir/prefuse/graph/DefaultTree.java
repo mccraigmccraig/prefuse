@@ -150,7 +150,7 @@ public class DefaultTree extends AbstractGraph implements Tree {
     public boolean addChild(Edge e) {
         TreeNode n1 = (TreeNode)e.getFirstNode();
         TreeNode n2 = (TreeNode)e.getSecondNode();
-        TreeNode p  = (contains(n1) ? n2 : n1);
+        TreeNode p  = (contains(n1) ? n1 : n2);
         TreeNode c  = (p==n1 ? n2 : n1);
         if ( e.isDirected() || !contains(p) || contains(c) )
             return false;
@@ -220,8 +220,13 @@ public class DefaultTree extends AbstractGraph implements Tree {
      * @see edu.berkeley.guir.prefuse.graph.Graph#removeNode(edu.berkeley.guir.prefuse.graph.Node)
      */
     public boolean removeNode(Node n) {
-        throw new UnsupportedOperationException("DefaultTree does not support"
-                + " removeNode(). Use removeChild() instead");
+        if ( !contains(n) )
+            return false;
+        if ( n == m_root )
+            m_root = null;
+        else
+            ((TreeNode)n).getParent().removeChild((TreeNode)n);
+        return true;
     } //
 
     /**

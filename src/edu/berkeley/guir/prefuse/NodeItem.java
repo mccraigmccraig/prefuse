@@ -1,5 +1,6 @@
 package edu.berkeley.guir.prefuse;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -44,7 +45,9 @@ public class NodeItem extends GraphItem {
 		if ( parent == null ) { return; }
 		NodeItem pitem  = m_registry.getNodeItem(parent);
 		if ( pitem == null ) { return; }
-		item.setLocation(pitem.getX(), pitem.getY());
+        Point2D loc = pitem.getLocation();
+        item.updateLocation(loc);
+		item.setLocation(loc);
 	} //
 	
 	public void clear() {

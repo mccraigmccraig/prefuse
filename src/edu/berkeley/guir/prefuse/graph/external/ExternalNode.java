@@ -17,7 +17,6 @@ public class ExternalNode extends DefaultNode implements ExternalEntity {
     
     protected GraphLoader  m_loader;
 
-    protected long    m_access;
     protected boolean m_loaded = false;
     protected boolean m_loadStarted = false;
     
@@ -43,8 +42,20 @@ public class ExternalNode extends DefaultNode implements ExternalEntity {
     } //
     
     public void touch() {
-        m_access = System.currentTimeMillis();
+        m_loader.touch(this);
     } //
+    
+    public void unload() {
+        Iterator iter = m_edges.iterator();
+        while ( iter.hasNext() ) {
+            Edge e = (Edge)iter.next();
+            Node n = e.getAdjacentNode(this);
+            n.removeEdge(e);
+            if ( n instanceof ExternalNode ) {
+                ((ExternalNode)n).setNeighborsLoaded(false);
+            }
+        }
+    }
     
     // ========================================================================
     // == PROXIED NODE METHODS ================================================
@@ -141,7 +152,7 @@ public class ExternalNode extends DefaultNode implements ExternalEntity {
      * @see edu.berkeley.guir.prefuse.graph.Node#isNeighbor(edu.berkeley.guir.prefuse.graph.Node)
      */
     public boolean isNeighbor(Node n) {
-        //checkLoadedStatus();
+        touch();
         return super.isNeighbor(n);
     } //
     

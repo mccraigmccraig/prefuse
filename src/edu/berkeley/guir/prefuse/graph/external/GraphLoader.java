@@ -32,10 +32,12 @@ public abstract class GraphLoader implements Runnable {
     protected Graph m_graph;
     protected ItemRegistry m_registry;
     
+    protected int m_maxSize = 50;
+    
     protected String m_keyField;
-    protected LinkedHashMap m_cache = new LinkedHashMap(200, 0.75f, true) {
+    protected LinkedHashMap m_cache = new LinkedHashMap(m_maxSize,.75f,true) {
         public boolean removeEldestEntry(Map.Entry eldest) {
-            return evict();
+            return evict((ExternalEntity)eldest.getValue());
         }
     };
     protected GraphLoaderListener m_listener;
@@ -60,6 +62,10 @@ public abstract class GraphLoader implements Runnable {
         m_listener = GraphLoaderMulticaster.remove(m_listener, l);
     } //
     
+    public void touch(ExternalEntity e) {
+        m_cache.get(e.getAttribute(m_keyField));
+    } //
+    
     public synchronized void loadNeighbors(ExternalNode n) {
         submit(new Job(LOAD_NEIGHBORS,n));
     } //
@@ -79,8 +85,13 @@ public abstract class GraphLoader implements Runnable {
         }
     } //
     
-    public boolean evict() {
-        return false;
+    public boolean evict(ExternalEntity eldest) {
+        boolean b = m_cache.size()>m_maxSize && !m_registry.isVisible(eldest);
+        if ( b && m_listener != null )
+            m_listener.entityUnloaded(this, eldest);
+        if ( b )
+            m_graph.removeNode(eldest);
+        return b;
     } //
     
     public void run() {
@@ -117,7 +128,7 @@ public abstract class GraphLoader implements Runnable {
         String key = n.getAttribute(m_keyField);
         if ( m_cache.containsKey(key) )
             // switch n reference to original loaded version 
-            n = (ExternalNode)m_cache.get(key);
+            n = (ExternalEntity)m_cache.get(key);
         else
             m_cache.put(key, n);
         
@@ -134,7 +145,10 @@ public abstract class GraphLoader implements Runnable {
                 if ( src != null )
                     m_graph.addEdge(e);
             } else if ( type == LOAD_PARENT || type == LOAD_CHILDREN ) {
-                ((Tree)m_graph).addChild(e);
+                if ( src != null )
+                    ((Tree)m_graph).addChild(e);
+                if ( type == LOAD_CHILDREN )
+                    ((ExternalTreeNode)n).setParentLoaded(true);
             }
         }
         

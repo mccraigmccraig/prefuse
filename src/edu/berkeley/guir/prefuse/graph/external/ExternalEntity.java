@@ -13,6 +13,8 @@ public interface ExternalEntity extends Node {
 
     public void setLoader(GraphLoader loader);
     
+    public void unload();
+    
     public void touch();
     
 } // end of interface

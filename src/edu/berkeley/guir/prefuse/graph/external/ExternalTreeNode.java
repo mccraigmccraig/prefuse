@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import edu.berkeley.guir.prefuse.graph.DefaultTreeNode;
 import edu.berkeley.guir.prefuse.graph.Edge;
+import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
 /**
@@ -19,7 +20,6 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
     
     protected GraphLoader  m_loader;
 
-    protected long    m_access;
     protected boolean m_ploaded = false;
     protected boolean m_ploadStarted = false;
     protected boolean m_loaded = false;
@@ -60,7 +60,27 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
     } //
     
     public void touch() {
-        m_access = System.currentTimeMillis();
+        m_loader.touch(this);
+    } //
+    
+    public void unload() {
+        Iterator iter = m_children.iterator();
+        while ( iter.hasNext() ) {
+            Edge e = (Edge)iter.next();
+            TreeNode n = (TreeNode)e.getAdjacentNode(this);
+            n.removeAsChild(this);
+            if ( n instanceof ExternalTreeNode )
+                ((ExternalTreeNode)n).setParentLoaded(false);
+        }
+        m_parent.removeChild(this);
+        if ( m_parent instanceof ExternalTreeNode )
+            ((ExternalTreeNode)m_parent).setChildrenLoaded(false);
+        iter = m_edges.iterator();
+        while ( iter.hasNext() ) {
+            Edge e = (Edge)iter.next();
+            Node n = e.getAdjacentNode(this);
+            n.removeEdge(e);
+        }
     } //
     
     // ========================================================================
@@ -70,6 +90,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#addChild(edu.berkeley.guir.prefuse.graph.Edge)
      */
     public boolean addChild(Edge e) {
+        touch();
         return super.addChild(e);
     } //
 
@@ -77,6 +98,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#addChild(int, edu.berkeley.guir.prefuse.graph.Edge)
      */
     public boolean addChild(int idx, Edge e) {
+        touch();
         return super.addChild(idx, e);
     } //
 
@@ -84,6 +106,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#getChild(int)
      */
     public TreeNode getChild(int idx) {
+        checkLoadedStatus(LOAD_CHILDREN);
         return super.getChild(idx);
     } //
 
@@ -91,6 +114,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#getChildCount()
      */
     public int getChildCount() {
+        touch();
         return super.getChildCount();
     } //
 
@@ -98,6 +122,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#getChildEdge(int)
      */
     public Edge getChildEdge(int i) {
+        checkLoadedStatus(LOAD_CHILDREN);
         return super.getChildEdge(i);
     } //
 
@@ -105,6 +130,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#getChildEdges()
      */
     public Iterator getChildEdges() {
+        checkLoadedStatus(LOAD_CHILDREN);
         return super.getChildEdges();
     } //
 
@@ -112,6 +138,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#getChildIndex(edu.berkeley.guir.prefuse.graph.Edge)
      */
     public int getChildIndex(Edge e) {
+        touch();
         return super.getChildIndex(e);
     } //
 
@@ -119,6 +146,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#getChildIndex(edu.berkeley.guir.prefuse.graph.TreeNode)
      */
     public int getChildIndex(TreeNode c) {
+        touch();
         return super.getChildIndex(c);
     } //
 
@@ -126,6 +154,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#getChildren()
      */
     public Iterator getChildren() {
+        checkLoadedStatus(LOAD_CHILDREN);
         return super.getChildren();
     } //
 
@@ -133,6 +162,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#getNextSibling()
      */
     public TreeNode getNextSibling() {
+        checkLoadedStatus(LOAD_PARENT);
         return super.getNextSibling();
     } //
 
@@ -140,6 +170,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#getDescendantCount()
      */
     public int getDescendantCount() {
+        touch();
         return super.getDescendantCount();
     } //
 
@@ -147,6 +178,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#getParent()
      */
     public TreeNode getParent() {
+        checkLoadedStatus(LOAD_PARENT);
         return super.getParent();
     } //
 
@@ -154,6 +186,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#getParentEdge()
      */
     public Edge getParentEdge() {
+        checkLoadedStatus(LOAD_PARENT);
         return super.getParentEdge();
     } //
 
@@ -161,6 +194,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#getPreviousSibling()
      */
     public TreeNode getPreviousSibling() {
+        checkLoadedStatus(LOAD_PARENT);
         return super.getPreviousSibling();
     } //
 
@@ -168,6 +202,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#isChild(edu.berkeley.guir.prefuse.graph.TreeNode)
      */
     public boolean isChild(TreeNode c) {
+        touch();
         return super.isChild(c);
     } //
 
@@ -175,6 +210,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#isChildEdge(edu.berkeley.guir.prefuse.graph.Edge)
      */
     public boolean isChildEdge(Edge e) {
+        touch();
         return super.isChildEdge(e);
     } //
 
@@ -182,6 +218,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#isDescendant(edu.berkeley.guir.prefuse.graph.TreeNode)
      */
     public boolean isDescendant(TreeNode n) {
+        touch();
         return super.isDescendant(n);
     } //
 
@@ -189,6 +226,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#isSibling(edu.berkeley.guir.prefuse.graph.TreeNode)
      */
     public boolean isSibling(TreeNode n) {
+        checkLoadedStatus(LOAD_PARENT);
         return super.isSibling(n);
     } //
 
@@ -196,6 +234,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#removeAllAsChildren()
      */
     public void removeAllAsChildren() {
+        touch();
         super.removeAllAsChildren();
     } //
 
@@ -203,6 +242,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#removeAllChildren()
      */
     public void removeAllChildren() {
+        touch();
         super.removeAllChildren();
     } //
 
@@ -210,6 +250,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#removeAsChild(int)
      */
     public TreeNode removeAsChild(int idx) {
+        touch();
         return super.removeAsChild(idx);
     } //
 
@@ -217,6 +258,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#removeAsChild(edu.berkeley.guir.prefuse.graph.TreeNode)
      */
     public boolean removeAsChild(TreeNode n) {
+        touch();
         return super.removeAsChild(n);
     } //
 
@@ -224,6 +266,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#removeChild(int)
      */
     public TreeNode removeChild(int idx) {
+        touch();
         return super.removeChild(idx);
     } //
 
@@ -231,6 +274,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#removeChild(edu.berkeley.guir.prefuse.graph.TreeNode)
      */
     public boolean removeChild(TreeNode n) {
+        touch();
         return super.removeChild(n);
     } //
 
@@ -238,6 +282,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#removeChildEdge(edu.berkeley.guir.prefuse.graph.Edge)
      */
     public boolean removeChildEdge(Edge e) {
+        touch();
         return super.removeChildEdge(e);
     } //
 
@@ -245,6 +290,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#removeChildEdge(int)
      */
     public Edge removeChildEdge(int idx) {
+        touch();
         return super.removeChildEdge(idx);
     } //
 
@@ -252,6 +298,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#setAsChild(int, edu.berkeley.guir.prefuse.graph.TreeNode)
      */
     public boolean setAsChild(int idx, TreeNode c) {
+        touch();
         return super.setAsChild(idx,c);
     } //
 
@@ -259,6 +306,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#setAsChild(edu.berkeley.guir.prefuse.graph.TreeNode)
      */
     public boolean setAsChild(TreeNode c) {
+        touch();
         return super.setAsChild(c);
     } //
 
@@ -266,6 +314,7 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#setDescendantCount(int)
      */
     public void setDescendantCount(int count) {
+        touch();
         super.setDescendantCount(count);
     } //
 
@@ -273,7 +322,139 @@ public class ExternalTreeNode extends DefaultTreeNode implements ExternalEntity 
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#setParentEdge(edu.berkeley.guir.prefuse.graph.Edge)
      */
     public void setParentEdge(Edge e) {
+        touch();
         super.setParentEdge(e);
     } //
 
+    // ========================================================================
+    // == PROXIED NODE METHODS ================================================
+
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#addEdge(edu.berkeley.guir.prefuse.graph.Edge)
+     */
+    public boolean addEdge(Edge e) {
+        touch();
+        return super.addEdge(e);
+    } //
+    
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#addEdge(int, edu.berkeley.guir.prefuse.graph.Edge)
+     */
+    public boolean addEdge(int i, Edge e) {
+        touch();
+        return super.addEdge(i,e);
+    } //
+    
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#getEdge(int)
+     */
+    public Edge getEdge(int i) {
+        checkLoadedStatus(LOAD_ALL);
+        return super.getEdge(i);
+    } //
+    
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#getEdge(edu.berkeley.guir.prefuse.graph.Node)
+     */
+    public Edge getEdge(Node n) {
+        checkLoadedStatus(LOAD_ALL);
+        return super.getEdge(n);
+    } //
+
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#getEdgeCount()
+     */
+    public int getEdgeCount() {
+        touch();
+        return super.getEdgeCount();
+    } //
+    
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#getEdges()
+     */
+    public Iterator getEdges() {
+        checkLoadedStatus(LOAD_ALL);
+        return super.getEdges();
+    } //
+    
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#getIndex(edu.berkeley.guir.prefuse.graph.Edge)
+     */
+    public int getIndex(Edge e) {
+        touch();
+        return super.getIndex(e);
+    } //
+
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#getIndex(edu.berkeley.guir.prefuse.graph.Node)
+     */
+    public int getIndex(Node n) {
+        touch();
+        return super.getIndex(n);
+    } //
+    
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#getNeighbor(int)
+     */
+    public Node getNeighbor(int i) {
+        checkLoadedStatus(LOAD_ALL);
+        return super.getNeighbor(i);
+    } //
+
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#getNeighbors()
+     */
+    public Iterator getNeighbors() {
+        checkLoadedStatus(LOAD_ALL);
+        return super.getNeighbors();
+    } //
+    
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#isIncidentEdge(edu.berkeley.guir.prefuse.graph.Edge)
+     */
+    public boolean isIncidentEdge(Edge e) {
+        touch();
+        return super.isIncidentEdge(e);
+    } //
+
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#isNeighbor(edu.berkeley.guir.prefuse.graph.Node)
+     */
+    public boolean isNeighbor(Node n) {
+        touch();
+        return super.isNeighbor(n);
+    } //
+    
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#removeEdge(edu.berkeley.guir.prefuse.graph.Edge)
+     */
+    public boolean removeEdge(Edge e) {
+        touch();
+        return super.removeEdge(e);
+    } //
+    
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#removeEdge(int)
+     */
+    public Edge removeEdge(int i) {
+        touch();
+        return super.removeEdge(i);
+    } //
+
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#removeNeighbor(int)
+     */
+    public Node removeNeighbor(int i) {
+        touch();
+        return super.removeNeighbor(i);
+    } //
+
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.Node#removeNeighbor(edu.berkeley.guir.prefuse.graph.Node)
+     */
+    public boolean removeNeighbor(Node n) {
+        touch();
+        return super.removeNeighbor(n);
+    } //
+    
 } // end of class ExternalTreeNode

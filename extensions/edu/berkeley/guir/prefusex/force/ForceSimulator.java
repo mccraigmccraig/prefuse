@@ -98,6 +98,8 @@ public class ForceSimulator {
     } //
     
     public Spring addSpring(ForceItem item1, ForceItem item2, float length) {
+        if ( item1 == null || item2 == null )
+            throw new IllegalArgumentException("ForceItems must be non-null");
         Spring s = Spring.getFactory().getSpring(item1, item2, length);
         springs.add(s);
         return s;
