@@ -66,6 +66,17 @@ public class ForceDirectedLayout extends Layout {
         m_fsim = fsim;
     } //
     
+    public int getRunOnceIterations() {
+        return m_iterations;
+    } //
+    
+    public void setRunOnceIterations(int iter) {
+        if ( iter < 1 )
+            throw new IllegalArgumentException(
+                    "Iterations must be a positive number!");
+        m_iterations = iter;
+    } //
+    
     /**
      * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
      */
@@ -81,9 +92,19 @@ public class ForceDirectedLayout extends Layout {
                 nitem.setLocation(anchor);
             }
             m_fsim.clear();
+            long timestep = 1000L;
             initSimulator(registry, m_fsim);
-            for ( int i = 0; i < m_iterations; i++ )
-                m_fsim.runSimulator(50);
+            for ( int i = 0; i < m_iterations; i++ ) {
+                // use an annealing schedule to set time step
+                timestep *= (1.0 - i/(double)m_iterations);
+                long step = timestep+50;
+                // run simulator
+                m_fsim.runSimulator(step);
+                // debugging output
+                if (i % 10 == 0 ) {
+                    System.out.println("iter: "+i);
+                }
+            }
             updateNodePositions();
         } else {
             // get timestep
