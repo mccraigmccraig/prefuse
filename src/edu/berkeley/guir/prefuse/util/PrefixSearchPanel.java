@@ -36,7 +36,7 @@ import edu.berkeley.guir.prefuse.graph.Entity;
  * Provides keyword search over the currently visualized data.
  *
  * @version 1.0
- * @author <a href="http://jheer.org">Jeffrey Heer</a> vizster(AT)jheer.org
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class PrefixSearchPanel extends JPanel
     implements DocumentListener, ActionListener
@@ -68,7 +68,7 @@ public class PrefixSearchPanel extends JPanel
                 searcher = (PrefixSearchFocusSet)search;
             } else {
                 throw new IllegalStateException(
-                    "Search focus set not instance of KeywordSearchFocusSet!");
+                    "Search focus set not instance of PrefixSearchFocusSet!");
             }
         } else {
             searcher = new PrefixSearchFocusSet();
