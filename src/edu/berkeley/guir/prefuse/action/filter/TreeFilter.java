@@ -134,4 +134,20 @@ public class TreeFilter extends Filter {
         super.run(registry, frac);
     } //    
     
-}
+	public boolean isEdgesVisible() {
+		return m_edgesVisible;
+	} //
+	
+	public void setEdgesVisible(boolean visible) {
+		m_edgesVisible = visible;
+	} //
+	
+	public boolean isUseFocusAsRoot() {
+		return m_useFocusAsRoot;
+	} //
+	
+	public void setUseFocusAsRoot(boolean focusAsRoot) {
+		m_useFocusAsRoot = focusAsRoot;
+	} //
+    
+} // end of class TreeFilter

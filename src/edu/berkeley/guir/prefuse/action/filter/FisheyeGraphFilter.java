@@ -176,4 +176,20 @@ public class FisheyeGraphFilter extends Filter {
         super.run(registry, frac);
 	} //
 
-} // end of class FisheyeTreeFilter
+	public boolean isEdgesVisible() {
+		return m_edgesVisible;
+	} //
+	
+	public void setEdgesVisible(boolean visible) {
+		m_edgesVisible = visible;
+	} //
+	
+	public int getMinDOI() {
+		return m_minDOI;
+	} //
+	
+	public void setMinDOI(int minDOI) {
+		m_minDOI = minDOI;
+	} //
+	
+} // end of class FisheyeGraphFilter

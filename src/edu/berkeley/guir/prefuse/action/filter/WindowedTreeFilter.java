@@ -30,7 +30,7 @@ public class WindowedTreeFilter extends Filter {
     // determines if filtered edges are visible by default
     private boolean m_edgesVisible;
     private boolean m_useFocusAsRoot;
-    private double m_minDOI;
+    private int m_minDOI;
     private Node m_root;
     private List m_queue = new LinkedList();
     
@@ -157,4 +157,28 @@ public class WindowedTreeFilter extends Filter {
         super.run(registry, frac);
     } //
     
+	public boolean isEdgesVisible() {
+		return m_edgesVisible;
+	} //
+	
+	public void setEdgesVisible(boolean visible) {
+		m_edgesVisible = visible;
+	} //
+	
+	public int getMinDOI() {
+		return m_minDOI;
+	} //
+	
+	public void setMinDOI(int minDOI) {
+		m_minDOI = minDOI;
+	} //
+	
+	public boolean isUseFocusAsRoot() {
+		return m_useFocusAsRoot;
+	} //
+	
+	public void setUseFocusAsRoot(boolean focusAsRoot) {
+		m_useFocusAsRoot = focusAsRoot;
+	} //
+	
 } // end of class WindowedTreeFilter
