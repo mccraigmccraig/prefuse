@@ -40,7 +40,7 @@
   <node id="renaissance" label="Renaissance">
 	<att name="nodetype" value="period"/>
     <att name="startyear" value="1430"/>
-    <att name="endyear" value="1562"/>
+    <att name="endyear" value="1600"/>
     <att name="comments" value="aka 'The Rebirth,' This period is well-known as a time of rapid development in all forms of learning and the arts. There was a new self-sustaining freedom of expression which spread throughout much of Europe, and incubated many new ideas and schools of thought. The church was still very powerful and its influence was everywhere, yet the reformation brought a degree of freedom to religious thinking and some hymns which we recognise today were written in this period. A shift in power also meant that the secular needs of the Royal Courts were as important as those of the church in sponsoring new musical material. So as well as music for the Mass, there were Motets and Madrigals setting texts and verse to music, as well as a number of dance forms. Music styles became more complex with multiple parts for different instruments and further developments in harmony. Instruments such as the recorder and lute were common as well as early versions of today's instruments. The creativity of this period was given further impetus by the invention of the printing press which brought standardisation to the previously hand-written forms of musical notation, and allowed many more copies to be made.\n\nKey composers of this period include Thomas Tallis, William Byrd, John Taverner, Josquin des Prez and Giovanni Palestrina."/>
 </node>
   <node id="josquin" label="Josquin Desprez">
@@ -70,7 +70,7 @@
   <node id="counter-reformation" label="Counter-Reformation">
 	<att name="nodetype" value="period"/>
     <att name="startyear" value="1562"/>
-    <att name="endyear" value=""/>
+    <att name="endyear" value="1600"/>
     <att name="comments" value="Lead by Pope Pius IV, a period that restored church music to its pure vocal form by eliminating all instruments except the organ, any evidence of secularism, harmony and folk melody."/>
 </node>
   <node id="palestrina" label="Giovanni Pierluigi da Palestrina">
@@ -122,13 +122,13 @@
     <att name="comments" value="Jacopo Peri composes the first opera (Italian)."/>
 </node>
   <node id="baroque" label="Baroque">
-	<att name="nodetype" value="event"/>
+	<att name="nodetype" value="period"/>
     <att name="startyear" value="1600"/>
     <att name="endyear" value="1750"/>
     <att name="comments" value="The word Baroque comes from the Portuguese word for 'misshapen pearl' often tied closely with the word 'ornate.'In general, the period desires to evoke emotional states by appealing to the senses."/>
 </node>
   <node id="baroqueearly" label="Early Baroque">
-	<att name="nodetype" value="event"/>
+	<att name="nodetype" value="period"/>
     <att name="startyear" value="1600"/>
     <att name="endyear" value="1680"/>
     <att name="comments" value="The most important figure of the Early Baroque period was Claudio Monteverdi, who had dramatic styles of madrigals."/>
@@ -146,7 +146,7 @@
     <att name="comments" value="The first known female composer of an opera. Her most famous work is La Liberazione di Ruggiero."/>
 </node>
   <node id="baroquelate" label="Late Baroque">
-	<att name="nodetype" value="event"/>
+	<att name="nodetype" value="period"/>
     <att name="startyear" value="1680"/>
     <att name="endyear" value="1750"/>
     <att name="comments" value="The greatest legacy handed down by this period is its enormous wealth of operas and oratorios. Other major musical contributions of the Late Baroque era were various dance forms such as the minuet, gigue, courante, allemande and sarabande. These dances reflected movements that were ornamental, which was another key feature of this particular time in the history of music. The concerto grosso, key instrumental form, reflects the contrast between two groups of instruments: the concertino/concertante (a small body of string soloists) and the ripieno, a larger section. It was from this early concerto form that the later Classical and Romantic concertos developed."/>
@@ -249,8 +249,8 @@
 </node>
   <node id="" label="">
 	<att name="nodetype" value="person"/>
-    <att name="startyear" value=""/>
-    <att name="endyear" value=""/>
+    <att name="startyear" value="0"/>
+    <att name="endyear" value="0"/>
     <att name="comments" value=""/>
 </node>
 
