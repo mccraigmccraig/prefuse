@@ -245,7 +245,9 @@ public class ToolTipManager implements MouseMotionListener {
             if ( text == null ) return new Dimension(0,0);
             Graphics g = m_display.getGraphics();
             FontMetrics fm = g.getFontMetrics();
-            int w = fm.stringWidth(getText())+8;
+            String s = getText();
+            int w = 8;
+            if (s != null) w += fm.stringWidth(s);
             int h = fm.getHeight();
             return new Dimension(w,h);
         } //
