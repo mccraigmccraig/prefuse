@@ -1,0 +1,163 @@
+package edu.berkeley.guir.prefuse.demos;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Comparator;
+import java.util.Iterator;
+
+import javax.swing.JFrame;
+
+import edu.berkeley.guir.prefuse.Display;
+import edu.berkeley.guir.prefuse.GraphItem;
+import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.NodeItem;
+import edu.berkeley.guir.prefuse.action.AbstractAction;
+import edu.berkeley.guir.prefuse.action.ColorFunction;
+import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
+import edu.berkeley.guir.prefuse.action.RepaintAction;
+import edu.berkeley.guir.prefuse.action.TreeEdgeFilter;
+import edu.berkeley.guir.prefuse.activity.ActionPipeline;
+import edu.berkeley.guir.prefuse.activity.ActivityManager;
+import edu.berkeley.guir.prefuse.event.ControlAdapter;
+import edu.berkeley.guir.prefuse.graph.Tree;
+import edu.berkeley.guir.prefuse.graph.io.HDirTreeReader;
+import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
+import edu.berkeley.guir.prefuse.render.ShapeRenderer;
+import edu.berkeley.guir.prefusex.layout.SquarifiedTreeMapLayout;
+
+/**
+ * Demonstration showcasing a TreeMap layout
+ *
+ * @version 1.0
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
+ */
+public class TreeMapDemo extends JFrame {
+
+    public static final String TREE_CHI = "../prefuse/etc/chitest.hdir";
+    
+    private ItemRegistry registry;
+    
+    public TreeMapDemo() {
+        super("prefuse TreeMap Demo");
+        
+        try {
+            // load graph
+            Tree tree = (new HDirTreeReader()).loadTree(TREE_CHI);
+            registry = new ItemRegistry(tree);
+            registry.setRendererFactory(new DefaultRendererFactory(
+                new NodeRenderer(), null, null));
+            registry.setItemComparator(new Comparator() {
+                public int compare(Object o1, Object o2) {
+                    double s1 = ((GraphItem)o1).getSize();
+                    double s2 = ((GraphItem)o2).getSize();
+                    return ( s1>s2 ? -1 : (s1<s2 ? 1 : 0));
+                } //
+            });
+            
+            Display display = new Display();
+            display.setRegistry(registry);
+            display.addControlListener(new ControlAdapter() {
+               public void itemEntered(GraphItem item, MouseEvent e) {
+                   Display d = (Display)e.getSource();
+                   d.setToolTipText(item.getAttribute("label"));
+               } //
+               public void itemExited(GraphItem item, MouseEvent e) {
+                   Display d = (Display)e.getSource();
+                   d.setToolTipText(null);
+               } //
+            });
+            display.setSize(700,700);
+            
+            ActionPipeline filter = new ActionPipeline(registry);
+            filter.add(new GraphNodeFilter());
+            filter.add(new TreeEdgeFilter());
+            filter.add(new TreeMapSizeFunction());
+            filter.add(new SquarifiedTreeMapLayout());
+            filter.add(new TreeMapColorFunction());
+            filter.add(new RepaintAction());
+            
+            // create and display application window
+            addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    System.exit(0);
+                }
+            });
+            getContentPane().add(display, BorderLayout.CENTER);
+            pack();
+            setVisible(true);
+            
+            // because awt doesn't always give us 
+            // our graphics context right away...
+            while ( display.getGraphics() == null );
+            ActivityManager.scheduleNow(filter);
+            
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
+    } //
+    
+    public static void main(String argv[]) {
+        new TreeMapDemo();
+    } //
+    
+    public class TreeMapColorFunction extends ColorFunction {
+        public Paint getColor(GraphItem item) {
+            return Color.WHITE;
+        } //
+        public Paint getFillColor(GraphItem item) {
+            return new Color(0.5f,0.5f,(float)Math.random());
+        } //
+    } // end of inner class TreeMapColorFunction
+    
+    public class TreeMapSizeFunction extends AbstractAction {
+        public void run(ItemRegistry registry, double frac) {
+            int leafCount = 0;
+            Iterator iter = registry.getNodeItems();
+            while ( iter.hasNext() ) {
+                NodeItem n = (NodeItem)iter.next();
+                if ( n.getNumChildren() == 0 ) {
+                    n.setSize(1.0);
+                    for (NodeItem p=n.getParent(); p!=null; p=p.getParent())
+                        p.setSize(1.0+p.getSize());
+                    leafCount++;
+                }
+            }
+            
+            Dimension d = registry.getDisplay(0).getSize();
+            double area = d.width*d.height;
+            double divisor = ((double)leafCount)/area;
+            iter = registry.getNodeItems();
+            while ( iter.hasNext() ) {
+                NodeItem n = (NodeItem)iter.next();
+                n.setSize(n.getSize()/divisor);
+            }
+        } //
+        
+    } // end of inner class TreeMapSizeFunction
+    
+    public class NodeRenderer extends ShapeRenderer {
+        private Rectangle2D bounds = new Rectangle2D.Double();
+        protected int getRenderType() {
+            return RENDER_TYPE_DRAW_AND_FILL;
+        } //
+        protected Shape getRawShape(GraphItem item) {
+            Point2D d = (Point2D)item.getVizAttribute("dimension");
+            bounds.setRect(item.getX(),item.getY(),d.getX(),d.getY());
+            return bounds;
+        } //
+
+        protected AffineTransform getGraphicsSpaceTransform(GraphItem item) {
+            return null;
+        } //
+    } // end of inner class NodeRenderer
+    
+} // end of class TreeMapDemo
