@@ -44,7 +44,9 @@ import edu.berkeley.guir.prefusex.layout.RadialTreeLayout;
 
 /**
  * Demo application showcasing the use of an animated radial tree layout to
- * visualize a graph.
+ * visualize a graph. This is a re-implementation of <a 
+ * href="http://zesty.ca/pubs/yee-gtv-infovis2001.pdf">Ping Yee et al.'s 
+ * Animated Exploration of Dynamic Graphs with Radial Layout</a>.
  * 
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
