@@ -3,14 +3,12 @@ package edu.berkeley.guir.prefuse.demos;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Paint;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -26,7 +24,6 @@ import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
 import edu.berkeley.guir.prefuse.action.filter.GraphFilter;
 import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.activity.Activity;
-import edu.berkeley.guir.prefuse.event.ControlAdapter;
 import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.GraphLib;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
@@ -79,9 +76,8 @@ public class ForceDemo extends Display {
         setSize(700,700);
         pan(350,350);
         this.addControlListener(new NeighborHighlightControl());
-        this.addControlListener(new DragControl(false));
+        this.addControlListener(new DragControl(false, true));
         this.addControlListener(new FocusControl(0));
-        this.addControlListener(new MouseOverControl());
         this.addControlListener(new PanControl(false));
         this.addControlListener(new ZoomControl(false));
     } //
@@ -186,26 +182,5 @@ public class ForceDemo extends Display {
             }
         } //        
     } //
-    
-    /**
-     * Tags and fixes the node under the mouse pointer.
-     */
-    public class MouseOverControl extends ControlAdapter {
-        
-        public void itemEntered(VisualItem item, MouseEvent e) {
-            ((Display)e.getSource()).setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            item.setFixed(true);
-        } //
-        
-        public void itemExited(VisualItem item, MouseEvent e) {
-            ((Display)e.getSource()).setCursor(Cursor.getDefaultCursor());
-            item.setFixed(false);
-        } //
-        
-        public void itemReleased(VisualItem item, MouseEvent e) {
-            item.setFixed(false);
-        } //
-        
-    } // end of inner class FocusControl
     
 } // end of class ForceDemo
