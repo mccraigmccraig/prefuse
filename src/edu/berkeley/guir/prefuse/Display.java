@@ -643,7 +643,7 @@ public class Display extends JComponent {
      */
     protected void prepareGraphics(Graphics2D g) {
         if ( m_transform != null )
-            g.setTransform(m_transform);
+            g.transform(m_transform);
         setRenderingHints(g);
     } //
     
@@ -721,7 +721,6 @@ public class Display extends JComponent {
 			m_offscreen = getNewOffscreenBuffer();
         }
 	    Graphics2D g2D = (Graphics2D) m_offscreen.getGraphics();
-        //Graphics2D g2D = (Graphics2D)g;
         
 	    // paint the visualization
 		paintDisplay(g2D, getSize());
@@ -775,6 +774,26 @@ public class Display extends JComponent {
 		}
 
 		postPaint(g2D);
+	} //
+	
+	/**
+	 * Paints the graph to the provided graphics context, for output to a
+	 * printer.  This method does not double buffer the painting, in order to
+	 * provide the maximum quality.
+	 * 
+	 * @param g the printer graphics context.
+	 */
+	protected void printComponent(Graphics g) {
+		boolean wasHighQuality = m_highQuality;
+		try {
+			// Set the quality to high for the duration of the printing.
+			m_highQuality = true;
+			// Paint directly to the print graphics context.
+			paintDisplay((Graphics2D) g, getSize());
+		} finally {
+			// Reset the quality to the state it was in before printing.
+			m_highQuality = wasHighQuality;
+		}
 	} //
 	
     /**
