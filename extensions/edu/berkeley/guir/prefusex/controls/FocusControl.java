@@ -10,6 +10,7 @@ import edu.berkeley.guir.prefuse.FocusManager;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
+import edu.berkeley.guir.prefuse.activity.Activity;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 import edu.berkeley.guir.prefuse.focus.FocusSet;
 
@@ -28,6 +29,7 @@ public class FocusControl extends ControlAdapter {
     private Object focusSetKey = FocusManager.DEFAULT_KEY;
     protected int ccount;
     protected Class[] itemTypes = new Class[] { NodeItem.class };
+    protected Activity activity = null;
     
     /**
      * Creates a new FocusControl that changes the focus to another item
@@ -38,6 +40,16 @@ public class FocusControl extends ControlAdapter {
     } //
     
     /**
+     * Creates a new FocusControl that changes the focus to another item
+     * when that item is clicked once.
+     * @param act an activity run to upon focus change 
+     */
+    public FocusControl(Activity act) {
+        this(1);
+        activity = act;
+    } //
+    
+    /**
      * Creates a new FocusControl that changes the focus when an item is 
      * clicked the specified number of times. A click value of zero indicates
      * that the focus should be changed in response to mouse-over events.
@@ -45,6 +57,18 @@ public class FocusControl extends ControlAdapter {
      */
     public FocusControl(int clicks) {
         ccount = clicks;
+    } //
+    
+    /**
+     * Creates a new FocusControl that changes the focus when an item is 
+     * clicked the specified number of times. A click value of zero indicates
+     * that the focus should be changed in response to mouse-over events.
+     * @param clicks the number of clicks needed to switch the focus.
+     * @param act an activity run to upon focus change 
+     */
+    public FocusControl(int clicks, Activity act) {
+        ccount = clicks;
+        activity = act;
     } //
     
     /**
@@ -120,7 +144,7 @@ public class FocusControl extends ControlAdapter {
                 FocusSet fs = fm.getFocusSet(focusSetKey);
                 fs.set(item.getEntity());
                 registry.touch(item.getItemClass());
-                
+                runActivity();
             }
         }
     } //
@@ -135,6 +159,7 @@ public class FocusControl extends ControlAdapter {
                 FocusSet fs = fm.getFocusSet(focusSetKey);
                 fs.remove(item.getEntity());
                 registry.touch(item.getItemClass());
+                runActivity();
             }
         }
     } //
@@ -149,6 +174,13 @@ public class FocusControl extends ControlAdapter {
             FocusSet fs = fm.getFocusSet(focusSetKey);
             fs.set(item.getEntity());
             registry.touch(item.getItemClass());
+            runActivity();
+        }
+    } //
+    
+    private void runActivity() {
+        if ( activity != null ) {
+            activity.runNow();
         }
     } //
     
