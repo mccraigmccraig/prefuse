@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -23,6 +24,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 import edu.berkeley.guir.prefuse.Display;
@@ -30,6 +33,7 @@ import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.ActionMap;
+import edu.berkeley.guir.prefuse.action.FontFunction;
 import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
 import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
@@ -62,12 +66,19 @@ import edu.berkeley.guir.prefusex.layout.RandomLayout;
  */
 public class GraphEditor extends JFrame {
 
+    public static final int SMALL_FONT_SIZE  = 10;
+    public static final int MEDIUM_FONT_SIZE = 14;
+    public static final int LARGE_FONT_SIZE  = 20;
+    
 	public static final String OPEN    = "Open";
 	public static final String SAVE    = "Save";
 	public static final String SAVE_AS = "Save As...";
 	public static final String EXIT    = "Exit";
     public static final String RANDOM  = "Random Layout";
     public static final String FORCE   = "Force-Directed Layout";
+    public static final String SMALL_FONT  = "Small";
+    public static final String MEDIUM_FONT = "Medium";
+    public static final String LARGE_FONT  = "Large";
 
 	private JMenuItem saveItem;
 
@@ -80,8 +91,15 @@ public class GraphEditor extends JFrame {
 	private ItemRegistry registry;
 	private Display display;
 	private Graph g;
+    private int fontSize = SMALL_FONT_SIZE;
     private ActivityMap activityMap = new ActivityMap();
     private ActionMap   actionMap = new ActionMap();
+    
+    private Font[] fonts = { new Font("SansSerif",Font.PLAIN,SMALL_FONT_SIZE),
+                             new Font("SansSerif",Font.PLAIN,MEDIUM_FONT_SIZE),
+                             new Font("SansSerif",Font.PLAIN,LARGE_FONT_SIZE)};
+    private Font curFont = fonts[0];
+    
 		
     public static void main(String argv[]) {
         new GraphEditor();
@@ -92,7 +110,7 @@ public class GraphEditor extends JFrame {
         
 		setLookAndFeel();
 		try {
-			g = new SimpleGraph(Collections.EMPTY_LIST);
+			g = new SimpleGraph(Collections.EMPTY_LIST, true);
 
 			registry = new ItemRegistry(g);
             display  = new Display();
@@ -118,7 +136,7 @@ public class GraphEditor extends JFrame {
 			display.setSize(600,600);
 			display.setBackground(Color.WHITE);
             display.setBorder(BorderFactory.createEmptyBorder(30,30,30,30));
-            display.setFont(new Font("SansSerif",Font.PLAIN,10));
+            display.setFont(curFont);
             display.getTextEditor().addKeyListener(controller);
 			display.addControlListener(controller);
 			
@@ -126,6 +144,11 @@ public class GraphEditor extends JFrame {
             ActionPipeline filter = new ActionPipeline(registry);
             filter.add(new GraphNodeFilter());
             filter.add(new GraphEdgeFilter());
+            filter.add(actionMap.put("font", new FontFunction() {
+                public Font getFont(GraphItem item) {
+                    return curFont;
+                } //
+            }));
             activityMap.put("filter", filter);
             
             ActionPipeline update = new ActionPipeline(registry);
@@ -164,19 +187,43 @@ public class GraphEditor extends JFrame {
 			JMenuBar  menubar    = new JMenuBar();
 			JMenu     fileMenu   = new JMenu("File");
             JMenu     layoutMenu = new JMenu("Layout");
+            JMenu     fontMenu   = new JMenu("Font");
 			JMenuItem openItem   = new JMenuItem(OPEN);
 				      saveItem   = new JMenuItem(SAVE);
 			JMenuItem saveAsItem = new JMenuItem(SAVE_AS);
 			JMenuItem exitItem   = new JMenuItem(EXIT);
             JMenuItem randomItem = new JMenuItem(RANDOM);
             JMenuItem forceItem  = new JCheckBoxMenuItem(FORCE);
+            
+            JMenuItem smallItem  = new JRadioButtonMenuItem(SMALL_FONT);
+            JMenuItem mediumItem = new JRadioButtonMenuItem(MEDIUM_FONT);
+            JMenuItem largeItem  = new JRadioButtonMenuItem(LARGE_FONT);
 			
+            ButtonGroup bg = new ButtonGroup();
+            bg.add(smallItem);
+            bg.add(mediumItem);
+            bg.add(largeItem);
+            smallItem.setSelected(true);
+            
+            openItem.setAccelerator(KeyStroke.getKeyStroke("ctrl O"));
+            saveItem.setAccelerator(KeyStroke.getKeyStroke("ctrl S"));
+            saveAsItem.setAccelerator(KeyStroke.getKeyStroke("ctrl shift S"));
+            exitItem.setAccelerator(KeyStroke.getKeyStroke("ctrl X"));
+            randomItem.setAccelerator(KeyStroke.getKeyStroke("ctrl R"));
+            forceItem.setAccelerator(KeyStroke.getKeyStroke("ctrl F"));
+            smallItem.setAccelerator(KeyStroke.getKeyStroke("ctrl 1"));
+            mediumItem.setAccelerator(KeyStroke.getKeyStroke("ctrl 2"));
+            largeItem.setAccelerator(KeyStroke.getKeyStroke("ctrl 3"));
+            
 			openItem.setActionCommand(OPEN);
 			saveItem.setActionCommand(SAVE);
 			saveAsItem.setActionCommand(SAVE_AS);
 			exitItem.setActionCommand(EXIT);
             randomItem.setActionCommand(RANDOM);
             forceItem.setActionCommand(FORCE);
+            smallItem.setActionCommand(SMALL_FONT);
+            mediumItem.setActionCommand(MEDIUM_FONT);
+            largeItem.setActionCommand(LARGE_FONT);
 			
 			openItem.addActionListener(controller);
 			saveItem.addActionListener(controller);
@@ -184,6 +231,9 @@ public class GraphEditor extends JFrame {
 			exitItem.addActionListener(controller);
             randomItem.addActionListener(controller);
             forceItem.addActionListener(controller);
+            smallItem.addActionListener(controller);
+            mediumItem.addActionListener(controller);
+            largeItem.addActionListener(controller);
 			
 			fileMenu.add(openItem);
 			fileMenu.add(saveItem);
@@ -192,9 +242,14 @@ public class GraphEditor extends JFrame {
             
             layoutMenu.add(randomItem);
             layoutMenu.add(forceItem);
+            
+            fontMenu.add(smallItem);
+            fontMenu.add(mediumItem);
+            fontMenu.add(largeItem);
 			
 			menubar.add(fileMenu);
             menubar.add(layoutMenu);
+            menubar.add(fontMenu);
 			
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			setJMenuBar(menubar);
@@ -221,8 +276,9 @@ public class GraphEditor extends JFrame {
 			item.setColor(Color.BLACK);
 			item.setFillColor(Color.WHITE);
 			try {
-				int x = (int)Double.parseDouble(n.getAttribute("X"));
-				int y = (int)Double.parseDouble(n.getAttribute("Y"));
+				double x = Double.parseDouble(n.getAttribute("X"));
+				double y = Double.parseDouble(n.getAttribute("Y"));
+                item.updateLocation(x,y);
 				item.setLocation(x,y);
 			} catch ( Exception e ) {
 				System.err.println("!!");
@@ -276,7 +332,8 @@ public class GraphEditor extends JFrame {
 		} //
 		
 		public void itemReleased(GraphItem item, MouseEvent e) {
-            item.setFixed(false);
+            if (!editing)
+                item.setFixed(false);
             if ( !(item instanceof NodeItem) )
                 return;
             
@@ -290,6 +347,7 @@ public class GraphEditor extends JFrame {
 					update = true;
 				} else if ( activeItem == item && !drag ) {
 					editing = true;
+                    activeItem.setFixed(true);
 					display.editText(item, nameField);
 					display.getTextEditor().selectAll();
 					setEdited(true);
@@ -375,7 +433,10 @@ public class GraphEditor extends JFrame {
 		public void keyPressed(KeyEvent e) {
 			Object src = e.getSource();
 			char c = e.getKeyChar();
-			if ( Character.isLetterOrDigit(c) && 
+            int modifiers = e.getModifiers();
+            boolean modded = (modifiers & 
+               (KeyEvent.ALT_MASK | KeyEvent.CTRL_MASK)) > 0; 
+			if ( Character.isLetterOrDigit(c) && !modded && 
 				src == display && activeItem == null ) {
 				GraphItem item = addNode(xCur, yCur);
 				item.setAttribute(nameField,String.valueOf(c));
@@ -383,8 +444,11 @@ public class GraphEditor extends JFrame {
 				Rectangle r = item.getBounds();
 				r.width = 52; r.height += 2;
 				r.x -= 1+r.width/2; r.y -= 1; 
+                activeItem = item;
+                item.setFixed(true);
 				display.editText(item, nameField, r);
 				setEdited(true);
+                activityMap.scheduleNow("filter");
                 activityMap.scheduleNow("update");
 			}
 		} //
@@ -431,6 +495,7 @@ public class GraphEditor extends JFrame {
 			if ( activeItem != null ) {
 				activeItem.setColor(Color.BLACK);
 				activeItem.setFillColor(Color.WHITE);
+                activeItem.setFixed(false);
 				activeItem = null;
 			}
 			editing = false;
@@ -442,6 +507,7 @@ public class GraphEditor extends JFrame {
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
+            boolean runFilterUpdate = false;
 			String cmd = e.getActionCommand();
 			if ( OPEN.equals(cmd) ) {
 				JFileChooser chooser = new JFileChooser();
@@ -492,9 +558,25 @@ public class GraphEditor extends JFrame {
                 else {
                     activityMap.cancel("forceLayout");
                 }
-			} else {
+            } else if ( SMALL_FONT.equals(cmd) ) {
+                curFont = fonts[0];
+                display.setFont(curFont);
+                runFilterUpdate = true;
+            } else if ( MEDIUM_FONT.equals(cmd) ) {
+                curFont = fonts[1];
+                display.setFont(curFont);
+                runFilterUpdate = true;
+            } else if ( LARGE_FONT.equals(cmd) ) {
+                curFont = fonts[2];
+                display.setFont(curFont);
+                runFilterUpdate = true;
+            } else {
 				throw new IllegalStateException();
 			}
+            if ( runFilterUpdate ) {
+                activityMap.scheduleNow("filter");
+                activityMap.scheduleNow("update");
+            }
 		} //
 		
 		private void save(File f) {
