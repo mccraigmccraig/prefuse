@@ -31,6 +31,7 @@ import edu.berkeley.guir.prefuse.event.ControlListener;
 import edu.berkeley.guir.prefuse.event.ControlEventMulticaster;
 import edu.berkeley.guir.prefuse.render.Renderer;
 import edu.berkeley.guir.prefuse.util.Clip;
+import edu.berkeley.guir.prefuse.util.ToolTipManager;
 
 /**
  * User interface component that provides an interactive visualization 
@@ -62,6 +63,8 @@ public class Display extends JComponent {
     private boolean        m_editing;
     private GraphItem      m_editItem;
     private String         m_editAttribute;
+    
+    private ToolTipManager m_ttipManager;
 	
 	/**
 	 * Constructor. Creates a new display instance.
@@ -89,6 +92,34 @@ public class Display extends JComponent {
         m_cclip = new Clip();
 	} //
 
+    public void setUseCustomTooltips(boolean s) {
+        if ( s && m_ttipManager == null ) {
+            m_ttipManager = new ToolTipManager(this);
+            String text = super.getToolTipText();
+            super.setToolTipText(null);
+            m_ttipManager.setToolTipText(text);
+            this.addMouseMotionListener(m_ttipManager);
+        } else if ( !s && m_ttipManager != null ) {
+            this.removeMouseMotionListener(m_ttipManager);
+            String text = m_ttipManager.getToolTipText();
+            m_ttipManager.setToolTipText(null);
+            super.setToolTipText(text);
+            m_ttipManager = null;
+        }
+    } //
+    
+    public ToolTipManager getToolTipManager() {
+        return m_ttipManager;
+    } //
+    
+    public void setToolTipText(String text) {
+        if ( m_ttipManager != null ) {
+            m_ttipManager.setToolTipText(text);
+        } else {
+            super.setToolTipText(text);
+        }
+    } //
+    
 	/**
 	 * Set the size of the Display.
 	 * @see java.awt.Component#setSize(int, int)
@@ -357,7 +388,7 @@ public class Display extends JComponent {
 	public void paintComponent(Graphics g) {
 		if  (m_offscreen == null) {
 			m_offscreen = getNewOffscreenBuffer();
-		}
+        }
 		Graphics2D g2D = (Graphics2D) m_offscreen.getGraphics();
         //Graphics2D g2D = (Graphics2D)g;
         
@@ -420,7 +451,7 @@ public class Display extends JComponent {
             //System.out.println("frameRate: " + frameRate);
         }
 	} //
-
+    
     /**
      * Clears the specified region of the display (in screen co-ordinates)
      * in the display's offscreen buffer. The cleared region is replaced 
@@ -733,8 +764,5 @@ public class Display extends JComponent {
         }
         m_editing = false;
     } //
-    
-    // ========================================================================
-    // == TOOLTIP METHODS =====================================================
     
 } // end of class Display
