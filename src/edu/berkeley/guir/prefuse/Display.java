@@ -815,12 +815,16 @@ public class Display extends JComponent {
             m_clip.transform(m_itransform);
             Iterator items = m_registry.getItems();
             while (items.hasNext()) {
-                VisualItem vi = (VisualItem) items.next();
-                Renderer renderer = vi.getRenderer();
-                Rectangle2D b = renderer.getBoundsRef(vi);
-                
-                if ( m_clip.intersects(b) )
-                    renderer.render(g2D, vi);
+                try {
+	                VisualItem vi = (VisualItem) items.next();
+	                Renderer renderer = vi.getRenderer();
+	                Rectangle2D b = renderer.getBoundsRef(vi);
+	                
+	                if ( m_clip.intersects(b) )
+	                    renderer.render(g2D, vi);
+                } catch ( Exception e ) {
+                    e.printStackTrace();
+                }
             }
 		}
 
