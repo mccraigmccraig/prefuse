@@ -4,16 +4,20 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 /**
+ * <p>
  * Creates a graphical fisheye distortion of a graph view. This distortion 
  * allocates more space to items near the layout anchor and less space to 
  * items further away, magnifying space near the anchor and demagnifying 
  * distant space.
- * <br/><br/>
+ * </p>
+ * 
+ * <p>
  * For more details on this form of transformation, see Manojit Sarkar and 
  * Marc H. Brown, "Graphical Fisheye Views of Graphs", in Proceedings of 
  * CHI'92, Human Factors in Computing Systems, p. 83-91, 1992. Available
  * online at <a href="http://citeseer.ist.psu.edu/sarkar92graphical.html">
  * http://citeseer.ist.psu.edu/sarkar92graphical.html</a>. 
+ * </p>
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

@@ -6,8 +6,10 @@ import java.awt.Paint;
 import edu.berkeley.guir.prefuse.action.ColorFunction;
 
 /**
- * A color map that maps numeric values to colors for visualizing
- * a spectrum of values.
+ * A color map provides a mapping from numeric values to specific colors.
+ * This useful for assigning colors to visualized items. The numeric values
+ * may represent different categories (i.e. nominal variables) or run along
+ * a spectrum of values (i.e. quantitative variables).
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

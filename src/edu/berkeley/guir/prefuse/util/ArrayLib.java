@@ -9,7 +9,7 @@ import java.util.StringTokenizer;
  * A number of supplementary array routines not 
  *  supported by the java.util.Arrays class.
  *
- * @author Jeffrey Heer (<A HREF="mailto:jheer@acm.org">jheer@acm.org</A>)
+ * @author Jeffrey Heer
  * @version 1.0
  */
 public abstract class ArrayLib {

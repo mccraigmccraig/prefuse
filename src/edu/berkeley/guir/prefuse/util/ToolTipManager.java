@@ -15,7 +15,8 @@ import javax.swing.SwingUtilities;
 import edu.berkeley.guir.prefuse.Display;
 
 /**
- * Manages custom tool tips for a JComponent instance.
+ * Manages custom tool tips for a prefuse 
+ * {@link edu.berkeley.guir.prefuse.Display Display} instance.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
@@ -24,6 +25,7 @@ public class ToolTipManager implements MouseMotionListener {
 
     // TODO: edit so that tool tip is presented in its own window?
     // TODO: improve thread-safety
+    // TODO: review tool tip timer
     
     private Display       m_display;
     private JComponent    m_tooltip;

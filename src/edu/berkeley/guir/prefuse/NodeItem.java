@@ -52,9 +52,8 @@ public class NodeItem extends GraphItem {
 	
 	public void clear() {
 		super.clear();
-		if ( m_children != null )
-			m_children.clear();
-	}
+        removeAllNeighbors();
+	} //
 	
 	// ========================================================================
 	
@@ -115,7 +114,7 @@ public class NodeItem extends GraphItem {
 	 * Return the total number of neighbors of this node.
 	 * @return the number of neighbors
 	 */
-	public int getNumNeighbors() {
+	public int getEdgeCount() {
 		return m_neighbors.size();
 	} //
 
@@ -152,10 +151,6 @@ public class NodeItem extends GraphItem {
 		return m_edges.indexOf(e);
 	} //
 	
-	public int getNumEdges() {
-		return m_edges.size();
-	} //
-	
 	public void addEdge(EdgeItem e) {		
 		addEdge(m_edges.size(), e);
 	} //
@@ -188,7 +183,7 @@ public class NodeItem extends GraphItem {
 	
 	// -- tree routines -------------------------------------------------------
 	
-	public int getNumChildren() {
+	public int getChildCount() {
 		return ( m_children == null ? 0 : m_children.size() );
 	} //
 	

@@ -12,7 +12,25 @@ import edu.berkeley.guir.prefuse.graph.Entity;
 import edu.berkeley.guir.prefuse.graph.Tree;
 
 /**
+ * <p>
+ * A {@link FocusSet FocusSet} implementation that performs efficient keyword
+ * searches on graph data. The {@link #index(Iterator, String) index} method
+ * should be used to register searchable graph data. Then the
+ * {@link #search(String) search} method can be used to perform a search. The
+ * matching search results then become the members of this 
+ * <code>FocusSet</code>. This class uses a {@link Trie Trie} data structure
+ * to find search results in time proportional to only the length of the
+ * query string, however, only prefix matches will be identified as valid
+ * search matches.
+ * </p>
  * 
+ * <p>
+ * <b>NOTE:</b> The {@link #add(Entity) add}, (@link #remove(Entity) remove},
+ * and {@link #set(Entity) set} methods are not supported by this 
+ * implementation, and will generate exceptions if called. Instead, the focus
+ * membership is determined by the search matches found using the
+ * {@link #search(String) search} method.
+ * </p>
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

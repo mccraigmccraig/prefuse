@@ -11,7 +11,10 @@ import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 
 /**
- * Changes an item's location when dragged on screen.
+ * Changes an item's location when dragged on screen. Other effects
+ * include fixing a nodes position when the mouse if over it, and
+ * changing the mouse cursor to a hand when the mouse passes over an
+ * item.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
@@ -24,9 +27,21 @@ public class DragControl extends ControlAdapter {
     private boolean wasFixed, dragged;
     private boolean repaint = true;
     
+    /**
+     * Creates a new drag control that issues repaint requests as an item
+     * is dragged.
+     */
     public DragControl() {
     } //
     
+    /**
+     * Creates a new drag control that optionally issues repaint requests
+     * as an item is dragged.
+     * @param repaint indicates whether or not repaint requests are issued
+     *  as drag events occur. This can be set to false if other activities
+     *  (for example, a continuously running force simulation) are already
+     *  issuing repaint events.
+     */
     public DragControl(boolean repaint) {
         this.repaint = repaint;
     } //

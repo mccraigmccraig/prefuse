@@ -45,7 +45,7 @@ public interface TreeNode extends Node {
      * @param idx the index of the child
      * @return the requested edge
      */
-    public Edge getChildEdge(int i);
+    public Edge getChildEdge(int idx);
     
     /**
      * Returns an iterator over the edges connecting this node to its children

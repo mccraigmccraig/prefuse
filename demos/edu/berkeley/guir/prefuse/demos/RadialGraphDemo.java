@@ -42,8 +42,8 @@ import edu.berkeley.guir.prefusex.layout.RadialTreeLayout;
 import edu.berkeley.guir.prefusex.controls.DragControl;
 import edu.berkeley.guir.prefusex.controls.FocusControl;
 import edu.berkeley.guir.prefusex.controls.NeighborHighlightControl;
-import edu.berkeley.guir.prefusex.controls.PanHandler;
-import edu.berkeley.guir.prefusex.controls.ZoomHandler;
+import edu.berkeley.guir.prefusex.controls.PanControl;
+import edu.berkeley.guir.prefusex.controls.ZoomControl;
 
 /**
  * Demo application showcasing the use of an animated radial tree layout to
@@ -155,8 +155,8 @@ public class RadialGraphDemo extends JFrame {
             display.setBackground(Color.WHITE);
             display.addControlListener(new FocusControl());
             display.addControlListener(new DragControl());
-            display.addControlListener(new PanHandler());
-            display.addControlListener(new ZoomHandler());
+            display.addControlListener(new PanControl());
+            display.addControlListener(new ZoomControl());
             display.addControlListener(new NeighborHighlightControl(update));
             
 			// set up initial focus and focus listener

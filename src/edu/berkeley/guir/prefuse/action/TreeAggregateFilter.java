@@ -37,7 +37,7 @@ public class TreeAggregateFilter extends Filter {
 		while ( nodeIter.hasNext() ) {
 			NodeItem nitem  = (NodeItem)nodeIter.next();
 			TreeNode node   = (TreeNode)registry.getEntity(nitem);
-            if ( nitem.getNumChildren() == 0 && node.getChildCount() > 0 ) {				
+            if ( nitem.getChildCount() == 0 && node.getChildCount() > 0 ) {				
 				AggregateItem aggr = registry.getAggregateItem(node, true);
 				Point2D       eloc = nitem.getEndLocation();
 				Point2D       sloc = nitem.getStartLocation();

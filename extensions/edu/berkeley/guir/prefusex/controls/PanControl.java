@@ -9,22 +9,35 @@ import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 
 /**
- * 
- * Feb 10, 2004 - jheer - Created class
+ * Pans the display, changing the viewable region of the visualization.
+ * Panning is accomplished by clicking on the background of a visualization
+ * with the left mouse button and then dragging.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class PanHandler extends ControlAdapter {
+public class PanControl extends ControlAdapter {
 
     private int xDown, yDown;
     private boolean repaint = true;
     
-    public PanHandler() {
+    /**
+     * Creates a new panning control that issues repaint requests as an item
+     * is dragged.
+     */
+    public PanControl() {
         this(true);
     } //
     
-    public PanHandler(boolean repaint) {
+    /**
+     * Creates a new panning control that optionally issues repaint requests
+     * as an item is dragged.
+     * @param repaint indicates whether or not repaint requests are issued
+     *  as pan events occur. This can be set to false if other activities
+     *  (for example, a continuously running force simulation) are already
+     *  issuing repaint events.
+     */
+    public PanControl(boolean repaint) {
         this.repaint = repaint;
     } //    
     
@@ -58,4 +71,4 @@ public class PanHandler extends ControlAdapter {
         }
     } //
     
-} // end of class PanHandler
+} // end of class PanControl

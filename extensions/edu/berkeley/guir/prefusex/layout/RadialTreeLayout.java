@@ -14,7 +14,8 @@ import edu.berkeley.guir.prefuse.graph.Entity;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
 /**
- * Performs tree layout using a radial layout.
+ * Performs tree layout using a radial layout, laying out subsequent depth
+ * levels of a tree on circles of progressively increasing radius.
  * 
  * @version 1.0
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
@@ -136,7 +137,7 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
     private int countVisibleDescendants(NodeItem n, int d) {
         if ( d > m_maxDepth ) m_maxDepth = d;       
         int count = 0;
-        if ( n.getNumChildren() > 0 ) {
+        if ( n.getChildCount() > 0 ) {
             Iterator childIter = n.getChildren();
             while ( childIter.hasNext() ) {
                 NodeItem c = (NodeItem)childIter.next();

@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Factory class for GraphItem instances. This allows object
+ * Factory class for {@link GraphItem GraphItem} instances. This allows object
  * initialization to be consolidated in a single location and allocated objects
  * to be re-used by maintaining a pool of item references.
  * 
- * This class works closely with the ItemRegistry, but is
+ * This class works closely with the {@link ItemRegistry ItemRegistry}, but is
  * implemented separately to provide encapsulation and simplify design.
  * 
  * @version 1.0

@@ -34,14 +34,38 @@ import edu.berkeley.guir.prefuse.util.Clip;
 import edu.berkeley.guir.prefuse.util.ToolTipManager;
 
 /**
- * User interface component that provides an interactive visualization 
+ * <p>User interface component that provides an interactive visualization 
  * of a graph. The Display is responsible for drawing items to the
  * screen and providing callbacks for user interface actions such as
  * mouse and keyboard events. A Display must be associated with an
- * ItemRegistry from which it pulls the items to visualize.
+ * {@link edu.berkeley.guir.prefuse.ItemRegistry ItemRegistry} from 
+ * which it pulls the items to visualize.</p>
+ * 
+ * <p>The {@link edu.berkeley.guir.prefuse.event.ControlListener ControlListener}
+ * interface provides the various available user interface callbacks. The
+ * {@link edu.berkeley.guir.prefusex.controls} package contains a number
+ * of pre-built <code>ControlListener</code> implementations for common
+ * interactions.</p>
+ * 
+ * <p>The Display class also supports arbitrary graphics transforms through
+ * the <code>java.awt.geom.AffineTransform</code> class. The 
+ * {@link #setTransform(java.awt.geom.AffineTransform) setTransform} method
+ * allows arbitrary transforms to be applied, while the 
+ * {@link #pan(double,double) pan} and 
+ * {@link #zoom(java.awt.geom.Point2D,double) zoom}
+ * methods provide convenience methods that appropriately update the current
+ * transform to achieve panning and zooming on the presentation space.</p>
+ * 
+ * <p>Additionally, each Display instance also supports use of a text editor
+ * to facilitate direct editing of text. See the various
+ * {@link #editText(edu.berkeley.guir.prefuse.GraphItem, String) editItem}
+ * methods.</p>
  * 
  * @version 1.0
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @see ItemRegistry
+ * @see edu.berkeley.guir.prefuse.event.ControlListener
+ * @see edu.berkeley.guir.prefusex.controls
  */
 public class Display extends JComponent {
 

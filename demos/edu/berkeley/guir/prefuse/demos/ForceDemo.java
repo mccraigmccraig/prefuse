@@ -41,8 +41,8 @@ import edu.berkeley.guir.prefuse.render.TextItemRenderer;
 import edu.berkeley.guir.prefusex.layout.ForceDirectedLayout;
 import edu.berkeley.guir.prefusex.controls.DragControl;
 import edu.berkeley.guir.prefusex.controls.NeighborHighlightControl;
-import edu.berkeley.guir.prefusex.controls.PanHandler;
-import edu.berkeley.guir.prefusex.controls.ZoomHandler;
+import edu.berkeley.guir.prefusex.controls.PanControl;
+import edu.berkeley.guir.prefusex.controls.ZoomControl;
 import edu.berkeley.guir.prefusex.force.DragForce;
 import edu.berkeley.guir.prefusex.force.ForcePanel;
 import edu.berkeley.guir.prefusex.force.ForceSimulator;
@@ -85,8 +85,8 @@ public class ForceDemo extends Display {
         this.addControlListener(new NeighborHighlightControl());
         this.addControlListener(new DragControl(false));
         this.addControlListener(new MouseOverControl());
-        this.addControlListener(new PanHandler(false));
-        this.addControlListener(new ZoomHandler(false));
+        this.addControlListener(new PanControl(false));
+        this.addControlListener(new ZoomControl(false));
     } //
     
     public void runDemo() {

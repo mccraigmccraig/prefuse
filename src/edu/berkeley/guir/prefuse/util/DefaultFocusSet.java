@@ -12,8 +12,10 @@ import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.graph.Entity;
 
 /**
- * 
- * Feb 19, 2004 - jheer - Created class
+ * Default implementation of the {@link FocusSet FocusSet} interface. This
+ * class maintains a <code>java.util.LinkedHashSet</code> of focus entities,
+ * supporting quick lookup of entities while maintaining the order in which
+ * focus entities are added to the set.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

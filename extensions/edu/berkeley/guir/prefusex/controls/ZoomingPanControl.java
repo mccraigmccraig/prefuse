@@ -9,15 +9,19 @@ import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 
 /**
+ * <p>
  * Allows users to pan over a display such that the display zooms in and
  * out proportionally to how fast the pan is performed.
+ * </p>
  * 
- * TODO: this is a broken, work in progress. don't use this yet.
+ * <p>
+ * <b>TODO</b>: this is a broken, work in progress. <b>don't use this yet.</b>
+ * </p>
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class ZoomingPanHandler extends ControlAdapter {
+public class ZoomingPanControl extends ControlAdapter {
 
     private int xDown, yDown;
     private double sDown;
@@ -25,11 +29,11 @@ public class ZoomingPanHandler extends ControlAdapter {
     
     private double v0 = 1.0, d0 = 100, d1 = 600, s0 = .1;
     
-    public ZoomingPanHandler() {
+    public ZoomingPanControl() {
         this(true);
     } //
     
-    public ZoomingPanHandler(boolean repaint) {
+    public ZoomingPanControl(boolean repaint) {
         this.repaint = repaint;
     } //
     
@@ -80,4 +84,4 @@ public class ZoomingPanHandler extends ControlAdapter {
         }
     } //
     
-} // end of class ZoomingPanHandler
+} // end of class ZoomingPanControl

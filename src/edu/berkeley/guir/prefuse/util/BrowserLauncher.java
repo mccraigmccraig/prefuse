@@ -4,27 +4,35 @@ import java.io.IOException;
 import java.net.URL;
 
 /**
+ * <p>
  * Browser launcher will open a URL in an external browser on your system.
  *  (e.g. Internet Explorer or Netscape). If your browser is already open,
  *  a new browser window should be created without starting any new processes.
+ * </p>
  *
+ * <p>
  * On Windows systems the system's default browser will be used. On UNIX and other
  *  platforms the browser defaults to Netscape. For this default behavior to work,
  *  the command 'netscape' must be on your path.
+ * </p>
  *
+ * <p>
  * The ability to load a user-specified browser may be introduced in the future.
  *  A preliminary version was written, but then removed due to unacceptable 
  *  security issues.
+ * </p>
  *
+ * <p>
  * This class was inspired by an article at www.javaworld.com by Steven Spencer.
  *  The article is available at
  *  <A HREF="http://www.javaworld.com/javaworld/javatips/jw-javatip66.html">
  *   http://www.javaworld.com/javaworld/javatips/jw-javatip66.html
  *  </A>.
+ * </p>
  *
  * @version 1.0
  * @author Steven Spencer
- * @author Jeffrey Heer - <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author Jeffrey Heer (adapted original author's code)
  */
 public abstract class BrowserLauncher {
 

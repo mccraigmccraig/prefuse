@@ -33,8 +33,8 @@ import edu.berkeley.guir.prefuse.graph.io.HDirTreeReader;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.ShapeRenderer;
 import edu.berkeley.guir.prefuse.util.ColorMap;
-import edu.berkeley.guir.prefusex.controls.PanHandler;
-import edu.berkeley.guir.prefusex.controls.ZoomHandler;
+import edu.berkeley.guir.prefusex.controls.PanControl;
+import edu.berkeley.guir.prefusex.controls.ZoomControl;
 import edu.berkeley.guir.prefusex.layout.SquarifiedTreeMapLayout;
 
 /**
@@ -73,8 +73,8 @@ public class TreeMapDemo extends JFrame {
             Display display = new Display();
             display.setRegistry(registry);
             display.setUseCustomTooltips(true);
-            PanHandler  pH = new PanHandler();
-            ZoomHandler zH = new ZoomHandler();
+            PanControl  pH = new PanControl();
+            ZoomControl zH = new ZoomControl();
             display.addMouseListener(pH);
             display.addMouseMotionListener(pH);
             display.addMouseListener(zH);
@@ -143,7 +143,7 @@ public class TreeMapDemo extends JFrame {
             Iterator iter = registry.getNodeItems();
             while ( iter.hasNext() ) {
                 NodeItem n = (NodeItem)iter.next();
-                if ( n.getNumChildren() == 0 ) {
+                if ( n.getChildCount() == 0 ) {
                     n.setSize(1.0);
                     for (NodeItem p=n.getParent(); p!=null; p=p.getParent())
                         p.setSize(1.0+p.getSize());

@@ -8,13 +8,14 @@ import javax.swing.SwingUtilities;
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
-import edu.berkeley.guir.prefuse.activity.Activity;
-import edu.berkeley.guir.prefuse.activity.ActivityManager;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 
 /**
  * Sets the current focus (according to the ItemRegistry's default focus
- * set) when an item is clicked.
+ * set) when an item is clicked. This does not necessarily cause the
+ * display to change. For this functionality, use a 
+ * {@link edu.berkeley.guir.prefuse.event.FocusListener FocusListener} 
+ * to drive display updates when the focus changes.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
@@ -22,18 +23,22 @@ import edu.berkeley.guir.prefuse.event.ControlAdapter;
 public class FocusControl extends ControlAdapter {
 
     private int ccount;
-    private Activity update = null;
     
+    /**
+     * Creates a new FocusControl that changes the focus to another item
+     * when that item is clicked once.
+     */
     public FocusControl() {
         this(1);
     } //
     
+    /**
+     * Creates a new FocusControl that changes the focus when an item is 
+     * clicked the specified number of times.
+     * @param clicks the number of clicks needed to switch the focus.
+     */
     public FocusControl(int clicks) {
         ccount = clicks;
-    } //
-    
-    public FocusControl(Activity update) {
-        this.update = update;
     } //
     
     public void itemEntered(GraphItem item, MouseEvent e) {
@@ -50,8 +55,6 @@ public class FocusControl extends ControlAdapter {
         if ( SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == ccount ) {
             ItemRegistry registry = item.getItemRegistry();
             registry.getDefaultFocusSet().set(item.getEntity());
-            if ( update != null )
-                ActivityManager.scheduleNow(update);
         }
     } //
     

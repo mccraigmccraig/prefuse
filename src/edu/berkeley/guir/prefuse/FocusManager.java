@@ -11,11 +11,13 @@ import edu.berkeley.guir.prefuse.util.FocusSet;
  * This class helps manage focus and/or selected items in a visualization.
  * It assumes there is at most a single user-selected focus, corresponding
  * to the user's current locus of attention (e.g. a moused-over, or previously
- * clicked item). However, there can also be any number of other focus sets,
+ * clicked item). However, there can also be any number of other 
+ * {@link edu.berkeley.guir.prefuse.util.FocusSet FocusSets},
  * including search results, or multiple user selections. This class supports 
  * the storage, retrieval, and monitoring of such focus items and sets. Because
- * potential focus items may not yet be visualized, focus sets store Entity
- * instances rather than GraphItem instances.
+ * potential focus items may not yet be visualized, focus sets store
+ * {@link edu.berkeley.guir.prefuse.graph.Entity Entity}
+ * instances rather than {@link GraphItem GraphItem} instances.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

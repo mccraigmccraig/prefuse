@@ -4,8 +4,7 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 
 /**
- * 
- * Feb 21, 2004 - jheer - Created class
+ * Represents a clipping rectangle in a prefuse <code>Display</code>.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

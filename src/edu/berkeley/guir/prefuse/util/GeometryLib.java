@@ -5,12 +5,11 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 /**
- * A library of useful geometry routines.
- * 
- * Dec 1, 2003 - jheer - Created class
+ * A library of useful geometry routines for computing the intersection
+ * of different shapes.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class GeometryLib {
 

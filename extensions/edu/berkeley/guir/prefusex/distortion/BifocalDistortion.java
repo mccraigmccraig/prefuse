@@ -4,16 +4,20 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 /**
+ * <p>
  * Creates a bifocal distortion of space, magnifying focal space and
  * uniformly demagnifying non-focal space, where focal space is defined
  * relative to the layout anchor.
- * <br/><br/>
+ * </p>
+ * 
+ * <p>
  * For more details on this form of transformation, see Y. K. Leung and 
  * M. D. Apperley, "A Review and Taxonomy of Distortion-Oriented Presentation
  * Techniques", in Transactions of Computer-Human Interaction (TOCHI),
  * 1(2): 126-160 (1994). Available online at
  * <a href="portal.acm.org/citation.cfm?id=180173&dl=ACM">
  * portal.acm.org/citation.cfm?id=180173&dl=ACM</a>.
+ * </p>
  * 
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

@@ -13,11 +13,15 @@ import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
 /**
- * 
- * Feb 21, 2004 - jheer - Created class
+ * Represents a trie data structure (a play on the words "tree" and 
+ * "retrieval"). This builds a tree structure representing a set of
+ * words by indexing on word prefixes. It is useful for performing
+ * prefix-based searches over large amounts of text in a very
+ * efficient manner.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
+ * @see KeywordSearchFocusSet
  */
 public class Trie {
 

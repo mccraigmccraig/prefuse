@@ -12,7 +12,10 @@ import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 
 /**
- * Changes the location of a whole subtree when dragged on screen.
+ * Changes the location of a whole subtree when dragged on screen. This is
+ * similar to the {@link DragControl DragControl} class, except that it
+ * moves the entire visible subtree rooted at an item, rather than just the
+ * item itself.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
@@ -25,9 +28,21 @@ public class SubtreeDragControl extends ControlAdapter {
     private boolean wasFixed;
     private boolean repaint = true;
     
+    /**
+     * Creates a new subtree drag control that issues repaint requests as an
+     * item is dragged.
+     */
     public SubtreeDragControl() {
     } //
     
+    /**
+     * Creates a new subtree drag control that optionally issues repaint 
+     * requests as an item is dragged.
+     * @param repaint indicates whether or not repaint requests are issued
+     *  as drag events occur. This can be set to false if other activities
+     *  (for example, a continuously running force simulation) are already
+     *  issuing repaint events.
+     */
     public SubtreeDragControl(boolean repaint) {
         this.repaint = repaint;
     } //
@@ -80,7 +95,7 @@ public class SubtreeDragControl extends ControlAdapter {
         Point2D p = n.getLocation();
         n.updateLocation(p.getX()+dx,p.getY()+dy);
         n.setLocation(p.getX()+dx,p.getY()+dy);
-        for ( int i=0; i<n.getNumChildren(); i++ )
+        for ( int i=0; i<n.getChildCount(); i++ )
             updateLocations(n.getChild(i),dx,dy);
     } //
     

@@ -13,32 +13,32 @@ import edu.berkeley.guir.prefuse.graph.Node;
 public class GraphEventAdapter implements GraphEventListener {
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeAdded(edu.berkeley.guir.prefuse.graph.Node)
+	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeAdded(edu.berkeley.guir.prefuse.graph.Graph, edu.berkeley.guir.prefuse.graph.Node)
 	 */
 	public void nodeAdded(Graph g, Node n) {} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeRemoved(edu.berkeley.guir.prefuse.graph.Node)
+	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeRemoved(edu.berkeley.guir.prefuse.graph.Graph, edu.berkeley.guir.prefuse.graph.Node)
 	 */
 	public void nodeRemoved(Graph g, Node n) {} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeReplaced(edu.berkeley.guir.prefuse.graph.Node, edu.berkeley.guir.prefuse.graph.Node)
+	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeReplaced(edu.berkeley.guir.prefuse.graph.Graph, edu.berkeley.guir.prefuse.graph.Node, edu.berkeley.guir.prefuse.graph.Node)
 	 */
 	public void nodeReplaced(Graph g, Node o, Node n) {} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeAdded(edu.berkeley.guir.prefuse.graph.Edge)
+	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeAdded(edu.berkeley.guir.prefuse.graph.Graph, edu.berkeley.guir.prefuse.graph.Edge)
 	 */
 	public void edgeAdded(Graph g, Edge e) {} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeRemoved(edu.berkeley.guir.prefuse.graph.Edge)
+	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeRemoved(edu.berkeley.guir.prefuse.graph.Graph, edu.berkeley.guir.prefuse.graph.Edge)
 	 */
 	public void edgeRemoved(Graph g, Edge e) {} //
     
 	/**
-	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeReplaced(edu.berkeley.guir.prefuse.graph.Edge, edu.berkeley.guir.prefuse.graph.Edge)
+	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeReplaced(edu.berkeley.guir.prefuse.graph.Graph, edu.berkeley.guir.prefuse.graph.Edge, edu.berkeley.guir.prefuse.graph.Edge)
 	 */
 	public void edgeReplaced(Graph g, Edge o, Edge n) {} //
 

@@ -8,8 +8,7 @@ import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.action.Layout;
 
 /**
- * Performs a random layout of graph nodes within the layout's bounds and
- * (optionally) a specified margin;
+ * Performs a random layout of graph nodes within the layout's bounds.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

@@ -65,10 +65,19 @@ public class AggregateItem extends NodeItem {
 		m_endLocation.setLocation(0, 0);
 	} //
 
+    /**
+     * Get the entities associated with this aggregate.
+     * @return a List of Entity instances "contained" in this aggregate
+     */
 	public List getEntities() {
 		return m_registry.getEntities(this);
 	} //
 	
+    /**
+     * Returns the Entity "contained" in this aggregate at the given index.
+     * @param idx the index of the Entity to return
+     * @return the requested Entity
+     */
 	public Entity getEntity(int idx) {
 		return (Entity)m_registry.getEntities(this).get(idx);
 	} //
@@ -81,27 +90,36 @@ public class AggregateItem extends NodeItem {
 		m_nitem = item;
 	} //
 
+    /**
+     * Returns the number of elements represented by this aggregate.
+     * @return the number of elements represented by this aggregate.
+     */
 	public int getAggregateSize() {
 		return m_aggrSize;
 	} //
 
+    /**
+     * Sets the number of elements represented by this aggregate.
+     * @param size the size to set.
+     */
 	public void setAggregateSize(int size) {
 		m_aggrSize = size;
 	} //
 
 	/**
-	 * @return double
+     * Returns the orientation of this aggregate, in radians
+	 * @return the angle of orientation, in radians
 	 */
 	public double getOrientation() {
 		return m_orientation;
 	} //
 
 	/**
-	 * Sets the m_orientation.
-	 * @param m_orientation The m_orientation to set
+	 * Sets the orientation of this aggregate, in radians
+	 * @param orientation the orientation to set
 	 */
-	public void setOrientation(double m_orientation) {
-		this.m_orientation = m_orientation;
+	public void setOrientation(double orientation) {
+		m_orientation = orientation;
 	} //
 
 	/**
@@ -119,19 +137,19 @@ public class AggregateItem extends NodeItem {
 	} //
 
 	/**
-	 * Sets the m_endOrientation.
-	 * @param m_endOrientation The m_endOrientation to set
+	 * Sets the end orientation.
+	 * @param endOrientation The ending orientation to set
 	 */
-	public void setEndOrientation(double m_endOrientation) {
-		this.m_endOrientation = m_endOrientation;
+	public void setEndOrientation(double endOrientation) {
+		this.m_endOrientation = endOrientation;
 	} //
 
 	/**
-	 * Sets the m_startOrientation.
-	 * @param m_startOrientation The m_startOrientation to set
+	 * Sets the starting orientation.
+	 * @param startOrientation The starting orientation to set
 	 */
-	public void setStartOrientation(double m_startOrientation) {
-		this.m_startOrientation = m_startOrientation;
+	public void setStartOrientation(double startOrientation) {
+		this.m_startOrientation = startOrientation;
 	} //
 
 } // end of class AggregateItem

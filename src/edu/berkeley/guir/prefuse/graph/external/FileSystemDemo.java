@@ -36,8 +36,8 @@ import edu.berkeley.guir.prefuse.render.TextItemRenderer;
 import edu.berkeley.guir.prefusex.controls.DragControl;
 import edu.berkeley.guir.prefusex.controls.FocusControl;
 import edu.berkeley.guir.prefusex.controls.NeighborHighlightControl;
-import edu.berkeley.guir.prefusex.controls.PanHandler;
-import edu.berkeley.guir.prefusex.controls.ZoomHandler;
+import edu.berkeley.guir.prefusex.controls.PanControl;
+import edu.berkeley.guir.prefusex.controls.ZoomControl;
 import edu.berkeley.guir.prefusex.force.DragForce;
 import edu.berkeley.guir.prefusex.force.ForceSimulator;
 import edu.berkeley.guir.prefusex.force.NBodyForce;
@@ -118,7 +118,7 @@ public class FileSystemDemo extends JFrame {
         });
         forces.add(new ForceDirectedLayout(fsim, false) {
             protected float getSpringLength(NodeItem n1, NodeItem n2) {
-                if (n1.getNumNeighbors() == 1 || n2.getNumNeighbors() == 1)
+                if (n1.getEdgeCount() == 1 || n2.getEdgeCount() == 1)
                     return 75.f;
                 double doi = Math.max(n1.getDOI(), n2.getDOI());
                 return 200.f/Math.abs((float)doi-1);
@@ -135,8 +135,8 @@ public class FileSystemDemo extends JFrame {
         display.addControlListener(new NeighborHighlightControl());
         display.addControlListener(new DragControl(false));
         display.addControlListener(new MouseOverControl());
-        display.addControlListener(new PanHandler(false));
-        display.addControlListener(new ZoomHandler(false));
+        display.addControlListener(new PanControl(false));
+        display.addControlListener(new ZoomControl(false));
         registry.getDefaultFocusSet().addFocusListener(new FocusListener() {
             public void focusChanged(FocusEvent e) {
                 NodeItem n = registry.getNodeItem((Node)e.getFirstRemoved());

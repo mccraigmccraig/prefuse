@@ -75,8 +75,8 @@ public interface Node extends Entity {
     public int getIndex(Node n);
     
     /**
-     * Returns the i'th neighbor of this node.
-     * @param i the index of the neighbor in the neighbor list.
+     * Returns the neighbor of this node at the given index.
+     * @param idx the index of the neighbor in the neighbor list.
      * @return DefaultNode the DefaultNode at the specified position in the list of
      *  neighbors
      */

@@ -14,17 +14,23 @@ import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.TreeLayout;
 
 /**
+ * <p>
  * TreeMap layout algorithm that optimizes for low aspect ratios 
- * of visualized tree nodes.
- * <br/><br/>
+ * of visualized tree nodes. TreeMaps are a form of space-filling layout
+ * that represents nodes as boxes on the display, with children nodes
+ * represented as boxes placed within their parent's box.
+ * </p>
+ * <p>
  * This particular algorithm is taken from Bruls, D.M., C. Huizing, and 
  * J.J. van Wijk, "Squarified Treemaps" In <i>Data Visualization 2000, 
  * Proceedings of the Joint Eurographics and IEEE TCVG Sumposium on 
  * Visualization</i>, 2000, pp. 33-42. Available online at:
  * <a href="http://www.win.tue.nl/~vanwijk/stm.pdf">http://www.win.tue.nl/~vanwijk/stm.pdf</a>.
- * <br/><br/>
+ * </p>
+ * <p>
  * For more information on TreeMaps in general, see 
  * <a href="http://www.cs.umd.edu/hcil/treemap-history/">http://www.cs.umd.edu/hcil/treemap-history/</a>.
+ * </p>
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
@@ -91,7 +97,7 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
         childIter = p.getChildren();
         while ( childIter.hasNext() ) {
             NodeItem c = (NodeItem)childIter.next();
-            if ( c.getNumChildren() > 0 ) {
+            if ( c.getChildCount() > 0 ) {
                 updateArea(c,r);
                 layout(c, r);
             }

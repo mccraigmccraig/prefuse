@@ -44,9 +44,9 @@ import edu.berkeley.guir.prefuse.util.StringAbbreviator;
 import edu.berkeley.guir.prefusex.layout.BalloonTreeLayout;
 import edu.berkeley.guir.prefusex.controls.FocusControl;
 import edu.berkeley.guir.prefusex.controls.NeighborHighlightControl;
-import edu.berkeley.guir.prefusex.controls.PanHandler;
+import edu.berkeley.guir.prefusex.controls.PanControl;
 import edu.berkeley.guir.prefusex.controls.SubtreeDragControl;
-import edu.berkeley.guir.prefusex.controls.ZoomHandler;
+import edu.berkeley.guir.prefusex.controls.ZoomControl;
 
 /**
  * Visualizes a tree structure using a balloon tree layout.
@@ -141,8 +141,8 @@ public class BalloonGraphDemo {
             display.setBackground(Color.WHITE);
             display.addControlListener(new FocusControl());
             display.addControlListener(new SubtreeDragControl());
-            display.addControlListener(new PanHandler());
-            display.addControlListener(new ZoomHandler());
+            display.addControlListener(new PanControl());
+            display.addControlListener(new ZoomControl());
             display.addControlListener(new NeighborHighlightControl(update));
             			
 			// set up initial focus and focus listener

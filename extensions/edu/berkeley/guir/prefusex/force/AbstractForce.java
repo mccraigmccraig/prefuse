@@ -1,7 +1,10 @@
 package edu.berkeley.guir.prefusex.force;
 
 /**
- * Abstract implementation of force functions in a force simulation.
+ * Abstract implementation of force functions in a force simulation. This
+ * skeletal version provides support for storing and retrieving float-valued
+ * parameters of the force function. Subclasses should use the protected
+ * field <code>params</code> to store parameter values.
  * 
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefusex(AT)jheer.org

@@ -9,9 +9,14 @@ import edu.berkeley.guir.prefuse.action.TreeLayout;
 import edu.berkeley.guir.prefuse.graph.DefaultTree;
 
 /**
- * Calculates a Balloon DefaultTree layout of a tree. This layout places children
+ * <p>Calculates a BalloonTree layout of a tree. This layout places children
  * nodes radially around their parents, and is equivalent to a 2D view of
- * a Cone DefaultTree.
+ * a ConeTree.</p>
+ * 
+ * <p>This is an implementation of the algorithm presented in G. Melançon and 
+ * I. Herman, Circular Drawings of Rooted Trees, Reports of the Centre for 
+ * Mathematics and Computer Sciences, Report Number INS–9817, 1998.
+ * </p>
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
@@ -70,7 +75,7 @@ public class BalloonTreeLayout extends TreeLayout {
     } //
     
     private void setRadius(NodeItem n, ParamBlock np) {
-        int numChildren = n.getNumChildren();
+        int numChildren = n.getChildCount();
         double p  = Math.PI;
         double fs = (numChildren==0 ? 0 : np.f/numChildren);
         double pr = 0;
@@ -119,7 +124,7 @@ public class BalloonTreeLayout extends TreeLayout {
         n.setLocation(nx,ny);
         double dd = l*np.d;
         double p  = Math.PI;
-        double fs = np.f / (n.getNumChildren()+1);
+        double fs = np.f / (n.getChildCount()+1);
         double pr = 0;
         Iterator childIter = n.getChildren();
         while ( childIter.hasNext() ) {
@@ -141,7 +146,7 @@ public class BalloonTreeLayout extends TreeLayout {
         n.updateLocation(x,y);
         n.setLocation(x,y);
         ParamBlock np = getParams(n);
-        int numChildren = n.getNumChildren();
+        int numChildren = n.getChildCount();
         double dd = l*np.d;
         double p  = t + Math.PI;
         double fs = (numChildren==0 ? 0 : np.f/numChildren);

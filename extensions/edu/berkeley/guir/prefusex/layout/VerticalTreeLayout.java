@@ -10,7 +10,7 @@ import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.TreeLayout;
 
 /**
- * Performs tree layout using a vertical, top-down, layout.
+ * Performs a vertical, top-down, layout of a tree.
  * 
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> - prefuse(AT)jheer.org

@@ -24,34 +24,47 @@ import edu.berkeley.guir.prefuse.render.RendererFactory;
 import edu.berkeley.guir.prefuse.util.FocusSet;
 
 /**
+ * <p>
  * The ItemRegistry is the central data structure for a prefuse visualization.
  * The registry maintains mappings between abstract graph data (e.g., 
- * <tt>Node</tt>s and <tt>Edge</tt>s) and their visual representations (e.g.,
- * <tt>NodeItem</tt>s and <tt>EdgeItem</tt>s). The ItemRegistry maintains
- * rendering queues of all visualized GraphItems, a comparator for ordering
+ * {@link edu.berkeley.guir.prefuse.graph.Node Nodes} and 
+ * {@link edu.berkeley.guir.prefuse.graph.Edge Edges}) and their visual 
+ * representations (e.g., {@link NodeItem NodeItems} and 
+ * {@link EdgeItem EdgeItems}). The ItemRegistry maintains rendering queues 
+ * of all visualized {@link GraphItem GraphItems}, a comparator for ordering
  * these queues (and thus controlling rendering order), references to all
  * displays that render the contents of this registry, and a focus manager
- * keeping track of focus sets of Entity instances. In addition, the
- * ItemRegistry supports garbage collection of GraphItems across interaction
+ * keeping track of focus sets of {@link edu.berkeley.guir.prefuse.graph.Entity
+ * Entity} instances. In addition, the ItemRegistry supports garbage 
+ * collection of <code>GraphItems</code> across interaction
  * cycles of a visualization, allowing visual representations of graph
  * elements to pass in and out of existence as necessary.
- * <br/><br/>
- * GraphItems are not instantiated directly, instead they are created by
- * the ItemRegistry as visual representations for abstract graph data. To
- * create a new GraphItem or retrieve an existing one, use the provided
- * ItemRegistry methods (e.g., getItem(), getNodeItem, etc). These are the
- * methods used by the various filters in the edu.berkeley.guir.prefuse.actions
+ * </p>
+ *
+ * <p>
+ * <code>GraphItems</code> are not instantiated directly, instead they are 
+ * created by the <code>ItemRegistry</code> as visual representations for 
+ * abstract graph data. To create a new <code>GraphItem</code> or retrieve 
+ * an existing one, use the provided <code>ItemRegistry</code> methods 
+ * (e.g., <code>getItem()</code>, <code>getNodeItem</code>, etc). These are the
+ * methods used by the various filters in the 
+ * {@link edu.berkeley.guir.prefuse.action edu.berkeley.guir.prefuse.action}
  * package to determine which graph elements are visualized and which are not.
- * <br/><br/>
- * For convenience, the ItemRegistry creates entries for three types of
- * GraphItems: NodeItems, EdgeItems, and AggregateItems. The mappings and
+ * </p>
+ * 
+ * <p>
+ * For convenience, the <code>ItemRegistry</code> creates entries for three types 
+ * of <code>GraphItems</code>: {@link NodeItem NodeItems}, {@link EdgeItem 
+ * EdgeItems}, and {@link AggregateItem AggregateItems}. The mappings and
  * rendering queues for these entries can be accessed through convenience
- * methods such as getNodeItem(), getEdgeItems, etc. More generally, separate
- * entries with their own mappings and rendering queue can be made for any 
- * type of GraphItem by using the addItemClass() methods. For example, if
- * there are more than two different types of aggregates used (e.g., subtree
- * aggregates and aggregates of other nodes) it may facilitate design to
- * separate these into their own item classes.
+ * methods such as <code>getNodeItem()</code>, <code>getEdgeItems()</code>, 
+ * etc. More generally, separate entries with their own mappings and 
+ * rendering queue can be made for any type of <code>GraphItem</code> by 
+ * using the {@link #addItemClass(String,Class) addItemClass()} methods. For 
+ * example, if there are more than two different types of aggregates used 
+ * (e.g., subtree aggregates and aggregates of other nodes) it may facilitate
+ * design to separate these into their own item classes.
+ * </p>
  * 
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
@@ -162,7 +175,6 @@ public class ItemRegistry {
     } //
     
     public synchronized void setGraph(Graph g) {
-        // TODO: invalidate all current entries?
         m_graph = g;
     } //
     

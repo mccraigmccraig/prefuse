@@ -46,7 +46,7 @@ public class DefaultTreeNode extends DefaultNode implements TreeNode {
 	/**
 	 * Constructor, creates a new node, and makes it the child of the
 	 * specified input node.
-	 * @param parent the parent DefaultTreeNode
+	 * @param edgeFromParent an edge between this node and the desired parent
 	 */
 	public DefaultTreeNode(Edge edgeFromParent) {
 		m_numDescendants = 0;

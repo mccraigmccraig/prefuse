@@ -11,7 +11,7 @@ import java.awt.FontMetrics;
  *
  * @version 1.0
  * @author David Nation
- * @author Jeffrey Heer - <a href="mailto:jheer@parc.xerox.com">jheer@parc.xerox.com</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class StringAbbreviator {
 
