@@ -26,7 +26,7 @@ import edu.berkeley.guir.prefuse.util.FocusSet;
 /**
  * The ItemRegistry is the central data structure for a prefuse visualization.
  * The registry maintains mappings between abstract graph data (e.g., 
- * <tt>Node</tt>s and <tt>Edges</tt>) and their visual representations (e.g.,
+ * <tt>Node</tt>s and <tt>Edge</tt>s) and their visual representations (e.g.,
  * <tt>NodeItem</tt>s and <tt>EdgeItem</tt>s). The ItemRegistry maintains
  * rendering queues of all visualized GraphItems, a comparator for ordering
  * these queues (and thus controlling rendering order), references to all
@@ -548,7 +548,7 @@ public class ItemRegistry {
 	} //
 	
 	/**
-	 * Returns the visualized AggregateItem associated with the given Node,
+	 * Returns the visualized AggregateItem associated with the given Entity,
 	 * if any.
 	 * @param entity the Entity to look up
 	 * @return the AggregateItem associated with the entity, if any

@@ -3,23 +3,23 @@ package edu.berkeley.guir.prefuse.graph.event;
 import java.util.EventListener;
 
 import edu.berkeley.guir.prefuse.graph.Edge;
+import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.Node;
 
 /**
- * 
- * Aug 14, 2003 - jheer - Created class
+ * A listener interface for monitoring changes to a graph structure.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public interface GraphEventListener extends EventListener {
 
-	public void nodeAdded(Node n);
-	public void nodeRemoved(Node n);
-	public void nodeReplaced(Node o, Node n);
+	public void nodeAdded(Graph g, Node n);
+	public void nodeRemoved(Graph g, Node n);
+	public void nodeReplaced(Graph g, Node o, Node n);
 	
-	public void edgeAdded(Edge e);
-	public void edgeRemoved(Edge e);
-	public void edgeReplaced(Edge o, Edge n);
+	public void edgeAdded(Graph g, Edge e);
+	public void edgeRemoved(Graph g, Edge e);
+	public void edgeReplaced(Graph g, Edge o, Edge n);
 	
 } // end of interface GraphEventListener

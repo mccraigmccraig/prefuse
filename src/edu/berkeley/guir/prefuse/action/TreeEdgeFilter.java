@@ -30,7 +30,7 @@ public class TreeEdgeFilter extends Filter {
     
     /**
      * Filters tree edges, connecting filtered graph nodes into a
-     * tree structure. Edge visibility can be controlled.
+     * tree structure. DefaultEdge visibility can be controlled.
      * @param edgesVisible determines whether or not the filtered
      *  edges are visible in the display.
      */
@@ -44,18 +44,19 @@ public class TreeEdgeFilter extends Filter {
 		while ( nodeIter.hasNext() ) {
 			NodeItem nitem  = (NodeItem)nodeIter.next();
 			TreeNode node   = (TreeNode)registry.getEntity(nitem);
-			TreeNode parent = node.getParent();
-			
-			while ( parent != null && !registry.isVisible(parent) )
-				parent = parent.getParent();
-			if ( parent == null ) continue;
-
-			Edge edge = ( parent==node.getParent() ? 
-					      parent.getEdge(node) : new Edge(parent, node) );
-			EdgeItem e = registry.getEdgeItem(edge, true);
-            NodeItem p = registry.getNodeItem(parent);
-            p.addChild(e);
-            if ( !m_edgesVisible ) e.setVisible(false);
+            
+            if ( node.getChildCount() > 0 ) {
+                Iterator iter = node.getChildEdges();
+                while ( iter.hasNext() ) {
+                    Edge e = (Edge)iter.next();
+                    TreeNode c = (TreeNode)e.getAdjacentNode(node);
+                    if ( registry.isVisible(c) ) {
+                        EdgeItem eitem = registry.getEdgeItem(e,true);
+                        nitem.addChild(eitem);
+                        if ( !m_edgesVisible ) eitem.setVisible(false);
+                    }
+                }
+            }
 		}
 	} //
 

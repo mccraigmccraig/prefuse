@@ -6,10 +6,9 @@ import java.util.NoSuchElementException;
 
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
+
 /**
  * Iterates over tree nodes in a breadth-first manner.
- * 
- * May 3, 2003 - jheer - Created class
  * 
  * @version 1.0
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>

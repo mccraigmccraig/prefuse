@@ -18,8 +18,6 @@ import edu.berkeley.guir.prefuse.graph.TreeNode;
  * Interpolates between starting and ending display locations by linearly
  * interpolating between polar co-ordinates.
  * 
- * Apr 28, 2003 - jheer - Created class
- * 
  * @version 1.0
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
  */

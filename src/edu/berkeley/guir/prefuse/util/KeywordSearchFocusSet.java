@@ -13,7 +13,6 @@ import edu.berkeley.guir.prefuse.graph.Tree;
 
 /**
  * 
- * Feb 21, 2004 - jheer - Created class
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

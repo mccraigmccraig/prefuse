@@ -4,7 +4,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
+import edu.berkeley.guir.prefuse.graph.DefaultEdge;
+import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Entity;
+import edu.berkeley.guir.prefuse.graph.DefaultTree;
+import edu.berkeley.guir.prefuse.graph.DefaultTreeNode;
 import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
@@ -162,10 +166,10 @@ public class Trie {
     } //
     
     public Tree tree() {
-        TreeNode r = new TreeNode();
+        TreeNode r = new DefaultTreeNode();
         r.setAttribute("label", "root");
         tree(root, r);
-        return new Tree(r);
+        return new DefaultTree(r);
     } //
     
     private void tree(TrieBranch b, TreeNode n) {
@@ -173,15 +177,17 @@ public class Trie {
             if ( b.children[i] instanceof TrieLeaf ) {
                 TrieLeaf l = (TrieLeaf)b.children[i];
                 while ( l != null ) {
-                    TreeNode c = new TreeNode();
+                    TreeNode c = new DefaultTreeNode();
                     c.setAttribute("label", l.word);
-                    n.addChild(c);
+                    Edge e = new DefaultEdge(n,c);
+                    n.addChild(e);
                     l = l.next;
                 }
             } else {
-                TreeNode c = new TreeNode();
+                DefaultTreeNode c = new DefaultTreeNode();
                 c.setAttribute("label", String.valueOf(b.chars[i]));
-                n.addChild(c);
+                Edge e = new DefaultEdge(n,c);
+                n.addChild(e);
                 tree((TrieBranch)b.children[i], c);
             }
         }

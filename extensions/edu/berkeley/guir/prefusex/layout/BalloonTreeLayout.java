@@ -6,12 +6,12 @@ import java.util.Iterator;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.TreeLayout;
-import edu.berkeley.guir.prefuse.graph.Tree;
+import edu.berkeley.guir.prefuse.graph.DefaultTree;
 
 /**
- * Calculates a Balloon Tree layout of a tree. This layout places children
+ * Calculates a Balloon DefaultTree layout of a tree. This layout places children
  * nodes radially around their parents, and is equivalent to a 2D view of
- * a Cone Tree.
+ * a Cone DefaultTree.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
@@ -28,7 +28,7 @@ public class BalloonTreeLayout extends TreeLayout {
     public void run(ItemRegistry registry, double frac) {
         m_registry = registry;
         Point2D anchor = getLayoutAnchor(registry);
-        Tree tree = (Tree)registry.getGraph();
+        DefaultTree tree = (DefaultTree)registry.getGraph();
         NodeItem n = registry.getNodeItem(tree.getRoot());
         layout(n,anchor.getX(),anchor.getY());
     } //

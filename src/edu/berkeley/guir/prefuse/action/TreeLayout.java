@@ -2,7 +2,7 @@ package edu.berkeley.guir.prefuse.action;
 
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
-import edu.berkeley.guir.prefuse.graph.Tree;
+import edu.berkeley.guir.prefuse.graph.DefaultTree;
 
 /**
  * 
@@ -26,7 +26,7 @@ public abstract class TreeLayout extends Layout {
     public NodeItem getLayoutRoot(ItemRegistry registry) {
         if ( m_root != null )
             return m_root;
-        Tree t = (Tree)registry.getGraph();
+        DefaultTree t = (DefaultTree)registry.getGraph();
         return registry.getNodeItem(t.getRoot());
     } //
 

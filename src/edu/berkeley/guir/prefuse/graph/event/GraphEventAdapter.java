@@ -1,45 +1,45 @@
 package edu.berkeley.guir.prefuse.graph.event;
 
 import edu.berkeley.guir.prefuse.graph.Edge;
+import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.Node;
 
 /**
- * 
- * Aug 14, 2003 - jheer - Created class
+ * Adapter class to simplify creating GraphEventListener instances
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class GraphEventAdapter implements GraphEventListener {
 
 	/**
 	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeAdded(edu.berkeley.guir.prefuse.graph.Node)
 	 */
-	public void nodeAdded(Node n) {} //
+	public void nodeAdded(Graph g, Node n) {} //
 
 	/**
 	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeRemoved(edu.berkeley.guir.prefuse.graph.Node)
 	 */
-	public void nodeRemoved(Node n) {} //
+	public void nodeRemoved(Graph g, Node n) {} //
 
 	/**
 	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeReplaced(edu.berkeley.guir.prefuse.graph.Node, edu.berkeley.guir.prefuse.graph.Node)
 	 */
-	public void nodeReplaced(Node o, Node n) {} //
+	public void nodeReplaced(Graph g, Node o, Node n) {} //
 
 	/**
 	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeAdded(edu.berkeley.guir.prefuse.graph.Edge)
 	 */
-	public void edgeAdded(Edge e) {} //
+	public void edgeAdded(Graph g, Edge e) {} //
 
 	/**
 	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeRemoved(edu.berkeley.guir.prefuse.graph.Edge)
 	 */
-	public void edgeRemoved(Edge e) {} //
+	public void edgeRemoved(Graph g, Edge e) {} //
     
 	/**
 	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeReplaced(edu.berkeley.guir.prefuse.graph.Edge, edu.berkeley.guir.prefuse.graph.Edge)
 	 */
-	public void edgeReplaced(Edge o, Edge n) {} //
+	public void edgeReplaced(Graph g, Edge o, Edge n) {} //
 
 } // end of class GraphEventAdapter

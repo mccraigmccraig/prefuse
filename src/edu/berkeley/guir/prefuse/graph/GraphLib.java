@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Library of useful operations on graphs.
+ * Library of routines for creating or performing operations on graphs.
  * 
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
@@ -14,56 +14,49 @@ import java.util.List;
 public class GraphLib {
 
     public static Graph getStar(int n) {
-        Node n0 = new TreeNode();
-        n0.setAttribute("label","n"+0);
-        ArrayList al = new ArrayList(n+1);
-        al.add(n0);
+        Graph g = new DefaultGraph();
+        Node r = new DefaultTreeNode();
+        r.setAttribute("label","n"+0);
+        g.addNode(r);
         for ( int i=1; i <= n; i++ ) {
-            Node nn = new TreeNode();
+            Node nn = new DefaultTreeNode();
             nn.setAttribute("label","n"+i);
-            Edge e = new Edge(n0, nn);
-            n0.addEdge(e);
-            nn.addEdge(e);
-            al.add(nn);
+            g.addNode(nn);
+            Edge e = new DefaultEdge(nn, r);
+            g.addEdge(e);
         }
-        return new SimpleGraph(al);
+        return g;
     } //
     
     public static Graph getClique(int n) {
+        Graph g = new DefaultGraph();
         Node nodes[] = new Node[n];
-        ArrayList al = new ArrayList(n);
         for ( int i = 0; i < n; i++ ) {
-            nodes[i] = new TreeNode();
+            nodes[i] = new DefaultTreeNode();
             nodes[i].setAttribute("label", "n"+i);
-            al.add(nodes[i]);
+            g.addNode(nodes[i]);
         }
         for ( int i = 0; i < n; i++ ) {
-            for ( int j = 0; j < n; j++ )
-                if ( i != j ) nodes[i].addNeighbor(nodes[j]);
+            for ( int j = i; j < n; j++ )
+                if ( i != j )
+                    g.addEdge(new DefaultEdge(nodes[i], nodes[j]));
         }
-        return new SimpleGraph(al);
+        return g;
     } //
     
     public static Graph getGrid(int m, int n) {
-        ArrayList nodes = new ArrayList();
+        Graph g = new DefaultGraph();
+        Node[] nodes = new Node[m*n];
         for ( int i = 0; i < m*n; i++ ) {
-            TreeNode node = new TreeNode();
-            node.setAttribute("label", "n"+i);
-            nodes.add(node);
-            if ( i >= n ) {
-                TreeNode above = (TreeNode)nodes.get(i-n);
-                Edge e = new Edge(above, node);
-                node.addEdge(e);
-                above.addEdge(e);
-            }
-            if ( i % n != 0 ) {
-                TreeNode bfor = (TreeNode)nodes.get(i-1);
-                Edge e = new Edge(bfor, node);
-                node.addEdge(e);
-                bfor.addEdge(e);
-            }
+            nodes[i] = new DefaultTreeNode();
+            nodes[i].setAttribute("label", "n"+i);
+            g.addNode(nodes[i]);
+            if ( i >= n )
+                g.addEdge(new DefaultEdge(nodes[i-n], nodes[i]));
+            if ( i % n != 0 )
+                g.addEdge(new DefaultEdge(nodes[i-1], nodes[i]));
         }
-        return new SimpleGraph(nodes);
+        return g;
     } //
     
 	public static final int SEARCH_NODES = 0;
@@ -133,7 +126,7 @@ public class GraphLib {
 //	 */
 //	public static Graph getFilteredGraph(final Graph og, FilterFunction func)
 //	{
-//		SimpleGraph g = new SimpleGraph();
+//		Graph g = new DefaultGraph();
 //		HashMap nodeMap = new HashMap();
 //		Iterator iter = og.getNodes();
 //		while ( iter.hasNext() ) {
@@ -156,7 +149,7 @@ public class GraphLib {
 //			Node v1 = (Node)nodeMap.get(e.getFirstNode());
 //			Node v2 = (Node)nodeMap.get(e.getSecondNode());
 //			if ( v1 != null && v2 != null && func.filter(e) ) {
-//				Edge e2 = new Edge(v1, v2);
+//				Edge e2 = new DefaultEdge(v1, v2);
 //				e2.setAttributes(e.getAttributes());
 //				g.addEdge(e2);
 //			}
@@ -169,7 +162,7 @@ public class GraphLib {
 //	 * @param g the graph to filter
 //	 * @param func a FilterFunction that determines what entities are filtered.
 //	 */
-//	public static void filterGraph(SimpleGraph g, FilterFunction func) {
+//	public static void filterGraph(Graph g, FilterFunction func) {
 //		Iterator iter = g.getNodes();
 //		List removeList = new ArrayList();
 //		while ( iter.hasNext() ) {

@@ -170,7 +170,7 @@ public class ForceDemo extends Display {
         Graph g = GraphLib.getGrid(15,15);
         
         System.out.println("Visualizing Graph: "
-            +g.getNumNodes()+" nodes, "+g.getNumEdges()+" edges");
+            +g.getNodeCount()+" nodes, "+g.getEdgeCount()+" edges");
         
         ForceSimulator fsim = new ForceSimulator();
         fsim.addForce(new NBodyForce(-0.4f, 0.9f));

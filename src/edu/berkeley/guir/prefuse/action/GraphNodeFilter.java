@@ -25,9 +25,8 @@ public class GraphNodeFilter extends Filter {
 	public void run(ItemRegistry registry, double frac) {
 		Iterator nodeIter = registry.getGraph().getNodes();
 		while ( nodeIter.hasNext() ) {
-			Node node = (Node)nodeIter.next();
-			NodeItem item = registry.getNodeItem(node, true);
-		}
+			NodeItem item = registry.getNodeItem((Node)nodeIter.next(), true);
+        }
         
 		// optional garbage collection
         super.run(registry, frac);

@@ -27,10 +27,10 @@ import edu.berkeley.guir.prefuse.activity.ActivityManager;
 import edu.berkeley.guir.prefuse.activity.SlowInSlowOutPacer;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
-import edu.berkeley.guir.prefuse.graph.Edge;
+import edu.berkeley.guir.prefuse.graph.DefaultTreeNode;
 import edu.berkeley.guir.prefuse.graph.Graph;
-import edu.berkeley.guir.prefuse.graph.TreeLib;
 import edu.berkeley.guir.prefuse.graph.Tree;
+import edu.berkeley.guir.prefuse.graph.TreeLib;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 import edu.berkeley.guir.prefuse.graph.io.XMLGraphReader;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
@@ -70,7 +70,7 @@ public class RadialGraphDemo extends JFrame {
 		TreeNode r = (TreeNode)nodeIter.next();
 		while ( nodeIter.hasNext() ) {
 			TreeNode n = (TreeNode)nodeIter.next();
-			if ( n.getNumNeighbors() > r.getNumNeighbors() ) {
+			if ( n.getEdgeCount() > r.getEdgeCount() ) {
 				r = n;
 			}
 		}
@@ -86,7 +86,7 @@ public class RadialGraphDemo extends JFrame {
 			// load graph
 			String inputFile = GRAPH_FRIENDSTER;
 			XMLGraphReader gr = new XMLGraphReader();
-			gr.setNodeType(TreeNode.class);
+			gr.setNodeType(DefaultTreeNode.class);
 			graph = gr.loadGraph(inputFile);
 			tree = getInitialTree(graph);
 			
@@ -164,7 +164,7 @@ public class RadialGraphDemo extends JFrame {
                 public void focusChanged(FocusEvent e) {
                     if ( update.isScheduled() )
                         update.cancel();
-                    TreeNode node = (TreeNode)e.getFirstAdded();
+                    DefaultTreeNode node = (DefaultTreeNode)e.getFirstAdded();
                     if ( node != null && !node.equals(tree.getRoot()) ) {                           
                         tree = TreeLib.breadthFirstTree(node);
                         registry.setGraph(tree);
@@ -228,8 +228,7 @@ public class RadialGraphDemo extends JFrame {
 				return nodeColors[Math.min(d, nodeColors.length-1)];
 			} else if (item instanceof EdgeItem) {
 				EdgeItem e = (EdgeItem) item;
-				Edge edge = (Edge) registry.getEntity(e);
-				if (edge.isTreeEdge()) {
+				if ( e.isTreeEdge() ) {
 					int d, d1, d2;
                     d1 = e.getFirstNode().getDepth();
                     d2 = e.getSecondNode().getDepth();

@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import edu.berkeley.guir.prefuse.graph.DefaultEdge;
+import edu.berkeley.guir.prefuse.graph.DefaultTree;
+import edu.berkeley.guir.prefuse.graph.DefaultTreeNode;
 import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
@@ -57,7 +60,7 @@ public class TabDelimitedTreeReader extends AbstractTreeReader {
 					parentLabel  = (String)headers.get(1);				
 					parsedHeader = true;	
 				} else {
-					TreeNode n = new TreeNode();
+					TreeNode n = new DefaultTreeNode();
 					String values[] = line.split("\t");				
 					for ( int i = 0; i < values.length; i++ ) {				
 						n.setAttribute((String)headers.get(i), values[i]);					
@@ -82,7 +85,7 @@ public class TabDelimitedTreeReader extends AbstractTreeReader {
 						}
 					} else if ( nodeMap.containsKey(plabel) ) {
 						TreeNode p = (TreeNode)nodeMap.get(plabel);
-						p.addChild(n);
+						p.addChild(new DefaultEdge(p,n));
 					}			
 				}
 				
@@ -108,7 +111,7 @@ public class TabDelimitedTreeReader extends AbstractTreeReader {
 						String context = "[" + n.getAttribute(label) + ", " + plabel + "]";
 						throw new IllegalStateException("Found parentless node: " + context);
 					} else {
-						p.addChild(n);
+						p.addChild(new DefaultEdge(p,n));
 					}
 				}
 			} catch ( NullPointerException npe ) {				
@@ -118,8 +121,8 @@ public class TabDelimitedTreeReader extends AbstractTreeReader {
 			}
 		}
 		
-		System.out.println("Read in tree with "+(root.getNumDescendants()+1)+" nodes.");
-		return new Tree(root);
+		System.out.println("Read in tree with "+(root.getDescendantCount()+1)+" nodes.");
+		return new DefaultTree(root);
 	} //
 
 } // end of class TabDelimitedTreeReader

@@ -11,11 +11,11 @@ import java.awt.geom.Point2D;
 
 import edu.berkeley.guir.prefuse.EdgeItem;
 import edu.berkeley.guir.prefuse.GraphItem;
-import edu.berkeley.guir.prefuse.graph.Edge;
+import edu.berkeley.guir.prefuse.graph.DefaultEdge;
 import edu.berkeley.guir.prefuse.util.GeometryLib;
 
 /**
- * Edge renderer that draws edges as lines connecting nodes. Both
+ * DefaultEdge renderer that draws edges as lines connecting nodes. Both
  * straight and curved (Bezier) lines are supported.
  * 
  * Apr 26, 2003 - jheer - Created class
@@ -137,7 +137,7 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	 */
 	public void render(Graphics2D g, GraphItem item) {
 		super.render(g, item);
-		if ( ((Edge)((EdgeItem)item).getEntity()).isDirected() ) {
+		if ( ((DefaultEdge)((EdgeItem)item).getEntity()).isDirected() ) {
 			Point2D start = null, end = null;
 			int width;
 			

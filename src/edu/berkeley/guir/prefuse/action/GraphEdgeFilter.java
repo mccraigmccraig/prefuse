@@ -30,7 +30,7 @@ public class GraphEdgeFilter extends Filter {
     
     /**
      * Filters graph edges, connecting filtered graph nodes into a
-     * graph structure. Edge visibility can be controlled.
+     * graph structure. DefaultEdge visibility can be controlled.
      * @param edgesVisible determines whether or not the filtered
      *  edges are visible in the display.
      */
@@ -50,9 +50,7 @@ public class GraphEdgeFilter extends Filter {
 			Iterator edgeIter = node.getEdges();
 			while ( edgeIter.hasNext() ) {
 				Edge edge = (Edge)edgeIter.next();
-                Node n = (Node)edge.getFirstNode();
-                if ( n == node )
-                    n = (Node)edge.getSecondNode();
+                Node n = edge.getAdjacentNode(node);
                 if ( registry.isVisible(n) ) {
                     EdgeItem eitem = registry.getEdgeItem(edge, true);
                     try {

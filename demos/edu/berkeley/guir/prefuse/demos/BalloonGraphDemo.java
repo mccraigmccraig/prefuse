@@ -29,7 +29,6 @@ import edu.berkeley.guir.prefuse.activity.SlowInSlowOutPacer;
 import edu.berkeley.guir.prefuse.collections.DOIItemComparator;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
-import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.TreeLib;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
@@ -280,8 +279,7 @@ public class BalloonGraphDemo {
                 return cmap.getColor(d);
             } else if (item instanceof EdgeItem) {
                 EdgeItem e = (EdgeItem) item;
-                Edge edge = (Edge) registry.getEntity(e);
-                if (edge.isTreeEdge()) {
+                if ( e.isTreeEdge() ) {
                     int d, d1, d2;
                     d1 = e.getFirstNode().getDepth();
                     d2 = e.getSecondNode().getDepth();

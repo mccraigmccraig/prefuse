@@ -44,6 +44,10 @@ public class FileSystemLoader extends GraphLoader {
         
     } //
     
+    protected void getParent(ExternalTreeNode n) {
+        
+    } //
+    
     public ExternalNode loadNode(ExternalNode o, File f) {
         ExternalNode n = null;
         try {

@@ -11,6 +11,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import edu.berkeley.guir.prefuse.graph.DefaultEdge;
+import edu.berkeley.guir.prefuse.graph.DefaultTree;
+import edu.berkeley.guir.prefuse.graph.DefaultTreeNode;
 import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
@@ -67,7 +70,7 @@ public class TreeMLTreeReader extends AbstractTreeReader {
 		
 		public void endDocument() {
 			// construct tree
-			m_tree = new Tree(m_root);
+			m_tree = new DefaultTree(m_root);
 		} //
 		
 		public void endElement(String namespaceURI, String localName, String qName) {
@@ -81,10 +84,11 @@ public class TreeMLTreeReader extends AbstractTreeReader {
 				// parse a node element
 				TreeNode n;
 				if ( m_activeNode == null ) {
-					n = new TreeNode();
+					n = new DefaultTreeNode();
 					m_root = n;
 				} else {
-					n = new TreeNode(m_activeNode);
+					n = new DefaultTreeNode();
+                    m_activeNode.addChild(new DefaultEdge(m_activeNode,n));
 				}
 				m_activeNode = n;
 			} else if ( qName.equals(ATTR) ) {

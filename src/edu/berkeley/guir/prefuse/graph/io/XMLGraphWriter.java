@@ -15,14 +15,12 @@ import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.Node;
 
 /**
- * Writes out a graph to an XGMML-format XML file.
- * See <a href="www.cs.rpi.edu/~puninj/XGMML/">www.cs.rpi.edu/~puninj/XGMML/</a>
+ * Writes out a graph to an XGMML-format XML file. See
+ * <a href="http://www.cs.rpi.edu/~puninj/XGMML/">www.cs.rpi.edu/~puninj/XGMML/</a>
  * for a description of the XGMML format.
  * 
- * Jun 25, 2003 - jheer - Created class
- * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> - prefuse(AT)jheer.org
  */
 public class XMLGraphWriter extends AbstractGraphWriter {
 
@@ -71,7 +69,7 @@ public class XMLGraphWriter extends AbstractGraphWriter {
 	} //
     
     private Set initializeIDs(Graph g) {
-        Set s = new HashSet(g.getNumNodes()/2);
+        Set s = new HashSet(g.getNodeCount()/2);
         String a;
         Iterator nodeIter = g.getNodes();
         while ( nodeIter.hasNext() ) {

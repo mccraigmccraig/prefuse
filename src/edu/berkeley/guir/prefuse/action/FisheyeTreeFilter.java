@@ -130,7 +130,7 @@ public class FisheyeTreeFilter extends Filter {
 	} //
 	
 	protected void setDOI(NodeItem item, int doi, int ldist) {
-		double localDOI = -1 * ldist / (double)Math.min(1000.0, m_tree.getNumNodes());
+		double localDOI = -1 * ldist / (double)Math.min(1000.0, m_tree.getNodeCount());
 		item.setDOI(doi+localDOI);
 	} //
 

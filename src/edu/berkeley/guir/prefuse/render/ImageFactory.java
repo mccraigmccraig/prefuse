@@ -132,7 +132,7 @@ public class ImageFactory {
 
 	/**
 	 * Get the image associated with the provided aggregate. Assumes the
-	 * aggregate represents an elided subtree of a TreeNode instance.
+	 * aggregate represents an elided subtree of a DefaultTreeNode instance.
 	 * @param aItem the aggregate item
 	 * @return the corresponding image, if available.
 	 */

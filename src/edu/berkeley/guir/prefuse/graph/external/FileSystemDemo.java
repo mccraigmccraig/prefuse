@@ -23,8 +23,8 @@ import edu.berkeley.guir.prefuse.event.ControlAdapter;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.graph.Entity;
-import edu.berkeley.guir.prefuse.graph.Node;
-import edu.berkeley.guir.prefuse.graph.SimpleGraph;
+import edu.berkeley.guir.prefuse.graph.DefaultGraph;
+import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.event.GraphLoaderListener;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
@@ -58,18 +58,17 @@ public class FileSystemDemo extends JFrame {
     public FileSystemDemo() {
         super("File System Demo");
         
-        SimpleGraph g = new SimpleGraph();
+        Graph g = new DefaultGraph();
         registry = new ItemRegistry(g);
         
         loader = new FileSystemLoader(registry);
         ExternalNode root = loader.loadNode(null, new File("."));
         
         loader.addGraphLoaderListener(new GraphLoaderListener() {
-            public void entityLoaded(Entity e) {
-                //System.out.println("entityLoaded: " + e);
+            public void entityLoaded(GraphLoader loader, Entity e) {
                 ActivityManager.schedule(filter);
             } //
-            public void entityUnloaded(Entity e) {
+            public void entityUnloaded(GraphLoader loader, Entity e) {
                 ActivityManager.schedule(filter);
             } //
         });
@@ -116,7 +115,6 @@ public class FileSystemDemo extends JFrame {
         display.addControlListener(new ZoomHandler(false));
         registry.getDefaultFocusSet().addFocusListener(new FocusListener() {
             public void focusChanged(FocusEvent e) {
-                Node node = (Node)e.getFirstAdded();
                 ActivityManager.scheduleNow(filter);
             } //
         });

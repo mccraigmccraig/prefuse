@@ -1,6 +1,5 @@
 package edu.berkeley.guir.prefuse.graph;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -12,8 +11,6 @@ import java.util.Map;
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
  */
 public interface Entity {
-	
-	public static final Class MAP_TYPE = HashMap.class;
 	
 	/**
 	 * Get an attribute associated with this entity.

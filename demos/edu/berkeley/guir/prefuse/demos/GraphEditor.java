@@ -43,10 +43,12 @@ import edu.berkeley.guir.prefuse.activity.Activity;
 import edu.berkeley.guir.prefuse.activity.ActivityMap;
 import edu.berkeley.guir.prefuse.event.ActivityAdapter;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
+import edu.berkeley.guir.prefuse.graph.DefaultEdge;
 import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Graph;
+import edu.berkeley.guir.prefuse.graph.DefaultNode;
+import edu.berkeley.guir.prefuse.graph.DefaultGraph;
 import edu.berkeley.guir.prefuse.graph.Node;
-import edu.berkeley.guir.prefuse.graph.SimpleGraph;
 import edu.berkeley.guir.prefuse.graph.io.GraphReader;
 import edu.berkeley.guir.prefuse.graph.io.GraphWriter;
 import edu.berkeley.guir.prefuse.graph.io.XMLGraphReader;
@@ -110,7 +112,7 @@ public class GraphEditor extends JFrame {
         
 		setLookAndFeel();
 		try {
-			g = new SimpleGraph(Collections.EMPTY_LIST, true);
+			g = new DefaultGraph(Collections.EMPTY_LIST, true);
 
 			registry = new ItemRegistry(g);
             display  = new Display();
@@ -463,9 +465,9 @@ public class GraphEditor extends JFrame {
 		} //
 
 		private NodeItem addNode(int x, int y) {
-			Node n = new Node();
+			Node n = new DefaultNode();
 			n.setAttribute(nameField, DEFAULT_LABEL);
-			((SimpleGraph)g).addNode(n);
+			g.addNode(n);
 			NodeItem item = registry.getNodeItem(n,true);
 			item.setColor(Color.BLACK);
 			item.setFillColor(Color.WHITE);
@@ -477,8 +479,8 @@ public class GraphEditor extends JFrame {
 		private void addEdge(GraphItem item1, GraphItem item2) {
 			Node n1 = (Node)item1.getEntity();
 			Node n2 = (Node)item2.getEntity();
-			if ( n1.getNeighborIndex(n2) < 0 ) {
-				Edge e = new Edge(n1, n2, directed);
+			if ( n1.getIndex(n2) < 0 ) {
+				Edge e = new DefaultEdge(n1, n2, directed);
 				n1.addEdge(e);
 				if ( !directed )
 					n2.addEdge(e);
@@ -487,7 +489,7 @@ public class GraphEditor extends JFrame {
 		
 		private void removeNode(GraphItem item) {
             Node n = (Node)item.getEntity();
-			((SimpleGraph)g).removeNode(n);
+			g.removeNode(n);
 		} //
 
 		private void stopEditing() {

@@ -3,8 +3,10 @@ package edu.berkeley.guir.prefuse.graph.io;
 import java.io.*;
 import java.util.*;
 
+import edu.berkeley.guir.prefuse.graph.DefaultEdge;
+import edu.berkeley.guir.prefuse.graph.DefaultTree;
+import edu.berkeley.guir.prefuse.graph.DefaultTreeNode;
 import edu.berkeley.guir.prefuse.graph.Tree;
-import edu.berkeley.guir.prefuse.graph.TreeNode;
 
 /**
  * Reads in trees from HDir formatted files.
@@ -43,7 +45,7 @@ public class HDirTreeReader extends AbstractTreeReader {
 	private int index = 0;
 	private int count = 0;
 
-	private TreeNode root;
+	private DefaultTreeNode root;
 
     /**
      * @see edu.berkeley.guir.prefuse.graph.io.TreeReader#loadTree(java.io.InputStream)
@@ -53,8 +55,8 @@ public class HDirTreeReader extends AbstractTreeReader {
 		fieldNameList = new Vector();
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		readDataFile(br);
-		System.out.println("Read in tree with "+(root.getNumDescendants()+1)+" nodes.");
-        return new Tree(root);
+		System.out.println("Read in tree with "+(root.getDescendantCount()+1)+" nodes.");
+        return new DefaultTree(root);
     } //
 
     //// =====================================================================
@@ -70,7 +72,7 @@ public class HDirTreeReader extends AbstractTreeReader {
         //  <R> and <D> items must not be broken into multiple lines
 
         index = -1; // initialize index value
-        TreeNode node = null;
+        DefaultTreeNode node = null;
         boolean firstTime = true;
         int c, c2;
 
@@ -223,7 +225,7 @@ public class HDirTreeReader extends AbstractTreeReader {
                                 t.pushBack();
                             TEXTs = aTEXT;
                             //TEXTs
-                            node = new TreeNode();
+                            node = new DefaultTreeNode();
 							node.setAttribute("Key", String.valueOf(count++));
                             node.setAttribute(textFieldName, TEXTs);
                             isizes = 0;
@@ -268,7 +270,7 @@ public class HDirTreeReader extends AbstractTreeReader {
         BufferedReader d,
         int currentLevel,
         StreamTokenizer t,
-        TreeNode parent) {
+        DefaultTreeNode parent) {
         String aTEXT;
         String line, value;
         String dirprefix = "";
@@ -285,7 +287,7 @@ public class HDirTreeReader extends AbstractTreeReader {
                 if ((c2 == StreamTokenizer.TT_WORD) || (c2 == '"'))
                     dirprefix = t.sval;
             
-            TreeNode node = null;
+            DefaultTreeNode node = null;
             out : while (true) {
                 switch (c = t.nextToken()) {
                     case StreamTokenizer.TT_EOF :
@@ -359,7 +361,7 @@ public class HDirTreeReader extends AbstractTreeReader {
                                 t.pushBack();
                             TEXTs = aTEXT;
 
-                            node = new TreeNode(); 
+                            node = new DefaultTreeNode(); 
 							node.setAttribute("Key", String.valueOf(count++));                           
                             node.setAttribute(textFieldName, TEXTs);
                             isizes = 0;
@@ -377,7 +379,7 @@ public class HDirTreeReader extends AbstractTreeReader {
                             } else
                                 t.pushBack();
 
-                            parent.addChild(node);
+                            parent.addChild(new DefaultEdge(parent, node));
 
                         } else if (Tag.equals("<hl")) {
 

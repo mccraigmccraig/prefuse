@@ -28,8 +28,8 @@ public class EdgeItem extends GraphItem {
 		super.init(registry, itemClass, entity);
 		
 		Edge edge = (Edge)entity;
-		Entity n1 = edge.getFirstNode();
-		Entity n2 = edge.getSecondNode();
+		Node n1 = edge.getFirstNode();
+		Node n2 = edge.getSecondNode();
 		
 		NodeItem item1 = getItem(n1);
 		setFirstNode(item1);
@@ -37,12 +37,8 @@ public class EdgeItem extends GraphItem {
 		setSecondNode(item2);
 	} //
 	
-	protected NodeItem getItem(Entity n) {
-		NodeItem item = null;
-		if ( n instanceof Node ) {
-			item = m_registry.getNodeItem((Node)n);
-		}
-		return item;
+	protected NodeItem getItem(Node n) {
+		return m_registry.getNodeItem(n);
 	} //
 
     /**
@@ -52,6 +48,14 @@ public class EdgeItem extends GraphItem {
 	public boolean isDirected() {
 		return ((Edge)m_entity).isDirected();
 	} //
+    
+    /**
+     * Indicates whether or not this edge is a tree edge.
+     * @return true if this edge is a tree edge, false otherwise
+     */
+    public boolean isTreeEdge() {
+        return ((Edge)m_entity).isTreeEdge();
+    } //
 	
     /**
      * Given a node item incident on this edge, returns the other node item
@@ -61,7 +65,7 @@ public class EdgeItem extends GraphItem {
      * @throws IllegalArgumentException if the provided NodeItem is not
      *  incident on this edge.
      */
-    public NodeItem getOtherNode(NodeItem nitem) {
+    public NodeItem getAdjacentNode(NodeItem nitem) {
         if ( m_node1 == nitem )
             return m_node2;
         else if ( m_node2 == nitem )

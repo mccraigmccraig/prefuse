@@ -167,7 +167,7 @@ public class IndentedTreeLayout extends TreeLayout {
 					treeHeight -= item.getBounds().height;
 					
 					// if all children are elided, don't bother with aggregate
-//					TreeNode p = (TreeNode)item.getEntity();
+//					DefaultTreeNode p = (DefaultTreeNode)item.getEntity();
 //					if ( p != null ) {
 //						Integer ecount = (Integer)pmap.get(p);
 //						ecount = new Integer((ecount == null ? 1 : ecount.intValue()+1));

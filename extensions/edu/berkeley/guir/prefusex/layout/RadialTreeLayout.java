@@ -204,7 +204,7 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
         if ( e.getEventType() != FocusEvent.FOCUS_SET )
             return;
         Entity focus, fprev;
-        if ( (focus=e.getFirstAdded()) instanceof TreeNode && 
+        if ( (focus=e.getFirstAdded())   instanceof TreeNode && 
              (fprev=e.getFirstRemoved()) instanceof TreeNode ) {
             TreeNode prev = (TreeNode)fprev;
             for ( ; prev != null && prev.getParent() != focus; prev = prev.getParent() );

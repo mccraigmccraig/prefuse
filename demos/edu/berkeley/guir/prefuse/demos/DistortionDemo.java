@@ -123,10 +123,10 @@ public class DistortionDemo extends JFrame {
             Iterator iter = g.getNodes(); iter.next();
             for ( n=2; iter.hasNext(); n++ ) {
                 Node nd = (Node)iter.next();
-                if ( nd.getNumEdges() == 2 )
+                if ( nd.getEdgeCount() == 2 )
                     break;
             }
-            m = g.getNumNodes() / n;
+            m = g.getNodeCount() / n;
             iter = g.getNodes();
             for ( int i=0; iter.hasNext(); i++ ) {
                 Node nd = (Node)iter.next();

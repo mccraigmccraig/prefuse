@@ -1,6 +1,7 @@
 package edu.berkeley.guir.prefuse.graph;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -49,19 +50,15 @@ public abstract class AbstractEntity implements Entity {
 	 */
 	public void setAttribute(String name, String value) {
 		if ( m_attributes == null ) {
-			try {
-				m_attributes = (Map)MAP_TYPE.newInstance();
-			} catch ( Exception e ) {
-				e.printStackTrace();
-			}
+		    m_attributes = new HashMap(3);
 		}
 		m_attributes.put(name, value);
 	} //
 
 	/**
-	 * Sets the attribute map for this Entity. The map
-	 * should contain only <code>String</code> values,
-	 * otherwise an exception will be thrown.
+	 * Sets the attribute map for this Entity, using the same reference passed
+     * in as an argument (i.e. a copy is not made). The map should contain 
+     * only <code>String</code> values, otherwise an exception will be thrown.
 	 * @param attrMap the attribute map
 	 * @throws IllegalArgumentException is the input map
 	 * contains non-<code>String</code> values.
@@ -92,18 +89,20 @@ public abstract class AbstractEntity implements Entity {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		StringBuffer sbuf = new StringBuffer();
-		sbuf.append("Entity[");
-		Iterator iter = m_attributes.keySet().iterator();
-		while ( iter.hasNext() ) {
-			String key = (String)iter.next();
-			String val = (String)m_attributes.get(key);
-			sbuf.append(key).append('=').append(val);
-			if ( iter.hasNext() )
-				sbuf.append(',');
-		}
-		sbuf.append("]");
-		return sbuf.toString();
+		return "Entity["+getAttributeString()+"]";
 	} //
+    
+    protected String getAttributeString() {
+        StringBuffer sbuf = new StringBuffer();
+        Iterator iter = m_attributes.keySet().iterator();
+        while ( iter.hasNext() ) {
+            String key = (String)iter.next();
+            String val = (String)m_attributes.get(key);
+            sbuf.append(key).append('=').append(val);
+            if ( iter.hasNext() )
+                sbuf.append(',');
+        }
+        return sbuf.toString();
+    } //
 
 } // end of abstract class AbstractEntity

@@ -9,7 +9,7 @@ import java.net.URL;
 import edu.berkeley.guir.prefuse.graph.Tree;
 
 /**
- * Interface by which to read in Tree instances from stored files.
+ * Interface by which to read in DefaultTree instances from stored files.
  * 
  * Apr 22, 2003 - jheer - Created class
  * 
@@ -21,7 +21,7 @@ public interface TreeReader {
 	/**
 	 * Load a tree from the file with the given filename.
 	 * @param filename the file name of the file containing the tree
-	 * @return the loaded Tree
+	 * @return the loaded DefaultTree
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
@@ -30,7 +30,7 @@ public interface TreeReader {
 	/**
 	 * Load a tree from the given url.
 	 * @param url the url to read the tree from
-	 * @return the loaded Tree
+	 * @return the loaded DefaultTree
 	 * @throws IOException
 	 */
 	public Tree loadTree(URL url) throws IOException;
@@ -38,7 +38,7 @@ public interface TreeReader {
 	/**
 	 * Load a tree from the given file
 	 * @param f the file to read the tree from
-	 * @return the loaded Tree
+	 * @return the loaded DefaultTree
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
@@ -47,7 +47,7 @@ public interface TreeReader {
 	/**
 	 * Load a tree from the given input stream
 	 * @param is the input stream to read the tree from
-	 * @return the loaded Tree
+	 * @return the loaded DefaultTree
 	 * @throws IOException
 	 */
 	public Tree loadTree(InputStream is) throws IOException;

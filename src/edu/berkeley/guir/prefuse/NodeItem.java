@@ -31,7 +31,7 @@ public class NodeItem extends GraphItem {
 			
 		/// XXX TODO: this is ugly. fix this later.
 		if ( entity instanceof TreeNode ) 
-			setLocationToParent((TreeNode)entity, this);
+		    setLocationToParent((TreeNode)entity, this);
 	} //
 	
 	/**
@@ -82,7 +82,7 @@ public class NodeItem extends GraphItem {
 	/**
 	 * Returns the i'th neighbor of this node.
 	 * @param i the index of the neighbor in the neighbor list.
-	 * @return Node the Node at the specified position in the list of
+	 * @return DefaultNode the DefaultNode at the specified position in the list of
 	 *  neighbors
 	 */
 	public NodeItem getNeighbor(int i) {
@@ -214,7 +214,7 @@ public class NodeItem extends GraphItem {
 	/**
 	 * Inserts a new child at the specified location in this node's child list.
 	 * @param i index at which to add the child
-	 * @param e the Edge to the child
+	 * @param e the DefaultEdge to the child
 	 */
 	public void addChild(int i, EdgeItem e) {
 		NodeItem n1 = e.getFirstNode();

@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.graph.DefaultEdge;
 import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Graph;
-import edu.berkeley.guir.prefuse.graph.SimpleGraph;
 import edu.berkeley.guir.prefuse.graph.event.GraphLoaderListener;
 import edu.berkeley.guir.prefuse.graph.event.GraphLoaderMulticaster;
 
@@ -110,20 +110,23 @@ public abstract class GraphLoader implements Runnable {
             m_cache.put(key, n);
         
         n.setLoader(this);
+        if (e == null && src != null )
+            e = new DefaultEdge(src, n, m_graph.isDirected());
         
         synchronized ( m_registry ) {
-            ((SimpleGraph)m_graph).addNode(n);
+            m_graph.addNode(n);
             if ( src != null )
-                ((SimpleGraph)m_graph).addEdge(src,n);
+                m_graph.addEdge(e);
         }
         
         if ( m_listener != null )
-            m_listener.entityLoaded(n);
+            m_listener.entityLoaded(this,n);
     } //
     
     protected abstract void getNeighbors(ExternalNode n);
     
     protected abstract void getChildren(ExternalTreeNode n);
+    protected abstract void getParent(ExternalTreeNode n);
     
     public class Job {
         public Job(int type, ExternalNode n) {

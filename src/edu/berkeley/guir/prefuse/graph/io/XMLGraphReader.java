@@ -12,10 +12,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import edu.berkeley.guir.prefuse.graph.DefaultEdge;
 import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Graph;
+import edu.berkeley.guir.prefuse.graph.DefaultNode;
+import edu.berkeley.guir.prefuse.graph.DefaultGraph;
 import edu.berkeley.guir.prefuse.graph.Node;
-import edu.berkeley.guir.prefuse.graph.SimpleGraph;
 
 /**
  * Reads in a graph from an XGMML-format XML file.
@@ -23,7 +25,7 @@ import edu.berkeley.guir.prefuse.graph.SimpleGraph;
  * for a description of the XGMML format.
  * 
  * This class supports setting the node type to use when building the graph.
- * For example, one should set the node type to TreeNode.class if one wants
+ * For example, one should set the node type to DefaultTreeNode.class if one wants
  * to impose tree structures on the input graph.
  * 
  * May 21, 2003 - jheer - Created class
@@ -33,7 +35,7 @@ import edu.berkeley.guir.prefuse.graph.SimpleGraph;
  */
 public class XMLGraphReader extends AbstractGraphReader	implements GraphReader {
 
-	protected Class NODE_TYPE = Node.class;
+	protected Class NODE_TYPE = DefaultNode.class;
 
 	/**
 	 * @see edu.berkeley.guir.prefuse.graph.io.GraphReader#loadGraph(java.io.InputStream)
@@ -55,7 +57,7 @@ public class XMLGraphReader extends AbstractGraphReader	implements GraphReader {
 	
 	/**
 	 * Return the class type used for representing nodes.
-	 * @return the Class of new Node instances.
+	 * @return the Class of new DefaultNode instances.
 	 */
 	public Class getNodeType() {
 		return NODE_TYPE;
@@ -64,7 +66,7 @@ public class XMLGraphReader extends AbstractGraphReader	implements GraphReader {
 	/**
 	 * Set the type to be used for node instances. All created nodes
 	 * will be instances of the input type. The input class should be
-	 * a descendant class of edu.berkeley.guir.prefuse.graph.Node.
+	 * a descendant class of edu.berkeley.guir.prefuse.graph.DefaultNode.
 	 * @param type the class type to use for node instances.
 	 */
 	public void setNodeType(Class type) {
@@ -107,7 +109,7 @@ public class XMLGraphReader extends AbstractGraphReader	implements GraphReader {
 		
 		public void endDocument() {
 			// construct graph
-			m_graph = new SimpleGraph(m_nodeMap.values(), m_directed);
+			m_graph = new DefaultGraph(m_nodeMap.values(), m_directed);
 		} //
 		
 		public void endElement(String namespaceURI, String localName, String qName) {
@@ -197,7 +199,7 @@ public class XMLGraphReader extends AbstractGraphReader	implements GraphReader {
 				return null;
 			}
 
-			Edge e = new Edge(s,t,m_directed);
+			Edge e = new DefaultEdge(s,t,m_directed);
 			if ( label != null ) e.setAttribute(LABEL, label);
 			if ( weight != null ) e.setAttribute(WEIGHT, weight);
 			

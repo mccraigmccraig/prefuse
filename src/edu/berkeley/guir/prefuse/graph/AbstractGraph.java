@@ -1,16 +1,13 @@
 package edu.berkeley.guir.prefuse.graph;
 
-import java.util.Iterator;
-
 import edu.berkeley.guir.prefuse.graph.event.GraphEventListener;
 import edu.berkeley.guir.prefuse.graph.event.GraphEventMulticaster;
 
 /**
- * 
- * Aug 14, 2003 - jheer - Created class
+ * Skeletal graph implementation handling graph listener methods. 
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public abstract class AbstractGraph implements Graph {
 
@@ -28,68 +25,38 @@ public abstract class AbstractGraph implements Graph {
 	 * Remove a focus listener.
 	 * @param gl the listener to remove.
 	 */
-	public void removeFocusListener(GraphEventListener gl) {
+	public void removeGraphEventListener(GraphEventListener gl) {
 		m_graphListener = GraphEventMulticaster.remove(m_graphListener, gl);
 	} //
 	
-	public void fireNodeAdded(Node n) {
+	protected void fireNodeAdded(Node n) {
 		if ( m_graphListener != null )
-			m_graphListener.nodeAdded(n);
+			m_graphListener.nodeAdded(this, n);
 	} //
 
-	public void fireNodeRemoved(Node n) {
+	protected void fireNodeRemoved(Node n) {
 		if ( m_graphListener != null )
-			m_graphListener.nodeRemoved(n);
-	} //
-	
-	public void fireNodeReplaced(Node o, Node n) {
-		if ( m_graphListener != null )
-			m_graphListener.nodeReplaced(o,n);
+			m_graphListener.nodeRemoved(this, n);
 	} //
 	
-	public void fireEdgeAdded(Edge e) {
+	protected void fireNodeReplaced(Node o, Node n) {
 		if ( m_graphListener != null )
-			m_graphListener.edgeAdded(e);
+			m_graphListener.nodeReplaced(this,o,n);
 	} //
 	
-	public void fireEdgeRemoved(Edge e) {
+	protected void fireEdgeAdded(Edge e) {
 		if ( m_graphListener != null )
-			m_graphListener.edgeRemoved(e);
+			m_graphListener.edgeAdded(this, e);
 	} //
 	
-	public void fireEdgeReplaced(Edge o, Edge n) {
+	protected void fireEdgeRemoved(Edge e) {
 		if ( m_graphListener != null )
-			m_graphListener.edgeReplaced(o,n);
+			m_graphListener.edgeRemoved(this, e);
 	} //
-		
-	/**
-	 * @see edu.berkeley.guir.prefuse.graph.Graph#getNumNodes()
-	 */
-	public abstract int getNumNodes();
-
-	/**
-	 * @see edu.berkeley.guir.prefuse.graph.Graph#getNumEdges()
-	 */
-	public abstract int getNumEdges();
-
-	/**
-	 * @see edu.berkeley.guir.prefuse.graph.Graph#getNodes()
-	 */
-	public abstract Iterator getNodes();
-
-	/**
-	 * @see edu.berkeley.guir.prefuse.graph.Graph#getEdges()
-	 */
-	public abstract Iterator getEdges();
-
-	/**
-	 * @see edu.berkeley.guir.prefuse.graph.Graph#isDirected()
-	 */
-	public abstract boolean isDirected();
-
-	/**
-	 * @see edu.berkeley.guir.prefuse.graph.Graph#contains(edu.berkeley.guir.prefuse.graph.Node)
-	 */
-	public abstract boolean contains(Node n);
+	
+	protected void fireEdgeReplaced(Edge o, Edge n) {
+		if ( m_graphListener != null )
+			m_graphListener.edgeReplaced(this, o,n);
+	} //
 
 } // end of class AbstractGraph

@@ -4,9 +4,10 @@ import java.util.EventListener;
 
 import edu.berkeley.guir.prefuse.event.EventMulticaster;
 import edu.berkeley.guir.prefuse.graph.Entity;
+import edu.berkeley.guir.prefuse.graph.external.GraphLoader;
 
 /**
- * Manages listeners for graph modification events.
+ * Manages listeners for graph data loading and unloading events.
  * 
  * @author newbergr
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
@@ -15,14 +16,20 @@ public class GraphLoaderMulticaster extends EventMulticaster
     implements GraphLoaderListener
 {
 
-	public void entityLoaded(Entity e) {
-	    ((GraphLoaderListener)a).entityLoaded(e);
-        ((GraphLoaderListener)b).entityLoaded(e);
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.event.GraphLoaderListener#entityLoaded(edu.berkeley.guir.prefuse.graph.external.GraphLoader, edu.berkeley.guir.prefuse.graph.Entity)
+     */
+	public void entityLoaded(GraphLoader loader, Entity e) {
+	    ((GraphLoaderListener)a).entityLoaded(loader, e);
+        ((GraphLoaderListener)b).entityLoaded(loader, e);
     } //
     
-    public void entityUnloaded(Entity e) {
-        ((GraphLoaderListener)a).entityUnloaded(e);
-        ((GraphLoaderListener)b).entityUnloaded(e);
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.event.GraphLoaderListener#entityUnloaded(edu.berkeley.guir.prefuse.graph.external.GraphLoader, edu.berkeley.guir.prefuse.graph.Entity)
+     */
+    public void entityUnloaded(GraphLoader loader, Entity e) {
+        ((GraphLoaderListener)a).entityUnloaded(loader, e);
+        ((GraphLoaderListener)b).entityUnloaded(loader, e);
     } //
 
 	public static GraphLoaderListener add(GraphLoaderListener a, GraphLoaderListener b) {

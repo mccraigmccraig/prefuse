@@ -1,173 +1,139 @@
 package edu.berkeley.guir.prefuse.graph;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 /**
- * Represents a node in a graph.
- * 
- * Apr 22, 2003 - jheer - Created class
- * 
+ * An interface representing a node in a graph.
+ *
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class Node extends AbstractEntity {
-	
-	// The type of list instance used to store children.
-	protected static final Class LIST_TYPE = ArrayList.class;
-	
-	protected List m_neighbors;
-	protected List m_edges;
-	
-	/**
-	 * Default constructor. Creates a new node.
-	 */
-	public Node() {
-		try {
-			m_neighbors = (List)LIST_TYPE.newInstance();
-			m_edges     = (List)LIST_TYPE.newInstance();
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		}
-	} //
-	
-	/**
-	 * Returns an iterator over all neighbor nodes of this node.
-	 * @return an iterator over this node's neighbors.
-	 */
-	public Iterator getNeighbors() {
-		return m_neighbors.iterator();
-	} //
-	
-	/**
-	 * Returns the i'th neighbor of this node.
-	 * @param i the index of the neighbor in the neighbor list.
-	 * @return Node the Node at the specified position in the list of
-	 *  neighbors
-	 */
-	public Node getNeighbor(int i) {
-		return (Node)m_neighbors.get(i);
-	} //
+public interface Node extends Entity {
 
-	/**
-	 * Indicates if a given node is a neighbor of this one.
-	 * @param n the node to check as a neighbor
-	 * @return true if the node is a neighbor, false otherwise
-	 */
-	public boolean isNeighbor(Node n) {
-		return ( m_neighbors.indexOf(n) > -1 );
-	} //
+    /**
+     * Adds an edge connecting this node to another node. The edge is added to
+     * the end of this node's internal list of edges.
+     * @param e the Edge to add
+     * @return true if the edge was added, false if the edge connects to a
+     *  node that is alrady a neighbor of this node.
+     */
+    public boolean addEdge(Edge e);
+    
+    /**
+     * Adds an edge connecting this node to another node at the specified 
+     * index.
+     * @param idx the index at which to insert the edge
+     * @param e the Edge to add
+     * @return true if the edge was added, false if the edge connects to a
+     *  node that is alrady a neighbor of this node.
+     */
+    public boolean addEdge(int idx, Edge e);
+    
+    /**
+     * Returns the edge connected to the given neighbor node.
+     * @param n the neighbor node for which to retrieve the edge
+     * @return the requested Edge
+     * @throws NoSuchElementException if the given node is not a neighbor of
+     *  this node.
+     */
+    public Edge getEdge(Node n);
+    
+    /**
+     * Returns the edge at the specified index.
+     * @param idx the index at which to retrieve the edge
+     * @return the requested Edge
+     */
+    public Edge getEdge(int idx);
+    
+    /**
+     * Returns the number of edges adjacent to this node.
+     * @return the number of adjacent edges. This is the same as the number
+     *  of neighbor nodes connected to this node.
+     */
+    public int getEdgeCount();
+    
+    /**
+     * Returns an iterator over all edges adjacent to this node.
+     * @return an iterator over all adjacent edges.
+     */
+    public Iterator getEdges();
+    
+    /**
+     * Returns the index, or position, of an incident edge. Returns -1 if the
+     * input edge is not incident on this node.
+     * @param e the edge to find the index of
+     * @return the edge index, or -1 if this edge is not incident
+     */
+    public int getIndex(Edge e);
+    
+    /**
+     * Returns the index, or position, of a neighbor node. Returns -1 if the
+     * input node is not a neighbor of this node.
+     * @param n the node to find the index of
+     * @return the node index, or -1 if this node is not a neighbor
+     */
+    public int getIndex(Node n);
+    
+    /**
+     * Returns the i'th neighbor of this node.
+     * @param i the index of the neighbor in the neighbor list.
+     * @return DefaultNode the DefaultNode at the specified position in the list of
+     *  neighbors
+     */
+    public Node getNeighbor(int idx);
+    
+    /**
+     * Returns an iterator over all neighbor nodes of this node.
+     * @return an iterator over this node's neighbors.
+     */
+    public Iterator getNeighbors();
 
-	/**
-	 * Returns the index, or position, of a neighbor node. Returns -1 if the
-	 * input node is not a neighbor of this node.
-	 * @param n the node to find the index of
-	 * @return the node index, or -1 if this node is not a neighbor
-	 */
-	public int getNeighborIndex(Node n) {
-		return m_neighbors.indexOf(n);
-	} //
-
-	/**
-	 * Return the total number of neighbors of this node.
-	 * @return the number of neighbors
-	 */
-	public int getNumNeighbors() {
-		return m_neighbors.size();
-	} //
-
-	/**
-	 * Add a new neighbor to this node.
-	 * @param n the node to add
-	 */
-	public void addNeighbor(Node n) {
-		if ( isNeighbor(n) )
-			throw new IllegalStateException("Node is already a neighbor!");
-		m_neighbors.add(n);
-		m_edges.add(new Edge(this,n));
-	} //
-	
-	/**
-	 * Add a new neighbor at the specified position.
-	 * @param i the index at which to insert the new neighbor
-	 * @param n the node to add as a neighbor
-	 */
-	public void addNeighbor(int i, Node n) {
-		if ( isNeighbor(n) )
-			throw new IllegalStateException("Node is already a neighbor!");
-		m_neighbors.add(i,n);
-		m_edges.add(i,new Edge(this,n));
-	} //
-	
-	/**
-	 * Remove the given node as a child of this node.
-	 * @param n the node to remove
-	 */
-	public boolean removeNeighbor(Node n) {
-		return ( removeNeighbor(getNeighborIndex(n)) != null );
-	} //
-
-	/**
-	 * Remove the neighbor node at the specified index.
-	 * @param i the index at which to remove a node
-	 */
-	public Node removeNeighbor(int i) {
-		Edge e = (Edge)m_edges.remove(i);
-		return (Node)m_neighbors.remove(i);
-	} //
-	
-	public Iterator getEdges() {
-		return m_edges.iterator();
-	} //
-	
-	public Edge getEdge(Node n) {
-		return (Edge)m_edges.get(m_neighbors.indexOf(n));
-	} //
-	
-	public Edge getEdge(int i) {
-		return (Edge)m_edges.get(i);
-	} //
-	
-	public boolean isIncidentEdge(Edge e) {
-		return ( m_edges.indexOf(e) > -1 );
-	} //
-	
-	public int getEdgeIndex(Edge e) {
-		return m_edges.indexOf(e);
-	} //
-	
-	public int getNumEdges() {
-		return m_edges.size();
-	} //
-	
-	public void addEdge(Edge e) {		
-		addEdge(m_edges.size(), e);
-	} //
-	
-	public void addEdge(int i, Edge e) {
-		Node n1 = (Node)e.getFirstNode();
-		Node n2 = (Node)e.getSecondNode();
-		if ( !e.isDirected() && n2 == this ) {
-			Node tmp = n1; n1 = n2; n2 = tmp;
-		}
-		if ( n1 != this ) {
-			throw new IllegalArgumentException(
-				"Edge must be incident on this Node!");
-		}
-		if ( isIncidentEdge(e) || isNeighbor(n2) )
-			throw new IllegalStateException("Node is already a neighbor!");		
-		m_edges.add(i,e);
-		m_neighbors.add(i,n2);		
-	} //
-	
-	public boolean removeEdge(Edge e) {
-		return ( removeEdge(m_edges.indexOf(e)) != null );
-	} //
-	
-	public Edge removeEdge(int i) {
-		m_neighbors.remove(i);
-		return (Edge)m_edges.remove(i);
-	} //
-	
-} // end of class Node
+    /**
+     * Indicates if a given edge is not only incident on this node
+     * but stored in this node's internal list of edges.
+     * @param e the edge to check for incidence
+     * @return true if the edge is incident on this node and stored in this
+     *  node's internal list of edges, false otherwise.
+     */
+    public boolean isIncidentEdge(Edge e);
+    
+    /**
+     * Indicates if a given node is a neighbor of this one.
+     * @param n the node to check as a neighbor
+     * @return true if the node is a neighbor, false otherwise
+     */
+    public boolean isNeighbor(Node n);
+    
+    /**
+     * Removes all edges incident on this node.
+     */
+    public void removeAllNeighbors();
+    
+    /**
+     * Remove the given edge as an incident edge on this node
+     * @param e the edge to remove
+     * @return true if the edge was found and removed, false otherwise
+     */
+    public boolean removeEdge(Edge e);
+    
+    /**
+     * Remove the incident edge at the specified index.
+     * @param idx the index at which to remove an edge
+     */
+    public Edge removeEdge(int idx);
+    
+    /**
+     * Remove the given node as a neighbor of this node. The edge connecting
+     * the nodes is also removed.
+     * @param n the node to remove
+     * @return true if the node was found and removed, false otherwise
+     */
+    public boolean removeNeighbor(Node n);
+    
+    /**
+     * Remove the neighbor node at the specified index.
+     * @param idx the index at which to remove a node
+     */
+    public Node removeNeighbor(int idx);
+    
+} // end of interface Node

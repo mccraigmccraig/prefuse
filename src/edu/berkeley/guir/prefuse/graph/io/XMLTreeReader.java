@@ -13,6 +13,9 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import edu.berkeley.guir.prefuse.graph.DefaultEdge;
+import edu.berkeley.guir.prefuse.graph.DefaultTree;
+import edu.berkeley.guir.prefuse.graph.DefaultTreeNode;
 import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.graph.Tree;
@@ -30,7 +33,7 @@ import edu.berkeley.guir.prefuse.graph.TreeNode;
  */
 public class XMLTreeReader extends AbstractTreeReader implements TreeReader {
 
-	protected Class NODE_TYPE = TreeNode.class;
+	protected Class NODE_TYPE = DefaultTreeNode.class;
 
 	/**
 	 * @see edu.berkeley.guir.prefuse.graph.io.GraphReader#loadGraph(java.io.InputStream)
@@ -89,12 +92,12 @@ public class XMLTreeReader extends AbstractTreeReader implements TreeReader {
 		
 		public void endDocument() {
 			// construct graph
-			//TreeNode root = (TreeNode)m_nodeMap.values().iterator().next();
+			//DefaultTreeNode root = (DefaultTreeNode)m_nodeMap.values().iterator().next();
 			//while ( root.getParent() != null ) {
 			//	root = root.getParent();
 			//}
-			TreeNode root = (TreeNode)m_nodeMap.get("Top");
-			m_tree = new Tree(root);
+			DefaultTreeNode root = (DefaultTreeNode)m_nodeMap.get("Top");
+			m_tree = new DefaultTree(root);
 		} //
 		
 		public void endElement(String namespaceURI, String localName, String qName) {
@@ -182,7 +185,7 @@ public class XMLTreeReader extends AbstractTreeReader implements TreeReader {
 				return null;
 			}
 
-			Edge e = new Edge(s,t,m_directed);
+			Edge e = new DefaultEdge(s,t,m_directed);
 			s.addChild(e);
 			return e;
 		} //

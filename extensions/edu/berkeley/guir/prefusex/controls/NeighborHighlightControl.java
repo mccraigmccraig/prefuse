@@ -50,7 +50,7 @@ public class NeighborHighlightControl extends ControlAdapter {
             Iterator iter = n.getEdges();
             while ( iter.hasNext() ) {
                 EdgeItem eitem = (EdgeItem)iter.next();
-                NodeItem nitem = eitem.getOtherNode(n);
+                NodeItem nitem = eitem.getAdjacentNode(n);
                 eitem.setVizAttribute("highlight", val);
                 nitem.setVizAttribute("highlight", val);
             }

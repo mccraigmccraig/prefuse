@@ -4,46 +4,64 @@ import java.util.EventListener;
 
 import edu.berkeley.guir.prefuse.event.EventMulticaster;
 import edu.berkeley.guir.prefuse.graph.Edge;
+import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.Node;
 
 /**
  * Manages listeners for graph modification events.
  * 
  * @author newbergr
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class GraphEventMulticaster extends EventMulticaster 
     implements GraphEventListener
 {
-
-	public void nodeAdded(Node n) {
-		((GraphEventListener) a).nodeAdded(n);
-		((GraphEventListener) b).nodeAdded(n);
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeAdded(edu.berkeley.guir.prefuse.graph.Graph, edu.berkeley.guir.prefuse.graph.Node)
+     */
+	public void nodeAdded(Graph g, Node n) {
+		((GraphEventListener) a).nodeAdded(g,n);
+		((GraphEventListener) b).nodeAdded(g,n);
 	} //
 
-	public void nodeRemoved(Node n) {
-		((GraphEventListener) a).nodeRemoved(n);
-		((GraphEventListener) b).nodeRemoved(n);
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeRemoved(edu.berkeley.guir.prefuse.graph.Graph, edu.berkeley.guir.prefuse.graph.Node)
+     */
+	public void nodeRemoved(Graph g, Node n) {
+		((GraphEventListener) a).nodeRemoved(g,n);
+		((GraphEventListener) b).nodeRemoved(g,n);
 	} //
 
-	public void nodeReplaced(Node o, Node n) {
-		((GraphEventListener) a).nodeReplaced(o,n);
-		((GraphEventListener) b).nodeReplaced(o,n);		
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeReplaced(edu.berkeley.guir.prefuse.graph.Graph, edu.berkeley.guir.prefuse.graph.Node, edu.berkeley.guir.prefuse.graph.Node)
+     */
+	public void nodeReplaced(Graph g, Node o, Node n) {
+		((GraphEventListener) a).nodeReplaced(g,o,n);
+		((GraphEventListener) b).nodeReplaced(g,o,n);		
 	} //
 
-	public void edgeAdded(Edge e) {
-		((GraphEventListener) a).edgeAdded(e);
-		((GraphEventListener) b).edgeAdded(e);
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeAdded(edu.berkeley.guir.prefuse.graph.Graph, edu.berkeley.guir.prefuse.graph.Edge)
+     */
+	public void edgeAdded(Graph g, Edge e) {
+		((GraphEventListener) a).edgeAdded(g,e);
+		((GraphEventListener) b).edgeAdded(g,e);
 	} //
 
-	public void edgeRemoved(Edge e) {
-		((GraphEventListener) a).edgeRemoved(e);
-		((GraphEventListener) b).edgeRemoved(e);
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeRemoved(edu.berkeley.guir.prefuse.graph.Graph, edu.berkeley.guir.prefuse.graph.Edge)
+     */
+	public void edgeRemoved(Graph g, Edge e) {
+		((GraphEventListener) a).edgeRemoved(g,e);
+		((GraphEventListener) b).edgeRemoved(g,e);
 	} //
 
-	public void edgeReplaced(Edge o, Edge n) {
-		((GraphEventListener) a).edgeReplaced(o,n);
-		((GraphEventListener) b).edgeReplaced(o,n);		
+    /**
+     * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeReplaced(edu.berkeley.guir.prefuse.graph.Graph, edu.berkeley.guir.prefuse.graph.Edge, edu.berkeley.guir.prefuse.graph.Edge)
+     */
+	public void edgeReplaced(Graph g, Edge o, Edge n) {
+		((GraphEventListener) a).edgeReplaced(g,o,n);
+		((GraphEventListener) b).edgeReplaced(g,o,n);		
 	} //
 
 	public static GraphEventListener add(GraphEventListener a, GraphEventListener b) {
