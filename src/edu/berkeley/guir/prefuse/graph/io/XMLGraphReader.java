@@ -198,9 +198,6 @@ public class XMLGraphReader extends AbstractGraphReader	implements GraphReader {
 			if ( label != null ) e.setAttribute(LABEL, label);
 			if ( weight != null ) e.setAttribute(WEIGHT, weight);
 			
-			s.addEdge(e);
-			if ( !m_directed )
-				t.addEdge(e);
             m_graph.addEdge(e);
 			return e;
 		} //
