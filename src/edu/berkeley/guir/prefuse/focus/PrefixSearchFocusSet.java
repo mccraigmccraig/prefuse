@@ -37,7 +37,7 @@ import edu.berkeley.guir.prefuse.util.Trie;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class KeywordSearchFocusSet implements FocusSet {
+public class PrefixSearchFocusSet implements FocusSet {
 
     private FocusListener m_listener = null;
     private LinkedHashSet m_set = new LinkedHashSet();
@@ -49,7 +49,7 @@ public class KeywordSearchFocusSet implements FocusSet {
     /**
      * Creates a new KeywordSearchFocusSet that is not case sensitive.
      */
-    public KeywordSearchFocusSet() {
+    public PrefixSearchFocusSet() {
         this(false);
     } //
     
@@ -58,7 +58,7 @@ public class KeywordSearchFocusSet implements FocusSet {
      * @param caseSensitive true if the search routines should be case
      * sensitive, false otherwise.
      */
-    public KeywordSearchFocusSet(boolean caseSensitive) {
+    public PrefixSearchFocusSet(boolean caseSensitive) {
         m_trie = new Trie(caseSensitive);
     } //
     
@@ -137,7 +137,7 @@ public class KeywordSearchFocusSet implements FocusSet {
      * @return a Tree of the Trie
      */
     public static Tree getTree(Iterator entities, String attrName) {
-        KeywordSearchFocusSet set = new KeywordSearchFocusSet(false);
+        PrefixSearchFocusSet set = new PrefixSearchFocusSet(false);
         set.index(entities, attrName);
         return set.m_trie.tree();
     } //

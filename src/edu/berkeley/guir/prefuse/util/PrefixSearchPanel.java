@@ -29,7 +29,7 @@ import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.event.ItemRegistryListener;
 import edu.berkeley.guir.prefuse.focus.FocusSet;
-import edu.berkeley.guir.prefuse.focus.KeywordSearchFocusSet;
+import edu.berkeley.guir.prefuse.focus.PrefixSearchFocusSet;
 import edu.berkeley.guir.prefuse.graph.Entity;
 
 /**
@@ -38,10 +38,10 @@ import edu.berkeley.guir.prefuse.graph.Entity;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> vizster(AT)jheer.org
  */
-public class KeywordSearchPanel extends JPanel
+public class PrefixSearchPanel extends JPanel
     implements DocumentListener, ActionListener
 {
-    private KeywordSearchFocusSet searcher;
+    private PrefixSearchFocusSet searcher;
     private FocusSet focus;
 
     private JTextField queryF   = new JTextField(15);
@@ -57,28 +57,28 @@ public class KeywordSearchPanel extends JPanel
     private Entity m_results[];
     private int    m_curResult;
 
-    public KeywordSearchPanel(String[] attr, ItemRegistry registry) {
+    public PrefixSearchPanel(String[] attr, ItemRegistry registry) {
         searchAttr = attr;
         FocusManager fmanager = registry.getFocusManager();
         focus = fmanager.getDefaultFocusSet();
         FocusSet search = registry.getFocusManager()
         					.getFocusSet(FocusManager.SEARCH_KEY);
         if ( search != null ) {
-            if ( search instanceof KeywordSearchFocusSet ) {
-                searcher = (KeywordSearchFocusSet)search;
+            if ( search instanceof PrefixSearchFocusSet ) {
+                searcher = (PrefixSearchFocusSet)search;
             } else {
                 throw new IllegalStateException(
                     "Search focus set not instance of KeywordSearchFocusSet!");
             }
         } else {
-            searcher = new KeywordSearchFocusSet();
+            searcher = new PrefixSearchFocusSet();
             fmanager.putFocusSet(FocusManager.SEARCH_KEY, searcher);
         }
         init(registry);
     } //
     
-    public KeywordSearchPanel(String[] attr, ItemRegistry registry, 
-            KeywordSearchFocusSet searchSet, FocusSet focusSet) {
+    public PrefixSearchPanel(String[] attr, ItemRegistry registry, 
+            PrefixSearchFocusSet searchSet, FocusSet focusSet) {
         searchAttr = attr;
         searcher = searchSet;
         focus = focusSet;
