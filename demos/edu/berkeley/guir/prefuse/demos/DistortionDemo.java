@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -18,22 +16,20 @@ import javax.swing.JRadioButton;
 
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.ItemRegistry;
-import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.ActionMap;
 import edu.berkeley.guir.prefuse.action.ActionSwitch;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
-import edu.berkeley.guir.prefuse.action.assignment.Layout;
 import edu.berkeley.guir.prefuse.action.filter.GraphFilter;
 import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.activity.ActivityMap;
 import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.GraphLib;
-import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefusex.controls.AnchorUpdateControl;
 import edu.berkeley.guir.prefusex.controls.DragControl;
 import edu.berkeley.guir.prefusex.distortion.BifocalDistortion;
 import edu.berkeley.guir.prefusex.distortion.Distortion;
 import edu.berkeley.guir.prefusex.distortion.FisheyeDistortion;
+import edu.berkeley.guir.prefusex.layout.GridLayout;
 
 /**
  * Demonstration illustrating the use of distortion transformations on
@@ -92,31 +88,6 @@ public class DistortionDemo extends JFrame {
         display.addMouseListener(auc);
         display.addMouseMotionListener(auc);
     } //
-    
-    class GridLayout extends Layout {
-        public void run(ItemRegistry registry, double frac) {
-            Rectangle2D b = getLayoutBounds(registry);
-            double bx = b.getMinX(), by = b.getMinY();
-            double w = b.getWidth(), h = b.getHeight();
-            int m, n;
-            Graph g = (Graph)registry.getGraph();
-            Iterator iter = g.getNodes(); iter.next();
-            for ( n=2; iter.hasNext(); n++ ) {
-                Node nd = (Node)iter.next();
-                if ( nd.getEdgeCount() == 2 )
-                    break;
-            }
-            m = g.getNodeCount() / n;
-            iter = g.getNodes();
-            for ( int i=0; iter.hasNext(); i++ ) {
-                Node nd = (Node)iter.next();
-                NodeItem ni = registry.getNodeItem(nd);
-                double x = bx + w*((i%n)/(double)(n-1));
-                double y = by + h*((i/n)/(double)(m-1));
-                setLocation(ni,null,x,y);
-            }
-        } //
-    } // end of inner class GridLayout
     
     class SwitchPanel extends JPanel implements ActionListener {
         public static final String BIFOCAL = "Bifocal";
