@@ -440,6 +440,32 @@ public class ItemRegistry {
 		}
 	} //
 
+    private void sortAll() {
+        Iterator entryIter = m_entryList.iterator();
+        while ( entryIter.hasNext() ) {
+            ItemEntry entry = (ItemEntry)entryIter.next();
+            if ( entry.modified ) {
+                Collections.sort(entry.itemList, m_comparator);
+                entry.modified = false;
+            }
+        }
+    } //
+    
+    /**
+     * Returns all the VisualItems in the registry. Items are returned 
+     * in their rendering order. This order is determined by the item 
+     * comparator. The setItemComparator() method can
+     * be used to control this ordering.
+     * @param visibleOnly determines if only currently visible items should
+     *  be included in the iteration.
+     * @return iterator over all VisualItems, in rendering order
+     */
+    public synchronized Iterator getItems(boolean visibleOnly) {
+        sortAll();
+        return new CompositeItemIterator(m_entryList,
+                        m_comparator,visibleOnly,false);
+    } //
+    
 	/**
 	 * Returns all the visible VisualItems in the registry. The order items 
 	 * are returned will determine their rendering order. This order is 
@@ -448,15 +474,8 @@ public class ItemRegistry {
 	 * @return iterator over all visible VisualItems, in rendering order
 	 */
 	public synchronized Iterator getItems() {
-		Iterator entryIter = m_entryList.iterator();
-		while ( entryIter.hasNext() ) {
-			ItemEntry entry = (ItemEntry)entryIter.next();
-			if ( entry.modified ) {
-				Collections.sort(entry.itemList, m_comparator);
-				entry.modified = false;
-			}
-		}
-		return new CompositeItemIterator(m_entryList,m_comparator,false);
+	    sortAll();
+		return new CompositeItemIterator(m_entryList,m_comparator,true,false);
 	} //
 
 	/**
@@ -466,15 +485,8 @@ public class ItemRegistry {
 	 * @return iterator over all visible VisualItems, in reverse rendering order
 	 */
 	public synchronized Iterator getItemsReversed() {
-		Iterator entryIter = m_entryList.iterator();
-		while ( entryIter.hasNext() ) {
-			ItemEntry entry = (ItemEntry)entryIter.next();
-			if ( entry.modified ) {
-				Collections.sort(entry.itemList, m_comparator);
-				entry.modified = false;
-			}
-		}
-		return new CompositeItemIterator(m_entryList,m_comparator,true);
+		sortAll();
+		return new CompositeItemIterator(m_entryList,m_comparator,true,true);
 	} //
 
     /**

@@ -1,6 +1,3 @@
-/*
- * Created on Apr 24, 2003
- */
 package edu.berkeley.guir.prefuse.collections;
 
 import java.util.Comparator;
@@ -32,7 +29,8 @@ public class CompositeItemIterator implements Iterator {
 	 * @param c the Comparator used to order the objects
 	 * @param reverse indicates whether or not to iterate in <i>reverse</i> order.
 	 */
-	public CompositeItemIterator(List itemLists, Comparator c, boolean reverse)
+	public CompositeItemIterator(List itemLists, Comparator c, 
+            boolean visibleOnly, boolean reverse)
 	{
 		int size = itemLists.size();
 		m_emptyCount = 0;
@@ -40,8 +38,15 @@ public class CompositeItemIterator implements Iterator {
 		m_item = new Object[size];
 		for ( int i = 0; i < size; i++ ) {
 			List itemList = ((ItemEntry)itemLists.get(i)).getItemList();
-			m_iter[i] = new VisibleItemIterator(itemList, reverse);
-			if ( m_iter[i].hasNext() ) {
+            // get the right kind of iterator
+            if ( visibleOnly )
+                m_iter[i] = new VisibleItemIterator(itemList, reverse);
+            else if ( reverse )
+                m_iter[i] = new ReverseListIterator(itemList);
+            else 
+                m_iter[i] = itemList.iterator();
+			// initialize item pool
+            if ( m_iter[i].hasNext() ) {
 				m_item[i] = m_iter[i].next();
 			} else {
 				m_emptyCount++;
