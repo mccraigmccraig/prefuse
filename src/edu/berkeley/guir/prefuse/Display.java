@@ -31,6 +31,8 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 
+import edu.berkeley.guir.prefuse.activity.Activity;
+import edu.berkeley.guir.prefuse.activity.SlowInSlowOutPacer;
 import edu.berkeley.guir.prefuse.event.ControlEventMulticaster;
 import edu.berkeley.guir.prefuse.event.ControlListener;
 import edu.berkeley.guir.prefuse.render.Renderer;
@@ -79,9 +81,14 @@ public class Display extends JComponent {
 	protected ControlListener m_listener;
 	protected BufferedImage   m_offscreen;
     protected Clip            m_clip = new Clip();
+    protected boolean         m_showDebug = false;
+    protected boolean         m_repaint = false;
+    protected boolean         m_highQuality = false;
     
-    protected AffineTransform m_transform  = new AffineTransform();
-    protected AffineTransform m_itransform = new AffineTransform();
+    // transform variables
+    protected AffineTransform   m_transform  = new AffineTransform();
+    protected AffineTransform   m_itransform = new AffineTransform();
+    protected TransformActivity m_transact = new TransformActivity();
     protected Point2D m_tmpPoint = new Point2D.Double();
     
     // frame count and debugging output
@@ -89,11 +96,11 @@ public class Display extends JComponent {
     protected int  nframes = 0;
     private int  sampleInterval = 10;
     private long mark = -1L;
-    private boolean m_showDebug = false;
     
+    // text editing variables
     private JTextComponent m_editor;
     private boolean        m_editing;
-    private VisualItem      m_editItem;
+    private VisualItem     m_editItem;
     private String         m_editAttribute;
     
     private ToolTipManager m_ttipManager;
@@ -210,6 +217,16 @@ public class Display extends JComponent {
     } //
     
     /**
+     * Determines if the Display uses a higher quality rendering, using
+     * anti-aliasing. This causes drawing to be much slower, however, and
+     * so is disabled by default.
+     * @param on true to enable anti-aliased rendering, false to disable it
+     */
+    public void setHighQuality(boolean on) {
+        m_highQuality = on;
+    } //
+    
+    /**
      * Returns the item registry used by this display.
      * @return this Display's ItemRegistry
      */
@@ -291,6 +308,34 @@ public class Display extends JComponent {
     } //
     
     /**
+     * Returns the current scale (i.e. zoom value).
+     * @return the current scale. This is the
+     *  scaling factor along the x-dimension, so be careful when
+     *  using this value in non-uniform scaling cases.
+     */
+    public double getScale() {
+        return m_transform.getScaleX();
+    } //
+    
+    /**
+     * Returns the x-coordinate of the top-left of the display, 
+     * in absolute co-ordinates
+     * @return the x co-ord of the top-left corner, in absolute coordinates
+     */
+    public double getDisplayX() {
+        return -m_transform.getTranslateX();
+    } //
+    
+    /**
+     * Returns the y-coordinate of the top-left of the display, 
+     * in absolute co-ordinates
+     * @return the y co-ord of the top-left corner, in absolute coordinates
+     */
+    public double getDisplayY() {
+        return -m_transform.getTranslateY();
+    } //
+    
+    /**
      * Pans the view provided by this display in screen coordinates.
      * @param dx the amount to pan along the x-dimension, in pixel units
      * @param dy the amount to pan along the y-dimension, in pixel units
@@ -308,6 +353,37 @@ public class Display extends JComponent {
      * @param dy the amount to pan along the y-dimension, in absolute co-ords
      */
     public void panAbs(double dx, double dy) {
+        m_transform.translate(dx, dy);
+        try {
+            m_itransform = m_transform.createInverse();
+        } catch ( Exception e ) { /*will never happen here*/ }
+    } //
+    
+    /**
+     * Pans the display view to center on the provided point in 
+     * screen (pixel) coordinates.
+     * @param x the x-point to center on, in screen co-ords
+     * @param y the y-point to center on, in screen co-ords
+     */
+    public void panTo(Point2D p) {
+        m_itransform.transform(p, m_tmpPoint);
+        panToAbs(m_tmpPoint);
+    } //
+    
+    /**
+     * Pans the display view to center on the provided point in 
+     * absolute (i.e. non-screen) coordinates.
+     * @param x the x-point to center on, in absolute co-ords
+     * @param y the y-point to center on, in absolute co-ords
+     */
+    public void panToAbs(Point2D p) {
+        double x = p.getX(); x = (Double.isNaN(x) ? 0 : x);
+        double y = p.getY(); y = (Double.isNaN(y) ? 0 : y);
+        double w = getWidth() /(2*m_transform.getScaleX());
+        double h = getHeight()/(2*m_transform.getScaleY());
+        
+        double dx = w-x-m_transform.getTranslateX();
+        double dy = h-y-m_transform.getTranslateY();
         m_transform.translate(dx, dy);
         try {
             m_itransform = m_transform.createInverse();
@@ -341,6 +417,104 @@ public class Display extends JComponent {
             m_itransform = m_transform.createInverse();
         } catch ( Exception e ) { /*will never happen here*/ }
     } //
+
+    public void animatePan(double dx, double dy, long duration) {
+        double panx = dx / m_transform.getScaleX();
+        double pany = dy / m_transform.getScaleY();
+        animatePanAbs(panx,pany,duration);
+    } //
+    
+    public void animatePanAbs(double dx, double dy, long duration) {
+        m_transact.pan(dx,dy,duration);
+    } //
+    
+    public void animatePanTo(Point2D p, long duration) {
+        Point2D pp = new Point2D.Double();
+        m_itransform.transform(p,pp);
+        animatePanToAbs(pp,duration);
+    } //
+    
+    public void animatePanToAbs(Point2D p, long duration) {
+        m_tmpPoint.setLocation(0,0);
+        m_itransform.transform(m_tmpPoint,m_tmpPoint);
+        double x = p.getX(); x = (Double.isNaN(x) ? 0 : x);
+        double y = p.getY(); y = (Double.isNaN(y) ? 0 : y);
+        double w = ((double)getWidth()) /(2*m_transform.getScaleX());
+        double h = ((double)getHeight())/(2*m_transform.getScaleY());
+        double dx = w-x+m_tmpPoint.getX();
+        double dy = h-y+m_tmpPoint.getY();
+        animatePanAbs(dx,dy,duration);
+    } //
+    
+    public void animateZoom(final Point2D p, double scale, long duration) {
+        Point2D pp = new Point2D.Double();
+        m_itransform.transform(p,pp);
+        animateZoomAbs(pp,scale,duration);
+    } //
+    
+    public void animateZoomAbs(final Point2D p, double scale, long duration) {
+        m_transact.zoom(p,scale,duration);
+    } //
+    
+    /**
+     * TODO: clean this up to be more general...
+     * TODO: change mechanism so that multiple transform
+     *        activities can be running at once?
+     */
+    private class TransformActivity extends Activity {
+        private double[] src, dst;
+        private AffineTransform m_at;
+        public TransformActivity() {
+            super(2000,20,0);
+            src = new double[6];
+            dst = new double[6];
+            m_at = new AffineTransform();
+            setPacingFunction(new SlowInSlowOutPacer());
+        } //
+        private AffineTransform getTransform() {
+            if ( this.isScheduled() )
+                m_at.setTransform(dst[0],dst[1],dst[2],dst[3],dst[4],dst[5]);
+            else
+                m_at.setTransform(m_transform);
+            return m_at;
+        } //
+        public void pan(double dx, double dy, long duration) {
+            AffineTransform at = getTransform();
+            this.cancel();
+            setDuration(duration);
+            at.translate(dx,dy);
+            at.getMatrix(dst);
+            m_transform.getMatrix(src);
+            this.runNow();
+        } //
+        public void zoom(final Point2D p, double scale, long duration) {
+            AffineTransform at = getTransform();
+            this.cancel();
+            setDuration(duration);
+            double zx = p.getX(), zy = p.getY();
+            at.translate(zx, zy);
+            at.scale(scale,scale);
+            at.translate(-zx, -zy);
+            at.getMatrix(dst);
+            m_transform.getMatrix(src);
+            this.runNow();
+        } //
+        protected void run(long elapsedTime) {
+            double f = getPace(elapsedTime);
+            m_transform.setTransform(
+                src[0] + f*(dst[0]-src[0]),
+                src[1] + f*(dst[1]-src[1]),
+                src[2] + f*(dst[2]-src[2]),
+                src[3] + f*(dst[3]-src[3]),
+                src[4] + f*(dst[4]-src[4]),
+                src[5] + f*(dst[5]-src[5])
+            );
+            try {
+                m_itransform = m_transform.createInverse();
+            } catch ( Exception e ) { /* won't happen */ }
+            repaint();
+        } //
+    } // end of inner class TransformActivity
     
     // ========================================================================
     // == RENDERING METHODS ===================================================
@@ -368,6 +542,13 @@ public class Display extends JComponent {
 		paint(g);
 	} //
 
+    public void repaint() {
+        if ( !m_repaint ) {
+            m_repaint = true;
+            super.repaint();
+        }
+    } //
+    
     /**
      * Paints the offscreen buffer to the provided graphics context.
      * @param g the Graphics context to paint to
@@ -412,8 +593,9 @@ public class Display extends JComponent {
 	 * @param g the Graphics context on which to set the rendering hints
 	 */
 	protected void setRenderingHints(Graphics2D g) {
-		//g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-		//					RenderingHints.VALUE_ANTIALIAS_ON);
+		if ( m_highQuality )
+		    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+		            RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setRenderingHint(
 			RenderingHints.KEY_INTERPOLATION,
 			RenderingHints.VALUE_INTERPOLATION_BICUBIC);
@@ -474,7 +656,7 @@ public class Display extends JComponent {
         // show debugging info?
 		if ( m_showDebug ) {
             g2D.setFont(getFont());
-            g2D.setColor(Color.BLACK);
+            g2D.setColor(getForeground());
             g2D.drawString(getDebugString(), 5, 15);     
         }
 
@@ -490,6 +672,7 @@ public class Display extends JComponent {
                 VisualItem vi = (VisualItem) items.next();
                 Renderer renderer = vi.getRenderer();
                 Rectangle2D b = renderer.getBoundsRef(vi);
+                
                 if ( m_clip.intersects(b) )
                     renderer.render(g2D, vi);
             }
@@ -499,6 +682,7 @@ public class Display extends JComponent {
 
 		paintBufferToScreen(g);		
 		g2D.dispose();
+        m_repaint = false;
         
         // compute frame rate
         nframes++;
