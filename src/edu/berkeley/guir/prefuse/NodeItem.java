@@ -126,7 +126,11 @@ public class NodeItem extends GraphItem {
 		EdgeItem e = (EdgeItem)m_edges.remove(i);
 		return (NodeItem)m_neighbors.remove(i);
 	} //
-	
+
+    public Iterator getNeighbors() {
+        return m_neighbors.iterator();
+    } //
+    
 	public Iterator getEdges() {
 		return m_edges.iterator();
 	} //

@@ -51,6 +51,15 @@ public class EdgeItem extends GraphItem {
 		return ((Edge)m_entity).isDirected();
 	} //
 	
+    public NodeItem getOtherNode(NodeItem nitem) {
+        if ( m_node1 == nitem )
+            return m_node2;
+        else if ( m_node2 == nitem )
+            return m_node1;
+        else
+            throw new IllegalArgumentException("Input NodeItem is incident on this Edge.");
+    } //
+    
 	/**
 	 * Return the GraphItem representing the first (source) node in the edge.
 	 * @return the first (source) GraphItem

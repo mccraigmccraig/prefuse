@@ -46,7 +46,7 @@ public class TextItemRenderer extends ShapeRenderer {
 		m_buff = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
 		m_g = (Graphics2D)m_buff.getGraphics();
 		
-		((RoundRectangle2D)m_textBox).setRoundRect(0,0,10,10,10,5);
+		((RoundRectangle2D)m_textBox).setRoundRect(0,0,10,10,10,2);
 	} //
 
 	public void setFont(Font f) {

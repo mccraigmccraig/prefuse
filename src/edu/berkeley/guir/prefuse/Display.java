@@ -36,6 +36,11 @@ public class Display extends Canvas {
 	protected ItemRegistry    m_itemRegistry;
 	protected ControlListener m_listener;
 	protected BufferedImage   m_offscreen;
+    
+    protected double frameRate;
+    private int  nframes = 0;
+    private int  sampleInterval = 10;
+    private long mark = -1L;
 	
 	/**
 	 * Constructor. Creates a new display instance.
@@ -191,7 +196,19 @@ public class Display extends Canvas {
 		postPaint(g2D);
 
 		paintBufferToScreen(g);		
-		g2D.dispose();		
+		g2D.dispose();
+        
+        // compute frame rate
+        nframes++;
+        if ( mark < 0 ) {
+            mark = System.currentTimeMillis();
+            nframes = 0;
+        } else if ( nframes == sampleInterval ){
+            long t = System.currentTimeMillis();
+            frameRate = (1000.0*nframes)/(t-mark);
+            mark = t;
+            nframes = 0;
+        }
 	} //
 
 	public void clearRegion(Rectangle r) {
