@@ -1,4 +1,4 @@
-package edu.berkeley.guir.prefuse.util;
+package edu.berkeley.guir.prefuse.focus;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +11,7 @@ import edu.berkeley.guir.prefuse.event.FocusEventMulticaster;
 import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.graph.Entity;
 import edu.berkeley.guir.prefuse.graph.Tree;
+import edu.berkeley.guir.prefuse.util.Trie;
 
 /**
  * <p>
@@ -187,7 +188,7 @@ public class KeywordSearchFocusSet implements FocusSet {
     
     /**
      * Clears this focus set, invalidating any previous search.
-     * @see edu.berkeley.guir.prefuse.util.FocusSet#clear()
+     * @see edu.berkeley.guir.prefuse.focus.FocusSet#clear()
      */
     public void clear() {
         m_curNode = null;

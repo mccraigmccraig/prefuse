@@ -12,9 +12,9 @@ import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
+import edu.berkeley.guir.prefuse.focus.DefaultFocusSet;
+import edu.berkeley.guir.prefuse.focus.FocusSet;
 import edu.berkeley.guir.prefuse.graph.Entity;
-import edu.berkeley.guir.prefuse.util.DefaultFocusSet;
-import edu.berkeley.guir.prefuse.util.FocusSet;
 
 /**
  * Manages a focus set of selected items, adding or removing items from

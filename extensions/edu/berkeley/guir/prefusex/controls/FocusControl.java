@@ -11,7 +11,7 @@ import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
-import edu.berkeley.guir.prefuse.util.FocusSet;
+import edu.berkeley.guir.prefuse.focus.FocusSet;
 
 /**
  * Sets the current focus (according to the ItemRegistry's default focus

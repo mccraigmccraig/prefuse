@@ -15,13 +15,13 @@ import edu.berkeley.guir.prefuse.collections.VisibleItemIterator;
 import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.event.ItemRegistryListener;
 import edu.berkeley.guir.prefuse.event.RegistryEventMulticaster;
+import edu.berkeley.guir.prefuse.focus.FocusSet;
 import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Entity;
 import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.RendererFactory;
-import edu.berkeley.guir.prefuse.util.FocusSet;
 
 /**
  * <p>

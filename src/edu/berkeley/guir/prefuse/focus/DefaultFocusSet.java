@@ -1,4 +1,4 @@
-package edu.berkeley.guir.prefuse.util;
+package edu.berkeley.guir.prefuse.focus;
 
 import java.util.ArrayList;
 import java.util.Collection;

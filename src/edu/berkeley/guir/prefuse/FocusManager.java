@@ -3,16 +3,16 @@ package edu.berkeley.guir.prefuse;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import edu.berkeley.guir.prefuse.focus.DefaultFocusSet;
+import edu.berkeley.guir.prefuse.focus.FocusSet;
 import edu.berkeley.guir.prefuse.graph.Entity;
-import edu.berkeley.guir.prefuse.util.DefaultFocusSet;
-import edu.berkeley.guir.prefuse.util.FocusSet;
 
 /**
  * This class helps manage focus and/or selected items in a visualization.
  * It assumes there is at most a single user-selected focus, corresponding
  * to the user's current locus of attention (e.g. a moused-over, or previously
  * clicked item). However, there can also be any number of other 
- * {@link edu.berkeley.guir.prefuse.util.FocusSet FocusSets},
+ * {@link edu.berkeley.guir.prefuse.focus.FocusSet FocusSets},
  * including search results, or multiple user selections. This class supports 
  * the storage, retrieval, and monitoring of such focus items and sets. Because
  * potential focus items may not yet be visualized, focus sets store

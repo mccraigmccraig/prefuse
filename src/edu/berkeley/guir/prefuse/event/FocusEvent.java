@@ -2,8 +2,8 @@ package edu.berkeley.guir.prefuse.event;
 
 import java.util.EventObject;
 
+import edu.berkeley.guir.prefuse.focus.FocusSet;
 import edu.berkeley.guir.prefuse.graph.Entity;
-import edu.berkeley.guir.prefuse.util.FocusSet;
 
 /**
  * 
