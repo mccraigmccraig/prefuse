@@ -21,9 +21,15 @@ import edu.berkeley.guir.prefuse.event.ControlAdapter;
  */
 public class FocusControl extends ControlAdapter {
 
+    private int ccount;
     private Activity update = null;
     
     public FocusControl() {
+        this(1);
+    } //
+    
+    public FocusControl(int clicks) {
+        ccount = clicks;
     } //
     
     public FocusControl(Activity update) {
@@ -41,7 +47,7 @@ public class FocusControl extends ControlAdapter {
     } //
     
     public void itemClicked(GraphItem item, MouseEvent e) {
-        if ( SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1 ) {
+        if ( SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == ccount ) {
             ItemRegistry registry = item.getItemRegistry();
             registry.getDefaultFocusSet().set(item.getEntity());
             if ( update != null )
