@@ -32,6 +32,8 @@ import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.io.HDirTreeReader;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.ShapeRenderer;
+import edu.berkeley.guir.prefusex.controls.PanHandler;
+import edu.berkeley.guir.prefusex.controls.ZoomHandler;
 import edu.berkeley.guir.prefusex.layout.SquarifiedTreeMapLayout;
 
 /**
@@ -50,11 +52,13 @@ public class TreeMapDemo extends JFrame {
         super("prefuse TreeMap Demo");
         
         try {
-            // load graph
+            // load graph and initialize the item registry
             Tree tree = (new HDirTreeReader()).loadTree(TREE_CHI);
             registry = new ItemRegistry(tree);
             registry.setRendererFactory(new DefaultRendererFactory(
                 new NodeRenderer(), null, null));
+            // make sure we draw from larger->smaller to prevent
+            // occlusion from parent node boxes
             registry.setItemComparator(new Comparator() {
                 public int compare(Object o1, Object o2) {
                     double s1 = ((GraphItem)o1).getSize();
@@ -63,8 +67,16 @@ public class TreeMapDemo extends JFrame {
                 } //
             });
             
+            // initialize our display
             Display display = new Display();
             display.setRegistry(registry);
+            display.setUseCustomTooltips(true);
+            PanHandler  pH = new PanHandler();
+            ZoomHandler zH = new ZoomHandler();
+            display.addMouseListener(pH);
+            display.addMouseMotionListener(pH);
+            display.addMouseListener(zH);
+            display.addMouseMotionListener(zH);
             display.addControlListener(new ControlAdapter() {
                public void itemEntered(GraphItem item, MouseEvent e) {
                    Display d = (Display)e.getSource();
@@ -77,11 +89,12 @@ public class TreeMapDemo extends JFrame {
             });
             display.setSize(700,700);
             
+            // create the single filtering and layout pipeline
             ActionPipeline filter = new ActionPipeline(registry);
             filter.add(new GraphNodeFilter());
-            filter.add(new TreeEdgeFilter());
+            filter.add(new TreeEdgeFilter(false));
             filter.add(new TreeMapSizeFunction());
-            filter.add(new SquarifiedTreeMapLayout());
+            filter.add(new SquarifiedTreeMapLayout(4));
             filter.add(new TreeMapColorFunction());
             filter.add(new RepaintAction());
             
@@ -114,7 +127,12 @@ public class TreeMapDemo extends JFrame {
             return Color.WHITE;
         } //
         public Paint getFillColor(GraphItem item) {
-            return new Color(0.5f,0.5f,(float)Math.random());
+            float c;
+            if ( item instanceof NodeItem )
+                c = Math.max(0,1-(((float)((NodeItem)item).getDepth())/8.0f));
+            else
+                c = 0.5f;
+            return new Color(0.5f,0.5f,c);
         } //
     } // end of inner class TreeMapColorFunction
     
@@ -140,8 +158,9 @@ public class TreeMapDemo extends JFrame {
                 NodeItem n = (NodeItem)iter.next();
                 n.setSize(n.getSize()/divisor);
             }
+            
+            System.out.println("leafCount = " + leafCount);
         } //
-        
     } // end of inner class TreeMapSizeFunction
     
     public class NodeRenderer extends ShapeRenderer {

@@ -42,14 +42,36 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
     private ArrayList m_row  = new ArrayList();
     private Rectangle2D m_r  = new Rectangle2D.Double();
     
-    private double m_frame = 0;
+    private double m_frame; // space between parents border and children
     
+    /**
+     * Creates a new SquarifiedTreeMapLayout with no spacing between
+     * parent areas and their enclosed children.
+     */
+    public SquarifiedTreeMapLayout() {
+        this(0);
+    } //
+    
+    /**
+     * Creates a new SquarifiedTreeMapLayout with the specified spacing between
+     * parent areas and their enclosed children.
+     * @param frame the amount of desired framing space, in pixels, between
+     * parent areas and their enclosed children.
+     */
+    public SquarifiedTreeMapLayout(double frame) {
+        m_frame = frame;
+    } //
+    
+    /**
+     * Runs the layout algorithm.
+     */
     public void run(ItemRegistry registry, double frac) {
         NodeItem    root   = getLayoutRoot(registry);
-        m_r.setRect(getBounds(registry));
+        m_r.setRect(getLayoutBounds(registry));
         root.setLocation(0,0);
         Point2D d = new Point2D.Double(m_r.getWidth(), m_r.getHeight());
         root.setVizAttribute("dimension",d);
+        updateArea(root, m_r);
         layout(root, m_r);
     } //
 
@@ -70,13 +92,42 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
         while ( childIter.hasNext() ) {
             NodeItem c = (NodeItem)childIter.next();
             if ( c.getNumChildren() > 0 ) {
-                // compute bounding rectangle for c
-                Point2D d = (Point2D)c.getVizAttribute("dimension");
-                r.setRect(c.getX()+m_frame,   c.getY()+m_frame, 
-                          d.getX()-2*m_frame, d.getY()-2*m_frame);
+                updateArea(c,r);
                 layout(c, r);
             }
         }
+    } //
+    
+    private void updateArea(NodeItem n, Rectangle2D r) {
+        Point2D d = (Point2D)n.getVizAttribute("dimension");
+        if ( m_frame == 0.0 ) {
+            // if no framing, simply update bounding rectangle
+            r.setRect(n.getX(), n.getY(),d.getX(), d.getY());
+            return;
+        }
+        
+        // compute area loss due to frame
+        double dA = 2*m_frame*(d.getX()+d.getY()-2*m_frame);
+        double A = n.getSize() - dA;
+        
+        // compute renormalization factor
+        double s = 0;
+        Iterator childIter = n.getChildren();
+        while ( childIter.hasNext() )
+            s += ((NodeItem)childIter.next()).getSize();
+        double t = A/s;
+        
+        // re-normalize children areas
+        childIter = n.getChildren();
+        while ( childIter.hasNext() ) {
+            NodeItem c = (NodeItem)childIter.next();
+            c.setSize(c.getSize()*t);
+        }
+        
+        // set bounding rectangle and return
+        r.setRect(n.getX()+m_frame,   n.getY()+m_frame, 
+                  d.getX()-2*m_frame, d.getY()-2*m_frame);
+        return;
     } //
     
     private void squarify(List c, List row, double w, Rectangle2D r) {
@@ -117,29 +168,39 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
     } //
     
     private Rectangle2D layoutRow(List row, double w, Rectangle2D r) {
-        double x = r.getX(), y = r.getY();
-        boolean horiz = (w == r.getWidth());
-        // set node positions and dimensions
-        NodeItem n;
+        double s = 0; // sum of row areas
         Iterator rowIter = row.iterator();
+        while ( rowIter.hasNext() )
+            s += ((GraphItem)rowIter.next()).getSize();
+        double x = r.getX(), y = r.getY(), d = 0;
+        double h = s/w;
+        boolean horiz = (w == r.getWidth());
+        
+        // set node positions and dimensions
+        rowIter = row.iterator();
         while ( rowIter.hasNext() ) {
-            n = (NodeItem)rowIter.next();
-            n.updateLocation(x,y);
-            n.setLocation(x,y);
-            double h = n.getSize() / w;
+            NodeItem n = (NodeItem)rowIter.next();
             if ( horiz ) {
-                setNodeDimensions(n,w,h);
-                y += h;
+                n.updateLocation(x+d,y);
+                n.setLocation(x+d,y);
             } else {
-                setNodeDimensions(n,h,w);
-                x += h;
+                n.updateLocation(x,y+d);
+                n.setLocation(x,y+d);
+            }
+            double nw = n.getSize()/h;
+            if ( horiz ) {
+                setNodeDimensions(n,nw,h);
+                d += nw;
+            } else {
+                setNodeDimensions(n,h,nw);
+                d += nw;
             }
         }
         // update space available in rectangle r
         if ( horiz )
-            r.setRect(r.getX(),r.getY()+y,r.getWidth(),r.getHeight()-y);
+            r.setRect(x,y+h,r.getWidth(),r.getHeight()-h);
         else
-            r.setRect(r.getX()+x,r.getY(),r.getWidth()-x,r.getHeight());
+            r.setRect(x+h,y,r.getWidth()-h,r.getHeight());
         return r;
     } //
     
