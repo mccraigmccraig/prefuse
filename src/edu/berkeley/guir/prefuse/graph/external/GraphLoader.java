@@ -9,13 +9,14 @@ import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.graph.DefaultEdge;
 import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Graph;
+import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.event.GraphLoaderListener;
 import edu.berkeley.guir.prefuse.graph.event.GraphLoaderMulticaster;
 
 
 /**
  * Loads graph data from an external data source, such as a database or
- * filesystem.
+ * filesystem, and manages cache for storing and evicting this data.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
@@ -24,6 +25,7 @@ public abstract class GraphLoader implements Runnable {
 
     public static final int LOAD_NEIGHBORS = 0;
     public static final int LOAD_CHILDREN  = 1;
+    public static final int LOAD_PARENT    = 2;
     
     protected List m_queue = new LinkedList();
     
@@ -59,15 +61,18 @@ public abstract class GraphLoader implements Runnable {
     } //
     
     public synchronized void loadNeighbors(ExternalNode n) {
-        Job j = new Job(LOAD_NEIGHBORS,n);
-        if ( !m_queue.contains(j) ) {
-            m_queue.add(j);
-            this.notifyAll();
-        }
+        submit(new Job(LOAD_NEIGHBORS,n));
     } //
     
     public synchronized void loadChildren(ExternalTreeNode n) {
-        Job j = new Job(LOAD_CHILDREN,n);
+        submit(new Job(LOAD_CHILDREN,n));
+    } //
+    
+    public synchronized void loadParent(ExternalTreeNode n) {
+        submit(new Job(LOAD_PARENT,n));
+    } //
+    
+    private synchronized void submit(Job j) {
         if ( !m_queue.contains(j) ) {
             m_queue.add(j);
             this.notifyAll();
@@ -83,10 +88,17 @@ public abstract class GraphLoader implements Runnable {
             Job job = getNextJob();
             if ( job != null ) {
                 if ( job.type == LOAD_NEIGHBORS ) {
-                    getNeighbors(job.n);
-                    job.n.setNeighborsLoaded(true);
+                    ExternalNode n = (ExternalNode)job.n;
+                    getNeighbors(n);
+                    n.setNeighborsLoaded(true);
                 } else if ( job.type == LOAD_CHILDREN ) {
-                    getChildren((ExternalTreeNode)job.n);
+                    ExternalTreeNode n = (ExternalTreeNode)job.n;
+                    getChildren(n);
+                    n.setChildrenLoaded(true);
+                } else if ( job.type == LOAD_PARENT ) {
+                    ExternalTreeNode n = (ExternalTreeNode)job.n;
+                    getParent(n);
+                    n.setParentLoaded(true);
                 }
             } else {
                 // nothing to do, chill out until notified
@@ -101,7 +113,7 @@ public abstract class GraphLoader implements Runnable {
         return (m_queue.isEmpty() ? null : (Job)m_queue.remove(0));
     } //
     
-    protected void foundNode(int type, ExternalNode src, ExternalNode n, Edge e) {
+    protected void foundNode(int type, ExternalEntity src, ExternalEntity n, Edge e) {
         String key = n.getAttribute(m_keyField);
         if ( m_cache.containsKey(key) )
             // switch n reference to original loaded version 
@@ -111,12 +123,19 @@ public abstract class GraphLoader implements Runnable {
         
         n.setLoader(this);
         if (e == null && src != null )
-            e = new DefaultEdge(src, n, m_graph.isDirected());
+            if ( type == LOAD_PARENT )
+                e = new DefaultEdge(n, src, m_graph.isDirected());
+            else
+                e = new DefaultEdge(src, n, m_graph.isDirected());
         
         synchronized ( m_registry ) {
-            m_graph.addNode(n);
-            if ( src != null )
-                m_graph.addEdge(e);
+            if ( type == LOAD_NEIGHBORS ) {
+                m_graph.addNode(n);
+                if ( src != null )
+                    m_graph.addEdge(e);
+            } else if ( type == LOAD_PARENT || type == LOAD_CHILDREN ) {
+                ((Tree)m_graph).addChild(e);
+            }
         }
         
         if ( m_listener != null )
@@ -124,22 +143,24 @@ public abstract class GraphLoader implements Runnable {
     } //
     
     protected abstract void getNeighbors(ExternalNode n);
-    
     protected abstract void getChildren(ExternalTreeNode n);
     protected abstract void getParent(ExternalTreeNode n);
     
     public class Job {
-        public Job(int type, ExternalNode n) {
+        public Job(int type, ExternalEntity n) {
             this.type = type;
             this.n = n;
         }
         int type;
-        ExternalNode n;
+        ExternalEntity n;
         public boolean equals(Object o) {
             if ( !(o instanceof Job) )
                 return false;
             Job j = (Job)o;
             return ( type==j.type && n==j.n );
+        }
+        public int hashCode() {
+            return type ^ n.hashCode();
         }
     } //
     

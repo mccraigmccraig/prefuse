@@ -13,7 +13,7 @@ import edu.berkeley.guir.prefuse.graph.Node;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class ExternalNode extends DefaultNode {
+public class ExternalNode extends DefaultNode implements ExternalEntity {
     
     protected GraphLoader  m_loader;
 
@@ -42,7 +42,7 @@ public class ExternalNode extends DefaultNode {
         return m_loaded;
     } //
     
-    protected void touch() {
+    public void touch() {
         m_access = System.currentTimeMillis();
     } //
     

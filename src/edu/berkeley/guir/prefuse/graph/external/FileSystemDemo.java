@@ -25,6 +25,7 @@ import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.graph.Entity;
 import edu.berkeley.guir.prefuse.graph.DefaultGraph;
 import edu.berkeley.guir.prefuse.graph.Graph;
+import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.graph.event.GraphLoaderListener;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
@@ -62,7 +63,8 @@ public class FileSystemDemo extends JFrame {
         registry = new ItemRegistry(g);
         
         loader = new FileSystemLoader(registry);
-        ExternalNode root = loader.loadNode(null, new File("."));
+        Node root = loader.loadNode(GraphLoader.LOAD_NEIGHBORS, 
+                                    null, new File("."));
         
         loader.addGraphLoaderListener(new GraphLoaderListener() {
             public void entityLoaded(GraphLoader loader, Entity e) {
