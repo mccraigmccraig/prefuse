@@ -4,12 +4,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
-import edu.berkeley.guir.prefuse.focus.KeywordSearchFocusSet;
 import edu.berkeley.guir.prefuse.graph.DefaultEdge;
-import edu.berkeley.guir.prefuse.graph.Edge;
-import edu.berkeley.guir.prefuse.graph.Entity;
 import edu.berkeley.guir.prefuse.graph.DefaultTree;
 import edu.berkeley.guir.prefuse.graph.DefaultTreeNode;
+import edu.berkeley.guir.prefuse.graph.Edge;
+import edu.berkeley.guir.prefuse.graph.Entity;
 import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
