@@ -12,6 +12,7 @@ import java.util.Iterator;
 import javax.swing.JFrame;
 
 import edu.berkeley.guir.prefuse.Display;
+import edu.berkeley.guir.prefuse.EdgeItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
@@ -57,7 +58,8 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
     public TimelineDemo() {
         // 1a. Load the timeline data into graph
         try {
-            graph = new XMLGraphReader().loadGraph(MUSIC_HISTORY);
+            //graph = new XMLGraphReader().loadGraph(MUSIC_HISTORY);
+            graph = new /*Timeline*/XMLGraphReader().loadGraph(MUSIC_HISTORY);
         } catch (Exception e) {
             e.printStackTrace();
             return;
@@ -93,7 +95,12 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         connectNewNotchNode(END, prevNotchNode, timeline_end); // end node
 
         // 2. Create a new item registry
-        final ItemRegistry registry = new ItemRegistry(graph);
+        final ItemRegistry registry = new ItemRegistry(graph, false);
+        registry.addItemClass(NOTCH_NODE_TYPE, NOTCH_NODE_ITEM_CLASS); // order matters
+        registry.addItemClass(NOTNOTCH_NODE_TYPE, NOTNOTCH_NODE_ITEM_CLASS);
+        // XXX Gotta switch back later (comment out)
+        registry.addItemClass(XMLGraphReader.XMLGraphHandler.NODE, NodeItem.class);
+        registry.addItemClass(ItemRegistry.DEFAULT_EDGE_CLASS, EdgeItem.class);
         final int timelineLength = appWidth * 3 / 4; // this factor ought to be
                                                      // shared across all
                                                      // timeline instances
@@ -109,8 +116,10 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         
         final ActionList distort = new ActionList(registry);
         distort.add(new TimelineGraphFilter());
-        final FisheyeDistortion feye = new FisheyeDistortion(1,0);
+        final FisheyeDistortion feye = new FisheyeDistortion(1,0,true);//NOTCH_NODE_TYPE);
         distort.add(feye);
+
+        distort.add(new MusicHistoryColorFunction());
         distort.add(new RepaintAction());
         
         // enable distortion mouse-over
@@ -126,7 +135,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         frame.setVisible(true);
 
         final ActionList initialArrange = new ActionList(registry);
-        initialArrange.add(new GraphFilter());
+        initialArrange.add(new /*Timeline*/GraphFilter());
         initialArrange.add(new MusicHistoryColorFunction());
         initialArrange.add(new MusicHistoryLayout(timelineLength, notchIndex));
         initialArrange.add(new RepaintAction());
@@ -137,7 +146,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
     // (( METHODS )) \\
     private Node connectNewNotchNode(final String notchIndex,
             final Node prevNotchNode, final int nextNotchNum) {
-        final DefaultNode nextNotchNode = new DefaultNode();
+        final Node nextNotchNode = new /*NotchNode();*/DefaultNode();
         nextNotchNode.setAttribute(NODE_TYPE, NOTCH_TYPE);
         nextNotchNode.setAttribute(
         		XMLGraphReader.XMLGraphHandler.ID, NOTCH+notchIndex);
@@ -206,8 +215,10 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
                     final double x;
                     if (notchIndexString.equals(START)) {
                         x = leftOffset;
+                        //node.setFixed(true);
                     } else if (notchIndexString.equals(END)) {
                         x = leftOffset + m_timelineLength;
+                        //node.setFixed(true);
                     } else { // a regular notch node
                         final int notchIndex = new Integer(notchIndexString)
                                 .intValue();
