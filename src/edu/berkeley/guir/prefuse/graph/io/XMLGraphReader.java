@@ -93,8 +93,8 @@ public class XMLGraphReader extends AbstractGraphReader	implements GraphReader {
 		public static final String GRAPH  = "graph";
 		public static final String DIRECTED = "directed";
 		
-		private Graph m_graph = null;
-		private HashMap m_nodeMap = new HashMap();
+		protected Graph m_graph = null;
+		protected HashMap m_nodeMap = new HashMap();
 		private Node m_activeNode = null;
 		private Edge m_activeEdge = null;
 		private boolean m_directed = false;
