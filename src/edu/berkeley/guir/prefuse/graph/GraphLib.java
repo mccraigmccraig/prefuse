@@ -8,20 +8,18 @@ import java.util.List;
 /**
  * Library of useful operations on graphs.
  * 
- * May 21, 2003 - jheer - Created class
- * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class GraphLib {
 
     public static Graph getStar(int n) {
-        Node n0 = new Node();
+        Node n0 = new TreeNode();
         n0.setAttribute("label","n"+0);
         ArrayList al = new ArrayList(n+1);
         al.add(n0);
         for ( int i=1; i <= n; i++ ) {
-            Node nn = new Node();
+            Node nn = new TreeNode();
             nn.setAttribute("label","n"+i);
             Edge e = new Edge(n0, nn);
             n0.addEdge(e);
@@ -35,7 +33,7 @@ public class GraphLib {
         Node nodes[] = new Node[n];
         ArrayList al = new ArrayList(n);
         for ( int i = 0; i < n; i++ ) {
-            nodes[i] = new Node();
+            nodes[i] = new TreeNode();
             nodes[i].setAttribute("label", "n"+i);
             al.add(nodes[i]);
         }
