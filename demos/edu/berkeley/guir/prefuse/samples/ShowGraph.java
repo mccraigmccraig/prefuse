@@ -33,7 +33,6 @@ public class ShowGraph extends JFrame {
 		
 		// create a new display component to show the data
 		Display display = new Display(registry);
-		display.setSize(400,400);
 		// lets users drag nodes around on screen
 		display.addControlListener(new DragControl());
 		
