@@ -1,8 +1,10 @@
 package edu.berkeley.guir.prefuse.action;
 
 import java.util.Iterator;
+
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
+import edu.berkeley.guir.prefuse.collections.SingleElementIterator;
 import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
@@ -36,7 +38,10 @@ public class FisheyeTreeFilter extends AbstractAction {
     } //
     
     protected Iterator getFoci(ItemRegistry registry) {
-        return registry.getDefaultFocusSet().iterator();
+        Iterator iter = registry.getDefaultFocusSet().iterator();
+        if ( !iter.hasNext() )
+            iter = new SingleElementIterator(m_root);
+        return iter;
     } //
     
 	public void run(ItemRegistry registry, double frac) {
