@@ -11,6 +11,7 @@ import java.awt.geom.RoundRectangle2D;
 
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.util.FontLib;
+import edu.berkeley.guir.prefuse.util.StringAbbreviator;
 
 /**
  * Renders an item as a text string. The text string used by default is the
@@ -30,12 +31,15 @@ public class TextItemRenderer extends ShapeRenderer {
 	public static final int ALIGNMENT_BOTTOM = 1;
 	public static final int ALIGNMENT_TOP    = 0;
 
-	//protected Graphics2D m_g;
 	protected String m_labelName = "label";
 	protected int m_xAlign = ALIGNMENT_CENTER;
 	protected int m_yAlign = ALIGNMENT_CENTER;
 	protected int m_horizBorder = 3;
 	protected int m_vertBorder = 0;
+
+	protected int m_maxTextWidth = -1;
+	protected int m_abbrevType = StringAbbreviator.TRUNCATE;
+	protected StringAbbreviator m_abbrev = StringAbbreviator.getInstance();
 	
 	protected RectangularShape m_textBox  = new Rectangle2D.Float();
 	protected Font m_font = new Font("SansSerif", Font.PLAIN, 10);
@@ -90,13 +94,48 @@ public class TextItemRenderer extends ShapeRenderer {
 	} //
 
 	/**
+	 * Sets the maximum width that should be allowed of the text label.
+	 * A value of -1 specifies no limit (this is the default).
+	 * @param maxWidth the maximum width of the text or -1 for no limit
+	 */
+	public void setMaxTextWidth(int maxWidth) {
+	    m_maxTextWidth = maxWidth;
+	} //
+	
+	/**
+	 * Sets the type of abbreviation to be used if a text label is longer
+	 * than the maximum text width. The value should be one of the constants
+	 * provided by the {@link edu.berkeley.guir.prefuse.util.StringAbbreviator
+	 * StringAbbreviator} class. To enable abbreviation, you must first set
+	 * the maximum text width using the {@link #setMaxTextWidth(int) 
+	 * setMaxTextWidth} method.
+	 * @param abbrevType the abbreviation type to use. Should be one of the
+	 * constants provided by the 
+	 * {@link edu.berkeley.guir.prefuse.util.StringAbbreviator
+	 * StringAbbreviator} class (e.g. StringAbbreviator.TRUNCATE or 
+	 * StringAbbreviator.NAME).
+	 */
+	public void setAbbrevType(int abbrevType) {
+	    m_abbrevType = abbrevType;
+	} //
+	
+	/**
 	 * Returns the text to draw. Subclasses can override this class to
 	 * perform custom text rendering.
 	 * @param item the item to represent as a <code>String</code>
 	 * @return a <code>String</code> to draw
 	 */
 	protected String getText(VisualItem item) {
-		return (String)item.getAttribute(m_labelName);
+		String s =  (String)item.getAttribute(m_labelName);
+		if ( m_maxTextWidth > -1 ) {
+		    Font font = item.getFont();
+		    if ( font == null ) { font = m_font; }
+		    FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(font);
+		    if ( fm.stringWidth(s) > m_maxTextWidth ) {
+		        s = m_abbrev.abbreviate(s, m_abbrevType, fm, m_maxTextWidth);			
+		    }
+		}
+		return s;
 	} //
 	
 	protected boolean isHyperlink(VisualItem item) {
