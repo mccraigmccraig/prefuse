@@ -21,7 +21,7 @@ public class PolygonRenderer extends ShapeRenderer {
     public static final int EDGE_CUBIC = 2;
     
     private int     edgeType = EDGE_LINE;
-    private float   controlFrac = 0.15f;
+    private float   controlFrac = 0.10f;
     
     public PolygonRenderer() {
         this(EDGE_LINE);
@@ -77,7 +77,7 @@ public class PolygonRenderer extends ShapeRenderer {
 	            for ( i=2; i<poly.length; i+=2 ) {
 	                float x1 = x+poly[i-2], y1 = y+poly[i-1];
 	                float x2 = x+poly[i],   y2 = y+poly[i+1];
-	                amp = frac*(float)Math.abs(Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2)));
+	                amp = frac*(float)Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
 	                
 	                float vx = x1-cx, vy = y1-cy;
 	                float norm = (float)Math.sqrt(vx*vx+vy*vy);
@@ -94,7 +94,7 @@ public class PolygonRenderer extends ShapeRenderer {
 	            
 	            float x1 = x+poly[i-2], y1 = y+poly[i-1];
 	            float x2 = x+poly[0],   y2 = y+poly[1];
-	            amp = frac*(float)Math.abs(Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2)));
+	            amp = frac*(float)Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
 	            
 	            float vx = x1-cx, vy = y1-cy;
 	            float norm = (float)Math.sqrt(vx*vx+vy*vy);
@@ -109,21 +109,49 @@ public class PolygonRenderer extends ShapeRenderer {
 	            path.curveTo(p1x,p1y,p2x,p2y,x2,y2);
             } else if ( edgeType == EDGE_QUAD ) {
 	            // now go around computing control points
-	            float frac = 0.1f;
+	            float frac = controlFrac;
 	            int i;
+	            float amp;
 	            for ( i=2; i<poly.length; i+=2 ) {
-	                float mx = x + poly[i-2] + (poly[i]-poly[i-2])/2f;
-	                float my = y + poly[i-1] + (poly[i+1]-poly[i-1])/2f;
-	                float px = mx + frac*(mx-cx);
-	                float py = my + frac*(my-cy);
-	                path.quadTo(px,py,x+poly[i],y+poly[i+1]);
+	                float x1 = x+poly[i-2], y1 = y+poly[i-1];
+	                float x2 = x+poly[i],   y2 = y+poly[i+1];
+	                amp = frac*(float)Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
+	                
+	                float mx = x + x1 + (x2-x1)/2f;
+	                float my = y + y1 + (y2-y1)/2f;
+	                
+	                float vx = mx-cx, vy = my-cy;
+	                float norm = (float)Math.sqrt(vx*vx+vy*vy);
+	                float px = mx + amp*vx/norm;
+	                float py = my + amp*vy/norm;
+	                path.quadTo(px,py,x2,y2);
+	                
+//	                float mx = x + poly[i-2] + (poly[i]-poly[i-2])/2f;
+//	                float my = y + poly[i-1] + (poly[i+1]-poly[i-1])/2f;
+//	                float px = mx + frac*(mx-cx);
+//	                float py = my + frac*(my-cy);
+//	                path.quadTo(px,py,x+poly[i],y+poly[i+1]);
 	            }
+	            
+	            float x1 = x+poly[i-2], y1 = y+poly[i-1];
+	            float x2 = x+poly[0],   y2 = y+poly[1];
+	            amp = frac*(float)Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
+	            
+	            float mx = x + x1 + (x2-x1)/2f;
+                float my = y + y1 + (y2-y1)/2f;
+                
+                float vx = mx-cx, vy = my-cy;
+                float norm = (float)Math.sqrt(vx*vx+vy*vy);
+                float px = mx + amp*vx/norm;
+                float py = my + amp*vy/norm;
+                path.quadTo(px,py,x2,y2);
+	            
 	            // close off the loop
-	            float mx = x + poly[i-2] + (poly[0]-poly[i-2])/2f;
-	            float my = y + poly[i-1] + (poly[1]-poly[i-1])/2f;
-	            float px = mx + frac*(mx-cx);
-	            float py = my + frac*(my-cy);
-	            path.quadTo(px,py,x+poly[0],y+poly[1]);
+//	            float mx = x + poly[i-2] + (poly[0]-poly[i-2])/2f;
+//	            float my = y + poly[i-1] + (poly[1]-poly[i-1])/2f;
+//	            float px = mx + frac*(mx-cx);
+//	            float py = my + frac*(my-cy);
+//	            path.quadTo(px,py,x+poly[0],y+poly[1]);
             }
         }
         path.closePath();
