@@ -92,7 +92,7 @@
     <att name="comments" value="Castration emerges as a way of preserving the sound of a woman's voice in Italian music. St. Paul's dictum prohibited women from singing on stage in churches."/>
 </node>
   <node id="castrationcommon" label="Castration becomes commonplace">
-	<att name="nodetype" value="person"/>
+	<att name="nodetype" value="event"/>
     <att name="startyear" value="1574"/>
     <att name="endyear" value="1574"/>
     <att name="comments" value=""/>
@@ -236,7 +236,7 @@
     <att name="comments" value=""/>
 </node>
   <node id="ringcycle" label="Der Ring des Nibelungen (The Ring Cycle)">
-	<att name="nodetype" value="person"/>
+	<att name="nodetype" value="piece"/>
     <att name="startyear" value="1853"/>
     <att name="endyear" value="1853"/>
     <att name="comments" value="The librettos to The Ring Cycle are published: Das Rheingold, Die Walkure, Seigfried and Die Gotterdamerung"/>
@@ -247,8 +247,158 @@
     <att name="endyear" value="timeline_end"/>
     <att name="comments" value="If the Romantic period saw the start of some fragmentation into different schools, this trend continued and accelerated into the modern era. There were those who continued to develop older traditions: the neo-classicists, the late romantics and the impressionist schools still prevailed, and those who took a new path with atonal music, serialism and later with experimental and minimalist music. Some composers created thematic material which could hardly be called 'melodies,' introducing dissonant intervals and different scales, and unusual rhythms and cross-rhythms were explored. There were composers, considered extreme by some audiences, who used traditional instruments in unconventional ways, overturned principles previously considered fundamental, and questioned the roles of composer, musician and listener. Experimental composers used randomization techniques, or gave unusual instructions which might not include any conventional musical notation at all.\n\nWhile classical music became more elite, popular music (which had been around for centuries) found a new mass audience, with the advent of recordings, radio and television. These new media had an insatiable demand for music, and film music in particular required much original music and recruited composers educated in the classical traditions. Popular music in turn had a strong influence on serious music, and jazz and other ideas became incorporated into the concert repertoire. The same electricity which powered the new media, also fuelled new gadgets for amplification and powered new instruments such as the electric guitar and synthesisers. More recently it has become possible to create and manipulate sound solely within computers, in a similar way to their use for creating graphics and animations for those same media. With all these developments music is much more accessible around the world, and as styles and techniques are invented, re-invented and combined this in turn stimulates further invention and discovery.\n\nComposers of the modern period include Richard Strauss, Edward Elgar, William Walton, Ralph Vaughan Williams, Erich Wolfgang Korngold, Sergei Rachmaninov, Zoltan Kodaly, Igor Stravinsky, Bela Bartok, George Gershwin, Maurice Ravel, Francois Poulenc, Arnold Schoenberg, Alban Berg, Anton Webern, Sergei Prokofiev, Dmitri Shostakovich, John Cage, Philip Glass, Michael Nyman, Leonard Bernstein, Pierre Boulez, Benjamin Britten, Henryk Gorecki, John Corigliano, Aaron Copland, John Williams, Georges Auric, Darius Milhaud, Malcolm Arnold."/>
 </node>
-  <node id="" label="">
+  <node id="dimeola" label="Al Di Meola">
 	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1954"/>
+    <att name="endyear" value="timeline_end"/>
+    <att name="comments" value="Al Di Meola (born July 22, 1954) is an American jazz fusion guitarist.
+
+Di Meola was born in Jersey City, New Jersey. In 1971, he enrolled in the Berklee School of Music in Boston, Massachusetts. In 1974 he joined Chick Corea's band, Return to Forever, and played with the band until they broke up in 1976.
+
+Di Meola went on to explore a variety of styles, but is noted for his Latin influenced fusion works. He is a four time winner as Best Jazz Guitarist in Guitar Player Magazine's Reader Poll.
+
+In addition to a prolific solo career, he has engaged in successful collaborations with bassist Stanley Clarke, violinist Jean-Luc Ponty, and guitarists John McLaughlin and Paco de Lucia."/>
+</node>
+  <node id="dimeola1" label="Land of the Midnight Sun">
+  	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1976"/>
+    <att name="endyear" value="1976"/>
+    <att name="comments" value=""/>
+</node>  <node id="dimeola2" label="Elegant Gypsy">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1977"/>
+    <att name="endyear" value="1977"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola3" label="Casino">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1978"/>
+    <att name="endyear" value="1978"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola4" label="Splendido Hotel">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1980"/>
+    <att name="endyear" value="1980"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola5" label="Electric Rendezvous">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1982"/>
+    <att name="endyear" value="1982"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola6" label="Tour De Force - Live">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1982"/>
+    <att name="endyear" value="1982"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola7" label="Scenario">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1983"/>
+    <att name="endyear" value="1983"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola8" label="Cielo E Terra">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1985"/>
+    <att name="endyear" value="1985"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola9" label="Soaring Through a Dream">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1985"/>
+    <att name="endyear" value="1985"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola10" label="Tirami Su">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1987"/>
+    <att name="endyear" value="1987"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola11" label="World Sinfonia">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1990"/>
+    <att name="endyear" value="1990"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola12" label="Kiss My Axe">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1991"/>
+    <att name="endyear" value="1991"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola13" label="Orange and Blue">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1994"/>
+    <att name="endyear" value="1994"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola14" label="World Sinfonia II - Heart of the Immigrants">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1993"/>
+    <att name="endyear" value="1993"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola15" label="Al Di Meola Play Piazzolla">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1996"/>
+    <att name="endyear" value="1996"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola16" label="The Infinite Desire">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1998"/>
+    <att name="endyear" value="1998"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola17" label="Winter Nights">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="1999"/>
+    <att name="endyear" value="1999"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola19" label="Flesh on Flesh">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="2002"/>
+    <att name="endyear" value="2002"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="dimeola18" label="The Grande Passion">
+	<att name="nodetype" value="piece"/>
+	<att name="artistID" value="dimeola"/>
+    <att name="startyear" value="2000"/>
+    <att name="endyear" value="2000"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="delucia" label="Paco de Lucia">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1947"/>
+    <att name="endyear" value="timeline_end"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="" label="">
+	<att name="nodetype" value="piece"/>
     <att name="startyear" value="0"/>
     <att name="endyear" value="0"/>
     <att name="comments" value=""/>
