@@ -5,14 +5,15 @@ import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
-import edu.berkeley.guir.prefuse.AggregateItem;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.graph.Entity;
-import edu.berkeley.guir.prefuse.graph.TreeNode;
 
 /**
  * <p>Controls loading and management of images. Includes a size-configurable
@@ -32,6 +33,7 @@ public class ImageFactory {
 	private int m_imageCacheSize = 500;
 	private int m_maxImageWidth  = 100;
 	private int m_maxImageHeight = 100;
+    private boolean m_asynch = true;
 	
 	//a nice LRU cache courtesy of java 1.4
 	private Map imageCache =
@@ -40,6 +42,9 @@ public class ImageFactory {
 				return size() > m_imageCacheSize;
 			}
 		};
+	private Map loadMap = new HashMap(50);
+    private Map loadingMap = new HashMap(50);
+    private Set loadingSet = new HashSet(50);
 
 	private final Component component = new Component() {};
 	private final MediaTracker tracker = new MediaTracker(component);
@@ -93,27 +98,47 @@ public class ImageFactory {
 	 */
 	public Image getImage(String imageLocation) {
 		Image image = (Image) imageCache.get(imageLocation);
-		if (image == null) {
+		if (image == null && !loadMap.containsKey(imageLocation)) {
 			URL imageURL = getImageURL(imageLocation);
 			if ( imageURL == null ) {
-				if ( !imageLocation.startsWith("/") ) {
-					return getImage("/" + imageLocation);					
-				} else {
-					System.err.println("Null image: " + imageLocation);
-					return null;
-				}
+			    System.err.println("Null image: " + imageLocation);
+				return null;
 			}
 			image = Toolkit.getDefaultToolkit().createImage(imageURL);
 
-			//block for image to load. TODO: decide whether to do this asynchronously
-			waitForImage(image);
-			if ( m_maxImageWidth > -1 || m_maxImageHeight > -1 )
-				image = getScaledImage(image);
-			imageCache.put(imageLocation, image);			
-		}
-		return image;
+			// if set for synchronous mode, block for image to load.
+            if ( !m_asynch ) {
+                waitForImage(image);
+                loadImage(imageLocation, image);
+            } else {
+                int id = ++nextTrackerID;
+                tracker.addImage(image, id);
+                loadMap.put(imageLocation, new LoadMapEntry(id,image));
+                
+                //System.err.println((++lcount));
+                //loadingSet.add(imageLocation);
+                //loadingMap.put(image, imageLocation);
+                //int width = image.getWidth(this);    
+            }
+		} else if ( loadMap.containsKey(imageLocation) ) {
+            LoadMapEntry entry = (LoadMapEntry)loadMap.get(imageLocation);
+            if ( tracker.checkID(entry.id, true) ) {
+                loadImage(imageLocation, entry.image);
+                loadMap.remove(imageLocation);
+            }
+        }
+		return (Image) imageCache.get(imageLocation);
 	} //
 
+    int lcount = 0;
+    
+    protected Image loadImage(String location, Image image) {
+        if ( m_maxImageWidth > -1 || m_maxImageHeight > -1 )
+            image = getScaledImage(image);
+        imageCache.put(location, image);
+        return image;
+    } //
+    
 	/**
 	 * Wait for an image to load.
 	 * @param image the image to wait for
@@ -130,50 +155,28 @@ public class ImageFactory {
 	} //
 
 	/**
-	 * Get the image associated with the provided aggregate. Assumes the
-	 * aggregate represents an elided subtree of a DefaultTreeNode instance.
-	 * @param aItem the aggregate item
-	 * @return the corresponding image, if available.
-	 */
-	public Image getImage(AggregateItem aItem) {
-		//TODO: something in this hash lookup is slow. 
-		// suspects: URL .equals or .hashCode, or LRU list maintenance.
-		String imageLocation = getImageLocation(aItem);
-		return getImage(imageLocation);
-	} //
-
-	/**
-	 * Maps from an aggregate item to a location string, using the convention
-	 * of the AggregateGenerator classes.
-	 * @param aItem AggregateItem to map from
-	 * @return the image location string
-	 */
-	protected String getImageLocation(AggregateItem aItem) {
-		TreeNode n = (TreeNode) aItem.getEntity();
-		TreeNode p = n.getParent();
-		String key = n.getAttribute("Key") + "_" + (p == null ? null : p.getAttribute("Key"));
-		String url = "/aggregates/" + key + ".png";
-		return url.intern();
-	} //
-
-	/**
 	 * Returns the URL for a location specified as a resource string.
 	 * @param location the resource location string
 	 * @return the corresponding URL
 	 */
 	protected URL getImageURL(String location) {
+        URL url = null;
         if ( location.startsWith("http:/") ||
              location.startsWith("ftp:/")  ||
              location.startsWith("file:/") ) {
             try {
-                return new URL(location);
+                url = new URL(location);
             } catch ( Exception e ) {
                 e.printStackTrace();
             }
+        } else {
+            url = ImageFactory.class.getResource(location);
+            if ( url==null && !location.startsWith("/") )
+                url = ImageFactory.class.getResource("/"+location);
         }
-        return ImageFactory.class.getResource(location);
+        return url;
 	} //
-	
+    
 	/**
 	 * Scales an image to fit within the current size thresholds.
 	 * @param img the image to scale
@@ -187,11 +190,11 @@ public class ImageFactory {
 
 		if ( w > h && w > 0 && m_maxImageWidth > -1 ) {
 			Image scaled = img.getScaledInstance(m_maxImageWidth, -1, Image.SCALE_SMOOTH);
-			img.flush(); waitForImage(scaled);
+			img.flush(); //waitForImage(scaled);
 			return scaled;
 		} else if ( h > 0 && m_maxImageHeight > -1 ) {
 			Image scaled = img.getScaledInstance(-1, m_maxImageHeight, Image.SCALE_SMOOTH);
-			img.flush(); waitForImage(scaled);				
+			img.flush(); //waitForImage(scaled);				
 			return scaled;
 		} else {
 			return img;
@@ -211,6 +214,9 @@ public class ImageFactory {
 	 * @param attr the attribute that contains the image location
 	 */
 	public void preloadImages(Iterator iter, String attr) {
+        boolean synch = m_asynch;
+        m_asynch = false;
+        
 		String loc = null;
 		while ( iter.hasNext() && imageCache.size() <= m_imageCacheSize ) {
 			// get the string describing the image location
@@ -224,6 +230,16 @@ public class ImageFactory {
 				getImage(loc);
 			}
 		}
+        m_asynch = synch;
 	} //
 	
+    private class LoadMapEntry {
+        public int id;
+        public Image image;
+        public LoadMapEntry(int id, Image image) {
+            this.id = id;
+            this.image = image;
+        }
+    } //
+    
 } // end of class ImageFactory
