@@ -11,6 +11,8 @@ import edu.berkeley.guir.prefuse.event.ControlAdapter;
 /**
  * Allows users to pan over a display such that the display zooms in and
  * out proportionally to how fast the pan is performed.
+ * 
+ * TODO: this is a broken, work in progress. don't use this yet.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
