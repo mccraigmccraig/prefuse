@@ -98,7 +98,7 @@ public class FisheyeGraphFilter extends Filter {
         if ( fgraph instanceof DefaultGraph )
             ((DefaultGraph)fgraph).reinit(graph.isDirected());
         else
-            fgraph = new DefaultGraph();
+            fgraph = new DefaultGraph(graph.isDirected());
 
         // filter the nodes using a depth-limited breadth first search
         // around the focus nodes

@@ -48,7 +48,7 @@ public class GraphFilter extends Filter {
         if ( fgraph instanceof DefaultGraph )
             ((DefaultGraph)fgraph).reinit(graph.isDirected());
         else
-            fgraph = new DefaultGraph();
+            fgraph = new DefaultGraph(graph.isDirected());
         
         // filter the nodes
         Iterator nodeIter = graph.getNodes();

@@ -102,7 +102,6 @@ public class XMLGraphReader extends AbstractGraphReader	implements GraphReader {
 		private boolean inNode, inEdge;
 		
 		public void startDocument() {
-			m_graph = new DefaultGraph(m_directed);
 			m_nodeMap.clear();
 		} //
 		
@@ -120,6 +119,7 @@ public class XMLGraphReader extends AbstractGraphReader	implements GraphReader {
 			if ( qName.equals(GRAPH) ) {
 				int idx = atts.getIndex(DIRECTED);
 			    m_directed = (idx >= 0 && atts.getValue(idx).equals("1"));
+                m_graph = new DefaultGraph(m_directed);
 		    } else if ( qName.equals(NODE) ) {
 				// parse a node element
 				Node n = parseNode(atts);

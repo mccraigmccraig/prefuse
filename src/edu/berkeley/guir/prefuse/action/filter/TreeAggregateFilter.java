@@ -4,10 +4,10 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 
 import edu.berkeley.guir.prefuse.AggregateItem;
+import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
-import edu.berkeley.guir.prefuse.graph.Tree;
-import edu.berkeley.guir.prefuse.graph.TreeNode;
+import edu.berkeley.guir.prefuse.graph.Node;
 
 /**
  * Filter that adds aggregate items for elided subtrees. By default, garbage
@@ -18,6 +18,8 @@ import edu.berkeley.guir.prefuse.graph.TreeNode;
  */
 public class TreeAggregateFilter extends Filter {
 
+    private Point2D m_anchor = null;
+    
     /**
      * Constructor.
      */
@@ -29,15 +31,17 @@ public class TreeAggregateFilter extends Filter {
 	 * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
 	 */
 	public void run(ItemRegistry registry, double frac) {
-		Tree t = (Tree)registry.getGraph();
-		
+        m_anchor = getLayoutAnchor(registry);
+        
 		double sx, sy, ex, ey, stheta, etheta;
 		
 		Iterator nodeIter = registry.getNodeItems();
 		while ( nodeIter.hasNext() ) {
 			NodeItem nitem  = (NodeItem)nodeIter.next();
-			TreeNode node   = (TreeNode)registry.getEntity(nitem);
-            if ( nitem.getChildCount() == 0 && node.getChildCount() > 0 ) {				
+			Node node       = (Node)nitem.getEntity();
+            int diff = 0;
+            if ( nitem.getChildCount() == 0 && 
+                 (diff=(node.getEdgeCount()-nitem.getEdgeCount())) > 0 ) {				
 				AggregateItem aggr = registry.getAggregateItem(node, true);
 				Point2D       eloc = nitem.getEndLocation();
 				Point2D       sloc = nitem.getStartLocation();
@@ -48,7 +52,7 @@ public class TreeAggregateFilter extends Filter {
 				
 				setOrientation(aggr);
 				
-				aggr.setAggregateSize(node.getDescendantCount());
+				aggr.setAggregateSize(diff);
 			}
 		}
         
@@ -56,13 +60,23 @@ public class TreeAggregateFilter extends Filter {
         super.run(registry, frac);
 	} //
     
+    public Point2D getLayoutAnchor(ItemRegistry registry) {
+        Point2D a = new Point2D.Double(0,0);
+        if ( registry != null ) {
+            Display d = registry.getDisplay(0);
+            a.setLocation(d.getWidth()/2.0,d.getHeight()/2.0);
+            d.getInverseTransform().transform(a,a);
+        }
+        return a;
+    } //
+    
     protected void setOrientation(AggregateItem item) {
         Point2D eloc = item.getEndLocation();
         Point2D sloc = item.getStartLocation();
-        Point2D anchor = null;
+        
         
         double ax, ay, sx, sy, ex, ey, etheta, stheta;
-        ax = anchor.getX(); ay = anchor.getY();
+        ax = m_anchor.getX(); ay = m_anchor.getY();
         sx = sloc.getX()-ax; sy = sloc.getY()-ay;
         ex = eloc.getX()-ax; ey = eloc.getY()-ay;
         
