@@ -30,6 +30,26 @@ public class DefaultRendererFactory implements RendererFactory {
 	/**
 	 * Constructor.
 	 * @param nodeRenderer the Renderer to use for NodeItems
+	 */
+	public DefaultRendererFactory(Renderer nodeRenderer)
+	{
+	    this(nodeRenderer, null, null);
+	} //
+	
+	/**
+	 * Constructor.
+	 * @param nodeRenderer the Renderer to use for NodeItems
+	 * @param edgeRenderer the Renderer to use for EdgeItems
+	 */
+	public DefaultRendererFactory(Renderer nodeRenderer, 
+								  Renderer edgeRenderer)
+	{
+	    this(nodeRenderer, edgeRenderer, null);
+	} //
+	
+	/**
+	 * Constructor.
+	 * @param nodeRenderer the Renderer to use for NodeItems
 	 * @param edgeRenderer the Renderer to use for EdgeItems
 	 * @param aggrRenderer the Renderer to use for AggregateItems
 	 */
