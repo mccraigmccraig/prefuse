@@ -72,11 +72,13 @@ public class DisplayLib {
                 continue;
             }
             double x = nitem.getX(), y = nitem.getY();
-            if ( !(Double.isInfinite(x) || Double.isNaN(x)) )
+            if ( !(Double.isInfinite(x) || Double.isNaN(x)) &&
+                 !(Double.isInfinite(y) || Double.isNaN(y)) )
+            {
                 cx += x;
-            if ( !(Double.isInfinite(y) || Double.isNaN(y)) )
                 cy += y;
-            count++;
+                count++;
+            }
         }
         if ( count > 0 ) {
             cx /= count;
