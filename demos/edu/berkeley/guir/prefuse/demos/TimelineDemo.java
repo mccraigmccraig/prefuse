@@ -30,7 +30,6 @@ import edu.berkeley.guir.prefuse.timeline.TimelineConstants;
 import edu.berkeley.guir.prefuse.timeline.TimelineDataRenderer;
 import edu.berkeley.guir.prefuse.timeline.TimelineLayout;
 import edu.berkeley.guir.prefusex.controls.DragControl;
-import edu.berkeley.guir.prefusex.layout.RandomLayout;
 
 /**
  * @author Jack Li jack(AT)cs_D0Tberkeley_D0Tedu
@@ -72,7 +71,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         int notchIndex = 1; // (0 is time_start, taken care of in the line
                             // before)
         if (divisionSpecification == NUM_DIVISIONS) {
-            final int numDivisions = 12; // entered desired division in this
+            final int numDivisions = 20; // entered desired division in this
                                          // mode
             notchLength = timelineSpan / numDivisions;
             for (; notchIndex < numDivisions; notchIndex++) {
@@ -115,10 +114,6 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         final ActionList actions = new ActionList(registry);
         actions.add(new GraphFilter());
         actions.add(new MusicHistoryColorFunction());
-        actions.add(new RandomLayout()); // change to timeline layout,
-                                         // musictimelinelayout
-        //actions.add(new TimelineLayout(timelineLength, notchIndex)); // the
-        // final notchIndex is the number of divisions
         actions.add(new MusicHistoryLayout(timelineLength, notchIndex));
         actions.add(new RepaintAction());
         actions.runNow();
@@ -173,11 +168,11 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
             super(m_timelineLength, m_numDivisions);
         }
 
-        private double getNodePosition(final int year, final double leftOffset) {
-            final int yearsFromLeft = year - timeline_start;
-            final double fractionFromLeft = (double) yearsFromLeft
-                    / timelineSpan;
-            return leftOffset + (fractionFromLeft * m_timelineLength);
+        private double getNodePosition(final int startYear, final int endYear, final double leftOffset) {
+            final int yearsFromLeft = startYear - timeline_start;
+            final double centerCorrection = ((double) endYear - startYear) / (timeline_end - timeline_start) * m_timelineLength / 2;
+            final double fractionFromLeft = (double) yearsFromLeft / timelineSpan; // horn or not?
+            return leftOffset + centerCorrection + (fractionFromLeft * m_timelineLength);
         }
 
         public void run(final ItemRegistry registry, final double frac) {
@@ -205,32 +200,38 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
                     }
                     setLocation(node, null, x, y);
                 } else {
-                    final String startYear = node.getAttribute(START_YEAR);
-                    final double x;
-                    if (startYear.equals(TIMELINE_START)) {
-                        x = getNodePosition(timeline_start, leftOffset);
+                    final String startYearString = node.getAttribute(START_YEAR);
+                    final String endYearString = node.getAttribute(END_YEAR);
+
+                    final int startYear, endYear;
+                    if (startYearString.equals(TIMELINE_START)) {
+                    	startYear = timeline_start;
                     } else {
-                        System.out.println(startYear);
-                        x = getNodePosition(new Integer(startYear).intValue(),
-                                leftOffset);
+                    	startYear = new Integer(startYearString).intValue(); // whoever gets children's hsopital
                     }
+                    if (endYearString.equals(TIMELINE_END)) {
+                    	endYear = timeline_end;
+                    }
+                    else {
+                    	endYear = new Integer(endYearString).intValue();
+                    }
+                    final double x = getNodePosition(startYear, endYear, leftOffset);
                     final double yOffset;
                     final String nodeType = node.getAttribute(NODE_TYPE);
                     if (nodeType.equals(PERIOD_TYPE)) {
-                        yOffset = 1 / 5;
+                        yOffset = 1.0 / 6;
                     } else if (nodeType.equals(EVENT_TYPE)) {
-                        yOffset = 2 / 5;
+                        yOffset = 2.0 / 5;
                     } else if (nodeType.equals(PERSON_TYPE)) {
-                        yOffset = 3 / 5;
+                        yOffset = 3.0 / 5;
                     } else if (nodeType.equals(PIECE_TYPE)) {
-                        yOffset = 4 / 5;
+                        yOffset = 4.0 / 5;
                     } else {
-                        yOffset = 1;
+                        yOffset = 1.0;
                     }
-                    final Rectangle2D b = getLayoutBounds(registry);
-                    final double y = b.getY() + Math.random()*b.getHeight();
-                    //final double y = bounds.getY() - yOffset * bounds.getHeight();//
-                    		//+ Math.random() / 10 * bounds.getHeight(); // make y random for now
+                    //final double y = bounds.getY() + Math.random()*bounds.getHeight();
+                    final double y = bounds.getY() + yOffset * bounds.getHeight()
+                    		+ Math.random() / 8 * bounds.getHeight();
                     setLocation(node, null, x, y);
                 }
             }
