@@ -53,11 +53,6 @@ public class NeighborHighlightControl extends ControlAdapter {
             setNeighborHighlight((NodeItem)item, false);
     } //
     
-    public void itemReleased(VisualItem item, MouseEvent e) {
-        if ( item instanceof NodeItem )
-            setNeighborHighlight((NodeItem)item, false);
-    } //
-    
     public void setNeighborHighlight(NodeItem n, boolean state) {
         ItemRegistry registry = n.getItemRegistry();
         synchronized ( registry ) {
