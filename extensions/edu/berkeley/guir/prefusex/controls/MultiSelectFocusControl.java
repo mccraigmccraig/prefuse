@@ -17,22 +17,38 @@ import edu.berkeley.guir.prefuse.util.DefaultFocusSet;
 import edu.berkeley.guir.prefuse.util.FocusSet;
 
 /**
+ * Manages a focus set of selected items, adding or removing items from
+ * the selection set in response to shift-clicks.
+ * 
  * @author Jack Li jack(AT)cs_D0Tberkeley_D0Tedu
  */
 public class MultiSelectFocusControl extends ControlAdapter {
-	// (( CONSTANTS )) \\
-    private static final Object FOCUS_KEY = FocusManager.SELECTION_KEY;
+
+    private static final Object DEFAULT_FOCUS_KEY = FocusManager.SELECTION_KEY;
 	private final ItemRegistry registry; // needed for clearing focusSet on mouseClicked
-    
+    private final Object focusKey;
 	
-	// (( CONSTRUCTORS )) \\
+	/**
+	 * Constructor. Uses the FocusManager.SELECTION_KEY as the key for the
+	 * selection focus set.
+	 * @param registry ItemRegistry monitoring the focus set
+	 */
     public MultiSelectFocusControl(final ItemRegistry registry) {
+        this(registry, DEFAULT_FOCUS_KEY);
+    } //
+    
+    /**
+	 * Constructor. Uses the given focusKey as the key for the
+	 * selection focus set.
+	 * @param registry ItemRegistry monitoring the focus set
+	 * @param focusKey the key object to use to access the selection FocusSet
+	 */
+    public MultiSelectFocusControl(final ItemRegistry registry, Object focusKey) {
     	this.registry = registry;
-    	registry.getFocusManager().putFocusSet(FOCUS_KEY, new DefaultFocusSet());
-    }
+    	this.focusKey = focusKey;
+    	registry.getFocusManager().putFocusSet(focusKey, new DefaultFocusSet());
+    } //
     
-    
-    // (( METHODS )) \\
     /**
      * Shift click adds the item to the focus set if not added;
      * else it removes the item
@@ -42,7 +58,7 @@ public class MultiSelectFocusControl extends ControlAdapter {
              SwingUtilities.isLeftMouseButton(e))
         {
         	final FocusManager focusManager = registry.getFocusManager();
-            final FocusSet focusSet = focusManager.getFocusSet(FOCUS_KEY);
+            final FocusSet focusSet = focusManager.getFocusSet(focusKey);
             final Entity node = item.getEntity();
             
             if (e.isShiftDown()) { // mode: adding to/removing from focus set
@@ -52,7 +68,7 @@ public class MultiSelectFocusControl extends ControlAdapter {
 					focusSet.add(node);
 				}
 			} else { // mode: doing something cool/resetting focus
-				if (focusManager.isFocus(FOCUS_KEY, node)) {
+				if (focusManager.isFocus(focusKey, node)) {
 					System.out.println("a selected item has been clicked"+item);
 					// bring up comparison pane
 					//addComparisonPane(focusSet);
@@ -68,6 +84,7 @@ public class MultiSelectFocusControl extends ControlAdapter {
      * Clear the focus
      */
 	public void mouseClicked(MouseEvent e) {
-		registry.getFocusManager().getFocusSet(FOCUS_KEY).clear();
-	}
-}
+		registry.getFocusManager().getFocusSet(focusKey).clear();
+	} //
+	
+} // end of class MultiSelectFocusControl
