@@ -172,8 +172,8 @@ public class ForceDirectedLayout extends Layout {
            ForceItem f1 = (ForceItem)n1.getVizAttribute("forceItem");
            NodeItem  n2 = (NodeItem)e.getSecondNode();
            ForceItem f2 = (ForceItem)n2.getVizAttribute("forceItem");
-           float coeff = getSpringCoefficient(n1, n2);
-           float slen = getSpringLength(n1, n2);
+           float coeff = getSpringCoefficient(e);
+           float slen = getSpringLength(e);
            fsim.addSpring(f1, f2, (coeff>=0?coeff:-1.f), (slen>=0?slen:-1.f));
        }      
     } //
@@ -182,11 +182,11 @@ public class ForceDirectedLayout extends Layout {
         return 1.0f;
     } //
     
-    protected float getSpringLength(NodeItem n1, NodeItem n2) {
+    protected float getSpringLength(EdgeItem e) {
         return -1.f;
     } //
     
-    protected float getSpringCoefficient(NodeItem n1, NodeItem n2) {
+    protected float getSpringCoefficient(EdgeItem e) {
         return -1.f;
     } //
     
