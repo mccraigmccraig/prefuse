@@ -247,14 +247,12 @@
     <att name="endyear" value="timeline_end"/>
     <att name="comments" value="If the Romantic period saw the start of some fragmentation into different schools, this trend continued and accelerated into the modern era. There were those who continued to develop older traditions: the neo-classicists, the late romantics and the impressionist schools still prevailed, and those who took a new path with atonal music, serialism and later with experimental and minimalist music. Some composers created thematic material which could hardly be called 'melodies,' introducing dissonant intervals and different scales, and unusual rhythms and cross-rhythms were explored. There were composers, considered extreme by some audiences, who used traditional instruments in unconventional ways, overturned principles previously considered fundamental, and questioned the roles of composer, musician and listener. Experimental composers used randomization techniques, or gave unusual instructions which might not include any conventional musical notation at all.\n\nWhile classical music became more elite, popular music (which had been around for centuries) found a new mass audience, with the advent of recordings, radio and television. These new media had an insatiable demand for music, and film music in particular required much original music and recruited composers educated in the classical traditions. Popular music in turn had a strong influence on serious music, and jazz and other ideas became incorporated into the concert repertoire. The same electricity which powered the new media, also fuelled new gadgets for amplification and powered new instruments such as the electric guitar and synthesisers. More recently it has become possible to create and manipulate sound solely within computers, in a similar way to their use for creating graphics and animations for those same media. With all these developments music is much more accessible around the world, and as styles and techniques are invented, re-invented and combined this in turn stimulates further invention and discovery.\n\nComposers of the modern period include Richard Strauss, Edward Elgar, William Walton, Ralph Vaughan Williams, Erich Wolfgang Korngold, Sergei Rachmaninov, Zoltan Kodaly, Igor Stravinsky, Bela Bartok, George Gershwin, Maurice Ravel, Francois Poulenc, Arnold Schoenberg, Alban Berg, Anton Webern, Sergei Prokofiev, Dmitri Shostakovich, John Cage, Philip Glass, Michael Nyman, Leonard Bernstein, Pierre Boulez, Benjamin Britten, Henryk Gorecki, John Corigliano, Aaron Copland, John Williams, Georges Auric, Darius Milhaud, Malcolm Arnold."/>
 </node>
-  <node id="" label="???">
+  <node id="" label="">
 	<att name="nodetype" value="person"/>
     <att name="startyear" value=""/>
     <att name="endyear" value=""/>
     <att name="comments" value=""/>
 </node>
 
-  <!-- edges -->
-  <edge source="al-shehhi" target="halghamdi" weight="1"></edge>
-  <edge source="al-shehhi" target="raissi" weight="2"></edge>
+  <!-- [no] edges -->
 </graph>
