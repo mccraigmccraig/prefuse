@@ -252,14 +252,14 @@ public class ToolTipManager implements MouseMotionListener {
             return new Dimension(w,h);
         } //
         public void paintComponent(Graphics g) {
-            if ( text == null ) return;
+            //if ( text == null ) return;
             Rectangle r = this.getBounds();
             g.setColor(getBackground());
             g.fillRect(0,0,r.width-1,r.height-1);
             g.setColor(getForeground());
             g.drawRect(0,0,r.width-1,r.height-1);
             FontMetrics fm = g.getFontMetrics();
-            g.drawString(text,4,fm.getAscent());
+            if (text != null) g.drawString(text,4,fm.getAscent());
         } //
         public String getText() {
             return text;
