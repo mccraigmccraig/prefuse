@@ -31,8 +31,8 @@ public abstract class Layout extends AbstractAction {
     public Rectangle2D getLayoutBounds(ItemRegistry registry) {
         if ( m_bounds != null )
             return m_bounds;
-        Display d;
-        if ( registry != null && (d=registry.getDisplay(0)) != null ) {
+        if ( registry != null && registry.getDisplayCount() > 0 ) {
+            Display d = registry.getDisplay(0);
             Insets i = d.getInsets(m_insets);
             m_bpts[0] = i.left; 
             m_bpts[1] = i.top;
