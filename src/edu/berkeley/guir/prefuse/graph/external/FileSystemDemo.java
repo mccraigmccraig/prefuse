@@ -15,11 +15,11 @@ import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
-import edu.berkeley.guir.prefuse.action.ColorFunction;
-import edu.berkeley.guir.prefuse.action.FisheyeGraphFilter;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
-import edu.berkeley.guir.prefuse.action.TreeEdgeFilter;
-import edu.berkeley.guir.prefuse.activity.ActionPipeline;
+import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
+import edu.berkeley.guir.prefuse.action.filter.FisheyeGraphFilter;
+import edu.berkeley.guir.prefuse.action.filter.TreeEdgeFilter;
+import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
@@ -51,7 +51,7 @@ import edu.berkeley.guir.prefusex.layout.ForceDirectedLayout;
 public class FileSystemDemo extends JFrame {
 
     private ItemRegistry   registry;
-    private ActionPipeline forces, filter;
+    private ActionList forces, filter;
     private FileSystemLoader loader;
     
     public static void main(String[] argv) {
@@ -97,11 +97,11 @@ public class FileSystemDemo extends JFrame {
         registry.setRendererFactory(new DefaultRendererFactory(
                 nodeRenderer, edgeRenderer, null));
         
-        filter = new ActionPipeline(registry);
+        filter = new ActionList(registry);
         filter.add(new FisheyeGraphFilter(-3));
         filter.add(new TreeEdgeFilter());
         
-        forces = new ActionPipeline(registry,-1,20);
+        forces = new ActionList(registry,-1,20);
         forces.add(new AbstractAction() {
             public void run(ItemRegistry registry, double frac) {
                 Iterator iter = registry.getNodeItems();

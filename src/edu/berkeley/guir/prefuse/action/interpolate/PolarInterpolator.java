@@ -1,4 +1,4 @@
-package edu.berkeley.guir.prefuse.action;
+package edu.berkeley.guir.prefuse.action.interpolate;
 
 import java.awt.geom.Point2D;
 import java.util.HashSet;
@@ -6,8 +6,10 @@ import java.util.Iterator;
 import java.util.Set;
 
 import edu.berkeley.guir.prefuse.AggregateItem;
-import edu.berkeley.guir.prefuse.VisualItem;
+import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.VisualItem;
+import edu.berkeley.guir.prefuse.action.AbstractAction;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.graph.Entity;
@@ -25,9 +27,17 @@ public class PolarInterpolator extends AbstractAction implements FocusListener {
 
 	private static final double TWO_PI = 2*Math.PI;
 	
+    private Point2D m_anchor = new Point2D.Double();
 	private Set m_linear = new HashSet();
     private ItemRegistry m_registry;
 
+    private Point2D getAnchor(ItemRegistry registry) {
+        Display d = registry.getDisplay(0);
+        m_anchor.setLocation(d.getWidth()/2,d.getHeight()/2);
+        d.getAbsoluteCoordinate(m_anchor, m_anchor);
+        return m_anchor;
+    }
+    
 	public void run(ItemRegistry registry, double frac) {
 	    if ( registry != m_registry ) {
 	        if ( m_registry != null )
@@ -36,11 +46,7 @@ public class PolarInterpolator extends AbstractAction implements FocusListener {
             m_registry.getDefaultFocusSet().addFocusListener(this);
         }
         
-        // TODO: replace this with anchor parameter
-        Iterator fiter = registry.getDefaultFocusSet().iterator();
-        Node focus = (Node)fiter.next();
-        VisualItem fitem = registry.getNodeItem(focus);
-        Point2D anchor = fitem.getEndLocation();
+        Point2D anchor = getAnchor(registry);
 		
 		double ax, ay, sx, sy, ex, ey, x, y;
 		double dt1, dt2, sr, st, er, et, r, t, stt, ett;
@@ -50,8 +56,7 @@ public class PolarInterpolator extends AbstractAction implements FocusListener {
 		
 		Iterator itemIter = m_registry.getItems();
 		while ( itemIter.hasNext() ) {
-			VisualItem item = (VisualItem)itemIter.next(); 
-            Entity entity  = (Entity)item.getEntity();
+			VisualItem item = (VisualItem)itemIter.next();
 			Point2D startLoc = item.getStartLocation();
 			Point2D endLoc   = item.getEndLocation();
 
@@ -61,7 +66,7 @@ public class PolarInterpolator extends AbstractAction implements FocusListener {
 			ey = endLoc.getY() - ay;
 
 			// linearly interpolate to and from focus
-			if ( m_linear.contains(entity) ) {
+			if ( m_linear.contains(item) ) {
 				x = startLoc.getX() + frac * (endLoc.getX()-startLoc.getX());
 				y = startLoc.getY() + frac * (endLoc.getY()-startLoc.getY());
 				item.setLocation(x,y);
@@ -117,8 +122,9 @@ public class PolarInterpolator extends AbstractAction implements FocusListener {
         if ( e.getEventType() == FocusEvent.FOCUS_SET ) {
             m_linear.clear();
             Entity[] rem = e.getRemovedFoci();
-            if ( rem.length > 0 && rem[0] instanceof TreeNode ) {
-                TreeNode p = (TreeNode)rem[0];
+            if ( rem.length == 0 ) return;
+            if ( rem[0] instanceof Node ) {
+                TreeNode p = m_registry.getNodeItem((Node)rem[0]);
                 for ( ; p != null; p = p.getParent() )        
                     m_linear.add(p);
             }

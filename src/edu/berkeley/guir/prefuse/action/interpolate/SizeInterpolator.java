@@ -1,9 +1,10 @@
-package edu.berkeley.guir.prefuse.action;
+package edu.berkeley.guir.prefuse.action.interpolate;
 
 import java.util.Iterator;
 
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.action.AbstractAction;
 
 /**
  * Linearly interpolates the size of a VisualItem.

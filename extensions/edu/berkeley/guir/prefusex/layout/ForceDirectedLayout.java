@@ -6,7 +6,7 @@ import java.util.Iterator;
 import edu.berkeley.guir.prefuse.EdgeItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
-import edu.berkeley.guir.prefuse.action.Layout;
+import edu.berkeley.guir.prefuse.action.assignment.Layout;
 import edu.berkeley.guir.prefusex.force.DragForce;
 import edu.berkeley.guir.prefusex.force.ForceItem;
 import edu.berkeley.guir.prefusex.force.ForceSimulator;

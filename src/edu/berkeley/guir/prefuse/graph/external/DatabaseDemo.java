@@ -16,11 +16,11 @@ import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
-import edu.berkeley.guir.prefuse.action.ColorFunction;
-import edu.berkeley.guir.prefuse.action.FisheyeGraphFilter;
-import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
-import edu.berkeley.guir.prefuse.activity.ActionPipeline;
+import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
+import edu.berkeley.guir.prefuse.action.filter.FisheyeGraphFilter;
+import edu.berkeley.guir.prefuse.action.filter.GraphEdgeFilter;
+import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.event.ItemRegistryListener;
@@ -53,7 +53,7 @@ import edu.berkeley.guir.prefusex.layout.ForceDirectedLayout;
 public class DatabaseDemo extends JFrame {
 
     private ItemRegistry   registry;
-    private ActionPipeline forces, filter;
+    private ActionList forces, filter;
     private DatabaseLoader loader;
     
     private static final String sQuery = "select * from nodes where id = ";
@@ -132,8 +132,8 @@ public class DatabaseDemo extends JFrame {
         registry.setRendererFactory(new DefaultRendererFactory(
                 nodeRenderer, edgeRenderer, null));
         
-        // initialize force simulator and action pipelines
-        filter = new ActionPipeline(registry);
+        // initialize force simulator and action lists
+        filter = new ActionList(registry);
         filter.add(new FisheyeGraphFilter(-1));
         filter.add(new GraphEdgeFilter());
         
@@ -141,7 +141,7 @@ public class DatabaseDemo extends JFrame {
         fsim.addForce(new NBodyForce(-0.4f, 0.9f));
         fsim.addForce(new SpringForce(5E-5f, 150f));
         fsim.addForce(new DragForce(-0.005f));
-        forces = new ActionPipeline(registry,-1,20);
+        forces = new ActionList(registry,-1,20);
         forces.add(new AbstractAction() {
             public void run(ItemRegistry registry, double frac) {
                 Iterator iter = registry.getNodeItems();

@@ -13,7 +13,7 @@ import edu.berkeley.guir.prefuse.event.ActivityListener;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  * @see edu.berkeley.guir.prefuse.activity.ActivityManager
- * @see edu.berkeley.guir.prefuse.activity.ActionPipeline
+ * @see edu.berkeley.guir.prefuse.activity.ActionList
  */
 public abstract class Activity {
 

@@ -1,4 +1,4 @@
-package edu.berkeley.guir.prefuse.action;
+package edu.berkeley.guir.prefuse.action.filter;
 
 import java.awt.geom.Point2D;
 import java.util.Iterator;

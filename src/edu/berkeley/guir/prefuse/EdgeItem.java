@@ -52,7 +52,7 @@ public class EdgeItem extends VisualItem implements Edge {
      * @return true if this edge is directed, false otherwise
      */
 	public boolean isDirected() {
-		return ((Edge)m_entity).isDirected();
+        return ((Edge)m_entity).isDirected();
 	} //
     
     /**
@@ -60,7 +60,9 @@ public class EdgeItem extends VisualItem implements Edge {
      * @return true if this edge is a tree edge, false otherwise
      */
     public boolean isTreeEdge() {
-        return ((Edge)m_entity).isTreeEdge();
+        NodeItem n1 = (NodeItem)m_node1;
+        NodeItem n2 = (NodeItem)m_node2;
+        return (n1.getParent() == n2 || n2.getParent()== n1);
     } //
 	
     /**

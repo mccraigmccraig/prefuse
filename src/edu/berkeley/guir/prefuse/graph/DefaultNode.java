@@ -13,7 +13,7 @@ import edu.berkeley.guir.prefuse.collections.NodeIterator;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class DefaultNode extends AbstractEntity implements Node {
+public class DefaultNode extends DefaultEntity implements Node {
 	
 	protected List m_edges;
 	

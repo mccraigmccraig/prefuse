@@ -6,13 +6,14 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Abstract class from which graph entities (nodes and edges) can descend.
- * Provides support for handling entity attributes.
+ * A basic Entity implementation providing an object that can support
+ * any number of attributes. This is also the class from which the default
+ * implementation of graph entities (nodes and edges) descend.
  * 
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public abstract class AbstractEntity implements Entity {	
+public class DefaultEntity implements Entity {	
 
 	protected Map m_attributes;	
 
@@ -103,4 +104,4 @@ public abstract class AbstractEntity implements Entity {
         return sbuf.toString();
     } //
 
-} // end of abstract class AbstractEntity
+} // end of class DefaultEntity

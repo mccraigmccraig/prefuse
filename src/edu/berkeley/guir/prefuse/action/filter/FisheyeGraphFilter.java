@@ -1,12 +1,15 @@
-package edu.berkeley.guir.prefuse.action;
+package edu.berkeley.guir.prefuse.action.filter;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.berkeley.guir.prefuse.EdgeItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
+import edu.berkeley.guir.prefuse.graph.DefaultGraph;
+import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.Node;
 
@@ -18,7 +21,7 @@ import edu.berkeley.guir.prefuse.graph.Node;
  * by the minimum DOI value set for this action. By convention, DOI values
  * start at zero for focus nodes, and becoming decreasing negative numbers for
  * each hop away from a focus. This filter also performs garbage collection
- * of node items by default.</p>
+ * of node and edge items by default.</p>
  * 
  * <p>For more information about Furnas' fisheye view calculation and DOI values,
  * take a look at G.W. Furnas, "The FISHEYE View: A New Look at Structured 
@@ -39,24 +42,45 @@ import edu.berkeley.guir.prefuse.graph.Node;
  */
 public class FisheyeGraphFilter extends Filter {
 
+    public static final String[] ITEM_CLASSES = 
+        {ItemRegistry.DEFAULT_NODE_CLASS, ItemRegistry.DEFAULT_EDGE_CLASS};
+    
     public static final int DEFAULT_MIN_DOI = -2;
 	public static final String ATTR_CENTER  = "center";
 
-	protected int m_minDOI;
+	private int m_minDOI;
+    private boolean m_edgesVisible = true;
+    private List m_queue = new LinkedList();
     
-    protected ItemRegistry m_registry;
-    protected Graph m_graph;
-    protected List m_queue = new LinkedList();
+    // ========================================================================
+    // == CONSTRUCTORS ========================================================
     
     public FisheyeGraphFilter() {
         this(DEFAULT_MIN_DOI);
     } //
     
     public FisheyeGraphFilter(int minDOI) {
-        super(ItemRegistry.DEFAULT_NODE_CLASS, true);
-        m_minDOI = minDOI;
+        this(minDOI, true);
     } //
     
+    public FisheyeGraphFilter(int minDOI, boolean edgesVisible) {
+        this(minDOI, edgesVisible, true);
+    } //
+    
+    public FisheyeGraphFilter(int minDOI, boolean edgesVisible, boolean gc) {
+        super(ITEM_CLASSES, gc);
+        m_minDOI = minDOI;
+        m_edgesVisible = edgesVisible;
+    } //
+    
+    // ========================================================================
+    // == FILTER METHODS ======================================================
+    
+    /**
+     * Returns an iterator over the Entities in the default focus set.
+     * Override this method to control what Entities are passed to the
+     * filter as foci of the fisheye.
+     */
     protected Iterator getFoci(ItemRegistry registry) {
         Iterator iter = registry.getDefaultFocusSet().iterator();
         if ( !iter.hasNext() )
@@ -68,9 +92,16 @@ public class FisheyeGraphFilter extends Filter {
      * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
      */
 	public void run(ItemRegistry registry, double frac) {
-        m_registry = registry;
-		m_graph = registry.getGraph();
+		Graph graph = registry.getGraph();
+		// initialize filtered graph
+        Graph fgraph = registry.getFilteredGraph();
+        if ( fgraph instanceof DefaultGraph )
+            ((DefaultGraph)fgraph).reinit(graph.isDirected());
+        else
+            fgraph = new DefaultGraph();
 
+        // filter the nodes using a depth-limited breadth first search
+        // around the focus nodes
 		Iterator focusIter = getFoci(registry);
 		while ( focusIter.hasNext() ) {
             Object focus = focusIter.next();
@@ -83,7 +114,7 @@ public class FisheyeGraphFilter extends Filter {
             recurse = ( fitem==null ||  fitem.getDirty()>0 || fitem.getDOI()<0 );
             
             fitem = registry.getNodeItem(fnode, true);
-            fitem.removeAllNeighbors(); // necessary?
+            fgraph.addNode(fitem);
             
             if ( !recurse )
                 continue;
@@ -101,11 +132,11 @@ public class FisheyeGraphFilter extends Filter {
                     int i = 0;
                     while ( niter.hasNext() ) {
                         Node nn = (Node)niter.next();
-                        NodeItem nni = m_registry.getNodeItem(nn);
+                        NodeItem nni = registry.getNodeItem(nn);
                         
                         recurse = ( nni==null ||  nni.getDirty()>0 || nni.getDOI()<doi );
-                        nni = m_registry.getNodeItem(nn, true);
-                        nni.removeAllNeighbors(); // necessary?
+                        nni = registry.getNodeItem(nn, true);
+                        fgraph.addNode(nni);
                         
                         if ( recurse ) {
                             nni.setDOI(doi);
@@ -116,8 +147,25 @@ public class FisheyeGraphFilter extends Filter {
             } // elihw
 		}
         
-        m_registry = null;
-        m_graph = null;
+        // now filter the graph edges
+        Iterator nodeIter = registry.getNodeItems();
+        while ( nodeIter.hasNext() ) {
+            NodeItem nitem  = (NodeItem)nodeIter.next();
+            Node node = (Node)nitem.getEntity();
+            Iterator edgeIter = node.getEdges();
+            while ( edgeIter.hasNext() ) {
+                Edge edge = (Edge)edgeIter.next();
+                Node n = edge.getAdjacentNode(node);
+                if ( registry.isVisible(n) ) {
+                    EdgeItem eitem = registry.getEdgeItem(edge, true);
+                    fgraph.addEdge(eitem);
+                    if ( !m_edgesVisible ) eitem.setVisible(false);
+                }
+            }
+        }
+        
+        // update the registry's filtered graph
+        registry.setFilteredGraph(fgraph);
         
         // optional garbage collection
         super.run(registry, frac);

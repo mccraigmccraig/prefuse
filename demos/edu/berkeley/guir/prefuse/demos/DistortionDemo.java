@@ -28,12 +28,11 @@ import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.Action;
 import edu.berkeley.guir.prefuse.action.ActionMap;
 import edu.berkeley.guir.prefuse.action.ActionSwitch;
-import edu.berkeley.guir.prefuse.action.ColorFunction;
-import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
-import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
-import edu.berkeley.guir.prefuse.action.Layout;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
-import edu.berkeley.guir.prefuse.activity.ActionPipeline;
+import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
+import edu.berkeley.guir.prefuse.action.assignment.Layout;
+import edu.berkeley.guir.prefuse.action.filter.GraphFilter;
+import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.activity.ActivityMap;
 import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.GraphLib;
@@ -84,9 +83,8 @@ public class DistortionDemo extends JFrame {
             new DefaultEdgeRenderer(), 
             null));
         
-        ActionPipeline filter = new ActionPipeline(registry);
-        filter.add(new GraphNodeFilter());
-        filter.add(new GraphEdgeFilter());
+        ActionList filter = new ActionList(registry);
+        filter.add(new GraphFilter());
         filter.add(new ColorFunction() {
             public Paint getFillColor(VisualItem item) {
                 return Color.WHITE;
@@ -95,7 +93,7 @@ public class DistortionDemo extends JFrame {
         filter.add(new GridLayout());
         filter.add(new RepaintAction());
         
-        ActionPipeline distort = new ActionPipeline(registry);
+        ActionList distort = new ActionList(registry);
         Action[] acts = new Action[] {
             actionMap.put("distort1",new BifocalDistortion()),
             actionMap.put("distort2",new FisheyeDistortion())

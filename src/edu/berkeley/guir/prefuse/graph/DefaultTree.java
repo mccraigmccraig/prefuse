@@ -78,7 +78,8 @@ public class DefaultTree extends AbstractGraph implements Tree {
             TreeNode proot = m_root;
             m_root = root;
             fireNodeRemoved(proot);
-            fireNodeAdded(root);
+            if ( root != null )
+                fireNodeAdded(root);
         }
 	} //
 	
@@ -203,20 +204,26 @@ public class DefaultTree extends AbstractGraph implements Tree {
     } //
 
     /**
-     * This operation is not supported by DefaultTree.
-     * Use <tt>setRoot()</tt> or <tt>addChild()</tt> instead.
-     * @throws UnsupportedOperationException upon invocation
      * @see edu.berkeley.guir.prefuse.graph.Graph#addEdge(edu.berkeley.guir.prefuse.graph.Edge)
      */
     public boolean addEdge(Edge e) {
-        throw new UnsupportedOperationException("DefaultTree does not support"
-                + " addEdge(). Use setRoot() or addChild() instead");
+        if ( e.isDirected() ) {
+            throw new IllegalStateException(
+            "Directedness of edge and graph differ");
+        }
+        Node n1 = (Node)e.getFirstNode();
+        Node n2 = (Node)e.getSecondNode();
+        if ( !contains(n1) || !contains(n2) || 
+                n1.isNeighbor(n2) || n2.isNeighbor(n1) ) {
+            return false;
+        }
+        n1.addEdge(e);
+        n2.addEdge(e);
+        fireEdgeAdded(e);
+        return true;
     } //
 
     /**
-     * This operation is not supported by DefaultTree.
-     * Use <tt>removeChild()</tt> instead.
-     * @throws UnsupportedOperationException upon invocation
      * @see edu.berkeley.guir.prefuse.graph.Graph#removeNode(edu.berkeley.guir.prefuse.graph.Node)
      */
     public boolean removeNode(Node n) {
@@ -226,19 +233,34 @@ public class DefaultTree extends AbstractGraph implements Tree {
             m_root = null;
         else
             ((TreeNode)n).getParent().removeChild((TreeNode)n);
+        fireNodeRemoved(n);
         return true;
     } //
 
     /**
-     * This operation is not supported by DefaultTree.
-     * Use <tt>removeChild()</tt> instead.
-     * @throws UnsupportedOperationException upon invocation
      * @see edu.berkeley.guir.prefuse.graph.Graph#removeEdge(edu.berkeley.guir.prefuse.graph.Edge)
      */
     public boolean removeEdge(Edge e) {
-        throw new UnsupportedOperationException("DefaultTree does not support"
-                + " removeEdge(). Use removeChild() instead");
-    }
+        if ( !contains(e) )
+            return false;
+        TreeNode n1 = (TreeNode)e.getFirstNode();
+        TreeNode n2 = (TreeNode)e.getSecondNode();
+        
+        if ( !e.isTreeEdge() ) {
+            n1.removeEdge(e);
+            n2.removeEdge(e);
+            fireEdgeRemoved(e);
+        } else if ( n1 == m_root || n2 == m_root ) {
+            Node tmp = m_root;
+            m_root = null;
+            fireNodeRemoved(tmp);
+        } else {
+            TreeNode p = (n1.getParent() == n2? n2 : n1);
+            p.removeChildEdge(e);
+            fireNodeRemoved(e.getAdjacentNode(p));
+        }
+        return true;
+    } //
 
     /**
      * @see edu.berkeley.guir.prefuse.graph.Graph#replaceNode(edu.berkeley.guir.prefuse.graph.Node, edu.berkeley.guir.prefuse.graph.Node)

@@ -104,8 +104,10 @@ public class ItemRegistry {
 		public Map     itemMap;
 	} // end of inner class ItemEntry
 	
+    private Graph           m_backingGraph;
+    private Graph           m_filteredGraph;
+    
     private List            m_displays;
-    private Graph           m_graph;
     private FocusManager    m_fmanager;
 	private ItemFactory     m_ifactory;
 	private RendererFactory m_rfactory;
@@ -144,7 +146,7 @@ public class ItemRegistry {
      *  performed.
      */
 	public ItemRegistry(Graph g, boolean initDefault) {
-        m_graph = g;
+        m_backingGraph = g;
         m_displays = new ArrayList();
         m_fmanager = new FocusManager();
 		try {
@@ -189,7 +191,7 @@ public class ItemRegistry {
      * @return this ItemRegistry's backing Graph.
      */
     public synchronized Graph getGraph() {
-        return m_graph;
+        return m_backingGraph;
     } //
     
     /**
@@ -197,7 +199,23 @@ public class ItemRegistry {
      * @param g the backing Graph for this ItemRegistry
      */
     public synchronized void setGraph(Graph g) {
-        m_graph = g;
+        m_backingGraph = g;
+    } //
+    
+    /**
+     * Returns the filtered Graph of VisualItems.
+     * @return the filtered graph
+     */
+    public synchronized Graph getFilteredGraph() {
+        return m_filteredGraph;
+    } //
+    
+    /**
+     * Sets the filtered Graph of VisualItems.
+     * @param g the filtered Graph to set
+     */
+    public synchronized void setFilteredGraph(Graph g) {
+        m_filteredGraph = g;
     } //
     
     /**

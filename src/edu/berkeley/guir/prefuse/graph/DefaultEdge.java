@@ -6,7 +6,7 @@ package edu.berkeley.guir.prefuse.graph;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class DefaultEdge extends AbstractEntity implements Edge {
+public class DefaultEdge extends DefaultEntity implements Edge {
 
 	protected Node m_node1;
 	protected Node m_node2;
@@ -50,12 +50,10 @@ public class DefaultEdge extends AbstractEntity implements Edge {
 	 * @return true if this is a tree-edge, false otherwise.
 	 */
 	public boolean isTreeEdge() {
-		if ( m_node1 instanceof DefaultTreeNode && m_node2 instanceof DefaultTreeNode ) {
-			DefaultTreeNode n1 = (DefaultTreeNode)m_node1;
-			DefaultTreeNode n2 = (DefaultTreeNode)m_node2;
-			if ( n1.getChildIndex(n2) > -1 || 
-				 ( !m_directed && n2.getChildIndex(n1) > -1 ) )
-				 return true;
+		if ( m_node1 instanceof TreeNode && m_node2 instanceof TreeNode ) {
+			TreeNode n1 = (TreeNode)m_node1;
+			TreeNode n2 = (TreeNode)m_node2;
+			return (n1.getParent() == n2 || n2.getParent()== n1);
 		}
 		return false;
 	} //

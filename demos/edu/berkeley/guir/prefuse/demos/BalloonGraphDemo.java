@@ -2,10 +2,8 @@ package edu.berkeley.guir.prefuse.demos;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
-import java.awt.Graphics2D;
 import java.awt.Paint;
 
 import javax.swing.JFrame;
@@ -16,14 +14,12 @@ import edu.berkeley.guir.prefuse.EdgeItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
-import edu.berkeley.guir.prefuse.action.ColorFunction;
-import edu.berkeley.guir.prefuse.action.ColorInterpolator;
-import edu.berkeley.guir.prefuse.action.FisheyeTreeFilter;
-import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
-import edu.berkeley.guir.prefuse.action.LinearInterpolator;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
-import edu.berkeley.guir.prefuse.action.TreeEdgeFilter;
-import edu.berkeley.guir.prefuse.activity.ActionPipeline;
+import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
+import edu.berkeley.guir.prefuse.action.filter.FisheyeTreeFilter;
+import edu.berkeley.guir.prefuse.action.interpolate.ColorInterpolator;
+import edu.berkeley.guir.prefuse.action.interpolate.LinearInterpolator;
+import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.activity.SlowInSlowOutPacer;
 import edu.berkeley.guir.prefuse.collections.DOIItemComparator;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
@@ -62,8 +58,8 @@ public class BalloonGraphDemo {
 	public static ItemRegistry registry;
 	public static Tree tree;
 	public static Display display;
-    public static ActionPipeline filter, update, animate;
-    //public static ActionPipeline pipeline, animate, animate2;
+    public static FisheyeTreeFilter feye;
+    public static ActionList filter, update, animate;
     
     private static Font frameCountFont = new Font("SansSerif", Font.PLAIN, 14);
 		
@@ -77,7 +73,7 @@ public class BalloonGraphDemo {
 			// create display and filter
             registry = new ItemRegistry(tree);
             registry.setItemComparator(new DOIItemComparator());
-            display = new DemoDisplay();
+            display = new Display();
 
 			// initialize renderers
 			Renderer nodeRenderer = new TextItemRenderer() {
@@ -116,19 +112,17 @@ public class BalloonGraphDemo {
 			registry.setRendererFactory(new DemoRendererFactory(
 				nodeRenderer, nodeRenderer2, edgeRenderer));
 			
-            // initialize action pipelines
-            filter  = new ActionPipeline(registry);
-            filter.add(new FisheyeTreeFilter(-4));
-            filter.add(new TreeEdgeFilter());
+            // initialize action lists
+            filter  = new ActionList(registry);
+            filter.add((feye=new FisheyeTreeFilter(-4)));
             filter.add(new BalloonTreeLayout());
-            filter.add(new GraphEdgeFilter());
             filter.add(new DemoColorFunction(4));
             
-            update = new ActionPipeline(registry);
+            update = new ActionList(registry);
             update.add(new DemoColorFunction(4));
             update.add(new RepaintAction());
             
-            animate = new ActionPipeline(registry, 1500, 20);
+            animate = new ActionList(registry, 1500, 20);
             animate.setPacingFunction(new SlowInSlowOutPacer());
             animate.add(new LinearInterpolator());
             animate.add(new ColorInterpolator());
@@ -150,15 +144,15 @@ public class BalloonGraphDemo {
                     if ( update.isScheduled() )
                         update.cancel();
                     TreeNode node = (TreeNode)e.getFirstAdded();
-                    if ( node != null && !node.equals(tree.getRoot()) ) {                           
-                        tree = GraphLib.breadthFirstTree(node);
-                        registry.setGraph(tree);
+                    if ( node != null ) {
+                        NodeItem item = registry.getNodeItem(node);
+                        Tree t = GraphLib.breadthFirstTree(item);
+                        registry.setFilteredGraph(t);
                         filter.runNow();
                         animate.runNow();                    
                     }
                 } //
             });
-            registry.getDefaultFocusSet().set(tree.getRoot());
             
 			// create and display application window
 			JFrame frame = new JFrame("BalloonTree");
@@ -202,48 +196,6 @@ public class BalloonGraphDemo {
             }
         } //
     } // end of inner class DemoRendererFactory
-    
-	static class DemoDisplay extends Display {
-		private Color ringColor = Color.LIGHT_GRAY;
-		private int prevInc = -1;
-		private int nextInc = -1;
-		private int inc;
-		
-		protected void prePaint(Graphics2D g) {
-            Dimension d = getSize();
-            String fr = String.valueOf(frameRate) + "00";
-            fr = fr.substring(0,fr.indexOf(".")+3);
-            String s = "frame rate: " + fr + "fps";
-            FontMetrics fm = g.getFontMetrics(frameCountFont);
-            int h = fm.getHeight();
-            int w = fm.stringWidth(s);
-            g.setFont(frameCountFont);
-            g.setColor(Color.BLACK);
-            g.drawString(s, d.width-w-10, 5+h);
-//			if ( layout == null ) return;
-//			double animFrac = m_pipeline.getDoubleAttribute(AnimationManager.ATTR_ANIM_FRAC);
-//			animFrac = ( animFrac >= 1.0 ? 1.0 : animFrac );
-//			if ( animFrac == 0.0 ) {				
-//				nextInc = layout.getRadiusIncrement();
-//				if ( prevInc == -1 ) { prevInc = nextInc; }
-//			}
-//			
-//			Dimension d = this.getSize();
-//			inc = prevInc + (int)Math.round(animFrac * (nextInc - prevInc));
-//			if ( inc < 1 ) { return; }
-//			int w2  = d.width/2;
-//			int h2  = d.height/2;
-//			int hyp = (int)Math.round(Math.sqrt(w2*w2+h2*h2));
-//			g.setColor(ringColor);
-//			for ( int r = inc; r < hyp; r += inc ) {
-//				g.drawOval(w2-r, h2-r, 2*r, 2*r);
-//			}
-//			if ( animFrac == 1.0 ) {
-//				prevInc = nextInc;
-//			}
-		} //
-
-	} // end of inner class DemoDisplay
 	
     static public class DemoColorFunction extends ColorFunction {
         private Color graphEdgeColor = Color.LIGHT_GRAY;

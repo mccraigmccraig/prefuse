@@ -10,7 +10,7 @@ import java.util.List;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class Aggregate extends AbstractEntity {
+public class Aggregate extends DefaultEntity {
 	
 	// The type of list instance used to store entities.
 	protected static final Class LIST_TYPE = ArrayList.class;

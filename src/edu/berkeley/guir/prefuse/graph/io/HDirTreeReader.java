@@ -224,7 +224,7 @@ public class HDirTreeReader extends AbstractTreeReader {
                             TEXTs = aTEXT;
                             //TEXTs
                             node = new DefaultTreeNode();
-							node.setAttribute("Key", String.valueOf(count++));
+							node.setAttribute("id", String.valueOf(count++));
                             node.setAttribute(textFieldName, TEXTs);
                             isizes = 0;
                             if ((c2 = t.nextToken()) == ',') {
@@ -360,7 +360,7 @@ public class HDirTreeReader extends AbstractTreeReader {
                             TEXTs = aTEXT;
 
                             node = new DefaultTreeNode(); 
-							node.setAttribute("Key", String.valueOf(count++));                           
+							node.setAttribute("id", String.valueOf(count++));                           
                             node.setAttribute(textFieldName, TEXTs);
                             isizes = 0;
 

@@ -65,6 +65,17 @@ public class DefaultGraph extends AbstractGraph {
         m_edges = new LinkedHashSet();	
 	} //
 
+    /**
+     * Re-initializes this graph, allowing for reuse. All nodes and edges
+     * are removed from this graph and the edge directedness is reset. 
+     * This call does not notify any listeners of the change!
+     */
+    public void reinit(boolean directed) {
+        m_nodes.clear();
+        m_edges.clear();
+        m_directed = directed;
+    } //
+    
 	/**
 	 * Add a node to this graph.
 	 * @param n the node to add

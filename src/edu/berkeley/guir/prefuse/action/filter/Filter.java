@@ -1,10 +1,11 @@
-package edu.berkeley.guir.prefuse.action;
+package edu.berkeley.guir.prefuse.action.filter;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.action.AbstractAction;
 
 /**
  * Abstract class providing garbage collection facilities for Action instances

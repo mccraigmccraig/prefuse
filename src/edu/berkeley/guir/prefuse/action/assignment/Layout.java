@@ -1,4 +1,4 @@
-package edu.berkeley.guir.prefuse.action;
+package edu.berkeley.guir.prefuse.action.assignment;
 
 import java.awt.Insets;
 import java.awt.geom.Point2D;
@@ -6,6 +6,7 @@ import java.awt.geom.Rectangle2D;
 
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.action.AbstractAction;
 
 /**
  * Abstract class providing convenience methods for graph layout algorithms.

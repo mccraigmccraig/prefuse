@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.VisualItem;
-import edu.berkeley.guir.prefuse.action.Layout;
+import edu.berkeley.guir.prefuse.action.assignment.Layout;
 
 /**
  * Abstract class providing skeletal implementation for space-distortion

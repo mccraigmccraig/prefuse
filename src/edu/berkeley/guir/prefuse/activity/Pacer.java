@@ -8,7 +8,7 @@ package edu.berkeley.guir.prefuse.activity;
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
- * @see edu.berkeley.guir.prefuse.activity.ActionPipeline
+ * @see edu.berkeley.guir.prefuse.activity.ActionList
  * @see edu.berkeley.guir.prefuse.activity.SlowInSlowOutPacer
  * @see edu.berkeley.guir.prefuse.activity.ThereAndBackPacer
  */

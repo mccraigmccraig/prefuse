@@ -1,10 +1,11 @@
-package edu.berkeley.guir.prefuse.action;
+package edu.berkeley.guir.prefuse.action.interpolate;
 
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.action.AbstractAction;
 
 /**
  * This class linearly interpolates a node position between two positions. This

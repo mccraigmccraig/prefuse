@@ -11,7 +11,7 @@ import java.util.List;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
-import edu.berkeley.guir.prefuse.action.TreeLayout;
+import edu.berkeley.guir.prefuse.action.assignment.TreeLayout;
 
 /**
  * <p>

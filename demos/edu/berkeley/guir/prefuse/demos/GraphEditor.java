@@ -29,25 +29,24 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 import edu.berkeley.guir.prefuse.Display;
-import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
-import edu.berkeley.guir.prefuse.action.ActionMap;
-import edu.berkeley.guir.prefuse.action.FontFunction;
-import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
-import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
-import edu.berkeley.guir.prefuse.action.RepaintAction;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
-import edu.berkeley.guir.prefuse.activity.ActionPipeline;
+import edu.berkeley.guir.prefuse.action.ActionMap;
+import edu.berkeley.guir.prefuse.action.RepaintAction;
+import edu.berkeley.guir.prefuse.action.assignment.FontFunction;
+import edu.berkeley.guir.prefuse.action.filter.GraphFilter;
+import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.activity.Activity;
 import edu.berkeley.guir.prefuse.activity.ActivityMap;
 import edu.berkeley.guir.prefuse.event.ActivityAdapter;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 import edu.berkeley.guir.prefuse.graph.DefaultEdge;
+import edu.berkeley.guir.prefuse.graph.DefaultGraph;
+import edu.berkeley.guir.prefuse.graph.DefaultNode;
 import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Graph;
-import edu.berkeley.guir.prefuse.graph.DefaultNode;
-import edu.berkeley.guir.prefuse.graph.DefaultGraph;
 import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.graph.io.GraphReader;
 import edu.berkeley.guir.prefuse.graph.io.GraphWriter;
@@ -143,9 +142,8 @@ public class GraphEditor extends JFrame {
 			display.addControlListener(controller);
 			
 			// initialize filter
-            ActionPipeline filter = new ActionPipeline(registry);
-            filter.add(new GraphNodeFilter());
-            filter.add(new GraphEdgeFilter());
+            ActionList filter = new ActionList(registry);
+            filter.add(new GraphFilter());
             filter.add(actionMap.put("font", new FontFunction() {
                 public Font getFont(VisualItem item) {
                     return curFont;
@@ -153,7 +151,7 @@ public class GraphEditor extends JFrame {
             }));
             activityMap.put("filter", filter);
             
-            ActionPipeline update = new ActionPipeline(registry);
+            ActionList update = new ActionList(registry);
             update.add(new AbstractAction() {
 				public void run(ItemRegistry registry, double frac) {
 					Iterator nodeIter = registry.getNodeItems();
@@ -167,12 +165,12 @@ public class GraphEditor extends JFrame {
             update.add(new RepaintAction());
             activityMap.put("update", update);
             
-            ActionPipeline randomLayout = new ActionPipeline(registry);
+            ActionList randomLayout = new ActionList(registry);
             randomLayout.add(actionMap.put("random",new RandomLayout()));
             randomLayout.add(update);
             activityMap.put("randomLayout", randomLayout);
             
-            ActionPipeline forceLayout = new ActionPipeline(registry,-1,20);
+            ActionList forceLayout = new ActionList(registry,-1,20);
             forceLayout.add(actionMap.put("force",new ForceDirectedLayout(true)));
             forceLayout.add(update);
             forceLayout.addActivityListener(new ActivityAdapter() {

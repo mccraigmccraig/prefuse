@@ -21,11 +21,10 @@ import edu.berkeley.guir.prefuse.EdgeItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
-import edu.berkeley.guir.prefuse.action.ColorFunction;
-import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
-import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
-import edu.berkeley.guir.prefuse.activity.ActionPipeline;
+import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
+import edu.berkeley.guir.prefuse.action.filter.GraphFilter;
+import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.activity.Activity;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 import edu.berkeley.guir.prefuse.graph.Graph;
@@ -60,7 +59,7 @@ public class ForceDemo extends Display {
     private ForceSimulator m_fsim;
     private String         m_textField;
     private ItemRegistry   m_registry;
-    private Activity       m_pipeline;
+    private Activity       m_actionList;
     
     private Font frameCountFont = new Font("SansSerif", Font.PLAIN, 14);
     
@@ -75,7 +74,7 @@ public class ForceDemo extends Display {
         m_registry = new ItemRegistry(g);
         this.setItemRegistry(m_registry);
         initRenderers();
-        m_pipeline = initPipeline();
+        m_actionList = initActionList();
         setSize(700,700);
         pan(350,350);
         this.addControlListener(new NeighborHighlightControl());
@@ -113,7 +112,7 @@ public class ForceDemo extends Display {
         frame.setVisible(true);
         
         // start force simulation
-        m_pipeline.runNow();
+        m_actionList.runNow();
     } //
     
     private void initRenderers() {
@@ -127,14 +126,13 @@ public class ForceDemo extends Display {
                 nodeRenderer, edgeRenderer, null));
     } //
     
-    private ActionPipeline initPipeline() {
-        ActionPipeline pipeline = new ActionPipeline(m_registry,-1,20);
-        pipeline.add(new GraphNodeFilter());
-        pipeline.add(new GraphEdgeFilter());
-        pipeline.add(new ForceDirectedLayout(m_fsim, false));
-        pipeline.add(new DemoColorFunction());
-        pipeline.add(new RepaintAction());
-        return pipeline;
+    private ActionList initActionList() {
+        ActionList actionList = new ActionList(m_registry,-1,20);
+        actionList.add(new GraphFilter());
+        actionList.add(new ForceDirectedLayout(m_fsim, false));
+        actionList.add(new DemoColorFunction());
+        actionList.add(new RepaintAction());
+        return actionList;
     } //
     
     public static void main(String argv[]) {

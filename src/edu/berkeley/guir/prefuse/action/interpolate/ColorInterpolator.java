@@ -1,4 +1,4 @@
-package edu.berkeley.guir.prefuse.action;
+package edu.berkeley.guir.prefuse.action.interpolate;
 
 import java.awt.Color;
 import java.awt.Paint;
@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.VisualItem;
+import edu.berkeley.guir.prefuse.action.AbstractAction;
 import edu.berkeley.guir.prefuse.util.ColorLib;
 
 /**

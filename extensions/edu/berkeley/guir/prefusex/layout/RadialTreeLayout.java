@@ -4,13 +4,14 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 
-import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
-import edu.berkeley.guir.prefuse.action.TreeLayout;
+import edu.berkeley.guir.prefuse.VisualItem;
+import edu.berkeley.guir.prefuse.action.assignment.TreeLayout;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.graph.Entity;
+import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
 /**
@@ -208,9 +209,9 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
             return;
         Entity focus  = e.getFirstAdded();
         Entity pfocus = e.getFirstRemoved();
-        if ( focus instanceof TreeNode && pfocus instanceof TreeNode ) {
-            m_focus = m_registry.getNodeItem((TreeNode)focus);
-            m_pfocus = m_registry.getNodeItem((TreeNode)pfocus);
+        if ( focus instanceof Node && pfocus instanceof Node ) {
+            m_focus = m_registry.getNodeItem((Node)focus);
+            m_pfocus = m_registry.getNodeItem((Node)pfocus);
         } else {
             m_pfocus = m_focus;
             m_focus = null;

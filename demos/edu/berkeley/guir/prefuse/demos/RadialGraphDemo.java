@@ -14,15 +14,12 @@ import edu.berkeley.guir.prefuse.EdgeItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
-import edu.berkeley.guir.prefuse.action.ColorFunction;
-import edu.berkeley.guir.prefuse.action.ColorInterpolator;
-import edu.berkeley.guir.prefuse.action.Filter;
-import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
-import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
-import edu.berkeley.guir.prefuse.action.PolarInterpolator;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
-import edu.berkeley.guir.prefuse.action.TreeEdgeFilter;
-import edu.berkeley.guir.prefuse.activity.ActionPipeline;
+import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
+import edu.berkeley.guir.prefuse.action.filter.TreeFilter;
+import edu.berkeley.guir.prefuse.action.interpolate.ColorInterpolator;
+import edu.berkeley.guir.prefuse.action.interpolate.PolarInterpolator;
+import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.activity.SlowInSlowOutPacer;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
@@ -31,7 +28,6 @@ import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.GraphLib;
 import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.graph.Tree;
-import edu.berkeley.guir.prefuse.graph.TreeNode;
 import edu.berkeley.guir.prefuse.graph.io.XMLGraphReader;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
@@ -62,14 +58,8 @@ public class RadialGraphDemo extends JFrame {
 		
 	private ItemRegistry registry;
 	private Graph graph;
-	private Tree tree;
 	private Display display;
-    private ActionPipeline filter, update, animate;
-		
-	private static Tree getInitialTree(Graph g) {
-        Node[] n = GraphLib.getMostConnectedNodes(g);
-		return GraphLib.breadthFirstTree((TreeNode)n[0]);
-	} //
+    private ActionList layout, update, animate;
     
     public static void main(String[] argv) {
         new RadialGraphDemo();
@@ -82,10 +72,9 @@ public class RadialGraphDemo extends JFrame {
 			XMLGraphReader gr = new XMLGraphReader();
 			gr.setNodeType(DefaultTreeNode.class);
 			graph = gr.loadGraph(inputFile);
-			tree = getInitialTree(graph);
 			
 			// create display and filter
-            registry = new ItemRegistry(tree);
+            registry = new ItemRegistry(graph);
             display = new Display();
             
 			// initialize renderers
@@ -126,20 +115,18 @@ public class RadialGraphDemo extends JFrame {
 				nodeRenderer, edgeRenderer, aggrRenderer));
 			
 			// initialize action pipelines
-            filter  = new ActionPipeline(registry);
-            filter.add(new GraphNodeFilter());
-            Filter treeEdgeFilter = new TreeEdgeFilter();
-            treeEdgeFilter.setGarbageCollect(false);
-            filter.add(treeEdgeFilter);
-            filter.add(new RadialTreeLayout());
-            filter.add(new GraphEdgeFilter());
-            filter.add(new DemoColorFunction(3));
+            ActionList filter = new ActionList(registry);
+            filter.add(new TreeFilter());
             
-            update = new ActionPipeline(registry);
+            layout = new ActionList(registry);
+            layout.add(new RadialTreeLayout());
+            layout.add(new DemoColorFunction(3));
+            
+            update = new ActionList(registry);
             update.add(new DemoColorFunction(3));
             update.add(new RepaintAction());
             
-            animate = new ActionPipeline(registry, 1500, 20);
+            animate = new ActionList(registry, 1500, 20);
             animate.setPacingFunction(new SlowInSlowOutPacer());
             animate.add(new PolarInterpolator());
             animate.add(new ColorInterpolator());
@@ -160,16 +147,16 @@ public class RadialGraphDemo extends JFrame {
                 public void focusChanged(FocusEvent e) {
                     if ( update.isScheduled() )
                         update.cancel();
-                    DefaultTreeNode node = (DefaultTreeNode)e.getFirstAdded();
-                    if ( node != null && !node.equals(tree.getRoot()) ) {                           
-                        tree = GraphLib.breadthFirstTree(node);
-                        registry.setGraph(tree);
-                        filter.runNow();
+                    Node node = (Node)e.getFirstAdded();
+                    if ( node != null ) {
+                        NodeItem item = (NodeItem)registry.getNodeItem(node);
+                        Tree t = GraphLib.breadthFirstTree(item);
+                        registry.setFilteredGraph(t);
+                        layout.runNow();
                         animate.runNow();                     
                     }
                 } //
-            });
-			registry.getDefaultFocusSet().set(tree.getRoot());			
+            });			
 
 			// create and display application window
             setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -177,9 +164,8 @@ public class RadialGraphDemo extends JFrame {
 			pack();
 			setVisible(true);
             
-            // run filter and perform initial animation
-            filter.runNow();
-            animate.runNow();
+            // run filter, layout, and perform initial animation
+            filter.runNow(); layout.runNow(); animate.runNow();
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}	
@@ -187,7 +173,7 @@ public class RadialGraphDemo extends JFrame {
 	
     public class DemoColorFunction extends ColorFunction {
 	    private Color graphEdgeColor = Color.LIGHT_GRAY;
-        private Color highlightColor = Color.BLUE;
+        private Color highlightColor = new Color(50,50,255);
 	    private Color nodeColors[];
 	   	private Color edgeColors[];
 	   
@@ -216,7 +202,7 @@ public class RadialGraphDemo extends JFrame {
 		public Paint getColor(VisualItem item) {
             Boolean hl = (Boolean)item.getVizAttribute("highlight");
             if ( hl != null && hl.booleanValue() ) {
-                return Color.BLUE;
+                return highlightColor;
             } else if (item instanceof NodeItem) {
                 int d = ((NodeItem)item).getDepth();
 				return nodeColors[Math.min(d, nodeColors.length-1)];

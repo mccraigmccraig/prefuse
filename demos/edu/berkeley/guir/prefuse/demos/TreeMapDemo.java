@@ -20,13 +20,12 @@ import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
-import edu.berkeley.guir.prefuse.action.ColorFunction;
-import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
-import edu.berkeley.guir.prefuse.action.TreeEdgeFilter;
-import edu.berkeley.guir.prefuse.activity.ActionPipeline;
+import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
+import edu.berkeley.guir.prefuse.action.filter.TreeFilter;
+import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
-import edu.berkeley.guir.prefuse.graph.Tree;
+import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.io.HDirTreeReader;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.ShapeRenderer;
@@ -44,7 +43,7 @@ import edu.berkeley.guir.prefusex.layout.SquarifiedTreeMapLayout;
  */
 public class TreeMapDemo extends JFrame {
 
-    public static final String TREE_CHI = "../prefuse/etc/chitest.hdir";
+    public static final String TREE_CHI = "etc/chitest.hdir";
     
     private ItemRegistry registry;
     
@@ -53,8 +52,8 @@ public class TreeMapDemo extends JFrame {
         
         try {
             // load graph and initialize the item registry
-            Tree tree = (new HDirTreeReader()).loadTree(TREE_CHI);
-            registry = new ItemRegistry(tree);
+            Graph g = (new HDirTreeReader()).loadTree(TREE_CHI);
+            registry = new ItemRegistry(g);
             registry.setRendererFactory(new DefaultRendererFactory(
                 new NodeRenderer(), null, null));
             // make sure we draw from larger->smaller to prevent
@@ -89,10 +88,9 @@ public class TreeMapDemo extends JFrame {
             });
             display.setSize(700,700);
             
-            // create the single filtering and layout pipeline
-            ActionPipeline filter = new ActionPipeline(registry);
-            filter.add(new GraphNodeFilter());
-            filter.add(new TreeEdgeFilter(false));
+            // create the single filtering and layout action list
+            ActionList filter = new ActionList(registry);
+            filter.add(new TreeFilter(false));
             filter.add(new TreeMapSizeFunction());
             filter.add(new SquarifiedTreeMapLayout(4));
             filter.add(new TreeMapColorFunction());
@@ -165,6 +163,8 @@ public class TreeMapDemo extends JFrame {
         private Rectangle2D bounds = new Rectangle2D.Double();
         protected Shape getRawShape(VisualItem item) {
             Point2D d = (Point2D)item.getVizAttribute("dimension");
+            if (d == null)
+                System.out.println("uh-oh");
             bounds.setRect(item.getX(),item.getY(),d.getX(),d.getY());
             return bounds;
         } //

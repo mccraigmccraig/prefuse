@@ -1,10 +1,15 @@
-package edu.berkeley.guir.prefuse.action;
+package edu.berkeley.guir.prefuse.action.filter;
 
 import java.util.Iterator;
 
+import edu.berkeley.guir.prefuse.EdgeItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.collections.SingleElementIterator;
+import edu.berkeley.guir.prefuse.graph.DefaultTree;
+import edu.berkeley.guir.prefuse.graph.Edge;
+import edu.berkeley.guir.prefuse.graph.Graph;
+import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
@@ -38,26 +43,56 @@ import edu.berkeley.guir.prefuse.graph.TreeNode;
  */
 public class FisheyeTreeFilter extends Filter {
 
-    public static final int DEFAULT_MIN_DOI = -2;
+    public static final String[] ITEM_CLASSES = 
+        {ItemRegistry.DEFAULT_NODE_CLASS, ItemRegistry.DEFAULT_EDGE_CLASS};
     
-	public static final String ATTR_MIN_DOI = "minDOI";
+    public static final int DEFAULT_MIN_DOI = -2;
 	public static final String ATTR_CENTER  = "center";
 
-	protected int m_minDOI;
+	private int m_minDOI;
+    private boolean m_edgesVisible = true;
     
-    protected ItemRegistry m_registry;
-    protected Tree m_tree;
-	protected TreeNode m_root;
+    private Node m_froot;
     
+    // temporary member variables
+    private ItemRegistry m_registry;
+    private double m_localDOIDivisor;
+	private TreeNode m_root;
+    
+    
+    // ========================================================================
+    // == CONSTRUCTORS ========================================================
+
     public FisheyeTreeFilter() {
         this(DEFAULT_MIN_DOI);
     } //
     
     public FisheyeTreeFilter(int minDOI) {
-        super(ItemRegistry.DEFAULT_NODE_CLASS, true);
+        this(minDOI, true);
+    } //
+    
+    public FisheyeTreeFilter(int minDOI, boolean edgesVisible) {
+        this(minDOI, edgesVisible, true);
+    } //
+    
+    public FisheyeTreeFilter(int minDOI, boolean edgesVisible, boolean gc) {
+        super(ITEM_CLASSES, gc);
+        m_edgesVisible = edgesVisible;
         m_minDOI = minDOI;
     } //
     
+    // ========================================================================
+    // == FILTER METHODS ======================================================
+    
+    public void setTreeRoot(Node r) {
+        m_froot = r;
+    } //
+    
+    /**
+     * Returns an iterator over the Entities in the default focus set.
+     * Override this method to control what Entities are passed to the
+     * filter as foci of the fisheye.
+     */
     protected Iterator getFoci(ItemRegistry registry) {
         Iterator iter = registry.getDefaultFocusSet().iterator();
         if ( !iter.hasNext() )
@@ -69,10 +104,29 @@ public class FisheyeTreeFilter extends Filter {
      * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
      */
 	public void run(ItemRegistry registry, double frac) {
+	    // initialize temp member variables, get the backing graph
         m_registry = registry;
-		m_tree = (Tree)registry.getGraph();
-		m_root = m_tree.getRoot();
+        Graph graph = registry.getGraph();
+        if ( !(graph instanceof Tree) ) {
+            throw new IllegalStateException("The FisheyeTreeFilter requires "
+                + "that the backing graph returned by registry.getGraph() is "
+                + "a Tree instance.");
+        }
+		Tree tree = (Tree)graph;
+        m_localDOIDivisor = tree.getNodeCount();
+		m_root = tree.getRoot();
+        
+        // set up the filtered graph
+        Graph fgraph = registry.getFilteredGraph();
+        Tree  ftree = null;
+        if ( fgraph instanceof DefaultTree ) {
+            ftree = (DefaultTree)fgraph;
+            ftree.setRoot(null);
+        } else {
+            fgraph = ftree = new DefaultTree();
+        }
 
+        // compute the fisheye over nodes
 		Iterator focusIter = getFoci(registry);
 		while ( focusIter.hasNext() ) {
             Object focus = focusIter.next();
@@ -84,7 +138,6 @@ public class FisheyeTreeFilter extends Filter {
 			recurse = ( fitem==null ||  fitem.getDirty()>0 || fitem.getDOI()<0 );
 				
 			fitem = registry.getNodeItem(fnode, true);
-            fitem.removeAllNeighbors();
 			if ( recurse ) {
 				setDOI(fitem, 0, 0);
 				if ( (int)fitem.getDOI() > m_minDOI ) {					
@@ -94,9 +147,40 @@ public class FisheyeTreeFilter extends Filter {
 			}
 		}
         
+        // filter edges and build the filtered tree
+        ftree.setRoot(registry.getNodeItem(m_root));
+        Iterator nodeIter = registry.getNodeItems();
+        while ( nodeIter.hasNext() ) {
+            NodeItem item = (NodeItem)nodeIter.next();
+            Node     node = (Node)item.getEntity();
+            Iterator edgeIter = node.getEdges();
+            while ( edgeIter.hasNext() ) {
+                Edge edge = (Edge)edgeIter.next();
+                Node n = edge.getAdjacentNode(node);
+                
+                // check if this is a filtered node
+                if ( !registry.isVisible(n) ) continue;
+                
+                // filter the edge
+                EdgeItem eitem = registry.getEdgeItem(edge, true);
+                if ( edge.isTreeEdge() ) {
+                    TreeNode c = (TreeNode)eitem.getAdjacentNode(item);
+                    TreeNode p = (TreeNode)(c.getParent()==item?item:c);
+                    p.addChild(eitem);
+                } else {
+                    eitem.getFirstNode().addEdge(eitem);
+                    eitem.getSecondNode().addEdge(eitem);
+                }
+                if ( !m_edgesVisible ) eitem.setVisible(false);
+            }
+        }
+        
+        // clear temp member vars
         m_registry = null;
-        m_tree = null;
         m_root = null;
+        
+        // update the registry's filtered graph
+        registry.setFilteredGraph(ftree);
         
         // optional garbage collection
         super.run(registry, frac);
@@ -109,8 +193,7 @@ public class FisheyeTreeFilter extends Filter {
 		while ( childIter.hasNext() ) {
 			TreeNode cnode = (TreeNode)childIter.next();
 			if ( cnode == skip ) { continue; }
-			NodeItem citem = m_registry.getNodeItem(cnode, true);
-			citem.removeAllNeighbors();					
+			NodeItem citem = m_registry.getNodeItem(cnode, true);				
 			
 			setDOI(citem, (int)item.getDOI()-1, Math.abs(lidx-i));		
 			if ( (int)citem.getDOI() > m_minDOI ) {
@@ -126,10 +209,9 @@ public class FisheyeTreeFilter extends Filter {
 		NodeItem pitem = m_registry.getNodeItem(pnode);
 		
 		boolean recurse = false;
-		recurse = ( pitem==null ||  pitem.getDirty()>0 || pitem.getDOI()<0 );
+		recurse = ( pitem==null || pitem.getDirty()>0 || pitem.getDOI()<0 );
 		
 		pitem = m_registry.getNodeItem(pnode, true);
-        pitem.removeAllNeighbors();
 		if ( recurse ) {
 			setDOI(pitem, 0, 0);
 			if ( (int)pitem.getDOI() > m_minDOI ) {
@@ -140,7 +222,7 @@ public class FisheyeTreeFilter extends Filter {
 	} //
 	
 	protected void setDOI(NodeItem item, int doi, int ldist) {
-		double localDOI = -1 * ldist / (double)Math.min(1000.0, m_tree.getNodeCount());
+		double localDOI = -ldist / (double)Math.min(1000.0,m_localDOIDivisor);
 		item.setDOI(doi+localDOI);
 	} //
 

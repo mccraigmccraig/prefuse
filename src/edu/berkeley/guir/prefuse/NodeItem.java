@@ -73,13 +73,13 @@ public class NodeItem extends VisualItem implements TreeNode {
     private int m_numDescendants;
 	
     private void nodeItemCheck(Node n) {
-        if ( !(n instanceof NodeItem) )
+        if ( n != null && !(n instanceof NodeItem) )
             throw new IllegalArgumentException(
             "Node must be an instance of NodeItem");
     } //
     
     private void edgeItemCheck(Edge e) {
-        if ( !(e instanceof EdgeItem) )
+        if ( e != null && !(e instanceof EdgeItem) )
             throw new IllegalArgumentException(
             "Edge must be an instance of EdgeItem");
     } //
@@ -322,7 +322,7 @@ public class NodeItem extends VisualItem implements TreeNode {
         
         TreeNode c = (TreeNode)n;
         if ( getIndex(c) > -1 )
-            throw new IllegalStateException("Node is already a neighbor.");
+            return false;
         if ( getChildIndex(c) > -1 )
             return false;
         

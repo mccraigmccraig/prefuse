@@ -4,7 +4,7 @@ toolkit for constructing highly-interactive visualizations of graph-structured
 (i.e. node-link) data. <font face="Verdana,Arial,Helvetica,Sans-Serif">prefuse</font>
 applications are built by stringing together composable modules (called
 <code>{@link edu.berkeley.guir.prefuse.action.Action Actions}</code>) into
-<code>{@link edu.berkeley.guir.prefuse.activity.ActionPipeline ActionPipelines}</code>
+<code>{@link edu.berkeley.guir.prefuse.activity.ActionList ActionLists}</code>
 that perform various tasks such as graph processing and animation.
 
 <br/><br/>
@@ -44,7 +44,7 @@ to the <code>{@link edu.berkeley.guir.prefuse.ItemRegistry ItemRegistry}</code>,
 which determines which
 <code>{@link edu.berkeley.guir.prefuse.render.Renderer Renderer}</code>
 instances are used to draw individual items. Then any number of 
-<code>{@link edu.berkeley.guir.prefuse.activity.ActionPipeline ActionPipelines}</code>
+<code>{@link edu.berkeley.guir.prefuse.activity.ActionList ActionLists}</code>
 can be created and scheduled to perform graph operations such as layout, color
 assignment, and animation. Finally, interactive behaviors can be specified by
 adding custom 

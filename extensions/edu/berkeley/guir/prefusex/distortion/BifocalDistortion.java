@@ -104,18 +104,29 @@ public class BifocalDistortion extends Distortion {
         double ax = anchor.getX(), ay = anchor.getY();
         double minX = bounds.getMinX(), maxX = bounds.getMaxX();
         double minY = bounds.getMinY(), maxY = bounds.getMaxY();
+        double m;
         
-        double m = (x<ax ? ax-minX : maxX-ax);
-        if ( m == 0 ) m = maxX-minX;
-        if ( Math.abs(x-ax) <= rx*m )
+        if ( !(rx == 0 || mx == 1.0) ) {
+            m = (x<ax ? ax-minX : maxX-ax);
+            if ( m == 0 ) m = maxX-minX;
+            if ( Math.abs(x-ax) <= rx*m )
+                xmag = true;
+        } else {
             xmag = true;
+        }
         
-        m = (y<ay ? ay-minY : maxY-ay);
-        if ( m == 0 ) m = maxY-minY;
-        if ( Math.abs(y-ay) <= ry*m )
+        if ( !(ry == 0 || my == 1.0) ) {
+            m = (y<ay ? ay-minY : maxY-ay);
+            if ( m == 0 ) m = maxY-minY;
+            if ( Math.abs(y-ay) <= ry*m )
+                ymag = true;
+        } else {
             ymag = true;
+        }
         
         if ( xmag && ymag ) {
+            if ( rx == 0 || mx == 1.0 ) return my;
+            if ( ry == 0 || my == 1.0 ) return mx;
             return Math.min(mx,my);
         } else {
             return Math.min((1-rx*mx)/(1-rx), (1-ry*my)/(1-ry));

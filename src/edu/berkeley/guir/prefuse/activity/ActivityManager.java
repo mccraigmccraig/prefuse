@@ -26,7 +26,7 @@ import edu.berkeley.guir.prefuse.event.ActivityAdapter;
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  * @see Activity
- * @see ActionPipeline
+ * @see ActionList
  */
 public class ActivityManager extends Thread {
 

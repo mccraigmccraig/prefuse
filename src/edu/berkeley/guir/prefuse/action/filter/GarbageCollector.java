@@ -1,4 +1,4 @@
-package edu.berkeley.guir.prefuse.action;
+package edu.berkeley.guir.prefuse.action.filter;
 
 /**
  * Signals the <code>ItemRegistry</code> to perform a garbage collection 

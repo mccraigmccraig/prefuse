@@ -6,14 +6,13 @@ import java.awt.Paint;
 import javax.swing.JFrame;
 
 import edu.berkeley.guir.prefuse.Display;
-import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
-import edu.berkeley.guir.prefuse.action.ColorFunction;
-import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
-import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
-import edu.berkeley.guir.prefuse.activity.ActionPipeline;
+import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
+import edu.berkeley.guir.prefuse.action.filter.GraphFilter;
+import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.GraphLib;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
@@ -30,7 +29,7 @@ import edu.berkeley.guir.prefusex.layout.ForceDirectedLayout;
 public class AnimateGraph extends JFrame{
 	
 	private ItemRegistry registry;
-	private ActionPipeline filter, forces;
+	private ActionList filter, forces;
 	
 	public AnimateGraph() {
 		super("AnimateGraph");
@@ -65,21 +64,20 @@ public class AnimateGraph extends JFrame{
         boolean repaint = false;
 		display.addControlListener(new DragControl(repaint));
 		
-		// create a new action pipeline that
+		// create a new action list that
 		// (a) filters visual representations from the original graph
-		filter = new ActionPipeline(registry);
-		filter.add(new GraphNodeFilter());
-		filter.add(new GraphEdgeFilter());
+		filter = new ActionList(registry);
+		filter.add(new GraphFilter());
         filter.add(new MyColorFunction());
 		
-		// create a new action pipeline that 
+		// create a new action list that 
 		// (a) uses a force model to continually layout nodes
 		// (b) sets the node colors
 		// (c) repaints the display
 		
-		// run this pipeline for an infinite duration (duration value
-		// equals -1), re-executing the pipeline every 15 milliseconds
-		forces = new ActionPipeline(registry,-1,15);
+		// run this action list for an infinite duration (duration value
+		// equals -1), re-executing the action list every 15 milliseconds
+		forces = new ActionList(registry,-1,15);
 		forces.add(new ForceDirectedLayout(true));
 		forces.add(new RepaintAction());
 		
@@ -89,7 +87,7 @@ public class AnimateGraph extends JFrame{
 		pack();
 		setVisible(true);
 		
-		// now execute the pipelines to visualize the graph
+		// now execute the action lists to visualize the graph
         filter.runNow(); // filter runs once
         forces.runNow(); // forces re-runs every 15ms, indefinitely
 	}

@@ -1,10 +1,11 @@
-package edu.berkeley.guir.prefuse.action;
+package edu.berkeley.guir.prefuse.action.assignment;
 
 import java.awt.Font;
 import java.util.Iterator;
 
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.action.AbstractAction;
 
 /**
  * Simple <code>FontFunction</code> that blindly returns a null 

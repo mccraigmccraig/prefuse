@@ -102,13 +102,8 @@ public class XMLGraphReader extends AbstractGraphReader	implements GraphReader {
 		private boolean inNode, inEdge;
 		
 		public void startDocument() {
-			m_graph = null;
+			m_graph = new DefaultGraph(m_directed);
 			m_nodeMap.clear();
-		} //
-		
-		public void endDocument() {
-			// construct graph
-			m_graph = new DefaultGraph(m_nodeMap.values(), m_directed);
 		} //
 		
 		public void endElement(String namespaceURI, String localName, String qName) {
@@ -169,6 +164,7 @@ public class XMLGraphReader extends AbstractGraphReader	implements GraphReader {
 					n.setAttribute(alName, atts.getValue(i));
 				}
 			}
+            m_graph.addNode(n);
 			return n;
 		} //
 		
@@ -205,6 +201,7 @@ public class XMLGraphReader extends AbstractGraphReader	implements GraphReader {
 			s.addEdge(e);
 			if ( !m_directed )
 				t.addEdge(e);
+            m_graph.addEdge(e);
 			return e;
 		} //
 		
