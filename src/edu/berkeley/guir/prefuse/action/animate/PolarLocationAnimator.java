@@ -8,6 +8,7 @@ import java.util.Set;
 import edu.berkeley.guir.prefuse.AggregateItem;
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.ItemRegistry;
+import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
 import edu.berkeley.guir.prefuse.event.FocusEvent;
@@ -59,7 +60,7 @@ public class PolarLocationAnimator extends AbstractAction implements FocusListen
 			VisualItem item = (VisualItem)itemIter.next();
 			Point2D startLoc = item.getStartLocation();
 			Point2D endLoc   = item.getEndLocation();
-
+            
 			sx = startLoc.getX() - ax;
 			sy = startLoc.getY() - ay;
 			ex = endLoc.getX() - ax;
@@ -70,10 +71,25 @@ public class PolarLocationAnimator extends AbstractAction implements FocusListen
 				x = startLoc.getX() + frac * (endLoc.getX()-startLoc.getX());
 				y = startLoc.getY() + frac * (endLoc.getY()-startLoc.getY());
 				item.setLocation(x,y);
-			} else {	
+			} else {
 				sr = Math.sqrt(sx*sx + sy*sy);
-				st = Math.atan2(sy,sx);			
+                if ( item instanceof NodeItem && Double.isNaN(sr) ) {
+                    // for reasons unknown to me, some versions of Java screw up
+                    // a perfectly legal floating point calc, returning NaN(!)
+                    // here is a crappy hack that seems to work -- just try again!
+                    sr = Math.sqrt(sx*sx + sy*sy);
+                }
+                
+				st = Math.atan2(sy,sx);
+                
 				er = Math.sqrt(ex*ex + ey*ey);
+                if ( item instanceof NodeItem && Double.isNaN(er) ) {
+                    // for reasons unknown to me, some versions of Java screw up
+                    // a perfectly legal floating point calc, returning NaN(!)
+                    // here is a crappy hack that seems to work -- just try again!
+                    er = Math.sqrt(ex*ex + ey*ey);
+                }
+                
 				et = Math.atan2(ey,ex);
 				stt = translate(st);
 				ett = translate(et);
@@ -90,7 +106,7 @@ public class PolarLocationAnimator extends AbstractAction implements FocusListen
 							
 				x = Math.round(ax + r*Math.cos(t));
 				y = Math.round(ay + r*Math.sin(t));
-	
+                
 				item.setLocation(x,y);
 			}
 			
