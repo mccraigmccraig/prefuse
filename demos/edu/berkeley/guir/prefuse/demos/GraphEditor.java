@@ -59,7 +59,9 @@ import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.Renderer;
 import edu.berkeley.guir.prefuse.render.TextImageItemRenderer;
+import edu.berkeley.guir.prefusex.layout.CircleLayout;
 import edu.berkeley.guir.prefusex.layout.ForceDirectedLayout;
+import edu.berkeley.guir.prefusex.layout.FruchtermanReingoldLayout;
 import edu.berkeley.guir.prefusex.layout.RandomLayout;
 
 /**
@@ -79,6 +81,8 @@ public class GraphEditor extends JFrame {
 	public static final String SAVE_AS = "Save As...";
 	public static final String EXIT    = "Exit";
     public static final String RANDOM  = "Random Layout";
+    public static final String CIRCLE  = "Circle Layout";
+    public static final String FR      = "Fruchterman-Reingold Layout";
     public static final String FORCE   = "Force-Directed Layout";
     public static final String SMALL_FONT  = "Small";
     public static final String MEDIUM_FONT = "Medium";
@@ -185,6 +189,16 @@ public class GraphEditor extends JFrame {
             randomLayout.add(update);
             activityMap.put("randomLayout", randomLayout);
             
+            ActionList circleLayout = new ActionList(registry);
+            circleLayout.add(actionMap.put("circle",new CircleLayout()));
+            circleLayout.add(update);
+            activityMap.put("circleLayout", circleLayout);
+            
+            ActionList frLayout = new ActionList(registry);
+            frLayout.add(actionMap.put("fr",new FruchtermanReingoldLayout()));
+            frLayout.add(update);
+            activityMap.put("frLayout", frLayout);
+            
             ActionList forceLayout = new ActionList(registry,-1,20);
             forceLayout.add(actionMap.put("force",new ForceDirectedLayout(true)));
             forceLayout.add(update);
@@ -208,6 +222,8 @@ public class GraphEditor extends JFrame {
 			JMenuItem saveAsItem = new JMenuItem(SAVE_AS);
 			JMenuItem exitItem   = new JMenuItem(EXIT);
             JMenuItem randomItem = new JMenuItem(RANDOM);
+            JMenuItem circleItem = new JMenuItem(CIRCLE);
+            JMenuItem frItem     = new JMenuItem(FR);
             JMenuItem forceItem  = new JCheckBoxMenuItem(FORCE);
             
             JMenuItem smallItem  = new JRadioButtonMenuItem(SMALL_FONT);
@@ -225,6 +241,8 @@ public class GraphEditor extends JFrame {
             saveAsItem.setAccelerator(KeyStroke.getKeyStroke("ctrl shift S"));
             exitItem.setAccelerator(KeyStroke.getKeyStroke("ctrl X"));
             randomItem.setAccelerator(KeyStroke.getKeyStroke("ctrl R"));
+            circleItem.setAccelerator(KeyStroke.getKeyStroke("ctrl C"));
+            frItem.setAccelerator(KeyStroke.getKeyStroke("ctrl L"));
             forceItem.setAccelerator(KeyStroke.getKeyStroke("ctrl F"));
             smallItem.setAccelerator(KeyStroke.getKeyStroke("ctrl 1"));
             mediumItem.setAccelerator(KeyStroke.getKeyStroke("ctrl 2"));
@@ -235,6 +253,8 @@ public class GraphEditor extends JFrame {
 			saveAsItem.setActionCommand(SAVE_AS);
 			exitItem.setActionCommand(EXIT);
             randomItem.setActionCommand(RANDOM);
+            circleItem.setActionCommand(CIRCLE);
+            frItem.setActionCommand(FR);
             forceItem.setActionCommand(FORCE);
             smallItem.setActionCommand(SMALL_FONT);
             mediumItem.setActionCommand(MEDIUM_FONT);
@@ -245,6 +265,8 @@ public class GraphEditor extends JFrame {
 			saveAsItem.addActionListener(controller);
 			exitItem.addActionListener(controller);
             randomItem.addActionListener(controller);
+            circleItem.addActionListener(controller);
+            frItem.addActionListener(controller);
             forceItem.addActionListener(controller);
             smallItem.addActionListener(controller);
             mediumItem.addActionListener(controller);
@@ -256,6 +278,8 @@ public class GraphEditor extends JFrame {
 			fileMenu.add(exitItem);
             
             layoutMenu.add(randomItem);
+            layoutMenu.add(circleItem);
+            layoutMenu.add(frItem);
             layoutMenu.add(forceItem);
             
             fontMenu.add(smallItem);
@@ -564,6 +588,10 @@ public class GraphEditor extends JFrame {
 				System.exit(0);
             } else if ( RANDOM.equals(cmd) ) {
                 activityMap.scheduleNow("randomLayout");
+            } else if ( CIRCLE.equals(cmd) ) {
+                activityMap.scheduleNow("circleLayout");
+            } else if ( FR.equals(cmd) ) {
+                activityMap.scheduleNow("frLayout");
             } else if ( FORCE.equals(cmd) ) {
                 JCheckBoxMenuItem cb = (JCheckBoxMenuItem)e.getSource();
                 if ( cb.getState() )
