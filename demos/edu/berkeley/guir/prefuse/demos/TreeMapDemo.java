@@ -21,7 +21,7 @@ import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
-import edu.berkeley.guir.prefuse.action.ColorFunction;
+import edu.berkeley.guir.prefuse.action.ColorMapColorFunction;
 import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.action.TreeEdgeFilter;
@@ -32,6 +32,7 @@ import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.io.HDirTreeReader;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.ShapeRenderer;
+import edu.berkeley.guir.prefuse.util.ColorMap;
 import edu.berkeley.guir.prefusex.controls.PanHandler;
 import edu.berkeley.guir.prefusex.controls.ZoomHandler;
 import edu.berkeley.guir.prefusex.layout.SquarifiedTreeMapLayout;
@@ -122,17 +123,16 @@ public class TreeMapDemo extends JFrame {
         new TreeMapDemo();
     } //
     
-    public class TreeMapColorFunction extends ColorFunction {
+    public class TreeMapColorFunction extends ColorMapColorFunction { 
+        public TreeMapColorFunction() {
+            super(new ColorMap(ColorMap.getInterpolatedMap(
+               10,new Color(0.5f,0.5f,0.f),new Color(0.5f,0.5f,1.f)),0,9));
+        } //
         public Paint getColor(GraphItem item) {
             return Color.WHITE;
         } //
-        public Paint getFillColor(GraphItem item) {
-            float c;
-            if ( item instanceof NodeItem )
-                c = Math.max(0,1-(((float)((NodeItem)item).getDepth())/8.0f));
-            else
-                c = 0.5f;
-            return new Color(0.5f,0.5f,c);
+        public double getIndexValue(GraphItem item) {
+            return (item instanceof NodeItem ? ((NodeItem)item).getDepth():0);
         } //
     } // end of inner class TreeMapColorFunction
     
