@@ -18,6 +18,7 @@ import java.awt.geom.RoundRectangle2D;
 
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.util.FontLib;
+import edu.berkeley.guir.prefuse.util.StringAbbreviator;
 
 /**
  * Renders an item as an image and a text string.
@@ -44,6 +45,10 @@ public class TextImageItemRenderer extends ShapeRenderer {
 	protected int m_vertBorder  = 0;
 	protected int m_imageMargin = 4;
     
+	protected int m_maxTextWidth = -1;
+	protected int m_abbrevType = StringAbbreviator.TRUNCATE;
+	protected StringAbbreviator m_abbrev = StringAbbreviator.getInstance();
+	
     protected double m_imageSize = 1.0;
 	
 	protected Font m_font = new Font("SansSerif", Font.PLAIN, 10);
@@ -68,6 +73,67 @@ public class TextImageItemRenderer extends ShapeRenderer {
                 .setRoundRect(0,0,10,10,arcWidth,arcHeight);                    
         }
     } //
+
+	/**
+	 * Get the attribute name of the text to draw.
+	 * @return the text attribute name
+	 */
+	public String getTextAttributeName() {
+		return m_labelName;
+	} //
+	
+	/**
+	 * Set the attribute name for the text to draw.
+	 * @param name the text attribute name
+	 */
+	public void setTextAttributeName(String name) {
+		m_labelName = name;
+	} //    
+    
+	/**
+	 * Sets the maximum width that should be allowed of the text label.
+	 * A value of -1 specifies no limit (this is the default).
+	 * @param maxWidth the maximum width of the text or -1 for no limit
+	 */
+	public void setMaxTextWidth(int maxWidth) {
+	    m_maxTextWidth = maxWidth;
+	} //
+	
+	/**
+	 * Sets the type of abbreviation to be used if a text label is longer
+	 * than the maximum text width. The value should be one of the constants
+	 * provided by the {@link edu.berkeley.guir.prefuse.util.StringAbbreviator
+	 * StringAbbreviator} class. To enable abbreviation, you must first set
+	 * the maximum text width using the {@link #setMaxTextWidth(int) 
+	 * setMaxTextWidth} method.
+	 * @param abbrevType the abbreviation type to use. Should be one of the
+	 * constants provided by the 
+	 * {@link edu.berkeley.guir.prefuse.util.StringAbbreviator
+	 * StringAbbreviator} class (e.g. StringAbbreviator.TRUNCATE or 
+	 * StringAbbreviator.NAME).
+	 */
+	public void setAbbrevType(int abbrevType) {
+	    m_abbrevType = abbrevType;
+	} //
+	
+	/**
+	 * Returns the text to draw. Subclasses can override this class to
+	 * perform custom text rendering.
+	 * @param item the item to represent as a <code>String</code>
+	 * @return a <code>String</code> to draw
+	 */
+	protected String getText(VisualItem item) {
+		String s =  (String)item.getAttribute(m_labelName);
+		if ( m_maxTextWidth > -1 ) {
+		    Font font = item.getFont();
+		    if ( font == null ) { font = m_font; }
+		    FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(font);
+		    if ( fm.stringWidth(s) > m_maxTextWidth ) {
+		        s = m_abbrev.abbreviate(s, m_abbrevType, fm, m_maxTextWidth);			
+		    }
+		}
+		return s;
+	} //    
     
     /**
      * Sets the display-time scaling factor for images. This scaling
@@ -90,32 +156,6 @@ public class TextImageItemRenderer extends ShapeRenderer {
 	 */
 	public void setMaxImageDimensions(int width, int height) {
 		m_images.setMaxImageDimensions(width, height);
-	} //
-
-	/**
-	 * Get the attribute name of the text to draw.
-	 * @return the text attribute name
-	 */
-	public String getTextAttributeName() {
-		return m_labelName;
-	} //
-	
-	/**
-	 * Set the attribute name for the text to draw.
-	 * @param name the text attribute name
-	 */
-	public void setTextAttributeName(String name) {
-		m_labelName = name;
-	} //
-
-	/**
-	 * Returns the text to draw. Subclasses can override this class to
-	 * perform custom text rendering.
-	 * @param item the item to represent as a <code>String</code>
-	 * @return a <code>String</code> to draw
-	 */
-	protected String getText(VisualItem item) {
-		return (String)item.getAttribute(m_labelName);
 	} //
 	
 	/**
