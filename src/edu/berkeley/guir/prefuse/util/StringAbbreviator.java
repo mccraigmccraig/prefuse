@@ -6,8 +6,10 @@ import java.util.Hashtable;
 import java.awt.FontMetrics;
 
 /**
- * This class controls the abbreviation of strings to fit them
- *  to a given length.
+ * This class controls the abbreviation of strings to fit them to a given 
+ * length. It provides methods for various types of strings, specifically
+ * names, phone numbers, and e-mail addresses, in addition to simple
+ * string truncation.
  *
  * @version 1.0
  * @author David Nation

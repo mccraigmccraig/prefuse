@@ -6,9 +6,7 @@ import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 
 /**
- * Calls repaint on all displays tied to the given item registry
- * 
- * Feb 10, 2004 - jheer - Created class
+ * Issues repaint requests to all displays tied to the given item registry.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

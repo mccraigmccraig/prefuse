@@ -11,22 +11,28 @@ import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.Node;
 
 /**
- * Filters nodes in a graph using the original Furnas fisheye calculation,
- * and sets DOI (degree-of-interest) values for each filtered node. Performs
- * garbage collection of node items by default.
- * <br/><br/>
- * For more information about Furnas' fisheye view calculation and DOI values,
+ * <p>Filters nodes in a graph using the original Furnas fisheye calculation,
+ * and sets DOI (degree-of-interest) values for each filtered node. This 
+ * function filters current focus nodes, and includes neighbors only in a 
+ * limited window around these foci. The size of this window is determined
+ * by the minimum DOI value set for this action. By convention, DOI values
+ * start at zero for focus nodes, and becoming decreasing negative numbers for
+ * each hop away from a focus. This filter also performs garbage collection
+ * of node items by default.</p>
+ * 
+ * <p>For more information about Furnas' fisheye view calculation and DOI values,
  * take a look at G.W. Furnas, "The FISHEYE View: A New Look at Structured 
  * Files," Bell Laboratories Tech. Report, Murray Hill, New Jersey, 1981. 
  * Available online at <a href="http://citeseer.nj.nec.com/furnas81fisheye.html">
- * http://citeseer.nj.nec.com/furnas81fisheye.html</a>.
- * <br/><br/>
- * For a more recent example of fisheye views and DOI functions in information
+ * http://citeseer.nj.nec.com/furnas81fisheye.html</a>.</p>
+ * 
+ * <p>For a more recent example of fisheye views and DOI functions in information
  * visualization check out S.K. Card and D. Nation. "Degree-of-Interest 
  * Trees: A Component of an Attention-Reactive User Interface," Advanced 
  * Visual Interfaces, Trento, Italy, 2002. Available online at
  * <a href="http://www2.parc.com/istl/projects/uir/pubs/items/UIR-2002-11-Card-AVI-DOITree.pdf">
  * http://www2.parc.com/istl/projects/uir/pubs/items/UIR-2002-11-Card-AVI-DOITree.pdf</a>
+ * </p>
  * 
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> - prefuse(AT)jheer.org
@@ -58,6 +64,9 @@ public class FisheyeGraphFilter extends Filter {
         return iter;
     } //
     
+    /**
+     * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
+     */
 	public void run(ItemRegistry registry, double frac) {
         m_registry = registry;
 		m_graph = registry.getGraph();

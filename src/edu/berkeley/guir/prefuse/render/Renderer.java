@@ -10,8 +10,6 @@ import edu.berkeley.guir.prefuse.GraphItem;
  * Interface for rendering GraphItems. Supports drawing as well as location
  * and bounding box routines.
  * 
- * Created on May 2, 2003
- * 
  * @author newbergr
  * @author jheer
  */

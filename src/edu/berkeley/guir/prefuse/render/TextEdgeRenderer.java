@@ -16,10 +16,8 @@ import edu.berkeley.guir.prefuse.GraphItem;
 /**
  * Renders edges with text labels.
  * 
- * May 28, 2003 - jheer - Created class
- * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class TextEdgeRenderer extends DefaultEdgeRenderer {
 
@@ -31,13 +29,6 @@ public class TextEdgeRenderer extends DefaultEdgeRenderer {
 	protected Font m_font = new Font("SansSerif", Font.PLAIN, 10);
 	
 	protected Rectangle2D m_textBox = new Rectangle2D.Double();
-
-	/**
-	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRenderType()
-	 */
-	public int getRenderType() {
-		return RENDER_TYPE_FILL;
-	} //
 
 	/**
 	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.GraphItem)

@@ -195,6 +195,8 @@ public class Display extends JComponent {
      * Display is already associated with a different ItemRegistry, the
      * Display unregisters itself with the previous registry.
      * @param registry the ItemRegistry to associate with this Display.
+     *  A value of null associates this Display with no ItemRegistry
+     *  at all.
      */
     public void setRegistry(ItemRegistry registry) {
         if ( m_registry == registry ) {
@@ -205,7 +207,8 @@ public class Display extends JComponent {
             m_registry.removeDisplay(this);
         }
         m_registry = registry;
-        m_registry.addDisplay(this);
+        if ( registry != null )
+            m_registry.addDisplay(this);
     } //
 
     // ========================================================================

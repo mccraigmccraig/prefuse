@@ -8,14 +8,13 @@ import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 
 /**
- * Simple ColorFunction which blindly returns "black" when a color is
- * requested. Subclasses should override the getColor() and getFillColor()
- * methods to provide custom color selection functions.
- * 
- * Apr 30, 2003 - jheer - Created class
+ * Simple ColorFunction which returns "black" for the draw color and
+ * "gray" for the fill color when a color is requested. Subclasses 
+ * should override the getColor() and getFillColor() methods to provide
+ * custom color selection functions.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class ColorFunction extends AbstractAction {
     
@@ -48,7 +47,7 @@ public class ColorFunction extends AbstractAction {
 	} //
 
 	public Paint getFillColor(GraphItem item) {
-		return Color.BLACK;
+		return Color.GRAY;
 	} //
     
     public static Color calcIntermediateColor(Color c1, Color c2, double frac) {

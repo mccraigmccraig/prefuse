@@ -3,6 +3,7 @@ package edu.berkeley.guir.prefuse.demos;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -20,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import edu.berkeley.guir.prefuse.Display;
+import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.Action;
@@ -84,7 +86,11 @@ public class DistortionDemo extends JFrame {
         ActionPipeline filter = new ActionPipeline(registry);
         filter.add(new GraphNodeFilter());
         filter.add(new GraphEdgeFilter());
-        filter.add(new ColorFunction()); // make everything black
+        filter.add(new ColorFunction() {
+            public Paint getFillColor(GraphItem item) {
+                return Color.BLACK;
+            } //
+        });
         filter.add(new GridLayout());
         filter.add(new RepaintAction());
         

@@ -90,11 +90,8 @@ public class FileSystemDemo extends JFrame {
         fsim.addForce(new SpringForce(5E-5f, 150f));
         fsim.addForce(new DragForce(-0.005f));
         
-        TextItemRenderer    nodeRenderer = new TextItemRenderer() {
-            protected int getRenderType() {
-                return RENDER_TYPE_FILL; 
-            } //
-        };
+        TextItemRenderer    nodeRenderer = new TextItemRenderer();
+        nodeRenderer.setRenderType(TextItemRenderer.RENDER_TYPE_FILL);
         nodeRenderer.setRoundedCorner(8,8);
         nodeRenderer.setTextAttributeName("label");
         DefaultEdgeRenderer edgeRenderer = new DefaultEdgeRenderer();    

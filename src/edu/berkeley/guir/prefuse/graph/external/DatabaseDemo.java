@@ -125,11 +125,8 @@ public class DatabaseDemo extends JFrame {
         });
         
         // initialize renderers
-        TextItemRenderer    nodeRenderer = new TextItemRenderer() {
-            protected int getRenderType() {
-                return RENDER_TYPE_FILL; 
-            } //
-        };
+        TextItemRenderer    nodeRenderer = new TextItemRenderer();
+        nodeRenderer.setRenderType(TextItemRenderer.RENDER_TYPE_FILL);
         nodeRenderer.setRoundedCorner(8,8);
         nodeRenderer.setTextAttributeName("label");
         DefaultEdgeRenderer edgeRenderer = new DefaultEdgeRenderer();    

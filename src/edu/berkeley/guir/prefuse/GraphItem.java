@@ -41,9 +41,9 @@ public abstract class GraphItem {
 	protected Paint   m_startFillColor;
 	protected Paint   m_endFillColor;
     protected boolean m_fixed = false;
-	protected double m_size;
-	protected double m_startSize;
-	protected double m_endSize;
+	protected double m_size = 1.;
+	protected double m_startSize = 1.;
+	protected double m_endSize = 1.;
 	protected Font   m_font;
 	
 	/**

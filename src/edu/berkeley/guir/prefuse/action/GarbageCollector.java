@@ -6,8 +6,6 @@ package edu.berkeley.guir.prefuse.action;
  * collect must be specified through the constructor and/or 
  * <code>addItemClass()</code> method.
  * 
- * Jul 15, 2003 - jheer - Created class
- * 
  * @version 1.0
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
  */

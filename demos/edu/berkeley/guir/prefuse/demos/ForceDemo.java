@@ -121,11 +121,8 @@ public class ForceDemo extends Display {
     } //
     
     private void initRenderers() {
-        TextItemRenderer    nodeRenderer = new TextItemRenderer() {
-            protected int getRenderType() {
-                return RENDER_TYPE_FILL; 
-            } //
-        };
+        TextItemRenderer    nodeRenderer = new TextItemRenderer();
+        nodeRenderer.setRenderType(TextItemRenderer.RENDER_TYPE_FILL);
         nodeRenderer.setRoundedCorner(8,8);
         nodeRenderer.setTextAttributeName(m_textField);
         DefaultNodeRenderer nRenderer = new DefaultNodeRenderer();

@@ -124,11 +124,24 @@ public class ItemRegistry {
 	 * By default, creates queues and <code>ItemFactory</code> entries for
 	 * handling NodeItems, EdgeItems, and AggregateItems, respectively. All
 	 * are given default settings, including a maxDirty value of 1.
+     * @param g the Graph instance this ItemRegistry will be used to visualize.
 	 */
 	public ItemRegistry(Graph g) {
 		this(g, true);
 	} //
 	
+    /**
+     * Constructor. Creates an empty ItemRegistry and optionally performs the
+     * default initialization, createing queues and <code>ItemFactory</code>
+     * entries for handling NodeItems, EdgeItems, and AggregateItems, 
+     * respectively. All are given default settings, including a maxDirty 
+     * value of 1. If default initialization is disabled, callers will have
+     * to manually add their own {@link #addItemClass(String,Class) item 
+     * classes} to the registry.
+     * @param g the Graph instance this ItemRegistry will be used to visualize.
+     * @param initDefault indicates whether or not default initialization is
+     *  performed.
+     */
 	public ItemRegistry(Graph g, boolean initDefault) {
         m_graph = g;
         m_displays = new ArrayList();
@@ -170,35 +183,82 @@ public class ItemRegistry {
 		m_ifactory.addItemClass(itemClass, itemType, maxItems);
 	} //
 	
+    /**
+     * Returns the Graph visualized by this ItemRegistry.
+     * @return this ItemRegistry's backing Graph.
+     */
     public synchronized Graph getGraph() {
         return m_graph;
     } //
     
+    /**
+     * Sets the Graph visualized by this ItemRegistry.
+     * @param g the backing Graph for this ItemRegistry
+     */
     public synchronized void setGraph(Graph g) {
         m_graph = g;
     } //
     
+    /**
+     * Associates a Display with this ItemRegistry. Applications shouldn't
+     * need to call this method. Use the 
+     * {@link Display#setItemRegistry(ItemRegistry) setItemRegistry} method in
+     * the Display class instead.
+     * @param d the Display to associate with this
+     *  ItemRegistry.
+     */
     public synchronized void addDisplay(Display d) {
         if ( !m_displays.contains(d) )
             m_displays.add(d);
     } //
     
+    /**
+     * Removes a Display from this ItemRegistry
+     * @param d the Display to remove
+     * @return true if the Display was found and removed, false otherwise
+     */
     public synchronized boolean removeDisplay(Display d) {
-        return m_displays.remove(d);
+        boolean rv = m_displays.remove(d);
+        if ( rv ) d.setRegistry(null);
+        return rv;
     } //
     
+    /**
+     * Returns the Display at the given index. Displays are given sequentially
+     * larger indices as they are added to an ItemRegistry.
+     * @param i the index of the requested Display
+     * @return the requested Display
+     */
     public synchronized Display getDisplay(int i) {
         return (Display)m_displays.get(i);
     } //
     
+    /**
+     * Returns a reference to the backing list of Displays for this
+     * ItemRegistry. Be careful about modifying the contents of this
+     * list!!
+     * @return this ItemRegistry's backing list of Displays
+     */
     public synchronized List getDisplaysRef() {
         return m_displays;
     } //
     
+    /**
+     * Returns the FocusManager associated with this ItemRegistry. The
+     * FocusManager is used to keep track of various focus sets of
+     * Entity instances, such as selected nodes and search results.
+     * @return this ItemRegistry's FocusManager
+     */
     public synchronized FocusManager getFocusManager() {
         return m_fmanager;
     } //
     
+    /**
+     * Returns the default FocusSet overseen by this ItemRegistry's
+     * FocusManager. This FocusSet is typically used to keep track
+     * of clicked/selected elements of a visualization.
+     * @return the default FocusSet for this ItemRegistry.
+     */
     public synchronized FocusSet getDefaultFocusSet() {
         return m_fmanager.getDefaultFocusSet();
     } //
@@ -253,6 +313,12 @@ public class ItemRegistry {
 	// ========================================================================
 	// == REGISTRY METHODS ====================================================
 
+    /**
+     * Runs the garbage collector on items of the specified itemClass. This 
+     * method is typically invoked by an appropriate {@link 
+     * edu.berkeley.guir.prefuse.action.Filter filter} action.
+     * @param itemClass the item class to garbage collect
+     */
 	public synchronized void garbageCollect(String itemClass) {
 		ItemEntry entry = (ItemEntry)m_entryMap.get(itemClass);
 		if ( entry != null ) {
@@ -263,6 +329,11 @@ public class ItemRegistry {
 		}
 	} //
 	
+    /**
+     * Runs the garbage collector on the given ItemEntry, which contains
+     * the current state of a specific item class.
+     * @param entry the ItemEntry from which to garbage collect
+     */
 	public synchronized void garbageCollect(ItemEntry entry) {
 		entry.modified = true;
         Iterator iter = entry.itemList.iterator();
@@ -300,6 +371,9 @@ public class ItemRegistry {
 		garbageCollect(DEFAULT_AGGR_CLASS);
 	} //
 
+    /**
+     * Clears the ItemRegistry, removing all visualized GraphItems.
+     */
 	public synchronized void clear() {
 		Iterator iter = m_entryList.iterator();
 		while ( iter.hasNext() ) {
@@ -307,6 +381,10 @@ public class ItemRegistry {
 		}
 	} //
 
+    /**
+     * Clears the given ItemEntry, removing all visualized GraphItems.
+     * @param entry the ItemEntry to clear
+     */
 	private synchronized void clear(ItemEntry entry) {
 		entry.modified = true;
 		while ( entry.itemList.size() > 0 ) {
@@ -336,7 +414,8 @@ public class ItemRegistry {
 
 	/**
 	 * Returns all the visible GraphItems in the registry in <i>reversed</i>
-	 * rendering order.
+	 * rendering order. This is used by Display instances to determine
+     * which items are being manipulated during user interface events.
 	 * @return iterator over all visible GraphItems, in reverse rendering order
 	 */
 	public synchronized Iterator getItemsReversed() {
@@ -351,6 +430,15 @@ public class ItemRegistry {
 		return new CompositeItemIterator(m_entryList,m_comparator,true);
 	} //
 
+    /**
+     * Returns all GraphItems in the specified item class, optionally screening
+     * for only currently visible items. Items are returned in rendering order.
+     * @param itemClass the item class for which to return an iterator 
+     *  of GraphItems
+     * @param visibleOnly indicates whether or not only currently visible items
+     *  should be included in the iteration.
+     * @return an Iterator over the requested GraphItems, in rendering order
+     */
 	public synchronized Iterator getItems(String itemClass, boolean visibleOnly) {
 		ItemEntry entry = (ItemEntry)m_entryMap.get(itemClass);
 		if ( entry != null ) {
@@ -369,6 +457,12 @@ public class ItemRegistry {
 		}
 	} //
 
+    /**
+     * "Touches" an item class, marking it as modified. This causes the items
+     * in this class to be re-sorted next time an Iterator over the class
+     * is requested.
+     * @param itemClass the item class to "touch"
+     */
 	public synchronized void touch(String itemClass) {
 		ItemEntry entry = (ItemEntry)m_entryMap.get(itemClass);
 		if ( entry != null ) {
@@ -379,14 +473,23 @@ public class ItemRegistry {
 		}
 	} //
 	
+    /**
+     * Touches the default item class for NodeItems.
+     */
 	public synchronized void touchNodeItems() {
 		touch(DEFAULT_NODE_CLASS);
 	} //
 	
+    /**
+     * Touches the default item class for EdgeItems.
+     */
 	public synchronized void touchEdgeItems() {
 		touch(DEFAULT_EDGE_CLASS);
 	} //
 	
+    /**
+     * Touches the default item class for AggregateItems.
+     */
 	public synchronized void touchAggregateItems() {
 		touch(DEFAULT_AGGR_CLASS);
 	} //
@@ -495,6 +598,17 @@ public class ItemRegistry {
 		return ( (item=getNodeItem(n)) != null && item.isVisible() );		 
 	} //
 	
+    /**
+     * Requests a GraphItem of the specified item class corresponding to a
+     * given Entity, optionally creating the GraphItem if it doesn't already
+     * exist.
+     * @param itemClass the item class from which the GraphItem should be taken
+     * @param entity the Entity that this GraphItem is visualizing
+     * @param create indicates whether or not the GraphItem should be created
+     *  if it doesn't already exist.
+     * @return the requested GraphItem, or null if the GraphItem wasn't found
+     *  and the create parameter is false.
+     */
 	public synchronized GraphItem getItem(String itemClass, Entity entity, boolean create) {
 		ItemEntry entry = (ItemEntry)m_entryMap.get(itemClass);
 		if ( entry != null ) {

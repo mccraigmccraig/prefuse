@@ -9,21 +9,13 @@ import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 
 /**
+ * Linearly interpolates between starting and ending colors for GraphItems
+ * during an animation. Custom color interpolators can be written by 
+ * subclassing this class and overriding the 
+ * <code>getInterpolatedColor()</code> method.
  * 
- * Mar 8, 2004 - jheer - Created class
- *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
- */
-/**
- * Linearly interpolates between starting and ending colors for GraphItems.
- * Custom color interpolators can be written by subclassing this class and
- * overriding the getInterpolatedColor() method.
- * 
- * Apr 30, 2003 - jheer - Created class
- * 
- * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
  */
 public class ColorInterpolator extends AbstractAction {
     
@@ -32,8 +24,7 @@ public class ColorInterpolator extends AbstractAction {
 	public ColorInterpolator() {
 		m_colorCache = new HashMap();		
 	} //
-	
-	
+
 	/**
 	 * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
 	 */

@@ -6,13 +6,11 @@ import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.NodeItem;
 
 /**
- * Factory from which to retrieve GraphItem renderers. Assumes only one type
- * of renderer each for NodeItems, EdgeItems, and AggregateItems.
- * 
- * Apr 22, 2003 - jheer - Created class
+ * Default factory from which to retrieve GraphItem renderers. Assumes only one
+ * type of renderer each for NodeItems, EdgeItems, and AggregateItems.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class DefaultRendererFactory implements RendererFactory {
 

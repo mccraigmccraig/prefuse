@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
@@ -15,12 +14,14 @@ import java.awt.image.BufferedImage;
 import edu.berkeley.guir.prefuse.GraphItem;
 
 /**
- * Renders an item as a text string.
- * 
- * Apr 28, 2003 - jheer - Created class
+ * Renders an item as a text string. The text string used by default is the
+ * value of the "label" attribute. To use a different attribute, use the
+ * <code>setTextAttributeName</code> method. To perform custom String
+ * selection, simply subclass this Renderer and override the 
+ * <code>getText</code> method.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class TextItemRenderer extends ShapeRenderer {
 
@@ -48,10 +49,22 @@ public class TextItemRenderer extends ShapeRenderer {
 		m_g = (Graphics2D)m_buff.getGraphics();
 	} //
 
+    /**
+     * Sets the default font used by this Renderer. If calling getFont() on
+     * a GraphItem returns a non-null value, the returned Font will be used
+     * instead of this default one.
+     * @param f the default font to use.
+     */
 	public void setFont(Font f) {
 		m_font = f;
 	} //
     
+    /**
+     * Rounds the corners of the bounding rectangle in which the text
+     * string is rendered.
+     * @param arcWidth the width of the curved corner
+     * @param arcHeight the height of the curved corner
+     */
     public void setRoundedCorner(int arcWidth, int arcHeight) {
         if ( (arcWidth == 0 || arcHeight == 0) && 
             !(m_textBox instanceof Rectangle2D) ) {
@@ -63,13 +76,6 @@ public class TextItemRenderer extends ShapeRenderer {
                 .setRoundRect(0,0,10,10,arcWidth,arcHeight);                    
         }
     } //
-
-	/**
-	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRenderType()
-	 */
-	protected int getRenderType() {
-		return RENDER_TYPE_DRAW_AND_FILL; 
-	} //
 
 	/**
 	 * Get the attribute name of the text to draw.
@@ -108,10 +114,10 @@ public class TextItemRenderer extends ShapeRenderer {
 	protected Shape getRawShape(GraphItem item) {
 		if ( m_g == null ) { return null; }
 		
-		Font font = item.getFont();
-		if ( font == null ) { font = m_font; }
 		String s = getText(item);
 		if ( s == null ) { s = ""; }
+        Font font = item.getFont();
+        if ( font == null ) { font = m_font; }
 		FontMetrics fm = m_g.getFontMetrics(font);
 		int h = fm.getHeight() + 2*m_vertBorder;
 		int w = fm.stringWidth(s) + 2*m_horizBorder;
@@ -137,13 +143,6 @@ public class TextItemRenderer extends ShapeRenderer {
 			y = y-h;
 		}
 		p.setLocation(x,y);
-	} //
-
-	/**
-	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getGraphicsSpaceTransform(edu.berkeley.guir.prefuse.GraphItem)
-	 */
-	protected AffineTransform getGraphicsSpaceTransform(GraphItem item) {
-		return null;
 	} //
 
 	/**

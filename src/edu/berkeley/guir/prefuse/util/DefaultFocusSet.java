@@ -27,14 +27,26 @@ public class DefaultFocusSet implements FocusSet {
     
     private FocusListener m_listener;
 
+    /**
+     * Adds a listener to monitor changes to this FocusSet.
+     * @param fl the FocusListener to add
+     */
     public void addFocusListener(FocusListener fl) {
         m_listener = FocusEventMulticaster.add(m_listener, fl);
     } //
 
+    /**
+     * Removes a listener currently monitoring this FocusSet.
+     * @param fl the FocusListener to remove
+     */
     public void removeFocusListener(FocusListener fl) {
         m_listener = FocusEventMulticaster.remove(m_listener, fl);
     } //
 
+    /**
+     * Adds a new Entity to this FocusSet.
+     * @param focus the Entity to add
+     */
     public void add(Entity focus) {
         if ( m_foci.add(focus) && m_listener != null ) {
             m_listener.focusChanged(new FocusEvent(this,
@@ -42,6 +54,11 @@ public class DefaultFocusSet implements FocusSet {
         }
     } //
 
+    /**
+     * Adds a Collection of Entity instances to this FocusSet. All members of
+     * this Collection should be of type Entity.
+     * @param foci the Collection of Entity instances to add.
+     */
     public void add(Collection foci) {
         Iterator iter = foci.iterator();
         while ( iter.hasNext() ) {
@@ -61,6 +78,10 @@ public class DefaultFocusSet implements FocusSet {
         m_tmp.clear();
     } //
 
+    /**
+     * Removes an Entity from this FocusSet.
+     * @param focus the Entity to remove
+     */
     public void remove(Entity focus) {
         if ( m_foci.remove(focus) && m_listener != null ) {
             m_listener.focusChanged(new FocusEvent(this,
@@ -68,6 +89,11 @@ public class DefaultFocusSet implements FocusSet {
         }
     } //
 
+    /**
+     * Removes a Collection of Entity instances from this FocusSet. All members 
+     * of this Collection should already be members of this set.
+     * @param foci the Collection of Entity instances to remove.
+     */
     public void remove(Collection foci) {
         Iterator iter = foci.iterator();
         while ( iter.hasNext() ) {
@@ -82,6 +108,11 @@ public class DefaultFocusSet implements FocusSet {
         }
     } //
     
+    /**
+     * Sets an Entity as the single focus in this FocusSet. This causes any
+     * previous members of the focus set to be removed.
+     * @param focus the Entity to set
+     */
     public void set(Entity focus) {
         Entity[] add = null, rem = null;
         if ( m_foci.size() > 0 && m_listener != null )
@@ -95,6 +126,12 @@ public class DefaultFocusSet implements FocusSet {
         }
     } //
     
+    /**
+     * Sets a Collection of Entity instances as the foci in this FocusSet. 
+     * All members of this Collection should of type Entity. This method
+     * causes any previous members of the focus set to be removed.
+     * @param foci the Collection of Entity instances to remove.
+     */
     public void set(Collection foci) {
         // check validity of input before proceeding
         Iterator iter = foci.iterator();
@@ -128,6 +165,9 @@ public class DefaultFocusSet implements FocusSet {
         }
     } //
 
+    /**
+     * Clears this FocusSet, removing all current members.
+     */
     public void clear() {
         Entity[] rem = null;
         if ( m_listener != null && m_foci.size() > 0 )
@@ -139,14 +179,27 @@ public class DefaultFocusSet implements FocusSet {
         }
     } //
 
+    /**
+     * Returns an Iterator over the members of this FocusSet.
+     * @return an Iterator over the members of this FocusSet
+     */
     public Iterator iterator() {
         return m_foci.iterator();
     } //
 
+    /**
+     * Returns the size of this FocusSet.
+     * @return the number of elements in this FocusSet
+     */
     public int size() {
         return m_foci.size();
     } //
 
+    /**
+     * Indicates if a given Entity is contained within this FocusSet.
+     * @param entity the Entity to check for containment
+     * @return true if this Entity is in the FocusSet, false otherwise
+     */
     public boolean contains(Entity entity) {
         return m_foci.contains(entity);
     } //

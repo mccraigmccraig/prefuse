@@ -3,8 +3,8 @@ package edu.berkeley.guir.prefuse.action;
 import java.util.HashMap;
 
 /**
- * 
- * Feb 10, 2004 - jheer - Created class
+ * Maps between arbitrary object keys and Action instances. Useful for keeping
+ * a store of Action instances for future parameterization.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

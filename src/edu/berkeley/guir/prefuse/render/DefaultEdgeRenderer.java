@@ -15,13 +15,11 @@ import edu.berkeley.guir.prefuse.graph.DefaultEdge;
 import edu.berkeley.guir.prefuse.util.GeometryLib;
 
 /**
- * DefaultEdge renderer that draws edges as lines connecting nodes. Both
+ * Default edge renderer that draws edges as lines connecting nodes. Both
  * straight and curved (Bezier) lines are supported.
  * 
- * Apr 26, 2003 - jheer - Created class
- * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class DefaultEdgeRenderer extends ShapeRenderer {
 	
@@ -74,7 +72,7 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	/**
 	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRenderType()
 	 */
-	protected int getRenderType() { 
+	public int getRenderType() { 
 		if ( m_edgeType == EDGE_TYPE_LINE && m_curWidth > 1 ) {
 			return RENDER_TYPE_FILL;
 		} else if ( m_directed ) {

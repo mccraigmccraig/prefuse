@@ -5,8 +5,7 @@ import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.graph.DefaultTree;
 
 /**
- * 
- * Feb 21, 2004 - jheer - Created class
+ * Abstract class providing convenience methods for tree layout algorithms.
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

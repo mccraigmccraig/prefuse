@@ -8,8 +8,6 @@ import edu.berkeley.guir.prefuse.ItemRegistry;
 /**
  * Linearly interpolates the size of a GraphItem.
  * 
- * Apr 27, 2003 - jheer - Created class
- * 
  * @version 1.0
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
  */

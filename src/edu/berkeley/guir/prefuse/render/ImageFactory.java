@@ -15,18 +15,17 @@ import edu.berkeley.guir.prefuse.graph.Entity;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
 /**
- * Controls loading and management of images. Includes a size-configurable
+ * <p>Controls loading and management of images. Includes a size-configurable
  * LRU cache for managing loaded images. Also supports optional image scaling
  * of loaded images to cut down on memory and visualization operation costs.
+ * </p>
  * 
- * By default images are loaded upon first request. Use the
+ * <p>By default images are loaded upon first request. Use the
  * <code>preloadImages()</code> method to load images before they are
- * requested.
- * 
- * TODO: Pick final API, refine class as necessary.
+ * requested.</p>
  * 
  * @author newbergr
- * @author jheer
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class ImageFactory {
 	

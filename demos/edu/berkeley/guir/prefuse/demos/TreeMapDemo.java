@@ -8,7 +8,6 @@ import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Comparator;
@@ -166,17 +165,10 @@ public class TreeMapDemo extends JFrame {
     
     public class NodeRenderer extends ShapeRenderer {
         private Rectangle2D bounds = new Rectangle2D.Double();
-        protected int getRenderType() {
-            return RENDER_TYPE_DRAW_AND_FILL;
-        } //
         protected Shape getRawShape(GraphItem item) {
             Point2D d = (Point2D)item.getVizAttribute("dimension");
             bounds.setRect(item.getX(),item.getY(),d.getX(),d.getY());
             return bounds;
-        } //
-
-        protected AffineTransform getGraphicsSpaceTransform(GraphItem item) {
-            return null;
         } //
     } // end of inner class NodeRenderer
     

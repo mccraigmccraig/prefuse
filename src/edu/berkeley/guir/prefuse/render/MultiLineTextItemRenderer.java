@@ -12,11 +12,10 @@ import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.render.TextItemRenderer;
 
 /**
- * 
- * Aug 13, 2003 - jheer - Created class
+ * A text renderer that allows the text to be split among multiple lines.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class MultiLineTextItemRenderer extends TextItemRenderer {
 
@@ -178,4 +177,4 @@ public class MultiLineTextItemRenderer extends TextItemRenderer {
 		}
 	} //
 
-} // end of class BiowarfareNodeRenderer
+} // end of class MultiLineTextItemRenderer

@@ -1,6 +1,3 @@
-/*
- * Created on Apr 30, 2003
- */
 package edu.berkeley.guir.prefuse.render;
 
 import java.awt.Graphics2D;
@@ -29,7 +26,7 @@ public class DefaultAggregateRenderer implements Renderer {
 	private int[]           m_pixel    = new int[1];
 
 	/**
-	 * override render() to draw an image instead of the shape.
+	 * override render() to draw an image.
 	 */
 	public void render(Graphics2D g, GraphItem item) {
 		AggregateItem aItem = (AggregateItem) item;
@@ -57,6 +54,9 @@ public class DefaultAggregateRenderer implements Renderer {
 		return at;
 	} //
 
+    /**
+     * @see edu.berkeley.guir.prefuse.render.Renderer#locatePoint(java.awt.geom.Point2D, edu.berkeley.guir.prefuse.GraphItem)
+     */
 	public boolean locatePoint(Point2D p, GraphItem item) {
 		AggregateItem aItem = (AggregateItem) item;
 		Image image = m_imageFactory.getImage(aItem);
@@ -79,6 +79,9 @@ public class DefaultAggregateRenderer implements Renderer {
 		return false;
 	} //
 	
+    /**
+     * @see edu.berkeley.guir.prefuse.render.Renderer#getBoundsRef(edu.berkeley.guir.prefuse.GraphItem)
+     */
 	public Rectangle getBoundsRef(GraphItem item) {
 		AggregateItem aItem = (AggregateItem) item;
 		Image image = m_imageFactory.getImage(aItem);

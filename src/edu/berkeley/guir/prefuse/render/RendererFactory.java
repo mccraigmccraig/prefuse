@@ -3,12 +3,11 @@ package edu.berkeley.guir.prefuse.render;
 import edu.berkeley.guir.prefuse.GraphItem;
 
 /**
- * Factory interface from which to retrieve GraphItem renderers.
- * 
- * Apr 22, 2003 - jheer - Created class
+ * The RendererFactory is responsible for providing the proper Renderer
+ * instance for drawing a given GraphItem.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public interface RendererFactory {
 

@@ -10,7 +10,6 @@ import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -18,12 +17,10 @@ import java.awt.image.BufferedImage;
 import edu.berkeley.guir.prefuse.GraphItem;
 
 /**
- * Renders an item as a text string.
- * 
- * Apr 28, 2003 - jheer - Created class
+ * Renders an item as an image and a text string.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class TextImageItemRenderer extends ShapeRenderer {
 
@@ -64,13 +61,6 @@ public class TextImageItemRenderer extends ShapeRenderer {
 	 */
 	public void setMaxImageDimensions(int width, int height) {
 		m_images.setMaxImageDimensions(width, height);
-	} //
-
-	/**
-	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRenderType()
-	 */
-	protected int getRenderType() {
-		return RENDER_TYPE_DRAW_AND_FILL; 
 	} //
 
 	/**
@@ -175,13 +165,6 @@ public class TextImageItemRenderer extends ShapeRenderer {
 			y = y-h;
 		}
 		p.setLocation(x,y);
-	} //
-
-	/**
-	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getGraphicsSpaceTransform(edu.berkeley.guir.prefuse.GraphItem)
-	 */
-	protected AffineTransform getGraphicsSpaceTransform(GraphItem item) {
-		return null;
 	} //
 
 	/**
