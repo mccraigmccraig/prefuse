@@ -13,6 +13,7 @@ import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.activity.Activity;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 import edu.berkeley.guir.prefuse.focus.FocusSet;
+import edu.berkeley.guir.prefuse.graph.Entity;
 
 /**
  * Sets the current focus (according to the ItemRegistry's default focus
@@ -30,6 +31,7 @@ public class FocusControl extends ControlAdapter {
     protected int ccount;
     protected Class[] itemTypes = new Class[] { NodeItem.class };
     protected Activity activity = null;
+    protected Entity curFocus = null;
     
     /**
      * Creates a new FocusControl that changes the focus to another item
@@ -139,12 +141,13 @@ public class FocusControl extends ControlAdapter {
             Display d = (Display)e.getSource();
             d.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             if ( ccount == 0 ) {
-                ItemRegistry registry = item.getItemRegistry();
-                FocusManager fm = registry.getFocusManager();
-                FocusSet fs = fm.getFocusSet(focusSetKey);
-                fs.set(item.getEntity());
-                registry.touch(item.getItemClass());
-                runActivity();
+        		curFocus = item.getEntity();
+        		ItemRegistry registry = item.getItemRegistry();
+        		FocusManager fm = registry.getFocusManager();
+        		FocusSet fs = fm.getFocusSet(focusSetKey);
+        		fs.set(item.getEntity());
+        		registry.touch(item.getItemClass());
+        		runActivity();
             }
         }
     } //
@@ -154,6 +157,7 @@ public class FocusControl extends ControlAdapter {
             Display d = (Display)e.getSource();
             d.setCursor(Cursor.getDefaultCursor());
             if ( ccount == 0 ) {
+            	curFocus = null;
                 ItemRegistry registry = item.getItemRegistry();
                 FocusManager fm = registry.getFocusManager();
                 FocusSet fs = fm.getFocusSet(focusSetKey);
@@ -169,12 +173,16 @@ public class FocusControl extends ControlAdapter {
              SwingUtilities.isLeftMouseButton(e)    && 
              e.getClickCount() == ccount )
         {
-            ItemRegistry registry = item.getItemRegistry();
-            FocusManager fm = registry.getFocusManager();
-            FocusSet fs = fm.getFocusSet(focusSetKey);
-            fs.set(item.getEntity());
-            registry.touch(item.getItemClass());
-            runActivity();
+        	Entity focus = item.getEntity();
+        	if ( focus != curFocus ) {
+        		curFocus = focus;
+	            ItemRegistry registry = item.getItemRegistry();
+	            FocusManager fm = registry.getFocusManager();
+	            FocusSet fs = fm.getFocusSet(focusSetKey);
+	            fs.set(item.getEntity());
+	            registry.touch(item.getItemClass());
+	            runActivity();
+        	}
         }
     } //
     
