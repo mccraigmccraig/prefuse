@@ -16,7 +16,7 @@ import edu.berkeley.guir.prefuse.graph.TreeNode;
 public class HDirTreeReader extends AbstractTreeReader {
 
 	private Vector fieldNameList;
-	private String textFieldName = "Text";
+	private String textFieldName = "label";
 	private int levels;
 	private double sizes;
 	private double isizes;

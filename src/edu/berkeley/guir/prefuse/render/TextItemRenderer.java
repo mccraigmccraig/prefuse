@@ -1,13 +1,14 @@
 package edu.berkeley.guir.prefuse.render;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -37,7 +38,7 @@ public class TextItemRenderer extends ShapeRenderer {
 	protected int m_horizBorder = 3;
 	protected int m_vertBorder = 0;
 	
-	protected RectangularShape m_textBox  = new RoundRectangle2D.Float();
+	protected RectangularShape m_textBox  = new Rectangle2D.Float();
 	protected Font m_font = new Font("SansSerif", Font.PLAIN, 10);
 	protected Point2D     m_tmpPoint = new Point2D.Float();
 
@@ -45,13 +46,23 @@ public class TextItemRenderer extends ShapeRenderer {
 		// TODO: this is hacky. Is there a better way to achieve this?
 		m_buff = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
 		m_g = (Graphics2D)m_buff.getGraphics();
-		
-		((RoundRectangle2D)m_textBox).setRoundRect(0,0,10,10,10,2);
 	} //
 
 	public void setFont(Font f) {
 		m_font = f;
 	} //
+    
+    public void setRoundedCorner(int arcWidth, int arcHeight) {
+        if ( (arcWidth == 0 || arcHeight == 0) && 
+            !(m_textBox instanceof Rectangle2D) ) {
+            m_textBox = new Rectangle2D.Float();
+        } else {
+            if ( !(m_textBox instanceof RoundRectangle2D) )
+                m_textBox = new RoundRectangle2D.Float();
+            ((RoundRectangle2D)m_textBox)
+                .setRoundRect(0,0,10,10,arcWidth,arcHeight);                    
+        }
+    } //
 
 	/**
 	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRenderType()
@@ -139,23 +150,23 @@ public class TextItemRenderer extends ShapeRenderer {
 	 * @see edu.berkeley.guir.prefuse.render.Renderer#render(java.awt.Graphics2D, edu.berkeley.guir.prefuse.GraphItem)
 	 */
 	public void render(Graphics2D g, GraphItem item) {
-		Color fillColor = item.getFillColor();
-		Color itemColor = item.getColor();
+		Paint fillColor = item.getFillColor();
+		Paint itemColor = item.getColor();
 		Shape shape = getShape(item);
 		if (shape != null) {
 			switch (getRenderType()) {
 				case RENDER_TYPE_DRAW :
-					g.setColor(itemColor);
+					g.setPaint(itemColor);
 					g.draw(shape);
 					break;
 				case RENDER_TYPE_FILL :
-					g.setColor(fillColor);
+					g.setPaint(fillColor);
 					g.fill(shape);
 					break;
 				case RENDER_TYPE_DRAW_AND_FILL :
-					g.setColor(fillColor);
+					g.setPaint(fillColor);
 					g.fill(shape);
-					g.setColor(itemColor);
+					g.setPaint(itemColor);
 					g.draw(shape);
 					break;
 			}
@@ -163,7 +174,7 @@ public class TextItemRenderer extends ShapeRenderer {
 			String s = getText(item);
 			if ( s != null ) {			
 				Rectangle r = shape.getBounds();
-				g.setColor(itemColor);
+				g.setPaint(itemColor);
 				Font font = item.getFont();
 				if ( font == null ) { font = m_font; }
 				g.setFont(font);

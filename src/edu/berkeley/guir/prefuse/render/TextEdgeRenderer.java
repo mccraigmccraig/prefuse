@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;
@@ -75,34 +76,34 @@ public class TextEdgeRenderer extends DefaultEdgeRenderer {
 			shape = m_line;
 		}
 		if (shape != null) {
-			g.setColor(item.getColor());			
+			g.setPaint(item.getColor());			
 			g.draw(shape);
 		}
 		
 		shape = m_textBox;		
-		Color fillColor = Color.WHITE;
-		Color itemColor = item.getColor();
+		Paint fillColor = Color.WHITE;
+		Paint itemColor = item.getColor();
 		if (shape != null) {
 			switch (getRenderType()) {
 				case RENDER_TYPE_DRAW :
-					g.setColor(itemColor);
+					g.setPaint(itemColor);
 					g.draw(shape);
 					break;
 				case RENDER_TYPE_FILL :
-					g.setColor(fillColor);
+					g.setPaint(fillColor);
 					g.fill(shape);
 					break;
 				case RENDER_TYPE_DRAW_AND_FILL :
-					g.setColor(fillColor);
+					g.setPaint(fillColor);
 					g.fill(shape);
-					g.setColor(itemColor);
+					g.setPaint(itemColor);
 					g.draw(shape);
 					break;
 			}
-			g.setColor(itemColor);
+			g.setPaint(itemColor);
 			String s = (String)item.getAttribute(m_labelName);
 			Rectangle r = shape.getBounds();
-			g.setColor(item.getColor());
+			g.setPaint(item.getColor());
 			g.setFont(m_font);
 			g.drawString(s, r.x+m_horizBorder, r.y+m_vertBorder+5*r.height/6);
 		}

@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -187,23 +188,23 @@ public class TextImageItemRenderer extends ShapeRenderer {
 	 * @see edu.berkeley.guir.prefuse.render.Renderer#render(java.awt.Graphics2D, edu.berkeley.guir.prefuse.GraphItem)
 	 */
 	public void render(Graphics2D g, GraphItem item) {
-		Color fillColor = item.getFillColor();
-		Color itemColor = item.getColor();
+		Paint fillColor = item.getFillColor();
+		Paint itemColor = item.getColor();
 		Shape shape = getShape(item);
 		if (shape != null) {
 			switch (getRenderType()) {
 				case RENDER_TYPE_DRAW :
-					g.setColor(itemColor);
+					g.setPaint(itemColor);
 					g.draw(shape);
 					break;
 				case RENDER_TYPE_FILL :
-					g.setColor(fillColor);
+					g.setPaint(fillColor);
 					g.fill(shape);
 					break;
 				case RENDER_TYPE_DRAW_AND_FILL :
-					g.setColor(fillColor);
+					g.setPaint(fillColor);
 					g.fill(shape);
-					g.setColor(itemColor);
+					g.setPaint(itemColor);
 					g.draw(shape);
 					break;
 			}
@@ -219,12 +220,12 @@ public class TextImageItemRenderer extends ShapeRenderer {
 			if ( img != null ) {
 				int y = r.y+(r.height-img.getHeight(null))/2;
 				Composite comp = g.getComposite();
-				if ( itemColor != null ) {
-					int alpha = itemColor.getAlpha();
+				if ( itemColor != null && itemColor instanceof Color) {
+					int alpha = ((Color)itemColor).getAlpha();
 					if ( alpha < 255 ) {
 						AlphaComposite alphaComp = 
 							AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 
-								((float)itemColor.getAlpha())/255);
+								((float)alpha)/255);
 						g.setComposite(alphaComp);
 					}
 				}
@@ -233,7 +234,7 @@ public class TextImageItemRenderer extends ShapeRenderer {
 				g.setComposite(comp);
 			}
 			if ( s != null ) {
-				g.setColor(itemColor);
+				g.setPaint(itemColor);
 				Font font = item.getFont();
 				if ( font == null ) { font = m_font; }
 				g.setFont(font);

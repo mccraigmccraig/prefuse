@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Label;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.TextArea;
 import java.awt.TextComponent;
@@ -175,8 +176,11 @@ public class PrefuseContainer extends Container {
 		String txt = nitem.getAttribute(attribute);
 		m_editItem = nitem;
 		m_editAttribute = attribute;
-		m_editor.setForeground(nitem.getColor());
-		m_editor.setBackground(nitem.getFillColor());
+        Paint c = nitem.getColor(), fc = nitem.getFillColor();
+        if ( c instanceof Color )
+            m_editor.setForeground((Color)c);
+        if ( fc instanceof Color )
+            m_editor.setBackground((Color)fc);
 		editText(txt, r);
 	} //
 	

@@ -1,0 +1,190 @@
+package edu.berkeley.guir.prefuse.util;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
+
+import edu.berkeley.guir.prefuse.graph.Entity;
+import edu.berkeley.guir.prefuse.graph.Tree;
+import edu.berkeley.guir.prefuse.graph.TreeNode;
+
+/**
+ * 
+ * Feb 21, 2004 - jheer - Created class
+ *
+ * @version 1.0
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
+ */
+public class Trie {
+
+    public class TrieNode {
+        boolean isLeaf;
+        int leafCount = 0;
+    } //
+    public class TrieBranch extends TrieNode {
+        char[] chars = new char[] {0};
+        TrieNode[] children = new TrieNode[1];
+    } //
+    public class TrieLeaf extends TrieNode {
+        public TrieLeaf(String word, Entity e) {
+            this.word = word;
+            entity = e;
+            next = null;
+            leafCount = 1;
+        }
+        String word;
+        Entity entity;
+        TrieLeaf next;
+    } //
+    public class TrieIterator implements Iterator {
+        private LinkedList queue;
+        private Entity next;
+        public TrieIterator(TrieNode node) {
+            queue = new LinkedList();
+            queue.add(node);
+        } //
+        public boolean hasNext() {
+            return !queue.isEmpty();
+        } //
+        public Object next() {
+            if ( queue.isEmpty() )
+                throw new NoSuchElementException();
+            
+            TrieNode n = (TrieNode)queue.removeFirst();
+            Object o;
+            if ( n instanceof TrieLeaf ) {
+                TrieLeaf l = (TrieLeaf)n;
+                o = l.entity;
+                if ( l.next != null )
+                    queue.addFirst(l.next);
+                return o;
+            } else {
+                TrieBranch b = (TrieBranch)n;
+                for ( int i = b.chars.length-1; i > 0; i-- ) {
+                    queue.addFirst(b.children[i]);
+                }
+                if ( b.children[0] != null )
+                    queue.addFirst(b.children[0]);
+                return next();
+            }
+        } //
+        public void remove() {
+            throw new UnsupportedOperationException();
+        } //
+    } // end of inner clas TrieIterator
+    
+    private TrieBranch root = new TrieBranch();
+    private boolean caseSensitive = false;
+    
+    public Trie(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
+    } //
+    
+    public void addString(String word, Entity e) {
+        TrieLeaf leaf = new TrieLeaf(word,e);
+        addLeaf(root, leaf, 0);
+    } //
+    
+    private final int getIndex(char[] chars, char c) {
+        for ( int i=0; i<chars.length; i++ )
+            if ( chars[i] == c ) return i;
+        return -1;
+    } //
+    
+    private final char getChar(String s, int i) {
+        char c = ( i < 0 || i >= s.length() ? 0 : s.charAt(i) );
+        return ( caseSensitive ? c : Character.toLowerCase(c) );
+    } //
+    
+    private void addLeaf(TrieBranch b, TrieLeaf l, int depth) {
+        b.leafCount += l.leafCount;
+        
+        char c = getChar(l.word, depth);
+        int i = getIndex(b.chars, c);
+        if ( i == -1 ) {
+            addChild(b,l,c);
+        } else {
+            TrieNode n = b.children[i];
+            if ( n == null ) {
+                // we have completely spelled out the word
+                b.children[i] = l;
+            } else if ( n instanceof TrieBranch ) {
+                // recurse down the tree
+                addLeaf((TrieBranch)n,l,depth+1);
+            } else {
+                // node is a leaf, need to do a split?
+                TrieLeaf nl = (TrieLeaf)n;
+                if ( i==0 || nl.word.equals(l.word) ) {
+                    // same word, so chain the entries
+                    for ( ; nl.next != null; nl = nl.next )
+                        nl.leafCount++;
+                    nl.leafCount++;
+                    nl.next = l;
+                } else {
+                    // different words, need to do a split
+                    TrieBranch nb = new TrieBranch();
+                    b.children[i] = nb;
+                    addLeaf(nb,nl,depth+1);
+                    addLeaf(nb,l,depth+1);
+                }
+            }
+        }
+    } //
+    
+    private void addChild(TrieBranch b, TrieNode n, char c) {
+        int len = b.chars.length;
+        char[] nchars = new char[len+1];
+        TrieNode[] nkids = new TrieNode[len+1];
+        System.arraycopy(b.chars,0,nchars,0,len);
+        System.arraycopy(b.children,0,nkids,0,len);
+        nchars[len] = c;
+        nkids[len] = n;
+        b.chars = nchars;
+        b.children = nkids;
+    } //
+    
+    public TrieNode find(String word) {
+        return (word.length() < 1 ? null : find(word, root, 0));
+    } //
+    
+    private TrieNode find(String word, TrieBranch b, int depth) {
+        char c = getChar(word, depth);
+        int i = getIndex(b.chars, c);
+        if ( i == -1 ) {
+            return null; // not in trie
+        } else if ( b.children[i] instanceof TrieLeaf ) {
+            return b.children[i];
+        } else if ( word.length()-1 == depth ) {
+            return b.children[i]; // end of search
+        } else {
+            return find(word, (TrieBranch)b.children[i], depth+1); // recurse
+        }
+    } //
+    
+    public Tree tree() {
+        TreeNode r = new TreeNode();
+        r.setAttribute("label", "root");
+        tree(root, r);
+        return new Tree(r);
+    } //
+    
+    private void tree(TrieBranch b, TreeNode n) {
+        for ( int i=0; i<b.chars.length; i++ ) {
+            if ( b.children[i] instanceof TrieLeaf ) {
+                TrieLeaf l = (TrieLeaf)b.children[i];
+                while ( l != null ) {
+                    TreeNode c = new TreeNode();
+                    c.setAttribute("label", l.word);
+                    n.addChild(c);
+                    l = l.next;
+                }
+            } else {
+                TreeNode c = new TreeNode();
+                c.setAttribute("label", String.valueOf(b.chars[i]));
+                n.addChild(c);
+                tree((TrieBranch)b.children[i], c);
+            }
+        }
+    } //
+    
+} // end of class Trie

@@ -27,9 +27,9 @@ public class DefaultItemComparator implements Comparator {
 		
 		GraphItem item1 = (GraphItem)o1;
 		GraphItem item2 = (GraphItem)o2;
-		
-		boolean f1 = item1.getItemRegistry().isFocus(item1);
-		boolean f2 = item2.getItemRegistry().isFocus(item2);
+        
+		boolean f1 = item1.isFocus();
+		boolean f2 = item2.isFocus();
 		
 		if ( item1 instanceof NodeItem ) {
 			if ( item2 instanceof NodeItem ) {

@@ -1,7 +1,7 @@
 package edu.berkeley.guir.prefuse;
 
-import java.awt.Color;
 import java.awt.Font;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
@@ -14,7 +14,7 @@ import edu.berkeley.guir.prefuse.render.Renderer;
  * Abstract class for representing an entity to be visualized. Subclasses
  * include Node, Edge, and Aggregate.
  * 
- * TODO: abstract the various properties into the attributes map.
+ * TODO: abstract the various properties into the attributes map?
  * 
  * Apr 22, 2003 - jheer - Created class
  * 
@@ -39,12 +39,12 @@ public abstract class GraphItem {
 	protected Point2D m_location;
 	protected Point2D m_startLocation;
 	protected Point2D m_endLocation;
-	protected Color   m_color;
-	protected Color   m_startColor;
-	protected Color   m_endColor;
-	protected Color   m_fillColor;
-	protected Color   m_startFillColor;
-	protected Color   m_endFillColor;
+	protected Paint   m_color;
+	protected Paint   m_startColor;
+	protected Paint   m_endColor;
+	protected Paint   m_fillColor;
+	protected Paint   m_startFillColor;
+	protected Paint   m_endFillColor;
 	protected double m_size;
 	protected double m_startSize;
 	protected double m_endSize;
@@ -257,6 +257,11 @@ public abstract class GraphItem {
 		m_visible = s;
 	} //
 
+    public boolean isFocus() {
+        FocusManager fmanager = m_registry.getFocusManager();
+        return fmanager.isFocus(m_entity);
+    } //
+    
 	/**
 	 * Get the renderer for drawing this GraphItem.
 	 * @return this item's Renderer
@@ -285,7 +290,7 @@ public abstract class GraphItem {
 	 * @return a Rectangle representing the bounding box for this GraphItem
 	 */
 	public Rectangle getBounds() {
-		return getRenderer().getBounds(this);
+		return getRenderer().getBoundsRef(this);
 	} //
 
 
@@ -349,44 +354,44 @@ public abstract class GraphItem {
 		return m_location.getY();
 	} //
 	
-	public Color getStartColor() {
+	public Paint getStartColor() {
 		return m_startColor;
 	} //
 	
-	public Color getEndColor() {
+	public Paint getEndColor() {
 		return m_endColor;
 	} //
 	
-	public Color getColor() {
+	public Paint getColor() {
 		return m_color;
 	} //	
 	
-	public void setColor(Color color) {
+	public void setColor(Paint color) {
 		m_color = color;
 	} //
 	
-	public void updateColor(Color color) {
+	public void updateColor(Paint color) {
 		m_startColor = m_color;
 		m_endColor = color;
 	} //
 	
-	public Color getStartFillColor() {
+	public Paint getStartFillColor() {
 		return m_startFillColor;
 	} //
 	
-	public Color getEndFillColor() {
+	public Paint getEndFillColor() {
 		return m_endFillColor;
 	} //
 	
-	public Color getFillColor() {
+	public Paint getFillColor() {
 		return m_fillColor;
 	} //	
 	
-	public void setFillColor(Color color) {
+	public void setFillColor(Paint color) {
 		m_fillColor = color;
 	} //
 	
-	public void updateFillColor(Color color) {
+	public void updateFillColor(Paint color) {
 		m_startFillColor = m_fillColor;
 		m_endFillColor = color;
 	} //

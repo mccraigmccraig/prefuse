@@ -18,7 +18,7 @@ import edu.berkeley.guir.prefuse.GraphItem;
 public interface Renderer {
  
   /**
-   * Render item into Graphics2D context.
+   * Render item into a Graphics2D context.
    * @param g the Graphics2D context
    * @param item the item to draw
    */
@@ -33,10 +33,10 @@ public interface Renderer {
   public boolean locatePoint(Point2D p, GraphItem item);
   
   /**
-   * Returns a bounding rectangle for the item.
+   * Returns a reference to the bounding rectangle for the item.
    * @param item the item to compute the bounding box for
    * @return the item's bounding box as a Rectangle
    */
-  public Rectangle getBounds(GraphItem item);  
+  public Rectangle getBoundsRef(GraphItem item);  
   
 } // end of interface Renderer

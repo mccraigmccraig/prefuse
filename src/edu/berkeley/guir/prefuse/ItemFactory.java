@@ -10,7 +10,7 @@ import java.util.Map;
  * initialization to be consolidated in a single location and allocated objects
  * to be re-used.
  * 
- * This class works in close conjunction with the ItemRegistry, but is
+ * This class works closely with the ItemRegistry, but is
  * implemented separately to provide encapsulation and simplify design.
  * 
  * Apr 24, 2003 - jheer - Created class

@@ -7,7 +7,6 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import edu.berkeley.guir.prefuse.GraphItem;
-import edu.berkeley.guir.prefuse.NodeItem;
 
 /**
  * A default implementation of a node that draws itself as a circle.
@@ -20,14 +19,21 @@ public class DefaultNodeRenderer extends ShapeRenderer {
 
 	// m_radius is class-level, used by aggregate renderer 
 	// right now to determine an offset
-	static int m_radius = 5;
+	private int m_radius = 5;
 	private Ellipse2D m_circle =
 		new Ellipse2D.Float(0, 0, 2 * m_radius, 2 * m_radius);
 
+    public void setRadius(int r) {
+        m_radius = r;
+        m_circle.setFrameFromCenter(0,0,r,r);
+    } //
+    
 	/**
 	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.GraphItem)
 	 */
 	protected Shape getRawShape(GraphItem item) {
+        m_circle.setFrame(item.getX()-m_radius,item.getY()-m_radius,
+                2*m_radius,2*m_radius);
 		return m_circle;
 	} //
 
@@ -38,14 +44,11 @@ public class DefaultNodeRenderer extends ShapeRenderer {
 		return RENDER_TYPE_DRAW_AND_FILL;
 	} //
 
-	/**
-	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getGraphicsSpaceTransform(edu.berkeley.guir.prefuse.GraphItem)
-	 */
-	protected AffineTransform getGraphicsSpaceTransform(GraphItem item) {
-		NodeItem nItem = (NodeItem) item;
-		AffineTransform at = new AffineTransform();
-		at.translate(nItem.getX() - m_radius, nItem.getY() - m_radius);
-		return at;
-	} //
+    /**
+     * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getGraphicsSpaceTransform(edu.berkeley.guir.prefuse.GraphItem)
+     */
+    protected AffineTransform getGraphicsSpaceTransform(GraphItem item) {
+        return null;
+    } //
 
 } // end of class DefaultNodeRenderer

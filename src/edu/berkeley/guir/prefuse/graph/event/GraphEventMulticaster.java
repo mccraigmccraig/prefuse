@@ -2,18 +2,19 @@ package edu.berkeley.guir.prefuse.graph.event;
 
 import java.util.EventListener;
 
+import edu.berkeley.guir.prefuse.event.EventMulticaster;
 import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Node;
 
 /**
- * Manages a list of listeners for prefuse registry events.
+ * Manages listeners for graph modification events.
  * 
  * @author newbergr
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
  */
-public class GraphEventMulticaster implements GraphEventListener {
-
-	protected final EventListener a, b;
+public class GraphEventMulticaster extends EventMulticaster 
+    implements GraphEventListener
+{
 
 	public void nodeAdded(Node n) {
 		((GraphEventListener) a).nodeAdded(n);
@@ -73,86 +74,8 @@ public class GraphEventMulticaster implements GraphEventListener {
 		return new GraphEventMulticaster(a, b);
 	} //
 
-	/** 
-	 * Returns the resulting multicast listener after removing the
-	 * old listener from listener-l.
-	 * If listener-l equals the old listener OR listener-l is null, 
-	 * returns null.
-	 * Else if listener-l is an instance of AWTEventMulticaster, 
-	 * then it removes the old listener from it.
-	 * Else, returns listener l.
-	 * @param l the listener being removed from
-	 * @param oldl the listener being removed
-	 */
-	protected static EventListener removeInternal(
-		EventListener l,
-		EventListener oldl) {
-		if (l == oldl || l == null) {
-			return null;
-		} else if (l instanceof GraphEventMulticaster) {
-			return ((GraphEventMulticaster) l).remove(oldl);
-		} else {
-			return l; // it's not here
-		}
-	} //
-
 	protected GraphEventMulticaster(EventListener a, EventListener b) {
-		this.a = a;
-		this.b = b;
+		super(a,b);
 	} //
 
-	protected EventListener remove(EventListener oldl) {
-		if (oldl == a)
-			return b;
-		if (oldl == b)
-			return a;
-		EventListener a2 = removeInternal(a, oldl);
-		EventListener b2 = removeInternal(b, oldl);
-		if (a2 == a && b2 == b) {
-			return this; // it's not here
-		}
-		return addInternal(a2, b2);
-	} //
-
-	private static int getListenerCount(EventListener l) {
-		if (l instanceof GraphEventMulticaster) {
-			GraphEventMulticaster mc = (GraphEventMulticaster) l;
-			return getListenerCount(mc.a) + getListenerCount(mc.b);
-		}
-		// Delete nulls. 
-		else {
-			return (l == null) ? 0 : 1;
-		}
-	} //
-
-	private static int populateListenerArray(
-		EventListener[] a,
-		EventListener l,
-		int index) {
-		if (l instanceof GraphEventMulticaster) {
-			GraphEventMulticaster mc = (GraphEventMulticaster) l;
-			int lhs = populateListenerArray(a, mc.a, index);
-			return populateListenerArray(a, mc.b, lhs);
-		} else if (l != null) {
-			a[index] = l;
-			return index + 1;
-		}
-		// Delete nulls. 
-		else {
-			return index;
-		}
-	} //
-
-	public static EventListener[] getListeners(
-		EventListener l,
-		Class listenerType) {
-		int n = getListenerCount(l);
-		EventListener[] result =
-			(EventListener[]) java.lang.reflect.Array.newInstance(
-				listenerType,
-				n);
-		populateListenerArray(result, l, 0);
-		return result;
-	} //
-	
 } // end of class PrefuseEventMulticaster

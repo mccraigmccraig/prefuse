@@ -3,7 +3,8 @@ package edu.berkeley.guir.prefuse.event;
 import java.util.EventListener;
 
 /**
- * Inteface for classes to monitor graph item focus events.
+ * Inteface for classes to monitor changes to the focus status
+ * of graph elements.
  * 
  * Apr 26, 2003 - jheer - Created class
  * 
@@ -11,12 +12,7 @@ import java.util.EventListener;
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
  */
 public interface FocusListener extends EventListener {
-
-	/**
-	 * Callback to inform listeners of changes to the set of
-	 * selected focus entities in the visualization.
-	 * @param e a FocusEvent describing the focus change.
-	 */
-	public void focusChanged(FocusEvent e);
+    
+    public void focusChanged(FocusEvent e);
 
 } // end of interface FocusListener

@@ -103,8 +103,8 @@ public class RadialAggregateGenerator {
 	
 					g2D.setColor(Color.BLACK);
 					AffineTransform baseTransform = g2D.getTransform();
-					synchronized ( m_itemRegistry ) {
-					  Iterator items = m_itemRegistry.getItems();
+					synchronized ( m_registry ) {
+					  Iterator items = m_registry.getItems();
 					  while (items.hasNext()) {
 						GraphItem gi = (GraphItem) items.next();
 						Renderer renderer = gi.getRenderer();

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.util.ArrayList;
@@ -130,23 +131,23 @@ public class MultiLineTextItemRenderer extends TextItemRenderer {
 	 * @see edu.berkeley.guir.prefuse.render.Renderer#render(java.awt.Graphics2D, edu.berkeley.guir.prefuse.GraphItem)
 	 */
 	public void render(Graphics2D g, GraphItem item) {
-		Color fillColor = item.getFillColor();
-		Color itemColor = item.getColor();
+		Paint fillColor = item.getFillColor();
+		Paint itemColor = item.getColor();
 		Shape shape = getShape(item);
 		if (shape != null) {
 			switch (getRenderType()) {
 				case RENDER_TYPE_DRAW :
-					g.setColor(itemColor);
+					g.setPaint(itemColor);
 					g.draw(shape);
 					break;
 				case RENDER_TYPE_FILL :
-					g.setColor(fillColor);
+					g.setPaint(fillColor);
 					g.fill(shape);
 					break;
 				case RENDER_TYPE_DRAW_AND_FILL :
-					g.setColor(fillColor);
+					g.setPaint(fillColor);
 					g.fill(shape);
-					g.setColor(itemColor);
+					g.setPaint(itemColor);
 					g.draw(shape);
 					break;
 			}
@@ -168,7 +169,7 @@ public class MultiLineTextItemRenderer extends TextItemRenderer {
 						g.fill(or);
 					}
 					
-					g.setColor(itemColor);
+					g.setPaint(itemColor);
 					g.setFont(font);
 					g.drawString(text, r.x+m_horizBorder, h+fm.getAscent());
 					h += fm.getHeight();

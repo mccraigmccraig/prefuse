@@ -54,9 +54,7 @@ public class PrefuseEventLogger implements ControlListener,
 	public static final String KEY_PRESSED           = "KEY-PRESSED";
 	public static final String KEY_RELEASED          = "KEY-RELEASED";
 	public static final String KEY_TYPED             = "KEY-TYPED";
-	public static final String FOCUS_ADDED           = "FOCUS-ADDED";
-	public static final String FOCUS_REMOVED         = "FOCUS-REMOVED";
-	public static final String FOCUS_SET             = "FOCUS-SET";
+	public static final String FOCUS_CHANGED         = "FOCUS-CHANGED";
 	public static final String REGISTRY_ITEM_ADDED   = "REGISTRY-ITEM-ADDED";
 	public static final String REGISTRY_ITEM_REMOVED = "REGISTRY-ITEM-REMOVED";
 	public static final String WINDOW_POSITION       = "WINDOW-POSITION";
@@ -96,7 +94,7 @@ public class PrefuseEventLogger implements ControlListener,
 		if ( m_display != null && (m_state & LOG_INTERFACE) > 0 )
 			m_display.addControlListener(this);
 		if ( m_registry != null && (m_state & LOG_FOCUS) > 0 )
-			m_registry.addFocusListener(this);
+			m_registry.getDefaultFocusSet().addFocusListener(this);
 		if ( m_registry != null && (m_state & LOG_REGISTRY) > 0 )
 			m_registry.addItemRegistryListener(this);
 		
@@ -116,7 +114,7 @@ public class PrefuseEventLogger implements ControlListener,
 		if ( m_display != null && (m_state & LOG_INTERFACE) > 0 )
 			m_display.removeControlListener(this);
 		if ( m_registry != null && (m_state & LOG_FOCUS) > 0 )
-			m_registry.removeFocusListener(this);
+			m_registry.getDefaultFocusSet().removeFocusListener(this);
 		if ( m_registry != null && (m_state & LOG_REGISTRY) > 0 )
 			m_registry.removeItemRegistryListener(this);		
 		
@@ -168,23 +166,31 @@ public class PrefuseEventLogger implements ControlListener,
 			+KeyEvent.getKeyModifiersText(e.getModifiers())+"]";
 		log(e.getWhen(), msg);
 	} //
+    
+    public void logFocusEvent(FocusEvent e) {
+        Entity[] list = null;
+        int i;
+        StringBuffer sbuf = new StringBuffer(FOCUS_CHANGED);
+        sbuf.append("\t[");
+        for ( list=e.getAddedFoci(), i=0; i<list.length; i++ ) {
+            if ( i > 0 ) sbuf.append(",");
+            sbuf.append(getEntityString(list[i]));
+        }
+        sbuf.append("]\t[");
+        for ( list=e.getRemovedFoci(), i=0; i<list.length; i++ ) {
+            if ( i > 0 ) sbuf.append(",");
+            sbuf.append(getEntityString(list[i]));
+        }
+        sbuf.append("]");
+        log(e.getWhen(), sbuf.toString());
+    } //
 	
-	public void logFocusEvent(FocusEvent e) {
-		int type = e.getType();
-		String msg = null;
-		if ( type == FocusEvent.FOCUS_ADDED )
-			msg = FOCUS_ADDED;
-		else if ( type == FocusEvent.FOCUS_REMOVED )
-			msg = FOCUS_REMOVED;
-		else if ( type == FocusEvent.FOCUS_SET )
-			msg = FOCUS_SET;
-		Entity entity = e.getFocus();
-		String s = ( entity == null ? "null" : entity.getAttribute(m_label) );
-		log(msg + "\t" + s);
-	} //
-	
-	private String getItemString(GraphItem item) {
-		return item.getAttribute(m_label);
+    protected String getEntityString(Entity entity) {
+        return (entity == null ? "NULL" : entity.getAttribute(m_label));
+    } //
+    
+	protected String getItemString(GraphItem item) {
+		return (item == null ? "NULL" : getEntityString(item.getEntity()));
 	} //
 
 	// ========================================================================
@@ -356,13 +362,6 @@ public class PrefuseEventLogger implements ControlListener,
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.event.FocusListener#focusChanged(edu.berkeley.guir.prefuse.event.FocusEvent)
-	 */
-	public void focusChanged(FocusEvent e) {
-		logFocusEvent(e);
-	} //
-
-	/**
 	 * @see edu.berkeley.guir.prefuse.event.ItemRegistryListener#registryItemAdded(edu.berkeley.guir.prefuse.GraphItem)
 	 */
 	public void registryItemAdded(GraphItem item) {
@@ -377,5 +376,12 @@ public class PrefuseEventLogger implements ControlListener,
 		log(REGISTRY_ITEM_REMOVED+"\t"+item.getItemClass()
 			+"\t"+item.getAttribute(m_label));
 	} //
+
+    /**
+     * @see edu.berkeley.guir.prefuse.event.FocusListener#userFocusChanged(edu.berkeley.guir.prefuse.graph.Entity, edu.berkeley.guir.prefuse.graph.Entity)
+     */
+    public void focusChanged(FocusEvent e) {
+        logFocusEvent(e);
+    } //
 
 } // end of class PrefuseEventLogger

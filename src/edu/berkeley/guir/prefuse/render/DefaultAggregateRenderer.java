@@ -41,7 +41,7 @@ public class DefaultAggregateRenderer implements Renderer {
 	protected AffineTransform getTransform(AggregateItem aItem, Image image) {
 		at.setToTranslation(aItem.getX(), aItem.getY());
 		at.rotate(aItem.getOrientation() - HALF_PI);
-		at.translate(0, -DefaultNodeRenderer.m_radius);
+		//at.translate(0, -DefaultNodeRenderer.m_radius);
 		at.translate(-image.getWidth(null) / 2, 0);
 		return at;
 	} //
@@ -51,7 +51,7 @@ public class DefaultAggregateRenderer implements Renderer {
 	 */
 	protected AffineTransform getInverseTransform(AggregateItem aItem, Image image) {
 		at.setToTranslation(image.getWidth(null) / 2, 0);
-		at.translate(0, DefaultNodeRenderer.m_radius);
+		//at.translate(0, DefaultNodeRenderer.m_radius);
 		at.rotate(HALF_PI - aItem.getOrientation());
 		at.translate(-aItem.getX(), -aItem.getY());
 		return at;
@@ -79,7 +79,7 @@ public class DefaultAggregateRenderer implements Renderer {
 		return false;
 	} //
 	
-	public Rectangle getBounds(GraphItem item) {
+	public Rectangle getBoundsRef(GraphItem item) {
 		AggregateItem aItem = (AggregateItem) item;
 		Image image = m_imageFactory.getImage(aItem);
 		if ( image == null ) { return new Rectangle(-1,-1,0,0);	}

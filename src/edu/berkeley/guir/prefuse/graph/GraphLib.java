@@ -2,7 +2,6 @@ package edu.berkeley.guir.prefuse.graph;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,6 +15,37 @@ import java.util.List;
  */
 public class GraphLib {
 
+    public static Graph getStar(int n) {
+        Node n0 = new Node();
+        n0.setAttribute("label","n"+0);
+        ArrayList al = new ArrayList(n+1);
+        al.add(n0);
+        for ( int i=1; i <= n; i++ ) {
+            Node nn = new Node();
+            nn.setAttribute("label","n"+i);
+            Edge e = new Edge(n0, nn);
+            n0.addEdge(e);
+            nn.addEdge(e);
+            al.add(nn);
+        }
+        return new SimpleGraph(al);
+    } //
+    
+    public static Graph getClique(int n) {
+        Node nodes[] = new Node[n];
+        ArrayList al = new ArrayList(n);
+        for ( int i = 0; i < n; i++ ) {
+            nodes[i] = new Node();
+            nodes[i].setAttribute("label", "n"+i);
+            al.add(nodes[i]);
+        }
+        for ( int i = 0; i < n; i++ ) {
+            for ( int j = 0; j < n; j++ )
+                if ( i != j ) nodes[i].addNeighbor(nodes[j]);
+        }
+        return new SimpleGraph(al);
+    } //
+    
 	public static final int SEARCH_NODES = 0;
 	public static final int SEARCH_EDGES = 1;
 	public static final int SEARCH_ALL   = 2;
@@ -75,74 +105,74 @@ public class GraphLib {
 		}
 	} //
 	
-	/**
-	 * Filters a graph of unwanted entities, creating a new subgraph.
-	 * @param og the original <code>Graph</code>. It will be not bechanged.
-	 * @param func a FilterFunction that determines what entities are filtered.
-	 * @return a new, filtered <code>Graph</code> instance.
-	 */
-	public static Graph getFilteredGraph(final Graph og, FilterFunction func)
-	{
-		SimpleGraph g = new SimpleGraph();
-		HashMap nodeMap = new HashMap();
-		Iterator iter = og.getNodes();
-		while ( iter.hasNext() ) {
-			Node u = (Node)iter.next();
-			if ( func.filter(u) ) {
-				Node v = null;
-				try {
-					v = (Node)u.getClass().newInstance();
-				} catch ( Exception e ) {
-					e.printStackTrace();
-				}
-				v.setAttributes(u.getAttributes());
-				nodeMap.put(u,v);
-				g.addNode(v);
-			}
-		}
-		iter = og.getEdges();
-		while ( iter.hasNext() ) {
-			Edge e = (Edge)iter.next();
-			Node v1 = (Node)nodeMap.get(e.getFirstNode());
-			Node v2 = (Node)nodeMap.get(e.getSecondNode());
-			if ( v1 != null && v2 != null && func.filter(e) ) {
-				Edge e2 = new Edge(v1, v2);
-				e2.setAttributes(e.getAttributes());
-				g.addEdge(e2);
-			}
-		}
-		return g;
-	} //
-	
-	/**
-	 * Filters a graph of unwanted entities.
-	 * @param g the graph to filter
-	 * @param func a FilterFunction that determines what entities are filtered.
-	 */
-	public static void filterGraph(SimpleGraph g, FilterFunction func) {
-		Iterator iter = g.getNodes();
-		List removeList = new ArrayList();
-		while ( iter.hasNext() ) {
-			Node u = (Node)iter.next();
-			if ( !func.filter(u) ) {
-				removeList.add(u);
-			}
-		}
-		iter = removeList.iterator();
-		while ( iter.hasNext() )
-			g.removeNode((Node)iter.next());
-		removeList.clear();
-		iter = g.getEdges();
-		while ( iter.hasNext() ) {
-			Edge e = (Edge)iter.next();
-			if ( !func.filter(e) ) {
-				removeList.add(e);
-			}
-		}
-		iter = removeList.iterator();
-		while ( iter.hasNext() )
-			g.removeEdge((Edge)iter.next());
-		removeList.clear();
-	} //
+//	/**
+//	 * Filters a graph of unwanted entities, creating a new subgraph.
+//	 * @param og the original <code>Graph</code>. It will be not bechanged.
+//	 * @param func a FilterFunction that determines what entities are filtered.
+//	 * @return a new, filtered <code>Graph</code> instance.
+//	 */
+//	public static Graph getFilteredGraph(final Graph og, FilterFunction func)
+//	{
+//		SimpleGraph g = new SimpleGraph();
+//		HashMap nodeMap = new HashMap();
+//		Iterator iter = og.getNodes();
+//		while ( iter.hasNext() ) {
+//			Node u = (Node)iter.next();
+//			if ( func.filter(u) ) {
+//				Node v = null;
+//				try {
+//					v = (Node)u.getClass().newInstance();
+//				} catch ( Exception e ) {
+//					e.printStackTrace();
+//				}
+//				v.setAttributes(u.getAttributes());
+//				nodeMap.put(u,v);
+//				g.addNode(v);
+//			}
+//		}
+//		iter = og.getEdges();
+//		while ( iter.hasNext() ) {
+//			Edge e = (Edge)iter.next();
+//			Node v1 = (Node)nodeMap.get(e.getFirstNode());
+//			Node v2 = (Node)nodeMap.get(e.getSecondNode());
+//			if ( v1 != null && v2 != null && func.filter(e) ) {
+//				Edge e2 = new Edge(v1, v2);
+//				e2.setAttributes(e.getAttributes());
+//				g.addEdge(e2);
+//			}
+//		}
+//		return g;
+//	} //
+//	
+//	/**
+//	 * Filters a graph of unwanted entities.
+//	 * @param g the graph to filter
+//	 * @param func a FilterFunction that determines what entities are filtered.
+//	 */
+//	public static void filterGraph(SimpleGraph g, FilterFunction func) {
+//		Iterator iter = g.getNodes();
+//		List removeList = new ArrayList();
+//		while ( iter.hasNext() ) {
+//			Node u = (Node)iter.next();
+//			if ( !func.filter(u) ) {
+//				removeList.add(u);
+//			}
+//		}
+//		iter = removeList.iterator();
+//		while ( iter.hasNext() )
+//			g.removeNode((Node)iter.next());
+//		removeList.clear();
+//		iter = g.getEdges();
+//		while ( iter.hasNext() ) {
+//			Edge e = (Edge)iter.next();
+//			if ( !func.filter(e) ) {
+//				removeList.add(e);
+//			}
+//		}
+//		iter = removeList.iterator();
+//		while ( iter.hasNext() )
+//			g.removeEdge((Edge)iter.next());
+//		removeList.clear();
+//	} //
 
 } // end of class GraphLib

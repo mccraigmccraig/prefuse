@@ -2,6 +2,7 @@ package edu.berkeley.guir.prefuse.render;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -39,23 +40,23 @@ public abstract class ShapeRenderer implements Renderer {
 	 * by subclasses in custom rendering routines. 
 	 */
 	protected void drawShape(Graphics2D g, GraphItem item, Shape shape) {
-        Color itemColor = item.getColor();
+	    Paint itemColor = item.getColor();
         if ( itemColor == null ) itemColor = Color.BLACK;
-        Color fillColor = item.getFillColor();
+        Paint fillColor = item.getFillColor();
         if ( fillColor == null ) fillColor = Color.BLACK;
 		switch (getRenderType()) {
 			case RENDER_TYPE_DRAW :
-				g.setColor(itemColor);
+				g.setPaint(itemColor);
 				g.draw(shape);
 				break;
 			case RENDER_TYPE_FILL :
-				g.setColor(fillColor);
+				g.setPaint(fillColor);
 				g.fill(shape);
 				break;
 			case RENDER_TYPE_DRAW_AND_FILL :
-				g.setColor(fillColor);
+				g.setPaint(fillColor);
 				g.fill(shape);
-				g.setColor(itemColor);
+				g.setPaint(itemColor);
 				g.draw(shape);
 				break;
 		}		
@@ -112,9 +113,9 @@ public abstract class ShapeRenderer implements Renderer {
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.render.Renderer#getBounds(edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.render.Renderer#getBoundsRef(edu.berkeley.guir.prefuse.GraphItem)
 	 */
-	public Rectangle getBounds(GraphItem item) {
+	public Rectangle getBoundsRef(GraphItem item) {
 		Shape s = getShape(item);
 		return (s != null ? s.getBounds() : new Rectangle(-1, -1, 0, 0));
 	} //

@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -199,7 +200,7 @@ public class OrgChartDemo {
 	   						 (int)Math.round(frac*c2.getBlue()  + (1-frac)*c1.getBlue()));
 	   	} //
 	   
-	   	public Color getColor(GraphItem item) {
+	   	public Paint getColor(GraphItem item) {
         	if ( item instanceof NodeItem ) {
 		   		int doi = (int)(-1*((NodeItem)item).getDOI());
 		   		if ( doi > thresh-1 ) { doi = thresh-1; }

@@ -1,5 +1,6 @@
 package edu.berkeley.guir.prefuse;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,21 +12,23 @@ import java.util.Map;
 import edu.berkeley.guir.prefuse.collections.CompositeItemIterator;
 import edu.berkeley.guir.prefuse.collections.DefaultItemComparator;
 import edu.berkeley.guir.prefuse.collections.VisibleItemIterator;
-import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.event.ItemRegistryListener;
-import edu.berkeley.guir.prefuse.event.PrefuseRegistryEventMulticaster;
+import edu.berkeley.guir.prefuse.event.RegistryEventMulticaster;
 import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Entity;
+import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.Node;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.RendererFactory;
+import edu.berkeley.guir.prefuse.util.FocusSet;
 
 /**
  * Registry containing all items to be visualized.
  *
  * Apr 22, 2003 - jheer - Created class
  * Jul 16, 2003 - jheer - Generalized to handle arbitrary item classes
+ * Feb 16, 2004 - jheer - Moved focus handling to FocusManager
  * 
  * @version 1.0
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
@@ -68,6 +71,9 @@ public class ItemRegistry {
 		public Map     itemMap;
 	} // end of inner class ItemEntry
 	
+    private List            m_displays;
+    private Graph           m_graph;
+    private FocusManager    m_fmanager;
 	private ItemFactory     m_ifactory;
 	private RendererFactory m_rfactory;
 	
@@ -88,11 +94,14 @@ public class ItemRegistry {
 	 * handling NodeItems, EdgeItems, and AggregateItems, respectively. All
 	 * are given default settings, including a maxDirty value of 1.
 	 */
-	public ItemRegistry() {
-		this(true);
+	public ItemRegistry(Graph g) {
+		this(g, true);
 	} //
 	
-	public ItemRegistry(boolean initDefault) {
+	public ItemRegistry(Graph g, boolean initDefault) {
+        m_graph = g;
+        m_displays = new ArrayList();
+        m_fmanager = new FocusManager();
 		try {
 			m_ifactory  = new ItemFactory();
 			m_rfactory  = new DefaultRendererFactory();
@@ -132,6 +141,40 @@ public class ItemRegistry {
 		m_ifactory.addItemClass(itemClass, itemType, maxItems);
 	} //
 	
+    public synchronized Graph getGraph() {
+        return m_graph;
+    } //
+    
+    public synchronized void setGraph(Graph g) {
+        // TODO: invalidate all current entries?
+        m_graph = g;
+    } //
+    
+    public synchronized void addDisplay(Display d) {
+        if ( !m_displays.contains(d) )
+            m_displays.add(d);
+    } //
+    
+    public synchronized boolean removeDisplay(Display d) {
+        return m_displays.remove(d);
+    } //
+    
+    public synchronized Display getDisplay(int i) {
+        return (Display)m_displays.get(i);
+    } //
+    
+    public synchronized List getDisplaysRef() {
+        return m_displays;
+    } //
+    
+    public synchronized FocusManager getFocusManager() {
+        return m_fmanager;
+    } //
+    
+    public synchronized FocusSet getDefaultFocusSet() {
+        return m_fmanager.getDefaultFocusSet();
+    } //
+    
 	/**
 	 * Return the renderer factory for this registry's items. The
 	 * renderer factory determines which renderer components should be
@@ -640,7 +683,7 @@ public class ItemRegistry {
 	 * @param irl the listener to add.
 	 */
   	public synchronized void addItemRegistryListener(ItemRegistryListener irl) {
-    	m_registryListener = PrefuseRegistryEventMulticaster.add(m_registryListener, irl);
+    	m_registryListener = RegistryEventMulticaster.add(m_registryListener, irl);
   	} //
 
 	/**
@@ -648,126 +691,7 @@ public class ItemRegistry {
 	 * @param irl the listener to remove.
 	 */
   	public synchronized void removeItemRegistryListener(ItemRegistryListener irl) {
-    	m_registryListener = PrefuseRegistryEventMulticaster.remove(m_registryListener, irl);
+    	m_registryListener = RegistryEventMulticaster.remove(m_registryListener, irl);
   	} //
-  	
-	/**
-	 * Add a focus listener.
-	 * @param fl the listener to add.
-	 */
-  	public synchronized void addFocusListener(FocusListener fl) {
-  		m_focusListener = PrefuseRegistryEventMulticaster.add(m_focusListener, fl);
-  	} //
-  	
-	/**
-	 * Remove a focus listener.
-	 * @param fl the listener to remove.
-	 */
-  	public synchronized void removeFocusListener(FocusListener fl) {
-  		m_focusListener = PrefuseRegistryEventMulticaster.remove(m_focusListener, fl);
-  	} //
-
-
-	// ========================================================================
-	// == FOCUS METHODS =======================================================
-
-	/**
-	 * Return an iterator over the (usually user-selected) focus nodes. Other
-	 * threads of execution may attempt to make changes to the registry while
-	 * one is using this iterator, so it is strongly recommended that the
-	 * resulting iterator be accessed only within an enclosing synchronized
-	 * block on this registry instance. For example: 
-	 * <tt>synchronized ( registry ) {
-	 *        // iterator accesses...
-	 * }</tt>
-	 * @return an iterator over the entities currently treated 
-	 *  as visualization foci
-	 */
-	public synchronized Iterator focusIterator() {
-		return m_focusList.iterator();
-	} //
-	
-	/**
-	 * Indicates if the given entity is in the focus set.
-	 * @param entity the entity to check
-	 * @return true if the entity is a focus, false otherwise
-	 */
-	public synchronized boolean isFocus(Entity entity) {
-		Iterator iter = m_focusList.iterator();
-		while ( iter.hasNext() ) {
-			Entity e = (Entity)iter.next();
-			if ( e == entity ) {
-				return true;
-			}
-		}
-		return false;
-	} //
-	
-	/**
-	 * Indicates if the given item is associated with an entity is in 
-	 *  the focus set.
-	 * @param item the item to check
-	 * @return true if the item's entity is a focus, false otherwise
-	 */
-	public synchronized boolean isFocus(GraphItem item) {
-		Entity e = getEntity(item);
-		return isFocus(e);
-	} //
-	
-	/**
-	 * Add a focus entity.
-	 * @param entity the new focus
-	 */
-	public synchronized void addFocus(Entity entity) {
-		m_focusList.add(entity);
-		if ( m_focusListener != null ) {
-			FocusEvent e = new FocusEvent(this, FocusEvent.FOCUS_ADDED, entity, null);
-			m_focusListener.focusChanged(e);
-		}
-	} //
-	
-	/**
-	 * Remove a focus entity.
-	 * @param entity the entity to remove as a focus.
-	 */
-	public synchronized void removeFocus(Entity entity) {
-		if ( m_focusList.remove(entity) && m_focusListener != null ) {
-			FocusEvent e = new FocusEvent(this, FocusEvent.FOCUS_REMOVED, null, entity);
-			m_focusListener.focusChanged(e);
-		}
-	} //
-	
-	/**
-	 * Removes all foci.
-	 */
-	public synchronized void clearFocus() {
-		for ( int i = 0; i < m_focusList.size(); ) {
-			Entity entity = (Entity)m_focusList.get(i);
-			removeFocus(entity);
-		}
-	} //
-	
-	/**
-	 * Set the current entity as a focus, removing all other foci.
-	 * @param entity the new focus
-	 */
-	public synchronized void setFocus(Entity entity) {
-		Entity prevFocus = null;
-		if ( m_focusList.size() > 0 )
-			prevFocus = (Entity)m_focusList.get(0); // TODO: hacky, refactor this later
-		clearFocusList();
-		m_focusList.add(entity);
-		if ( m_focusListener != null ) {
-			FocusEvent e = new FocusEvent(this, FocusEvent.FOCUS_SET, entity, prevFocus);
-			m_focusListener.focusChanged(e);
-		}
-	} //
-	
-	/**
-	 * Helper method to clear the focus list.
-	 */
-	private synchronized void clearFocusList() {
-		m_focusList.clear();
-	} //
 
 } // end of class ItemRegistry

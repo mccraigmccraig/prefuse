@@ -9,10 +9,10 @@ import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
-import edu.berkeley.guir.lib.GeometryLib;
 import edu.berkeley.guir.prefuse.EdgeItem;
 import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.graph.Edge;
+import edu.berkeley.guir.prefuse.util.GeometryLib;
 
 /**
  * Edge renderer that draws edges as lines connecting nodes. Both
@@ -100,9 +100,9 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 			} catch ( Exception e ) {}
 		}
 		
-		getAlignedPoint(m_tmpPoints[0], item1.getRenderer().getBounds(item1),
+		getAlignedPoint(m_tmpPoints[0], item1.getRenderer().getBoundsRef(item1),
 						m_xAlign1, m_yAlign1);
-		getAlignedPoint(m_tmpPoints[1], item2.getRenderer().getBounds(item2),
+		getAlignedPoint(m_tmpPoints[1], item2.getRenderer().getBoundsRef(item2),
 						m_xAlign2, m_yAlign2);
 		double n1x = m_tmpPoints[0].getX();
 		double n1y = m_tmpPoints[0].getY();
@@ -121,7 +121,7 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 					return m_line;
 				}
 			case EDGE_TYPE_CURVE:
-				getCurveControlPoints(m_ctrlPoints,n1x,n1y,n2x,n2y);
+				getCurveControlPoints(edge, m_ctrlPoints,n1x,n1y,n2x,n2y);
 				m_cubic.setCurve(n1x, n1y,
 								m_ctrlPoints[0].getX(), m_ctrlPoints[0].getY(),
 								m_ctrlPoints[1].getX(), m_ctrlPoints[1].getY(),
@@ -169,7 +169,7 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 				end = m_isctPoints[0];
 			AffineTransform at = getArrowTrans(start, end, width);
             Shape arrowHead = at.createTransformedShape(m_arrowHead);
-			g.setColor(item.getFillColor());
+			g.setPaint(item.getFillColor());
 			g.fill(arrowHead);
 		}
 	} //
@@ -215,13 +215,14 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	 * To reduce object initialization, the entries of the Point2D array are
 	 * already initialized, so use the <tt>Point2D.setLocation()</tt> method rather than
 	 * <tt>new Point2D.Double()</tt> to more efficiently set custom control points.
+     * @param eitem the EdgeItem we are determining the control points for
 	 * @param cp array of Point2D's (length >= 2) in which to return the control points
 	 * @param x1 the x co-ordinate of the first node this edge connects to
 	 * @param y1 the y co-ordinate of the first node this edge connects to
 	 * @param x2 the x co-ordinate of the second node this edge connects to
 	 * @param y2 the y co-ordinate of the second node this edge connects to
 	 */
-	protected void getCurveControlPoints(Point2D[] cp, 
+	protected void getCurveControlPoints(EdgeItem eitem, Point2D[] cp, 
 					double x1, double y1, double x2, double y2) 
 	{
 		double dx = x2-x1, dy = y2-y1;		
