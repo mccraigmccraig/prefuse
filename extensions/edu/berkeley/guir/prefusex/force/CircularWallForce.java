@@ -47,9 +47,14 @@ public class CircularWallForce extends AbstractForce {
         float dr = r-d;
         float c = dr > 0 ? -1 : 1;
         float v = c*params[GRAVITATIONAL_CONST]*item.mass / (dr*dr);
+        if ( d == 0.0 ) {
+            dx = ((float)Math.random()-0.5f) / 50.0f;
+            dy = ((float)Math.random()-0.5f) / 50.0f;
+            d  = (float)Math.sqrt(dx*dx+dy*dy);
+        }
         item.force[0] += v*dx/d;
         item.force[1] += v*dy/d;
-        System.out.println(dx/d+","+dy/d+","+dr+","+v);
+        //System.out.println(dx/d+","+dy/d+","+dr+","+v);
     } //
 
 } // end of class CircularWallForce
