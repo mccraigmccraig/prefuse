@@ -26,7 +26,7 @@ import edu.berkeley.guir.prefuse.util.FocusSet;
 public class FocusControl extends ControlAdapter {
 
     private Object focusSetKey = FocusManager.DEFAULT_KEY;
-    private int ccount;
+    protected int ccount;
     
     /**
      * Creates a new FocusControl that changes the focus to another item
@@ -39,7 +39,7 @@ public class FocusControl extends ControlAdapter {
     /**
      * Creates a new FocusControl that changes the focus when an item is 
      * clicked the specified number of times. A click value of zero indicates
-     * that the focus shoudl be changed in response to mouse-over events.
+     * that the focus should be changed in response to mouse-over events.
      * @param clicks the number of clicks needed to switch the focus.
      */
     public FocusControl(int clicks) {
@@ -49,7 +49,7 @@ public class FocusControl extends ControlAdapter {
     /**
      * Creates a new FocusControl that changes the focus when an item is 
      * clicked the specified number of times. A click value of zero indicates
-     * that the focus shoudl be changed in response to mouse-over events.
+     * that the focus should be changed in response to mouse-over events.
      * @param clicks the number of clicks needed to switch the focus.
      * @param focusSetKey the key corresponding to the focus set to use
      */
