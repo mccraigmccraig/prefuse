@@ -115,17 +115,20 @@ public class PrefixSearchFocusSet implements FocusSet {
      *  with a matching prefix will be added to the FocusSet.
      */
     public void search(String query) {
-        Entity[] rem = (Entity[])m_set.toArray(FocusEvent.EMPTY);
-        m_set.clear();
-        m_query = query;
-        m_curNode = m_trie.find(query);
-        if ( m_curNode != null ) {
-            Iterator iter = trieIterator();
-            while ( iter.hasNext() )
-                m_set.add(iter.next());
+        FocusEvent fe;
+        synchronized ( this ) {
+	        Entity[] rem = (Entity[])m_set.toArray(FocusEvent.EMPTY);
+	        m_set.clear();
+	        m_query = query;
+	        m_curNode = m_trie.find(query);
+	        if ( m_curNode != null ) {
+	            Iterator iter = trieIterator();
+	            while ( iter.hasNext() )
+	                m_set.add(iter.next());
+	        }
+	        Entity[] add = (Entity[])m_set.toArray(FocusEvent.EMPTY);
+	        fe = new FocusEvent(this, FocusEvent.FOCUS_SET, add, rem);
         }
-        Entity[] add = (Entity[])m_set.toArray(FocusEvent.EMPTY);
-        FocusEvent fe = new FocusEvent(this, FocusEvent.FOCUS_SET, add, rem);
         m_listener.focusChanged(fe);
     } //
     
@@ -151,14 +154,14 @@ public class PrefixSearchFocusSet implements FocusSet {
      * @param entities an Iterator over Entity instances to index
      * @param attrName the name of the attribute to index
      */
-    public void index(Iterator entities, String attrName) {
+    public synchronized void index(Iterator entities, String attrName) {
         while ( entities.hasNext() ) {
             Entity e = (Entity)entities.next();
             index(e, attrName);
         }
     } //
     
-    public void index(Entity e, String attrName) {
+    public synchronized void index(Entity e, String attrName) {
         String s;
         if ( (s=e.getAttribute(attrName)) == null ) return;
         StringTokenizer st = new StringTokenizer(s,m_delim);
@@ -172,7 +175,7 @@ public class PrefixSearchFocusSet implements FocusSet {
         m_trie.addString(s,e);
     } //
     
-    public void remove(Entity e, String attrName) {
+    public synchronized void remove(Entity e, String attrName) {
         String s;
         if ( (s=e.getAttribute(attrName)) == null ) return;
         StringTokenizer st = new StringTokenizer(s,m_delim);
@@ -191,11 +194,14 @@ public class PrefixSearchFocusSet implements FocusSet {
      * @see edu.berkeley.guir.prefuse.focus.FocusSet#clear()
      */
     public void clear() {
-        m_curNode = null;
-        m_query = null;
-        Entity[] rem = (Entity[])m_set.toArray(FocusEvent.EMPTY);
-        m_set.clear();
-        FocusEvent fe = new FocusEvent(this, FocusEvent.FOCUS_REMOVED, null, rem);
+        FocusEvent fe;
+        synchronized ( this ) {
+	        m_curNode = null;
+	        m_query = null;
+	        Entity[] rem = (Entity[])m_set.toArray(FocusEvent.EMPTY);
+	        m_set.clear();
+	        fe = new FocusEvent(this, FocusEvent.FOCUS_REMOVED, null, rem);
+    	}
         m_listener.focusChanged(fe);
     } //
 
@@ -205,7 +211,7 @@ public class PrefixSearchFocusSet implements FocusSet {
      * @return an Iterator over the Entity instances matching
      * the most recent search query.
      */
-    public Iterator iterator() {
+    public synchronized Iterator iterator() {
         if ( m_curNode == null ) {
             return Collections.EMPTY_LIST.iterator();
         } else {
@@ -221,7 +227,7 @@ public class PrefixSearchFocusSet implements FocusSet {
      * Returns the number of matches for the most recent search query.
      * @return the number of matches for the most recent search query.
      */
-    public int size() {
+    public synchronized int size() {
         return (m_curNode==null ? 0 : m_set.size());
     } //
 
@@ -231,7 +237,7 @@ public class PrefixSearchFocusSet implements FocusSet {
      * @param entity the Entity to check for containment
      * @return true if this Entity is in the FocusSet, false otherwise
      */
-    public boolean contains(Entity entity) {
+    public synchronized boolean contains(Entity entity) {
         return m_set.contains(entity);
     } //
     

@@ -48,7 +48,11 @@ public class DefaultFocusSet implements FocusSet {
      * @param focus the Entity to add
      */
     public void add(Entity focus) {
-        if ( m_foci.add(focus) && m_listener != null ) {
+        boolean add;
+        synchronized ( this ) {
+            add = m_foci.add(focus);
+        }
+        if ( add && m_listener != null ) {
             m_listener.focusChanged(new FocusEvent(this,
                 FocusEvent.FOCUS_ADDED, new Entity[] {focus}, null));
         }
@@ -60,22 +64,26 @@ public class DefaultFocusSet implements FocusSet {
      * @param foci the Collection of Entity instances to add.
      */
     public void add(Collection foci) {
-        Iterator iter = foci.iterator();
-        while ( iter.hasNext() ) {
-            Object o = iter.next();
-            if ( !(o instanceof Entity) ) {
-                throw new IllegalArgumentException(
-                    "All foci must be of type Entity");
-            } else if ( m_foci.add(o) && m_listener != null ) {
-                m_tmp.add(o);
-            }
+        synchronized ( m_tmp ) {
+	        synchronized ( this ) {
+		        Iterator iter = foci.iterator();
+		        while ( iter.hasNext() ) {
+		            Object o = iter.next();
+		            if ( !(o instanceof Entity) ) {
+		                throw new IllegalArgumentException(
+		                    "All foci must be of type Entity");
+		            } else if ( m_foci.add(o) && m_listener != null ) {
+		                m_tmp.add(o);
+		            }
+		        }
+	        }
+	        if ( m_listener != null && m_tmp.size() > 0 ) {
+	            Entity[] add = (Entity[])m_tmp.toArray(FocusEvent.EMPTY);
+	            m_listener.focusChanged(new FocusEvent(this,
+	                FocusEvent.FOCUS_ADDED, add, null));
+	        }
+	        m_tmp.clear();
         }
-        if ( m_listener != null && m_tmp.size() > 0 ) {
-            Entity[] add = (Entity[])m_tmp.toArray(FocusEvent.EMPTY);
-            m_listener.focusChanged(new FocusEvent(this,
-                FocusEvent.FOCUS_ADDED, add, null));
-        }
-        m_tmp.clear();
     } //
 
     /**
@@ -83,7 +91,11 @@ public class DefaultFocusSet implements FocusSet {
      * @param focus the Entity to remove
      */
     public void remove(Entity focus) {
-        if ( m_foci.remove(focus) && m_listener != null ) {
+        boolean remove;
+        synchronized ( this ) {
+            remove = m_foci.remove(focus);
+        }
+        if ( remove && m_listener != null ) {
             m_listener.focusChanged(new FocusEvent(this,
                 FocusEvent.FOCUS_REMOVED, null, new Entity[] {focus}));
         }
@@ -95,16 +107,21 @@ public class DefaultFocusSet implements FocusSet {
      * @param foci the Collection of Entity instances to remove.
      */
     public void remove(Collection foci) {
-        Iterator iter = foci.iterator();
-        while ( iter.hasNext() ) {
-            Object o = iter.next();
-            if ( m_foci.remove(o) && m_listener != null )
-                m_tmp.add(o);
-        }
-        if ( m_listener != null && m_tmp.size() > 0 ) {
-            Entity[] rem = (Entity[])m_tmp.toArray(FocusEvent.EMPTY);
-            m_listener.focusChanged(new FocusEvent(this,
-                FocusEvent.FOCUS_REMOVED,null,rem));
+        synchronized ( m_tmp ) {
+            synchronized ( this ) {
+		        Iterator iter = foci.iterator();
+		        while ( iter.hasNext() ) {
+		            Object o = iter.next();
+		            if ( m_foci.remove(o) && m_listener != null )
+		                m_tmp.add(o);
+		        }
+            }
+	        if ( m_listener != null && m_tmp.size() > 0 ) {
+	            Entity[] rem = (Entity[])m_tmp.toArray(FocusEvent.EMPTY);
+	            m_listener.focusChanged(new FocusEvent(this,
+	                FocusEvent.FOCUS_REMOVED,null,rem));
+	        }
+	        m_tmp.clear();
         }
     } //
     
@@ -115,11 +132,13 @@ public class DefaultFocusSet implements FocusSet {
      */
     public void set(Entity focus) {
         Entity[] add = null, rem = null;
-        if ( m_foci.size() > 0 && m_listener != null )
-            rem = (Entity[])m_foci.toArray(FocusEvent.EMPTY);
-        m_foci.clear();
-        if ( m_foci.add(focus) && m_listener != null )
-            add = new Entity[] {focus};
+        synchronized ( this ) {
+	        if ( m_foci.size() > 0 && m_listener != null )
+	            rem = (Entity[])m_foci.toArray(FocusEvent.EMPTY);
+	        m_foci.clear();
+	        if ( m_foci.add(focus) && m_listener != null )
+	            add = new Entity[] {focus};
+        }
         if ( add != null || rem != null ) {
             m_listener.focusChanged(new FocusEvent(this,
                 FocusEvent.FOCUS_SET,add,rem));
@@ -133,31 +152,35 @@ public class DefaultFocusSet implements FocusSet {
      * @param foci the Collection of Entity instances to remove.
      */
     public void set(Collection foci) {
-        // check validity of input before proceeding
-        Iterator iter = foci.iterator();
-        while ( iter.hasNext() ) {
-            Object o = iter.next();
-            if ( !(o instanceof Entity) ) {
-                throw new IllegalArgumentException(
-                "All foci must be of type Entity");
-            }
-        }
-        // now clear the focus set
         Entity[] add = null, rem = null;
-        if ( m_listener != null && m_foci.size() > 0 )
-            rem = (Entity[])m_foci.toArray(FocusEvent.EMPTY);
-        m_foci.clear();
-        // now add new foci
-        iter = foci.iterator();
-        while ( iter.hasNext() ) {
-            Entity o = (Entity)iter.next();
-            if ( m_foci.add(o) && m_listener != null ) {
-                m_tmp.add(o);
+        synchronized ( m_tmp ) {
+            synchronized ( this ) {
+		        // check validity of input before proceeding
+		        Iterator iter = foci.iterator();
+		        while ( iter.hasNext() ) {
+		            Object o = iter.next();
+		            if ( !(o instanceof Entity) ) {
+		                throw new IllegalArgumentException(
+		                "All foci must be of type Entity");
+		            }
+		        }
+		        // now clear the focus set
+		        if ( m_listener != null && m_foci.size() > 0 )
+		            rem = (Entity[])m_foci.toArray(FocusEvent.EMPTY);
+		        m_foci.clear();
+		        // now add new foci
+		        iter = foci.iterator();
+		        while ( iter.hasNext() ) {
+		            Entity o = (Entity)iter.next();
+		            if ( m_foci.add(o) && m_listener != null ) {
+		                m_tmp.add(o);
+		            }
+		        }
             }
-        }
-        if ( m_listener != null && m_tmp.size() > 0 ) {
-            add = (Entity[])m_tmp.toArray(FocusEvent.EMPTY);
-            m_tmp.clear();
+	        if ( m_listener != null && m_tmp.size() > 0 ) {
+	            add = (Entity[])m_tmp.toArray(FocusEvent.EMPTY);
+	            m_tmp.clear();
+	        }
         }
         if ( add != null || rem != null ) {
             m_listener.focusChanged(new FocusEvent(this,
@@ -170,9 +193,11 @@ public class DefaultFocusSet implements FocusSet {
      */
     public void clear() {
         Entity[] rem = null;
-        if ( m_listener != null && m_foci.size() > 0 )
-            rem = (Entity[])m_foci.toArray(FocusEvent.EMPTY);
-        m_foci.clear();
+        synchronized ( this ) {
+	        if ( m_listener != null && m_foci.size() > 0 )
+	            rem = (Entity[])m_foci.toArray(FocusEvent.EMPTY);
+	        m_foci.clear();
+        }
         if ( rem != null ) {
             m_listener.focusChanged(new FocusEvent(this,
                     FocusEvent.FOCUS_SET, null, rem));
@@ -183,7 +208,7 @@ public class DefaultFocusSet implements FocusSet {
      * Returns an Iterator over the members of this FocusSet.
      * @return an Iterator over the members of this FocusSet
      */
-    public Iterator iterator() {
+    public synchronized Iterator iterator() {
         return m_foci.iterator();
     } //
 
@@ -191,7 +216,7 @@ public class DefaultFocusSet implements FocusSet {
      * Returns the size of this FocusSet.
      * @return the number of elements in this FocusSet
      */
-    public int size() {
+    public synchronized int size() {
         return m_foci.size();
     } //
 
@@ -200,7 +225,7 @@ public class DefaultFocusSet implements FocusSet {
      * @param entity the Entity to check for containment
      * @return true if this Entity is in the FocusSet, false otherwise
      */
-    public boolean contains(Entity entity) {
+    public synchronized boolean contains(Entity entity) {
         return m_foci.contains(entity);
     } //
 
