@@ -291,7 +291,7 @@ public class DefaultTreeNode extends DefaultNode implements TreeNode {
         Edge e = (Edge)m_children.remove(idx);
 		TreeNode c = (TreeNode)e.getAdjacentNode(this);
 		c.setParentEdge(null);
-
+		
 		int delta = 1 + c.getDescendantCount();
         for ( TreeNode p = this; p != null; p = p.getParent() )
             p.setDescendantCount(p.getDescendantCount()-delta);
@@ -302,18 +302,24 @@ public class DefaultTreeNode extends DefaultNode implements TreeNode {
 	 * @see edu.berkeley.guir.prefuse.graph.TreeNode#removeChild(edu.berkeley.guir.prefuse.graph.TreeNode)
 	 */
 	public boolean removeChild(TreeNode n) {
-		return ( removeChild(getChildIndex(n)) != null );	
+		return ( removeChildAndNeighbor(getChildIndex(n)) != null);	
 	} //
 	
 	/**
 	 * @see edu.berkeley.guir.prefuse.graph.TreeNode#removeChild(int)
 	 */
 	public TreeNode removeChild(int idx) {
-        TreeNode c = removeAsChild(idx);
-		c.removeNeighbor(this);
-        return c;
+        return removeChildAndNeighbor(idx);
 	} //
     
+	private TreeNode removeChildAndNeighbor(int idx) {
+		super.removeEdge(super.getEdge((Node)getChild(idx)));
+		
+		TreeNode c = removeAsChild(idx);
+		c.removeNeighbor(this);
+        return c;
+	}
+	
     /**
      * @see edu.berkeley.guir.prefuse.graph.TreeNode#removeChildEdge(edu.berkeley.guir.prefuse.graph.Edge)
      */
