@@ -39,6 +39,11 @@ public class FocusManager {
      */
     public static final String SEARCH_KEY     = "search";
     
+    /**
+     * Object key that can be used for a focus set of items hovered over.
+     */
+    public static final String HOVER_KEY      = "hover";
+    
     private HashMap m_focusSets;
 
     /**
