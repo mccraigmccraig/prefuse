@@ -164,7 +164,8 @@ public class ColorMap {
     
     /**
      * Returns a color map array of default size that cycles through
-     * the hues of the HSB color space at full saturation and brightness.
+     * the hues of the HSB (Hue/Saturation/Brightness) color space at
+     * full saturation and brightness.
      * @return the color map array
      */
     public static Paint[] getHSBMap() {
@@ -173,7 +174,7 @@ public class ColorMap {
     
     /**
      * Returns a color map array of given size that cycles through
-     * the hues of the HSB color space.
+     * the hues of the HSB (Hue/Saturation/Brightness) color space.
      * @param size the size of the color map array
      * @param s the saturation value to use
      * @param b the brightness value to use
@@ -184,6 +185,57 @@ public class ColorMap {
         for ( int i=0; i<size; i++ ) {
             float h = ((float)i)/(size-1);
             cm[i] = new Color(Color.HSBtoRGB(h,s,b));
+        }
+        return cm;
+    } //
+    
+    /**
+     * Returns a color map of default size that moves from black to
+     * red to yellow to white.
+     * @return the color map array
+     */
+    public static Paint[] getHotMap() {
+        return getHotMap(DEFAULT_MAP_SIZE);
+    } //
+    
+    /**
+     * Returns a color map that moves from black to red to yellow
+     * to white.
+     * @param size the size of the color map array
+     * @return the color map array
+     */
+    public static Paint[] getHotMap(int size) {
+        Paint[] cm = new Paint[size];
+        for ( int i=0; i<size; i++ ) {
+            int n = (3*size)/8;
+            float r = ( i<n ? ((float)(i+1))/n : 1.f );
+            float g = ( i<n ? 0.f : ( i<2*n ? ((float)(i-n))/n : 1.f ));
+            float b = ( i<2*n ? 0.f : ((float)(i-2*n))/(size-2*n) );
+            cm[i] = new Color(r,g,b);
+        }
+        return cm;
+    } //
+    
+    /**
+     * Returns a color map array of default size that uses a "cool",
+     * blue-heavy color scheme.
+     * @return the color map array
+     */
+    public static Paint[] getCoolMap() {
+        return getCoolMap(DEFAULT_MAP_SIZE);
+    } //
+    
+    /**
+     * Returns a color map array that uses a "cool",
+     * blue-heavy color scheme.
+     * @param size the size of the color map array
+     * @return the color map array
+     */
+    public static Paint[] getCoolMap(int size) {
+        Paint[] cm = new Paint[size];
+        for( int i=0; i<size; i++ ) {
+            float r = ((float)i) / Math.max(size-1,1.f);
+            cm[i] = new Color(r,1-r,1.f);
         }
         return cm;
     } //
