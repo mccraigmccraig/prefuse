@@ -253,6 +253,14 @@ public class ItemRegistry {
     } //
     
     /**
+     * Returns the number of Displays associated with this ItemRegistry.
+     * @return the number of Displays
+     */
+    public synchronized int getDisplayCount() {
+        return m_displays.size();
+    } //
+    
+    /**
      * Issues repaint requests to all Displays associated with this
      * ItemRegistry.
      */
