@@ -28,7 +28,7 @@ public class ForceDirectedLayout extends Layout {
     
     private ForceSimulator m_fsim;
     private long m_lasttime = -1L;
-    private long m_maxstep = 100L;
+    private long m_maxstep = 50L;
     private boolean m_runonce;
     private int m_iterations = 100;
     private boolean m_enforceBounds;
