@@ -7,11 +7,12 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
+import javax.swing.DefaultButtonModel;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -24,7 +25,6 @@ import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.action.assignment.ResizeBoundsFunction;
 import edu.berkeley.guir.prefuse.action.assignment.SetBoundsFunction;
-import edu.berkeley.guir.prefuse.action.filter.GraphFilter;
 import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.graph.DefaultEdge;
 import edu.berkeley.guir.prefuse.graph.DefaultNode;
@@ -48,10 +48,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
     private static final int NUM_DIVISIONS = 0, NOTCH_LENGTH = 1;
 
     
-    // (( FIELDS )) \\
-    private static final String[] TYPES = {
-    		PERIOD_TYPE, EVENT_TYPE, PERSON_TYPE, PIECE_TYPE};
-    private static final Set registeredTypes = new HashSet();
+    // (( FIELDS )) \\\
     private final int appWidth = 1000;
     private final int appHeight = 800; // this should be more fixed than the width
     private final int divisionSpecification =
@@ -60,6 +57,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
     private final int timeline_start = 0;
     private final int timeline_end = 2005;
     private final int timelineSpan = timeline_end - timeline_start;
+    private final ActionList initialArrange;
 
     private final int timelineLength = appWidth * 9 / 10; // this factor ought to be
                                                  // shared across all
@@ -69,12 +67,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
     private Graph graph;
 
     
-    // (( CONSTRUCTORS )) \\
-    static {
-    	for (int i = 0; i < TYPES.length; i++) {
-    		registeredTypes.add(new TypeWrapper(TYPES[i]));
-    	}
-    }
+    // (( CONSTRUCTORS )) 
     
     public TimelineDemo() {
         // 1a. Load the timeline data into graph
@@ -82,7 +75,6 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
             graph = new XMLGraphReader().loadGraph(MUSIC_HISTORY);
         } catch (Exception e) {
             e.printStackTrace();
-            return;
         }
 
         // 1b. Add notch nodes into the graph
@@ -116,7 +108,8 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         });*/
         
         final ActionList distort = new ActionList(registry);
-        distort.add(new /*Timeline*/GraphFilter());
+        final TimelineGraphFilter filter = new TimelineGraphFilter();
+        distort.add(filter);//new /*Timeline*/GraphFilter());
         final FisheyeDistortion feye = new FisheyeDistortion(1,0,true);//NOTCH_NODE_TYPE);
         distort.add(feye);
         distort.add(new ResizeBoundsFunction(feye));
@@ -133,13 +126,13 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         final JFrame frame = new JFrame(TITLE);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         final Container content = frame.getContentPane();
-        content.add(new CheckBoxFilters(), BorderLayout.SOUTH);
+        content.add(new CheckBoxFilters(filter), BorderLayout.SOUTH);
 		content.add(display, BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
 
-        final ActionList initialArrange = new ActionList(registry);
-        initialArrange.add(new GraphFilter());
+        initialArrange = new ActionList(registry);
+        initialArrange.add(new TimelineGraphFilter());
         initialArrange.add(new MusicHistoryColorFunction());
         initialArrange.add(new MusicHistoryLayout(timeline_start, timeline_end, timelineLength, numNotches));
         initialArrange.add(new SetBoundsFunction()); // after layout
@@ -233,7 +226,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         }
 
         public void run(final ItemRegistry registry, final double frac) {
-            final Iterator nodeItems = registry.getNodeItems();
+            final Iterator nodeItems = registry.getFilteredGraph().getNodes();//getNodeItems();
             final Dimension displaySize = registry.getDisplay(0).getSize();
             final double leftOffset = (displaySize.getWidth() - m_timelineLength) / 2;
             VisualItem node;
@@ -314,31 +307,45 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
 		}
     } // end of class MusicHistoryLayout
     
-    private static class TypeWrapper {
-    	private final String typeId;
-    	
-    	public TypeWrapper(final String typeId) {
-    		this.typeId = typeId;
-    	}
 
-    	/**
-    	 * Capitalize the first letter
-    	 */
-		public String toString() {
-			return typeId.substring(0, 1).toUpperCase()+typeId.substring(1);
-		}
+    
+    private class CheckBoxFilters extends JPanel {
+        private final TimelineGraphFilter filter;
+        
+        public CheckBoxFilters(final TimelineGraphFilter filter) {
+            super();
+            this.filter = filter;
+            setLayout(new FlowLayout()); // 
+            for (final Iterator it = filter.getRegisteredTypes().iterator(); it.hasNext();) {
+                final TTypeWrapper type = (TTypeWrapper) it.next();
+                System.out.println("name: "+type.toString()+" ;  isShown: "+type.isShown());
+                final JCheckBox checkBox = new JCheckBox(type.toString());//, type.isShown());
+                checkBox.setModel(new TTypeCheckBoxModel(type));
+                checkBox.addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent act) {
+                        type.setShown(!type.isShown()); // checkBox automatically gets set
+                        checkBox.setSelected(!type.isShown());
+                        initialArrange.runNow();
+                        // refilter and show new timeline
+                    }});
+                add(checkBox);
+            }
+        }
     }
     
-    private static class CheckBoxFilters extends JPanel {
-    	public CheckBoxFilters() {
-    		super();
-    		setLayout(new FlowLayout());
-    		for (final Iterator it = registeredTypes.iterator(); it.hasNext(); ) {
-    			final TypeWrapper type = (TypeWrapper) it.next();
-    			final JCheckBox checkBox = new JCheckBox(type.toString(), true);
-    			add(checkBox);
-    		}
-    	}
+    private static class TTypeCheckBoxModel extends DefaultButtonModel {
+        private final TTypeWrapper type;
+        
+        public TTypeCheckBoxModel(final TTypeWrapper type) {
+            this.type = type;
+        }
+        
+        /**
+         * @return Returns the type.
+         */
+        public TTypeWrapper getType() {
+            return type;
+        }
     }
 
     

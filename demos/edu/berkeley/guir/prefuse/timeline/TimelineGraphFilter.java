@@ -3,7 +3,9 @@
  */
 package edu.berkeley.guir.prefuse.timeline;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import edu.berkeley.guir.prefuse.EdgeItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
@@ -19,20 +21,35 @@ import edu.berkeley.guir.prefuse.graph.Node;
  * @author Jack Li jack(AT)cs_D0Tberkeley_D0Tedu
  */
 public class TimelineGraphFilter extends GraphFilter implements TimelineConstants {
-	// (( CONSTRUCTORS )) \\
+    // (( CONSTANTS )) \\
+    private static final String[] TYPES = {
+            PERIOD_TYPE, EVENT_TYPE, PERSON_TYPE, PIECE_TYPE};
+    private static final boolean[] TYPES_INITIAL_SHOW = {
+            true, true, true, false };
+    
+    
+    // (( FIELDS )) \\
+    private static final List registeredTypes = new ArrayList();
+    
+    
+	// (( CONSTRUCTORS )) \\\\
+    static {
+        for (int i = 0; i < TYPES.length; i++) {
+            registeredTypes.add(new TTypeWrapper(TYPES[i], TYPES_INITIAL_SHOW[i]));
+        }
+    }
+    
+    
 	public TimelineGraphFilter() {
 		super();
 	}
-
-	/**
-	 * @param edgesVisible
-	 */
-	public TimelineGraphFilter(boolean edgesVisible) {
-		super(edgesVisible);
-	}
-
+	
 	
 	// (( METHODS )) \\
+	public List getRegisteredTypes() {
+	    return registeredTypes;
+	}
+	
 	public void run(ItemRegistry registry, double frac) {
         Graph graph = registry.getGraph();
         // initialize filtered graph
@@ -55,9 +72,15 @@ public class TimelineGraphFilter extends GraphFilter implements TimelineConstant
                 item = (NodeItem) registry.getItem(NOTNOTCH_NODE_TYPE, node, true);
             }*/
             item = registry.getNodeItem(node, true);
-            if (item.getAttribute(NODE_TYPE).equals(NOTCH_TYPE)) {
+            
+            // if type is true
+            String attribute = item.getAttribute(NODE_TYPE);
+            if (attribute.equals(NOTCH_TYPE) || isTypeShown(attribute)) {
+            //if (item.getAttribute(NODE_TYPE).equals(NOTCH_TYPE)) {
                 fgraph.addNode(item);
                 //System.out.println(i++);
+            } else {
+                item.setVisible(false);
             }
         }
         
@@ -84,6 +107,20 @@ public class TimelineGraphFilter extends GraphFilter implements TimelineConstant
         //super.run(registry, frac);
 	}
 	
-	public static void main(String[] args) {
-	}
+
+	
+	/**
+     * @param attribute
+     * @return
+     */
+    private boolean isTypeShown(final String attribute) {
+        for (final Iterator it = registeredTypes.iterator(); it.hasNext(); ) {
+            final TTypeWrapper type = (TTypeWrapper)it.next();
+            if (type.getTypeId().equals(attribute)) {
+                return type.isShown();
+            }
+        }
+        System.out.println("this type wasn't found: "+attribute);
+        return false;
+    }
 }
