@@ -19,7 +19,14 @@ public abstract class Distortion extends Layout {
 
     private Point2D m_tmp = new Point2D.Double();
     private boolean m_sizeDistorted = true;
+    private final boolean useFilteredGraph;
     
+    /**
+     * 
+     */
+    public Distortion(final boolean useFilteredGraph) {
+        this.useFilteredGraph = useFilteredGraph;
+    }
     /**
      * Controls whether item sizes are distorted 
      * along with the item locations.
@@ -44,8 +51,19 @@ public abstract class Distortion extends Layout {
     public void run(ItemRegistry registry, double frac) {
         Rectangle2D bounds = getLayoutBounds(registry);
         Point2D anchor = correct(getLayoutAnchor(), bounds);
-        Iterator iter = registry.getNodeItems();
+        final Iterator iter;
+        if (useFilteredGraph) {
+            //registry.printAllEntries();
+            // XXX Gotta switch back later
+            iter = registry.getFilteredGraph().getNodes();
+            //System.out.println("using this class: "+nodeClass);
+            //iter = registry.getItems(nodeClass, true);
+        } else {
+            iter = registry.getNodeItems();
+        }
+        int i = 0;
         while ( iter.hasNext() ) {
+            //System.out.println(i++);
             VisualItem item = (VisualItem)iter.next();
             if ( item.isFixed() ) continue;
             

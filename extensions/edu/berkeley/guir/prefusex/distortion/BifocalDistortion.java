@@ -74,13 +74,19 @@ public class BifocalDistortion extends Distortion {
      *  in the focal area
      */
     public BifocalDistortion(double xrange, double xmag, double yrange, double ymag) {
+        this(xrange, xmag, yrange, ymag, false);
+    } //
+    
+    public BifocalDistortion(final double xrange, final double xmag, 
+            final double yrange, final double ymag, final boolean useFilteredGraph) {
+        super(useFilteredGraph);
         rx = xrange;
         mx = xmag;
         ry = yrange;
         my = ymag;
         bx = !(rx == 0 || mx == 1.0);
         by = !(ry == 0 || my == 1.0);
-    } //
+    }
     
     /**
      * Calculates a bifocal display distortion.

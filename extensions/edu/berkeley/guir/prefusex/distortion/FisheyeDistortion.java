@@ -51,11 +51,16 @@ public class FisheyeDistortion extends Distortion {
      * @param yfactor the distortion factor along the y axis
      */
     public FisheyeDistortion(double xfactor, double yfactor) {
+        this(xfactor, yfactor, false);
+    } //
+    
+    public FisheyeDistortion(final double xfactor, final double yfactor, final boolean useFilteredGraph) {
+        super(useFilteredGraph);
         dx = xfactor;
         dy = yfactor;
         bx = dx > 0;
         by = dy > 0;
-    } //
+    }
     
     /**
      * Returns the distortion factor for the x-axis.
