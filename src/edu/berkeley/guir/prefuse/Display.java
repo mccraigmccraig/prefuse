@@ -151,6 +151,22 @@ public class Display extends JComponent {
         setSize(400,400); // set a default size
 	} //
 
+    /**
+     * Determines if a debugging string is printed on the Display.
+     * @param d true to show debugging info, false otherwise
+     */
+    public void setDebug(boolean d) {
+        m_showDebug = d;
+    } //
+    
+    /**
+     * Indicates if a debugging string is being printed on the Display.
+     * @return true if debugging info is shown, false otherwise
+     */
+    public boolean getDebug() {
+        return m_showDebug;
+    } //
+    
     public void setUseCustomTooltips(boolean s) {
         if ( s && m_ttipManager == null ) {
             m_ttipManager = new ToolTipManager(this);
