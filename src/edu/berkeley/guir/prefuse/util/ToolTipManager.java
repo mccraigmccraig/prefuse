@@ -10,7 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
 import edu.berkeley.guir.prefuse.Display;
 
@@ -23,12 +23,13 @@ import edu.berkeley.guir.prefuse.Display;
 public class ToolTipManager implements MouseMotionListener {
 
     // TODO: edit so that tool tip is presented in its own window?
+    // TODO: improve thread-safety
     
     private Display       m_display;
     private JComponent    m_tooltip;
     private ToolTipTimer  m_toolTipTimer;
     private boolean       m_toolTipsEnabled;
-    private long          m_toolTipDelay = 1000L;
+    private long          m_toolTipDelay = 2000L;
     
     public ToolTipManager(Display display, JComponent tooltip) {
         m_display = display;
@@ -39,7 +40,6 @@ public class ToolTipManager implements MouseMotionListener {
         m_toolTipsEnabled = true;
         
         new Thread(m_toolTipTimer).start();
-        //display.add(m_tooltip, 0);
     } //
     
     public ToolTipManager(Display display) {
@@ -51,7 +51,6 @@ public class ToolTipManager implements MouseMotionListener {
         m_toolTipsEnabled = true;
         
         new Thread(m_toolTipTimer).start();
-        //display.add(m_tooltip, 0);
     } //
     
     /**
@@ -205,19 +204,14 @@ public class ToolTipManager implements MouseMotionListener {
         } //
         public void paint() {
             m_display.repaintImmediate();
-            Dimension d = m_tooltip.getPreferredSize();
-            m_tooltip.setBounds(x,y,d.width,d.height);
+            Dimension  d = m_tooltip.getPreferredSize();
             Graphics2D g = (Graphics2D)m_display.getGraphics();
-            g.translate(x,y);
-            //m_tooltip.setVisible(true);
-            m_tooltip.paint(g);
+            // TODO: move to avoid display boundary
+            SwingUtilities.paintComponent(g,m_tooltip,m_display,
+                                          x,y,d.width,d.height);
         } //
         public void unpaint() {
-            //m_tooltip.setVisible(false);
-            if ( m_display instanceof Display )
-                ((Display)m_display).repaintImmediate();
-            else
-                m_tooltip.repaint();
+            m_display.repaintImmediate();
         } //
     } // end of inner class ToolTipTimer
     
@@ -225,7 +219,7 @@ public class ToolTipManager implements MouseMotionListener {
      * Default class for displaying tooltips. Presents one line of text
      * in a light yellow box with a black border.
      */
-    public class DefaultToolTipper extends JLabel {
+    public class DefaultToolTipper extends JComponent {
         private String text = null;
         public DefaultToolTipper() {
             this.setBackground(new Color(255,255,225));
@@ -239,7 +233,7 @@ public class ToolTipManager implements MouseMotionListener {
             int h = fm.getHeight();
             return new Dimension(w,h);
         } //
-        public void paint(Graphics g) {
+        public void paintComponent(Graphics g) {
             if ( text == null ) return;
             Rectangle r = this.getBounds();
             g.setColor(getBackground());
