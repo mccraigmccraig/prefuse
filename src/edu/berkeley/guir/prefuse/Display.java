@@ -111,6 +111,11 @@ public class Display extends JComponent {
 		super.setSize(d);
 	} //
 
+    public void reshape(int x, int y, int w, int h) {
+        m_offscreen = null;
+        super.reshape(x,y,w,h);
+    } //
+    
     public void setFont(Font f) {
         super.setFont(f);
         m_editor.setFont(f);
