@@ -41,7 +41,7 @@ import edu.berkeley.guir.prefuse.render.Renderer;
 import edu.berkeley.guir.prefuse.util.ColorLib;
 import edu.berkeley.guir.prefuse.util.FontLib;
 import edu.berkeley.guir.prefuse.util.display.Clip;
-import edu.berkeley.guir.prefuse.util.display.SaveImageAction;
+import edu.berkeley.guir.prefuse.util.display.ExportDisplayAction;
 import edu.berkeley.guir.prefuse.util.display.ToolTipManager;
 
 /**
@@ -148,11 +148,11 @@ public class Display extends JComponent {
                         m_showDebug = !m_showDebug;
                     }
                 },
-                "debug", KeyStroke.getKeyStroke("ctrl D"), WHEN_FOCUSED);
+                "debug info", KeyStroke.getKeyStroke("ctrl D"), WHEN_FOCUSED);
         // add image output control
         registerKeyboardAction(
-                new SaveImageAction(this),
-                "image save", KeyStroke.getKeyStroke("ctrl I"), WHEN_FOCUSED);
+                new ExportDisplayAction(this),
+                "export display", KeyStroke.getKeyStroke("ctrl E"), WHEN_FOCUSED);
         
         setItemRegistry(registry);
         setSize(400,400); // set a default size
