@@ -3,6 +3,8 @@ package edu.berkeley.guir.prefusex.distortion;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import edu.berkeley.guir.prefuse.ItemRegistry;
+
 /**
  * <p>
  * Creates a graphical fisheye distortion of a graph view. This distortion 
@@ -156,5 +158,23 @@ public class FisheyeDistortion extends Distortion {
             return x;
         }
     } //
-
+    
+    /**
+     * Given an original x coordinate, return the distorted x
+     * @return
+     */
+    public double fisheyeMove(final double undistortedX, final ItemRegistry registry) {
+        final Rectangle2D bounds = getLayoutBounds(registry);
+        final Point2D anchor = correct(getLayoutAnchor(), bounds);
+        
+		// compute distortion if we have a distortion focus
+		if (anchor != null) {
+			return fisheye(undistortedX,anchor.getX(),dx,bounds.getMinX(),bounds.getMaxX());
+//			if (m_sizeDistorted) {
+//				double sz = transformSize(bbox, loc, anchor, bounds);
+//				item.setSize(sz * item.getEndSize());
+//			}
+		}
+		return undistortedX;
+    }
 } // end of class FisheyeDistortion
