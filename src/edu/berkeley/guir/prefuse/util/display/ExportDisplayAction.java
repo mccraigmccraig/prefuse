@@ -9,9 +9,10 @@ import java.io.OutputStream;
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 
 import edu.berkeley.guir.prefuse.Display;
+import edu.berkeley.guir.prefuse.util.io.IOLib;
+import edu.berkeley.guir.prefuse.util.io.SimpleFileFilter;
 
 /**
  * SaveImageAction
@@ -47,7 +48,7 @@ public class ExportDisplayAction extends AbstractAction {
             return;
         }
         String format = ((SimpleFileFilter)chooser.getFileFilter()).getExtension();
-        String ext = getExtension(f);        
+        String ext = IOLib.getExtension(f);        
         if ( !format.equals(ext) ) {
             f = new File(f.getName()+"."+format);
         }
@@ -72,39 +73,5 @@ public class ExportDisplayAction extends AbstractAction {
                     JOptionPane.ERROR_MESSAGE);
         }
     } //
-    
-    public static String getExtension(File f) {
-    	if (f != null) {
-    	    String filename = f.getName();
-    	    int i = filename.lastIndexOf('.');
-    	    if(i>0 && i<filename.length()-1) {
-    	        return filename.substring(i+1).toLowerCase();
-    	    }
-    	}
-    	return null;
-    } //
-    
-    public class SimpleFileFilter extends FileFilter {
-        private String ext, desc;
-        
-        public SimpleFileFilter(String ext, String desc) {
-            this.ext = ext;
-            this.desc = desc;
-        } //
-        public boolean accept(File f) {
-            if ( f == null )
-                return false;
-            if ( f.isDirectory() )
-                return true;
-            String extension = ExportDisplayAction.getExtension(f);
-            return ( extension != null && extension.equals(ext) );
-        } //
-        public String getDescription() {
-            return desc;
-        } //
-        public String getExtension() {
-            return ext;
-        } //
-    } // end of class SimpleFileFilter
     
 } // end of class SaveImageAction

@@ -570,7 +570,7 @@ public class Display extends JComponent {
 	/**
 	 * Saves a copy of this display as an image to the specified output stream.
 	 * @param output the output stream to write to.
-	 * @param format the image format (e.g., "JPG", "PNG", "TIF").
+	 * @param format the image format (e.g., "JPG", "PNG").
 	 * @param scale how much to scale the image by.
 	 * @return true if image was successfully saved, false if an error occurred.
 	 */
