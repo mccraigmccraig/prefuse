@@ -22,8 +22,8 @@ public class BalloonTreeLayout extends TreeLayout {
     private ItemRegistry m_registry;
     private int m_minRadius = 2;
     
-    public Point2D getAnchor() {
-        Point2D anchor = super.getAnchor();
+    public Point2D getLayoutAnchor() {
+        Point2D anchor = super.getLayoutAnchor();
         if ( anchor != null )
             return anchor;
         
@@ -41,7 +41,7 @@ public class BalloonTreeLayout extends TreeLayout {
      */
     public void run(ItemRegistry registry, double frac) {
         m_registry = registry;
-        Point2D anchor = getAnchor();
+        Point2D anchor = getLayoutAnchor();
         Tree tree = (Tree)registry.getGraph();
         NodeItem n = registry.getNodeItem(tree.getRoot());
         layout(n,anchor.getX(),anchor.getY());

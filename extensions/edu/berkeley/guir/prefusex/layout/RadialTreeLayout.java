@@ -80,7 +80,7 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
             m_registry.getDefaultFocusSet().addFocusListener(this);
         }
         
-        m_origin = getAnchor(registry);
+        m_origin = getLayoutAnchor(registry);
         NodeItem n = getLayoutRoot(registry);
         RadialParams np = getParams(n);
         
@@ -88,7 +88,7 @@ public class RadialTreeLayout extends TreeLayout implements FocusListener {
         m_maxDepth = 0;
         countVisibleDescendants(n, 0);
         
-        if ( m_autoScale ) setScale(getBounds(registry));
+        if ( m_autoScale ) setScale(getLayoutBounds(registry));
         if ( !m_setTheta && m_prevParent != null ) {
             NodeItem p = registry.getNodeItem(m_prevParent);
             m_startTheta = calcStartingTheta(n, p);

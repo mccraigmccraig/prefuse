@@ -91,7 +91,7 @@ public class ForceDirectedLayout extends Layout {
             double y = fitem.location[1];
             
             if ( m_enforceBounds ) {
-                Rectangle2D bounds = getBounds(registry);
+                Rectangle2D bounds = getLayoutBounds(registry);
                 double xb = bounds.getX(), yb = bounds.getY();
                 double w = bounds.getWidth(), h = bounds.getHeight();
                 if ( x >= w ) x = xb+w;

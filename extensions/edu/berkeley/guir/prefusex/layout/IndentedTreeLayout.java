@@ -76,12 +76,12 @@ public class IndentedTreeLayout extends TreeLayout {
 		m_elide = s;
 	} //
     
-    public Point2D getAnchor(ItemRegistry registry) {
-        Point2D anchor = super.getAnchor();
+    public Point2D getLayoutAnchor(ItemRegistry registry) {
+        Point2D anchor = super.getLayoutAnchor();
         if ( anchor != null )
             return anchor;
         
-        Rectangle2D b = getBounds(registry);
+        Rectangle2D b = getLayoutBounds(registry);
         double x = 0, y = 0;
         if ( b != null ) {
             x = b.getX();
@@ -98,8 +98,8 @@ public class IndentedTreeLayout extends TreeLayout {
 		m_tmpAggr = null;
 		NodeItem n = getLayoutRoot(registry);
 		if ( n != null && n.isVisible() ) {
-            Rectangle2D b = getBounds(registry);
-            Point2D anchor = getAnchor(registry);
+            Rectangle2D b = getLayoutBounds(registry);
+            Point2D anchor = getLayoutAnchor(registry);
 			int availHeight = (int)Math.ceil(b.getHeight() - anchor.getY());
 			int treeHeight  = calcTreeHeight(m_entryList, n, 0, 0);
 			updateStartLocations(m_entryList);

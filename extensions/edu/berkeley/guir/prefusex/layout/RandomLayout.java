@@ -26,7 +26,7 @@ public class RandomLayout extends Layout {
     } //
     
     public void run(ItemRegistry registry, double frac) {
-        Rectangle2D b = getBounds(registry);
+        Rectangle2D b = getLayoutBounds(registry);
         double x, y;
         double w = b.getWidth() - 2*m_margin;
         double h = b.getHeight() - 2*m_margin;

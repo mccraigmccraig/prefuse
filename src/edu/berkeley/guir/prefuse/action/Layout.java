@@ -18,11 +18,11 @@ public abstract class Layout extends AbstractAction {
     protected Rectangle2D m_bounds = null;
     protected Point2D     m_anchor = null;
     
-    public Rectangle2D getBounds() {
+    public Rectangle2D getLayoutBounds() {
         return m_bounds;
     } //
     
-    public Rectangle2D getBounds(ItemRegistry registry) {
+    public Rectangle2D getLayoutBounds(ItemRegistry registry) {
         if ( m_bounds != null )
             return m_bounds;
         Display d;
@@ -32,15 +32,15 @@ public abstract class Layout extends AbstractAction {
             return new Rectangle();
     } //
     
-    public void setBounds(Rectangle2D b) {
+    public void setLayoutBounds(Rectangle2D b) {
         m_bounds = b;
     } //
     
-    public Point2D getAnchor() {
+    public Point2D getLayoutAnchor() {
         return m_anchor;
     } //
     
-    public Point2D getAnchor(ItemRegistry registry) {
+    public Point2D getLayoutAnchor(ItemRegistry registry) {
         if ( m_anchor != null )
             return m_anchor;
         double x = 0, y = 0;
@@ -51,7 +51,7 @@ public abstract class Layout extends AbstractAction {
         return new Point2D.Double(x,y);
     } //
     
-    public void setAnchor(Point2D a) {
+    public void setLayoutAnchor(Point2D a) {
         m_anchor = a;
     } //
     
