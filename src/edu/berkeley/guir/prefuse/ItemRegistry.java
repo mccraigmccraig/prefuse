@@ -35,14 +35,14 @@ import edu.berkeley.guir.prefuse.util.FocusSet;
  * ItemRegistry supports garbage collection of GraphItems across interaction
  * cycles of a visualization, allowing visual representations of graph
  * elements to pass in and out of existence as necessary.
- * 
+ * <br/><br/>
  * GraphItems are not instantiated directly, instead they are created by
  * the ItemRegistry as visual representations for abstract graph data. To
  * create a new GraphItem or retrieve an existing one, use the provided
  * ItemRegistry methods (e.g., getItem(), getNodeItem, etc). These are the
  * methods used by the various filters in the edu.berkeley.guir.prefuse.actions
  * package to determine which graph elements are visualized and which are not.
- * 
+ * <br/><br/>
  * For convenience, the ItemRegistry creates entries for three types of
  * GraphItems: NodeItems, EdgeItems, and AggregateItems. The mappings and
  * rendering queues for these entries can be accessed through convenience
@@ -63,9 +63,6 @@ public class ItemRegistry {
 	public static final String DEFAULT_AGGR_CLASS = "aggregate";
 	public static final int    DEFAULT_MAX_ITEMS  = 10000;
 	public static final int    DEFAULT_MAX_DIRTY  = 1;
-
-	private static final Class LIST_TYPE = LinkedList.class;
-	private static final Class MAP_TYPE  = HashMap.class;
 	
 	/**
 	 * Wrapper class that holds all the data structures for managing
@@ -76,8 +73,8 @@ public class ItemRegistry {
 			try {
 				name     = itemClass;
 				type     = classType;
-				itemList = (List)LIST_TYPE.newInstance();
-				itemMap  = (Map)MAP_TYPE.newInstance();
+				itemList = new LinkedList();
+				itemMap  = new HashMap();
 				modified = false;
 				maxDirty = dirty;
 			} catch ( Exception e) {
@@ -105,8 +102,6 @@ public class ItemRegistry {
 	private Map  m_entityMap; // maps from items back to their entities
 	
 	private Comparator m_comparator;
-	
-	private List m_focusList; // list of visualization's focal nodes
   
   	private ItemRegistryListener m_registryListener;
   	private FocusListener        m_focusListener;
@@ -128,12 +123,10 @@ public class ItemRegistry {
 		try {
 			m_ifactory  = new ItemFactory();
 			m_rfactory  = new DefaultRendererFactory();
-			m_entryList = (List)LIST_TYPE.newInstance();
-			m_entryMap  = (Map)MAP_TYPE.newInstance();
-			m_entityMap = (Map)MAP_TYPE.newInstance();
+			m_entryList = new LinkedList();
+			m_entryMap  = new HashMap();
+			m_entityMap = new HashMap();
 			m_comparator = new DefaultItemComparator();
-			
-			m_focusList = (List)LIST_TYPE.newInstance();
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}
@@ -260,17 +253,18 @@ public class ItemRegistry {
 	
 	public synchronized void garbageCollect(ItemEntry entry) {
 		entry.modified = true;
-		for ( int i = 0; i < entry.itemList.size(); i++ ) {
-			GraphItem item = (GraphItem)entry.itemList.get(i);			
-			int dirty = item.getDirty()+1;
-			item.setDirty(dirty);
-			if ( entry.maxDirty > -1 && dirty > entry.maxDirty ) {
-				removeItem(entry, item);
-				i--;
-			} else if ( dirty > 1 ) {
-				item.setVisible(false);
-			}
-		}		
+        Iterator iter = entry.itemList.iterator();
+        while ( iter.hasNext() ) {
+            GraphItem item = (GraphItem)iter.next();
+            int dirty = item.getDirty()+1;
+            item.setDirty(dirty);
+            if ( entry.maxDirty > -1 && dirty > entry.maxDirty ) {
+                iter.remove();
+                removeItem(entry, item, false);
+            } else if ( dirty > 1 ) {
+                item.setVisible(false);
+            }
+        }	
 	} //
 		
 	/**
@@ -305,7 +299,7 @@ public class ItemRegistry {
 		entry.modified = true;
 		while ( entry.itemList.size() > 0 ) {
 			GraphItem item = (GraphItem)entry.itemList.get(0);
-			this.removeItem(entry, item);
+			this.removeItem(entry, item, true);
 		}
 	} //
 
@@ -674,10 +668,13 @@ public class ItemRegistry {
 	 * Remove an item from the visualization queue.
 	 * @param entry the <code>ItemEntry</code> for this item's item class.
 	 * @param item the item to remove from the visualization queue
+     * @param lr indicates whether or not to remove the item from it's
+     *  rendering queue. This option is available to avoid errors that
+     *  arise when removing items coming from a currently active Iterator.
 	 */
-	private synchronized void removeItem(ItemEntry entry, GraphItem item) {
+	private synchronized void removeItem(ItemEntry entry, GraphItem item, boolean lr) {
 		removeMappings(entry, item);
-		entry.itemList.remove(item);
+		if (lr) entry.itemList.remove(item);
 		if ( m_registryListener != null ) {
 			m_registryListener.registryItemRemoved(item);
 		}
@@ -691,7 +688,7 @@ public class ItemRegistry {
 	public synchronized void removeItem(GraphItem item) {
 		ItemEntry entry = (ItemEntry)m_entryMap.get(item.getItemClass());
 		if ( entry != null ) {
-			removeItem(entry, item);
+			removeItem(entry, item, true);
 		} else {
 			throw new IllegalArgumentException("Didn't recognize the item's"
 						+ " item class.");				

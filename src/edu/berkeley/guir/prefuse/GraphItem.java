@@ -21,9 +21,6 @@ public abstract class GraphItem {
     
     // TODO: abstract the various properties into the attributes map?
 	
-	public static final Class POINT_TYPE = Point2D.Float.class;
-	public static final Class MAP_TYPE   = HashMap.class; 
-	
 	protected ItemRegistry m_registry;  // the item registry this item is associated with
 	protected String       m_itemClass; // the item class this item belongs to
 	protected Entity       m_entity;    // the graph entity this item maps to
@@ -52,14 +49,10 @@ public abstract class GraphItem {
 	 * Default constructor.
 	 */
 	public GraphItem() {
-		try {
-			m_attrs         = (Map)MAP_TYPE.newInstance();
-			m_location      = (Point2D)POINT_TYPE.newInstance();
-			m_startLocation = (Point2D)POINT_TYPE.newInstance();
-			m_endLocation   = (Point2D)POINT_TYPE.newInstance();
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		}
+			m_attrs         = new HashMap(5);
+			m_location      = new Point2D.Float();
+			m_startLocation = new Point2D.Float();
+			m_endLocation   = new Point2D.Float();
 	} //
 	
 	public String toString() {
