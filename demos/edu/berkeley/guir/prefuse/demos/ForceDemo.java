@@ -160,21 +160,21 @@ public class ForceDemo extends Display {
     } //
     
     public static void main(String argv[]) {
-//        String file = (argv.length==0 ? "etc/friendster.xml" : argv[0]);
-//        //String file = "../prefuse/etc/terror.xml";
-//        Graph g;
-//        try {
-//            g = (new XMLGraphReader()).loadGraph(file);
-//        } catch ( Exception e ) { e.printStackTrace(); return; }
+        String file = (argv.length==0 ? "etc/friendster.xml" : argv[0]);
+        //String file = "../prefuse/etc/terror.xml";
+        //Graph g;
+        //try {
+        //    g = (new XMLGraphReader()).loadGraph(file);
+        //} catch ( Exception e ) { e.printStackTrace(); return; }
         
-        Graph g = GraphLib.getClique(40);
+        Graph g = GraphLib.getStar(40);
         
         System.out.println("Visualizing Graph: "
             +g.getNumNodes()+" nodes, "+g.getNumEdges()+" edges");
         
         ForceSimulator fsim = new ForceSimulator();
         fsim.addForce(new NBodyForce(-0.4f, 0.9f));
-        fsim.addForce(new SpringForce(4E-5f, 250f));
+        fsim.addForce(new SpringForce(4E-5f, 100f));
         fsim.addForce(new DragForce(-0.005f));
         
         ForceDemo fdemo = new ForceDemo(g, fsim);

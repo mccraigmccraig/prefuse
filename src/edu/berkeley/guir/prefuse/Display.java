@@ -33,9 +33,11 @@ import edu.berkeley.guir.prefuse.render.Renderer;
 import edu.berkeley.guir.prefuse.util.Clip;
 
 /**
- * Component that provides an interactive visualization of a graph.
- * 
- * Apr 22, 2003 - jheer - Created class
+ * User interface component that provides an interactive visualization 
+ * of a graph. The Display is responsible for drawing items to the
+ * screen and providing callbacks for user interface actions such as
+ * mouse and keyboard events. A Display must be associated with an
+ * ItemRegistry from which it pulls the items to visualize.
  * 
  * @version 1.0
  * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
@@ -47,7 +49,8 @@ public class Display extends JComponent {
 	protected BufferedImage   m_offscreen;
     protected Clip            m_clip, m_pclip, m_cclip;
     
-    protected AffineTransform m_transform, m_itransform;
+    protected AffineTransform m_transform  = new AffineTransform();
+    protected AffineTransform m_itransform = new AffineTransform();
     protected Point2D m_tmpPoint = new Point2D.Double();
     
     protected double frameRate;
@@ -67,28 +70,23 @@ public class Display extends JComponent {
         setDoubleBuffered(false);
         setBackground(Color.WHITE);
         
+        // initialize text editor
         m_editing = false;
         m_editor = new JTextField();
         m_editor.setBorder(null);
         m_editor.setVisible(false);
         this.add(m_editor);
         
-		InputEventCapturer mec = new InputEventCapturer();
-		addMouseListener(mec);
-		addMouseMotionListener(mec);
-		addMouseWheelListener(mec);
-		addKeyListener(mec);
+        // register input event capturer
+		InputEventCapturer iec = new InputEventCapturer();
+		addMouseListener(iec);
+		addMouseMotionListener(iec);
+		addMouseWheelListener(iec);
+		addKeyListener(iec);
         
         m_clip  = new Clip();
         m_pclip = new Clip();
         m_cclip = new Clip();
-        
-        // XXX DEBUG
-        try {
-            setTransform(new AffineTransform());
-        } catch ( Exception e ) {
-            e.printStackTrace();
-        }
 	} //
 
 	/**
@@ -111,20 +109,38 @@ public class Display extends JComponent {
 		super.setSize(d);
 	} //
 
+    /**
+     * Reshapes (moves and resizes) this component.
+     */
     public void reshape(int x, int y, int w, int h) {
         m_offscreen = null;
         super.reshape(x,y,w,h);
     } //
     
+    /**
+     * Sets the font used by this Display. This determines the font used
+     * by this Display's text editor.
+     */
     public void setFont(Font f) {
         super.setFont(f);
         m_editor.setFont(f);
     } //
     
+    /**
+     * Returns the item registry used by this display.
+     * @return this Display's ItemRegistry
+     */
     public ItemRegistry getRegistry() {
         return m_registry;
     } //
     
+    /**
+     * Set the ItemRegistry associated with this Display. This Display
+     * will render the items contained in the provided registry. If this
+     * Display is already associated with a different ItemRegistry, the
+     * Display unregisters itself with the previous registry.
+     * @param registry the ItemRegistry to associate with this Display.
+     */
     public void setRegistry(ItemRegistry registry) {
         if ( m_registry == registry ) {
             // nothing need be done
@@ -252,14 +268,24 @@ public class Display extends JComponent {
 		return m_offscreen;
 	} //
 	
+    /**
+     * Creates a new buffered image to use as an offscreen buffer.
+     */
 	protected BufferedImage getNewOffscreenBuffer() {
         return (BufferedImage)createImage(getSize().width, getSize().height);
 	} //
 	
+    /**
+     * Updates this display
+     */
 	public void update(Graphics g) {
 		paint(g);
 	} //
 
+    /**
+     * Paints the offscreen buffer to the provided graphics context.
+     * @param g the Graphics context to paint to
+     */
 	protected void paintBufferToScreen(Graphics g) {
         int x = 0, y = 0;
         BufferedImage img = m_offscreen;
@@ -282,6 +308,11 @@ public class Display extends JComponent {
 		}
 	} //
 
+    /**
+     * Sets the transform of the provided Graphics context to be the
+     * transform of this Display and sets the desired rendering hints.
+     * @param g the Graphics context to prepare.
+     */
     protected void prepareGraphics(Graphics2D g) {
         if ( m_transform != null )
             g.setTransform(m_transform);
@@ -290,8 +321,9 @@ public class Display extends JComponent {
     
 	/**
 	 * Sets the rendering hints that should be used while drawing
-	 * the visualization to the screem.
-	 * @param g
+	 * the visualization to the screen. Subclasses can override
+     * this method to set hints as desired.
+	 * @param g the Graphics context on which to set the rendering hints
 	 */
 	protected void setRenderingHints(Graphics2D g) {
 		//g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -304,7 +336,7 @@ public class Display extends JComponent {
 	/**
 	 * Paint routine called <i>before</i> items are drawn. Subclasses should
 	 * override this method to perform custom drawing.
-	 * @param g
+	 * @param g the Graphics context to draw into
 	 */
 	protected void prePaint(Graphics2D g) {
 	} //
@@ -312,7 +344,7 @@ public class Display extends JComponent {
 	/**
 	 * Paint routine called <i>after</i> items are drawn. Subclasses should
 	 * override this method to perform custom drawing.
-	 * @param g
+	 * @param g the Graphics context to draw into
 	 */
 	protected void postPaint(Graphics2D g) {
 	} //
@@ -327,6 +359,7 @@ public class Display extends JComponent {
 			m_offscreen = getNewOffscreenBuffer();
 		}
 		Graphics2D g2D = (Graphics2D) m_offscreen.getGraphics();
+        //Graphics2D g2D = (Graphics2D)g;
         
 		// paint background
 		g2D.setColor(getBackground());

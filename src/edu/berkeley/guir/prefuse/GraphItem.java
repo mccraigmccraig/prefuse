@@ -11,22 +11,20 @@ import edu.berkeley.guir.prefuse.graph.Entity;
 import edu.berkeley.guir.prefuse.render.Renderer;
 
 /**
- * Abstract class for representing an entity to be visualized. Subclasses
- * include Node, Edge, and Aggregate.
- * 
- * TODO: abstract the various properties into the attributes map?
- * 
- * Apr 22, 2003 - jheer - Created class
+ * Abstract class for a visual representation of a graph element. Subclasses
+ * include NodeItem, EdgeItem, and AggregateItem.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public abstract class GraphItem {
+    
+    // TODO: abstract the various properties into the attributes map?
 	
 	public static final Class POINT_TYPE = Point2D.Float.class;
 	public static final Class MAP_TYPE   = HashMap.class; 
 	
-	protected ItemRegistry m_registry;  // the item registry this item is assoicated with
+	protected ItemRegistry m_registry;  // the item registry this item is associated with
 	protected String       m_itemClass; // the item class this item belongs to
 	protected Entity       m_entity;    // the graph entity this item maps to
 	protected int          m_dirty;     // used to keep track of dirty status

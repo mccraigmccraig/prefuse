@@ -48,26 +48,24 @@ import edu.berkeley.guir.prefusex.controls.PanHandler;
 import edu.berkeley.guir.prefusex.controls.ZoomHandler;
 
 /**
- * Prefuse Demo Application
- * 
- * Apr 25, 2003 - jheer - Created class
+ * Demo application showcasing the use of an animated radial tree layout to
+ * visualize a graph.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class RadialGraphDemo {
+public class RadialGraphDemo extends JFrame {
 
 	public static final String GRAPH_GUIR       = "etc/guir.xml";
 	public static final String GRAPH_FRIENDSTER = "../prefuse/etc/friendster.xml";
 	public static final String GRAPH_TERROR     = "etc/terror.xml";
-
 	public static final String nameField = "label";
 		
-	public static ItemRegistry registry;
-	public static Graph graph;
-	public static Tree tree;
-	public static Display display;
-    public static ActionPipeline filter, update, animate;
+	private ItemRegistry registry;
+	private Graph graph;
+	private Tree tree;
+	private Display display;
+    private ActionPipeline filter, update, animate;
 		
 	private static Tree getInitialTree(Graph g) {		
 		Iterator nodeIter = g.getNodes();
@@ -80,8 +78,12 @@ public class RadialGraphDemo {
 		}
 		return TreeLib.breadthFirstTree(r);
 	} //
+    
+    public static void main(String[] argv) {
+        new RadialGraphDemo();
+    } //
 		
-	public static void main(String[] args) {
+	public RadialGraphDemo() {
 		try {
 			// load graph
 			String inputFile = GRAPH_FRIENDSTER;
@@ -176,15 +178,14 @@ public class RadialGraphDemo {
 			registry.getDefaultFocusSet().set(tree.getRoot());			
 
 			// create and display application window
-			JFrame frame = new JFrame("RadialGraphDemo");
-			frame.addWindowListener(new WindowAdapter() {
+			addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e) {
 					System.exit(0);
 				}
 			});
-			frame.getContentPane().add(display, BorderLayout.CENTER);
-			frame.pack();
-			frame.setVisible(true);
+			getContentPane().add(display, BorderLayout.CENTER);
+			pack();
+			setVisible(true);
 			
 			// because awt doesn't always give us 
 			// our graphics context right away...
@@ -196,7 +197,7 @@ public class RadialGraphDemo {
 		}	
 	} //
 	
-    static class DemoColorFunction extends ColorFunction {
+    public class DemoColorFunction extends ColorFunction {
 	    private Color graphEdgeColor = Color.LIGHT_GRAY;
         private Color highlightColor = Color.BLUE;
 	    private Color nodeColors[];

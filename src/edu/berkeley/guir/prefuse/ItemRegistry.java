@@ -24,14 +24,37 @@ import edu.berkeley.guir.prefuse.render.RendererFactory;
 import edu.berkeley.guir.prefuse.util.FocusSet;
 
 /**
- * Registry containing all items to be visualized.
- *
- * Apr 22, 2003 - jheer - Created class
- * Jul 16, 2003 - jheer - Generalized to handle arbitrary item classes
- * Feb 16, 2004 - jheer - Moved focus handling to FocusManager
+ * The ItemRegistry is the central data structure for a prefuse visualization.
+ * The registry maintains mappings between abstract graph data (e.g., 
+ * <tt>Node</tt>s and <tt>Edges</tt>) and their visual representations (e.g.,
+ * <tt>NodeItem</tt>s and <tt>EdgeItem</tt>s). The ItemRegistry maintains
+ * rendering queues of all visualized GraphItems, a comparator for ordering
+ * these queues (and thus controlling rendering order), references to all
+ * displays that render the contents of this registry, and a focus manager
+ * keeping track of focus sets of Entity instances. In addition, the
+ * ItemRegistry supports garbage collection of GraphItems across interaction
+ * cycles of a visualization, allowing visual representations of graph
+ * elements to pass in and out of existence as necessary.
+ * 
+ * GraphItems are not instantiated directly, instead they are created by
+ * the ItemRegistry as visual representations for abstract graph data. To
+ * create a new GraphItem or retrieve an existing one, use the provided
+ * ItemRegistry methods (e.g., getItem(), getNodeItem, etc). These are the
+ * methods used by the various filters in the edu.berkeley.guir.prefuse.actions
+ * package to determine which graph elements are visualized and which are not.
+ * 
+ * For convenience, the ItemRegistry creates entries for three types of
+ * GraphItems: NodeItems, EdgeItems, and AggregateItems. The mappings and
+ * rendering queues for these entries can be accessed through convenience
+ * methods such as getNodeItem(), getEdgeItems, etc. More generally, separate
+ * entries with their own mappings and rendering queue can be made for any 
+ * type of GraphItem by using the addItemClass() methods. For example, if
+ * there are more than two different types of aggregates used (e.g., subtree
+ * aggregates and aggregates of other nodes) it may facilitate design to
+ * separate these into their own item classes.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class ItemRegistry {
 

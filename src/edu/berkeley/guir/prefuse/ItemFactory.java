@@ -8,16 +8,13 @@ import java.util.Map;
 /**
  * Factory class for GraphItem instances. This allows object
  * initialization to be consolidated in a single location and allocated objects
- * to be re-used.
+ * to be re-used by maintaining a pool of item references.
  * 
  * This class works closely with the ItemRegistry, but is
  * implemented separately to provide encapsulation and simplify design.
  * 
- * Apr 24, 2003 - jheer - Created class
- * Jul 16, 2003 - jheer - Generalized to handle arbitrary item classes
- * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class ItemFactory {
 	
@@ -54,6 +51,12 @@ public class ItemFactory {
 		}
 	} //
 	
+    /**
+     * Add a new item class for which to maintain an item pool.
+     * @param itemClass the label for the item class
+     * @param classType the Java Class of the items
+     * @param maxItems the maximum size of the item pool
+     */
 	public void addItemClass(String itemClass, Class classType, int maxItems) {
 		FactoryEntry fentry = new FactoryEntry(itemClass, classType, maxItems);
 		m_entryMap.put(itemClass, fentry);
@@ -62,6 +65,9 @@ public class ItemFactory {
 	// ========================================================================
 	// == FACTORY METHODS =====================================================
 	
+    /**
+     * Get an item from an item pool. Create a new item if the pool is empty.
+     */
 	public GraphItem getItem(String itemClass) {
 		FactoryEntry fentry = (FactoryEntry)m_entryMap.get(itemClass);
 		if ( fentry != null ) {

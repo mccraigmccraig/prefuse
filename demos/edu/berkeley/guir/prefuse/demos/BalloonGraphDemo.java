@@ -52,12 +52,10 @@ import edu.berkeley.guir.prefusex.controls.PanHandler;
 import edu.berkeley.guir.prefusex.controls.ZoomHandler;
 
 /**
- * Prefuse Demo Application
- * 
- * Apr 25, 2003 - jheer - Created class
+ * Visualizes a tree structure using a balloon tree layout.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class BalloonGraphDemo {
 

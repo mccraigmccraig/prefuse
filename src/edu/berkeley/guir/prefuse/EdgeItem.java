@@ -5,12 +5,10 @@ import edu.berkeley.guir.prefuse.graph.Entity;
 import edu.berkeley.guir.prefuse.graph.Node;
 
 /**
- * Represents an edge in the graph to visualize.
- * 
- * Apr 22, 2003 - jheer - Created class
+ * Visual representation of an edge in a graph.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
 public class EdgeItem extends GraphItem {
 
@@ -18,8 +16,8 @@ public class EdgeItem extends GraphItem {
 	protected NodeItem m_node2;
 
 	/**
-	 * Initialize this EdgeItem, binding it to the given
-	 * ItemRegistry and Entity.
+	 * Initialize this EdgeItem, binding it to the
+     *  given ItemRegistry and Entity.
 	 * @param registry the ItemRegistry monitoring this GraphItem
 	 * @param entity the Entity represented by this GraphItem
 	 */
@@ -47,10 +45,22 @@ public class EdgeItem extends GraphItem {
 		return item;
 	} //
 
+    /**
+     * Indicates whether or not this edge is a directed edge.
+     * @return true if this edge is directed, false otherwise
+     */
 	public boolean isDirected() {
 		return ((Edge)m_entity).isDirected();
 	} //
 	
+    /**
+     * Given a node item incident on this edge, returns the other node item
+     * incident on this edge.
+     * @param nitem a NodeItem incident on this edge
+     * @return the other NodeItem incident on this edge
+     * @throws IllegalArgumentException if the provided NodeItem is not
+     *  incident on this edge.
+     */
     public NodeItem getOtherNode(NodeItem nitem) {
         if ( m_node1 == nitem )
             return m_node2;
