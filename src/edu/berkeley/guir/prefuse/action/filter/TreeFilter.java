@@ -15,7 +15,7 @@ import edu.berkeley.guir.prefuse.graph.TreeNode;
 
 /**
  * Filters a tree in it's entirety. If the backing graph is not a tree,
- * a tree structured will still be imposed on the filtered graph
+ * a tree structure will still be imposed on the filtered graph.
  * By default, garbage collection on node and edge items is performed.
  *
  * @version 1.0
