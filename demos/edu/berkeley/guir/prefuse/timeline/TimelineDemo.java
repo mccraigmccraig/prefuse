@@ -18,6 +18,8 @@ import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
+import edu.berkeley.guir.prefuse.action.assignment.ResizeBoundsFunction;
+import edu.berkeley.guir.prefuse.action.assignment.SetBoundsFunction;
 import edu.berkeley.guir.prefuse.action.filter.GraphFilter;
 import edu.berkeley.guir.prefuse.activity.ActionList;
 import edu.berkeley.guir.prefuse.graph.DefaultEdge;
@@ -28,6 +30,8 @@ import edu.berkeley.guir.prefuse.graph.io.XMLGraphReader;
 import edu.berkeley.guir.prefuse.render.DefaultEdgeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.TextItemRenderer;
+import edu.berkeley.guir.prefusex.controls.MultiSelectFocusControl;
+import edu.berkeley.guir.prefusex.controls.YAxisDragControl;
 import edu.berkeley.guir.prefusex.distortion.FisheyeDistortion;
 
 /**
@@ -62,8 +66,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
     public TimelineDemo() {
         // 1a. Load the timeline data into graph
         try {
-            //graph = new XMLGraphReader().loadGraph(MUSIC_HISTORY);
-            graph = new /*Timeline*/XMLGraphReader().loadGraph(MUSIC_HISTORY);
+            graph = new XMLGraphReader().loadGraph(MUSIC_HISTORY);
         } catch (Exception e) {
             e.printStackTrace();
             return;
@@ -115,7 +118,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         final Display display = new Display(registry);
         display.setUseCustomTooltips(true);
         display.setSize(appWidth, appHeight);
-        
+        display.addControlListener(new MultiSelectFocusControl(registry));
         display.addControlListener(new YAxisDragControl());
 /*        display.addControlListener(new ControlAdapter() {
             private Point2D  m_tmp = new Point2D.Float();
@@ -189,7 +192,9 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
 
         public Paint getColor(VisualItem item) {
             if ( item instanceof NodeItem ) {
-                if ( item.isHighlighted() )
+                if (item.isFocus()) 
+                	return Color.MAGENTA;
+                else if ( item.isHighlighted() )
                     return pastelOrange;
                 else
                     return Color.BLACK;//Color.LIGHT_GRAY;
