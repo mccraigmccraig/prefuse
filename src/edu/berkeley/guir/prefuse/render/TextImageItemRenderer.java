@@ -39,6 +39,9 @@ public class TextImageItemRenderer extends ShapeRenderer {
 	protected String m_labelName = "label";
 	protected String m_imageName = "image";
 	
+	protected int m_arcWidth;
+	protected int m_arcHeight;
+	
 	protected int m_xAlign = ALIGNMENT_CENTER;
 	protected int m_yAlign = ALIGNMENT_CENTER;
 	protected int m_horizBorder = 3;
@@ -50,6 +53,7 @@ public class TextImageItemRenderer extends ShapeRenderer {
 	protected StringAbbreviator m_abbrev = StringAbbreviator.getInstance();
 	
     protected double m_imageSize = 1.0;
+    protected boolean m_showImages = true;
 	
 	protected Font m_font = new Font("SansSerif", Font.PLAIN, 10);
     protected RectangularShape m_imageBox  = new Rectangle2D.Float();
@@ -72,6 +76,8 @@ public class TextImageItemRenderer extends ShapeRenderer {
             ((RoundRectangle2D)m_imageBox)
                 .setRoundRect(0,0,10,10,arcWidth,arcHeight);                    
         }
+        m_arcWidth = arcWidth;
+        m_arcHeight = arcHeight;
     } //
 
 	/**
@@ -185,6 +191,7 @@ public class TextImageItemRenderer extends ShapeRenderer {
 	} //
 	
 	protected Image getImage(VisualItem item) {
+	    if ( !m_showImages ) return null;
 		String imageLoc = getImageLocation(item);
 		return ( imageLoc == null ? null : m_images.getImage(imageLoc) );
 	} //
@@ -200,26 +207,32 @@ public class TextImageItemRenderer extends ShapeRenderer {
         double is = size*m_imageSize;
 		double ih = (img==null ? 0 : is*img.getHeight(null));
 		double iw = (img==null ? 0 : is*img.getWidth(null));
-		
 		// get text dimensions
 		m_font = item.getFont();
         if ( size != 1 )
           m_font = FontLib.getFont(m_font.getName(), m_font.getStyle(),
-                      (int)Math.round(size*m_font.getSize()));
+                      			size*m_font.getSize());
         
 		String s = getText(item);
 		if ( s == null ) { s = ""; }
 		
         FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(m_font);
 		int th = fm.getHeight();
-		int tw = fm.stringWidth(s);
+		int tw = fm.stringWidth(s)+2;
 		
 		double w = tw + iw + 
                 size*(2*m_horizBorder + (tw>0 && iw>0 ? m_imageMargin : 0));
 		double h = Math.max(th, ih) + size*2*m_vertBorder;
 		
 		getAlignedPoint(m_tmpPoint, item, w, h, m_xAlign, m_yAlign);
-		m_imageBox.setFrame(m_tmpPoint.getX(),m_tmpPoint.getY(),w,h);
+		
+		if ( m_imageBox instanceof RoundRectangle2D ) {
+		    ((RoundRectangle2D)m_imageBox)
+            	.setRoundRect(m_tmpPoint.getX(),m_tmpPoint.getY(),w,h,
+            	        size*m_arcWidth,size*m_arcHeight);
+		} else {
+		    m_imageBox.setFrame(m_tmpPoint.getX(),m_tmpPoint.getY(),w,h);
+		}
 		return m_imageBox;
 	} //
 	
@@ -243,7 +256,7 @@ public class TextImageItemRenderer extends ShapeRenderer {
 		}
 		p.setLocation(x,y);
 	} //
-
+	
 	/**
 	 * @see edu.berkeley.guir.prefuse.render.Renderer#render(java.awt.Graphics2D, edu.berkeley.guir.prefuse.VisualItem)
 	 */
@@ -292,8 +305,8 @@ public class TextImageItemRenderer extends ShapeRenderer {
             
             m_transform.setTransform(is,0,0,is,x,y);
             g.drawImage(img, m_transform, null);
-
-			x += w + (s!=null ? size*m_imageMargin : 0);
+            
+			x += w + (s!=null && w>0 ? size*m_imageMargin : 0);
 			g.setComposite(comp);
 		}
         
@@ -303,7 +316,7 @@ public class TextImageItemRenderer extends ShapeRenderer {
 			g.setFont(m_font);
 			FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(m_font);
 			double y = r.getY() + (r.getHeight()-fm.getHeight())/2+fm.getAscent();
-			g.drawString(s, (float)x, (float)y);
+			g.drawString(s, (float)x+1, (float)y);
 		}
 	
         // now draw border
@@ -419,6 +432,20 @@ public class TextImageItemRenderer extends ShapeRenderer {
      */
     public void setImageSpacing(int s) {
         m_imageMargin = s;
+    } //
+    
+    /**
+     * @return Returns the m_showImages.
+     */
+    public boolean isShowImages() {
+        return m_showImages;
+    } //
+    
+    /**
+     * @param images The m_showImages to set.
+     */
+    public void setShowImages(boolean show) {
+        m_showImages = show;
     } //
     
 } // end of class TextImageItemRenderer

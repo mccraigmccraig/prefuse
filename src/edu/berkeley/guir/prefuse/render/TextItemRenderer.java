@@ -156,7 +156,7 @@ public class TextItemRenderer extends ShapeRenderer {
         double size = item.getSize();
         if ( size != 1 )
             m_font = FontLib.getFont(m_font.getName(), m_font.getStyle(),
-                    (int)Math.round(size*m_font.getSize()));
+                    size*m_font.getSize());
         
 		FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(m_font);
 		double h = fm.getHeight() + size*2*m_vertBorder;
