@@ -18,7 +18,7 @@ public abstract class AbstractGraph implements Graph {
 	
 	/**
 	 * Add a graph event listener.
-	 * @param fl the listener to add.
+	 * @param gl the listener to add.
 	 */
 	public void addGraphEventListener(GraphEventListener gl) {
 		m_graphListener = GraphEventMulticaster.add(m_graphListener, gl);
@@ -26,7 +26,7 @@ public abstract class AbstractGraph implements Graph {
   	
 	/**
 	 * Remove a focus listener.
-	 * @param fl the listener to remove.
+	 * @param gl the listener to remove.
 	 */
 	public void removeFocusListener(GraphEventListener gl) {
 		m_graphListener = GraphEventMulticaster.remove(m_graphListener, gl);

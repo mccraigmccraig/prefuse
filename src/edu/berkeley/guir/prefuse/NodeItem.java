@@ -213,8 +213,8 @@ public class NodeItem extends GraphItem {
 
 	/**
 	 * Inserts a new child at the specified location in this node's child list.
-	 * @param i
-	 * @param c
+	 * @param i index at which to add the child
+	 * @param e the Edge to the child
 	 */
 	public void addChild(int i, EdgeItem e) {
 		NodeItem n1 = e.getFirstNode();

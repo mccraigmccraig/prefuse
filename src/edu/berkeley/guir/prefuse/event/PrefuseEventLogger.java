@@ -378,7 +378,7 @@ public class PrefuseEventLogger implements ControlListener,
 	} //
 
     /**
-     * @see edu.berkeley.guir.prefuse.event.FocusListener#userFocusChanged(edu.berkeley.guir.prefuse.graph.Entity, edu.berkeley.guir.prefuse.graph.Entity)
+     * @see edu.berkeley.guir.prefuse.event.FocusListener#focusChanged(edu.berkeley.guir.prefuse.event.FocusEvent)
      */
     public void focusChanged(FocusEvent e) {
         logFocusEvent(e);

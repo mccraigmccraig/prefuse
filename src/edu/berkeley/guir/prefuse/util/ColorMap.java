@@ -43,7 +43,7 @@ public class ColorMap {
      * in the color map for values below the minimum, the last enty
      * for value above the maximum).
      * @param val the value for which to retrieve the corresponding color
-     * @return 
+     * @return the color (as a Paint instance) corresponding the given value
      */
     public Paint getColor(double val) {
         if ( val < minValue ) {

@@ -43,7 +43,7 @@ public class ForceDirectedLayout extends Layout {
     } //
     
     /**
-     * @see edu.berkeley.guir.prefuse.filter.PipelineComponent#process()
+     * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
      */
     public void run(ItemRegistry registry, double frac) {
         this.registry = registry;

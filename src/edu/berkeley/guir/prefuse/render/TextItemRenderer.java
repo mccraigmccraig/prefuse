@@ -103,7 +103,7 @@ public class TextItemRenderer extends ShapeRenderer {
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.render.Renderer#getRawShape(edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRawShape(edu.berkeley.guir.prefuse.GraphItem)
 	 */
 	protected Shape getRawShape(GraphItem item) {
 		if ( m_g == null ) { return null; }
@@ -140,7 +140,7 @@ public class TextItemRenderer extends ShapeRenderer {
 	} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.render.Renderer#getGraphicsSpaceTransform(edu.berkeley.guir.prefuse.GraphItem)
+	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getGraphicsSpaceTransform(edu.berkeley.guir.prefuse.GraphItem)
 	 */
 	protected AffineTransform getGraphicsSpaceTransform(GraphItem item) {
 		return null;

@@ -96,11 +96,10 @@ public class NBodyForce extends AbstractForce {
 	} //
 
 	/**
-	 * Initialize the simulation with the NodeItem instances contained in the
-	 * input iterator. After this call has been made, the simulation can
-	 * be queried for the n-body force on a given item.
-	 * @param itemIter an iterator of NodeItem instances to be included in the
-	 *  n-body simulation.
+	 * Initialize the simulation with the provided enclosing simulation. After
+     * this call has been made, the simulation can be queried for the 
+     * n-body force on a given item.
+	 * @param fsim the enclosing ForceSimulator
 	 */
 	public void init(ForceSimulator fsim) {
 		clear(); // clear internal state
@@ -135,7 +134,7 @@ public class NBodyForce extends AbstractForce {
 
 	/**
 	 * Inserts an item into the quadtree.
-	 * @param p the item to add.
+	 * @param item the ForceItem to add.
 	 * @throws IllegalStateException if the current location of the item is
 	 *  outside the bounds of the quadtree
 	 */

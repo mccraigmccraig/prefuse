@@ -91,7 +91,7 @@ public class IndentedTreeLayout extends TreeLayout {
     } //
     
 	/**
-	 * @see edu.berkeley.guir.prefuse.filter.AbstractPipelineComponent#process()
+	 * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
 	 */
 	public void run(ItemRegistry registry, double frac) {
         m_registry = registry;
@@ -297,7 +297,7 @@ public class IndentedTreeLayout extends TreeLayout {
 	/**
 	 * Set the (x,y) co-ordinates of the given node. Updates aggregated
 	 * items as well as visible items.
-	 * @param n the node to set the position for
+	 * @param item the item to set the position for
 	 * @param x the x-coordinate of the node
 	 * @param y the y-coordinate of the node
 	 */

@@ -21,7 +21,7 @@ import edu.berkeley.guir.prefuse.graph.TreeNode;
 public class TreeAggregateFilter extends AbstractAction {
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.filter.AbstractPipelineComponent#process()
+	 * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
 	 */
 	public void run(ItemRegistry registry, double frac) {
 		Tree t = (Tree)registry.getGraph();

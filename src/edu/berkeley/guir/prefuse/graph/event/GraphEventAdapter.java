@@ -23,7 +23,7 @@ public class GraphEventAdapter implements GraphEventListener {
 	public void nodeRemoved(Node n) {} //
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeSwapped(edu.berkeley.guir.prefuse.graph.Node, edu.berkeley.guir.prefuse.graph.Node)
+	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#nodeReplaced(edu.berkeley.guir.prefuse.graph.Node, edu.berkeley.guir.prefuse.graph.Node)
 	 */
 	public void nodeReplaced(Node o, Node n) {} //
 
@@ -36,9 +36,9 @@ public class GraphEventAdapter implements GraphEventListener {
 	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeRemoved(edu.berkeley.guir.prefuse.graph.Edge)
 	 */
 	public void edgeRemoved(Edge e) {} //
-
+    
 	/**
-	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeSwapped(edu.berkeley.guir.prefuse.graph.Edge)
+	 * @see edu.berkeley.guir.prefuse.graph.event.GraphEventListener#edgeReplaced(edu.berkeley.guir.prefuse.graph.Edge, edu.berkeley.guir.prefuse.graph.Edge)
 	 */
 	public void edgeReplaced(Edge o, Edge n) {} //
 

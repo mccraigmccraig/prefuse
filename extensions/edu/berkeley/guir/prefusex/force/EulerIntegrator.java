@@ -12,7 +12,7 @@ import java.util.Iterator;
 public class EulerIntegrator implements Integrator {
     
     /**
-     * @see edu.berkeley.guir.prefusex.force.Integrator#integrate(edu.berkeley.guir.prefusex.force.ForceItem)
+     * @see edu.berkeley.guir.prefusex.force.Integrator#integrate(edu.berkeley.guir.prefusex.force.ForceSimulator, long)
      */
     public void integrate(ForceSimulator sim, long timestep) {
         float speedLimit = sim.getSpeedLimit();

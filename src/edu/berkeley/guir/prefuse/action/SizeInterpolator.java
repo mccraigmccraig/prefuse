@@ -18,7 +18,7 @@ public class SizeInterpolator extends AbstractAction {
 	public static final String ATTR_ANIM_FRAC = "animationFrac";
 
 	/**
-	 * @see edu.berkeley.guir.prefuse.filter.AbstractPipelineComponent#process()
+	 * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
 	 */
 	public void run(ItemRegistry registry, double frac) {
 		double ss, es, s;		

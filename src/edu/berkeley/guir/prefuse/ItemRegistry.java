@@ -550,8 +550,8 @@ public class ItemRegistry {
 	/**
 	 * Returns the visualized AggregateItem associated with the given Node,
 	 * if any.
-	 * @param node the Node to look up
-	 * @return AggregateItem the AggregateItem associated with the node, if any
+	 * @param entity the Entity to look up
+	 * @return the AggregateItem associated with the entity, if any
 	 */
 	public synchronized AggregateItem getAggregateItem(Entity entity) {
 		return (AggregateItem)getItem(DEFAULT_AGGR_CLASS, entity, false);
@@ -562,10 +562,10 @@ public class ItemRegistry {
 	 * any. If create is true, creates the desired AggregateItem and adds it to
 	 * the registry, and removes any previous bindings associated with the
 	 * Entity.
-	 * @param node the Node to look up
+	 * @param entity the Entity to look up
 	 * @param create if true, a new AggregateItem will be allocated if 
 	 *  necessary
-	 * @return AggregateItem the AggregateItem associated with the node, if any
+	 * @return AggregateItem the AggregateItem associated with the entity, if any
 	 */
 	public synchronized AggregateItem getAggregateItem(Entity entity, boolean create) {
 		return (AggregateItem)getItem(DEFAULT_AGGR_CLASS, entity, create);

@@ -47,7 +47,7 @@ public class VerticalTreeLayout extends TreeLayout {
     } //
     
 	/**
-	 * @see edu.berkeley.guir.prefuse.layout.AbstractTreeLayout#layout(edu.berkeley.guir.prefuse.graph.Tree, edu.berkeley.guir.prefuse.ItemRegistry)
+	 * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
 	 */
 	public void run(ItemRegistry registry, double frac) {
         m_registry = registry;
@@ -102,18 +102,17 @@ public class VerticalTreeLayout extends TreeLayout {
 	} //
 	
 	/**
-	 * Compute the layout.
-	 * @param n
-	 * @param r
-	 * @param theta1
-	 * @param theta2
+	 * Recursivel compute the layout.
+	 * @param n the parent NodeItem
+	 * @param h the current height (depth in the display)
+	 * @param x1 the minimum breadth co-ordinate
+     * @param x2 the maximum breadth co-ordinate
 	 */
-	protected void layout(NodeItem n, int h, double x2, double x1) {
+	protected void layout(NodeItem n, int h, double x1, double x2) {
 		int numDescendants = getVisibleDescendants(n), i = 0;
 
-		if ( numDescendants == 0 ) {
+		if ( numDescendants == 0 )
 			return;
-		}
 
 		double dx  = (x2-x1);
 		double dx2 = dx / 2.0;

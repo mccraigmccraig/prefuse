@@ -501,10 +501,9 @@ public class Display extends JComponent {
 	} //
     
 	/**
-	 * Returns the GraphItem located at (x,y).
-	 * @param x the x coordinate
-	 * @param y the y coordinate
-	 * @return the GraphItem located at (x,y), if any
+	 * Returns the GraphItem located at the given point.
+	 * @param p the Point at which to look
+	 * @return the GraphItem located at the given point, if any
 	 */
 	public GraphItem findItem(Point p) {
         Point2D p2 = (m_itransform==null ? p : 
@@ -714,12 +713,12 @@ public class Display extends JComponent {
      * @param r Rectangle representing the desired bounding box of the text
      *  editing widget
      */
-    public void editText(GraphItem nitem, String attribute, Rectangle r) {
+    public void editText(GraphItem item, String attribute, Rectangle r) {
         if ( m_editing ) { stopEditing(); }
-        String txt = nitem.getAttribute(attribute);
-        m_editItem = nitem;
+        String txt = item.getAttribute(attribute);
+        m_editItem = item;
         m_editAttribute = attribute;
-        Paint c = nitem.getColor(), fc = nitem.getFillColor();
+        Paint c = item.getColor(), fc = item.getFillColor();
         if ( c instanceof Color )
             m_editor.setForeground((Color)c);
         if ( fc instanceof Color )

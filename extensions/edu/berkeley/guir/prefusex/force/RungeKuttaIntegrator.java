@@ -13,7 +13,7 @@ import java.util.Iterator;
 public class RungeKuttaIntegrator implements Integrator {
     
     /**
-     * @see edu.berkeley.guir.prefusex.force.Integrator#integrate(edu.berkeley.guir.prefusex.force.ForceItem, long)
+     * @see edu.berkeley.guir.prefusex.force.Integrator#integrate(edu.berkeley.guir.prefusex.force.ForceSimulator, long)
      */
     public void integrate(ForceSimulator sim, long timestep) {
         float speedLimit = sim.getSpeedLimit();

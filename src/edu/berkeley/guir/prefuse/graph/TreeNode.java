@@ -82,7 +82,7 @@ public class TreeNode extends Node {
 	 * Nodes are considered descendants of themselves (i.e.
 	 * <tt>n.isDescendant(n)</tt> will always be true).
 	 * @param n
-	 * @return
+	 * @return true if the givn node is a descendant, false otherwise
 	 */
 	public boolean isDescendant(TreeNode n) {
 		while ( n != null ) {
@@ -273,8 +273,8 @@ public class TreeNode extends Node {
 
 	/**
 	 * Inserts a new child at the specified location in this node's child list.
-	 * @param i
-	 * @param c
+	 * @param i the index at which to add the child
+	 * @param e the Edge to the child
 	 */
 	public void addChild(int i, Edge e) {
 		Entity n1 = (Entity)e.getFirstNode();

@@ -60,42 +60,48 @@ public class DefaultRendererFactory implements RendererFactory {
 	} //
 	
 	/**
-	 * @return
+     * Returns the Renderer for AggregateItems
+	 * @return the Renderer for AggregateItems
 	 */
 	public Renderer getAggregateRenderer() {
 		return m_aggrRenderer;
 	} //
 
 	/**
-	 * @return
+     * Returns the Renderer for EdgeItems
+	 * @return the Renderer for EdgeItems
 	 */
 	public Renderer getEdgeRenderer() {
 		return m_edgeRenderer;
 	} //
 
 	/**
-	 * @return
+     * Returns the Renderer for NodeItems
+	 * @return the Renderer for NodeItems
 	 */
 	public Renderer getNodeRenderer() {
 		return m_nodeRenderer;
 	} //
 
 	/**
-	 * @param renderer
+     * Sets the Renderer for AggregateItems
+	 * @param renderer the new Renderer for AggregateItems
 	 */
 	public void setAggregateRenderer(Renderer renderer) {
 		m_aggrRenderer = renderer;
 	} //
 
 	/**
-	 * @param renderer
+     * Sets the Renderer for EdgeItems
+	 * @param renderer the new Renderer for EdgeItems
 	 */
 	public void setEdgeRenderer(Renderer renderer) {
 		m_edgeRenderer = renderer;
 	} //
 
 	/**
-	 * @param renderer
+     * Sets the Renderer for NodeItems
+	 * @param renderer the new Renderer for NodeItems
 	 */
 	public void setNodeRenderer(Renderer renderer) {
 		m_nodeRenderer = renderer;

@@ -11,8 +11,6 @@ import java.awt.Paint;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Iterator;
 
 import javax.swing.JFrame;
@@ -23,7 +21,6 @@ import edu.berkeley.guir.prefuse.EdgeItem;
 import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
-import edu.berkeley.guir.prefuse.PrefuseContainer;
 import edu.berkeley.guir.prefuse.action.ColorFunction;
 import edu.berkeley.guir.prefuse.action.ColorInterpolator;
 import edu.berkeley.guir.prefuse.action.FisheyeTreeFilter;
@@ -67,7 +64,6 @@ public class BalloonGraphDemo {
 	public static Tree tree;
 	public static Display display;
     public static ActionPipeline pipeline, animate, animate2;
-	public static PrefuseContainer container;
     
     private static Font frameCountFont = new Font("SansSerif", Font.PLAIN, 14);
 		
@@ -125,6 +121,8 @@ public class BalloonGraphDemo {
 			display.setRegistry(registry);
 			display.setSize(700,700);
 			display.setBackground(Color.WHITE);
+            display.setFont(new Font("SansSerif",Font.PLAIN,10));
+            display.getTextEditor().addKeyListener(controller);
 			display.addControlListener(controller);
             display.addControlListener(new PanHandler());
             display.addControlListener(new ZoomHandler());
@@ -155,18 +153,11 @@ public class BalloonGraphDemo {
 			registry.getDefaultFocusSet().set(tree.getRoot());			
 
 			// create and display application window
-			container = new PrefuseContainer(display);
-			container.setFont(new Font("SansSerif",Font.PLAIN,10));
-			container.setBackground(Color.WHITE);
-			container.getTextEditor().addKeyListener(controller);
+
 			
 			JFrame frame = new JFrame("BalloonTree");
-			frame.addWindowListener(new WindowAdapter() {
-				public void windowClosing(WindowEvent e) {
-					System.exit(0);
-				}
-			});
-			frame.getContentPane().add(container, BorderLayout.CENTER);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.getContentPane().add(display, BorderLayout.CENTER);
 			frame.pack();
 			frame.setVisible(true);
 			
@@ -252,7 +243,7 @@ public class BalloonGraphDemo {
 						runPipeline();						
 					}
 				} else if ( cc == 2 ) {
-					container.editText(item, nameField);
+					display.editText(item, nameField);
 				}
 			}
 		} //
@@ -261,7 +252,7 @@ public class BalloonGraphDemo {
 		} //
 		public void keyReleased(KeyEvent e) {
 			if ( e.getKeyCode() == KeyEvent.VK_ENTER ) {
-				container.stopEditing();
+				display.stopEditing();
 				runPipeline();
 			}
 		} //

@@ -12,7 +12,8 @@ import edu.berkeley.guir.prefuse.event.ActivityListener;
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
- * @see edu.berkeley.guir.prefuse.activity.ActivityManager, edu.berkeley.guir.prefuse.activity.ActionPipeline
+ * @see edu.berkeley.guir.prefuse.activity.ActivityManager
+ * @see edu.berkeley.guir.prefuse.activity.ActionPipeline
  */
 public abstract class Activity {
 
@@ -41,7 +42,7 @@ public abstract class Activity {
      * Creates a new Activity.
      * @param duration the length of this activity.
      *  A value of -1 indicates an infinite running time.
-     * @see edu.berkeley.guir.prefuse.action.Activity#Activity(long,long,long)     
+     * @see edu.berkeley.guir.prefuse.activity.Activity#Activity(long, long, long)     
      */
     public Activity(long duration) {
         this(duration, DEFAULT_STEP_TIME);
@@ -52,7 +53,7 @@ public abstract class Activity {
      * @param duration the length of this activity.
      *  A value of -1 indicates an infinite running time.
      * @param stepTime the delay time between steps of this activity
-     * @see edu.berkeley.guir.prefuse.action.Activity#Activity(long,long,long)
+     * @see edu.berkeley.guir.prefuse.activity.Activity#Activity(long, long, long)
      */
     public Activity(long duration, long stepTime) {
         this(duration, stepTime, System.currentTimeMillis());
