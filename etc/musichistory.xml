@@ -1,0 +1,260 @@
+<!-- created by Jack : July 1, 2004 -->
+<graph directed="0">
+  <!-- nodes -->
+  <node id="early" label="Early Music">
+	<att name="nodetype" value="period"/>
+    <att name="startyear" value="timeline_start"/>
+    <att name="endyear" value="800"/>
+    <att name="comments" value="Although music has undoubtedly been a feature of human society for many thousands of years, not very much is known about its early history. It is not until the time of some of the ancient civilzations that writings and sometimes pictures and artifacts have recorded the use of musical instruments. It is assumed that some music may have been improvisatory and that any technical aspects of music will have been passed via oral traditions, experienced musicians passing their skills by example to students. In this respect, the learning of musical techniques is no different from other skills. \n\nIn the later centuries of this period, formal musical traditions were being incubated in catholic monasteries of the time, and the church was to play a major role in the subsequent development of music. A formal approach to the unaccompanied singing of religious texts in Latin was devloped, called 'Gregorian Chant' named after Pope Gregory I of the 6th Centruy AD. This singing or 'plainsong' often centered around a single note with a few notes either side of it. The equivalent keys used at this time were called 'Modes' which roughly correspons to scales starting on different white notes on a piano."/>
+</node>
+  <node id="christianity" label="Christianity">
+	<att name="nodetype" value="event"/>
+    <att name="startyear" value="325"/>
+    <att name="endyear" value="325"/>
+    <att name="comments" value="Constantine declares Christianity the official religion of the Roman Empire. The spread of Christianity in the western world spurred the development of European music."/>
+</node>
+  <node id="chant" label="Gregorian chant">
+	<att name="nodetype" value="event"/>
+    <att name="startyear" value="600"/>
+    <att name="endyear" value="600"/>
+    <att name="comments" value="Pope Gregory the Great codifies and collects the chant, which is used in Roman Catholic services and is named the Gregorian chant in his honor."/>
+</node>
+  <node id="medieval" label="Medieval or Gothic">
+	<att name="nodetype" value="period"/>
+    <att name="startyear" value="800"/>
+    <att name="endyear" value="1430"/>
+    <att name="comments" value="Over the years many human endeavours have had the benefit of language. In particular a written language can convey a lot of information about past events, places, people and things. But it is difficult to describe music in words, and even more difficult to specify a tune. It was the development of a standard musical notation in the 11th century that allowed music to be documented in a physical form. Now music could be communicated efficiently, and succeeding generations would know something about the music of their ancestors.\n\nIt was the demands of the church that required a musical notation, and so it was Church Music which was initially written in this form. The plainchant of this time was still unaccompanied, but new developments were starting to appear. The singing might alternate between two parts for solo singers or choirs, or two parts might be sung together in a style called 'Organum.' In early Organum a second part simply followed the main part at a fixed interval so that the two parts moved in parallel. Later the supporting parts became more independent of the main one and this freedom led to early forms of harmony. Outside of the church's influence, Minstrels and Troubadours were entertaining in the castles of Europe, with music and song a key part of their unwritten repertoire.\n\nComposers from this period were usually monks, and mostly their names were not written down. Among the few names we do know about today are Hildegard von Bingen (a nun and Abbess) and Guillaume de Machaut."/>
+</node>
+  <node id="polyphony" label="polyphony">
+	<att name="nodetype" value="event"/>
+    <att name="startyear" value="850"/>
+    <att name="endyear" value="850"/>
+    <att name="comments" value="Western music begins to move from monophony to polyphony with the vocal parts in church music moving in parallel intervals."/>
+</node>
+  <node id="solfege" label="solfege">
+	<att name="nodetype" value="event"/>
+    <att name="startyear" value="1030"/>
+    <att name="endyear" value="1030"/>
+    <att name="comments" value="Italian monk Guido of Arezzo develops solfege, a system for learning music by ear. In the 19th century, solfege developed into the tonic sol-fa system used today."/>
+</node>
+  <node id="renaissance" label="Renaissance">
+	<att name="nodetype" value="period"/>
+    <att name="startyear" value="1430"/>
+    <att name="endyear" value="1562"/>
+    <att name="comments" value="aka 'The Rebirth,' This period is well-known as a time of rapid development in all forms of learning and the arts. There was a new self-sustaining freedom of expression which spread throughout much of Europe, and incubated many new ideas and schools of thought. The church was still very powerful and its influence was everywhere, yet the reformation brought a degree of freedom to religious thinking and some hymns which we recognise today were written in this period. A shift in power also meant that the secular needs of the Royal Courts were as important as those of the church in sponsoring new musical material. So as well as music for the Mass, there were Motets and Madrigals setting texts and verse to music, as well as a number of dance forms. Music styles became more complex with multiple parts for different instruments and further developments in harmony. Instruments such as the recorder and lute were common as well as early versions of today's instruments. The creativity of this period was given further impetus by the invention of the printing press which brought standardisation to the previously hand-written forms of musical notation, and allowed many more copies to be made.\n\nKey composers of this period include Thomas Tallis, William Byrd, John Taverner, Josquin des Prez and Giovanni Palestrina."/>
+</node>
+  <node id="josquin" label="Josquin Desprez">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1440"/>
+    <att name="endyear" value="1521"/>
+    <att name="comments" value="Often called the Prince of Music, Josquin was the leading composer of the Renaissance, being the most varied in invention and the most profound in expression. He worked for ducal courts in Italy and France, at the Sistine Chapel and for kings Louis XI and Louis XII."/>
+</node>
+  <node id="josquin1" label="Early Josquin">
+	<att name="nodetype" value="period"/>
+    <att name="startyear" value="1474"/>
+    <att name="endyear" value="1485"/>
+    <att name="comments" value="Josquin's first period is characterized by abstract, melismatic counterpoint in the manner of Ockeghem (1410-1497) and by tenuous relationships between words and music."/>
+</node>
+  <node id="josquin2" label="Middle Josquin">
+	<att name="nodetype" value="period"/>
+    <att name="startyear" value="1485"/>
+    <att name="endyear" value="1505"/>
+    <att name="comments" value="Josquin's middle period saw the development and perfection of the technique of pervasive imitation based on word-generated motifs. This style has been seen as a synthesis of two traditions: the northern polyphony of Dufay, Busnois and Ockeghem, in which he presumable had his earliest training, and the more chordal, harmonically orientated practice of Italy."/>
+</node>
+  <node id="josquin3" label="Final Josquin">
+	<att name="nodetype" value="period"/>
+    <att name="startyear" value="1505"/>
+    <att name="endyear" value="1521"/>
+    <att name="comments" value="In the final period, the relationship between word and note becomes even closer and there is increasing emphasis on declamation and rhetorical expression within a style of the utmost economy."/>
+</node>
+  <node id="counter-reformation" label="Counter-Reformation">
+	<att name="nodetype" value="period"/>
+    <att name="startyear" value="1562"/>
+    <att name="endyear" value=""/>
+    <att name="comments" value="Lead by Pope Pius IV, a period that restored church music to its pure vocal form by eliminating all instruments except the organ, any evidence of secularism, harmony and folk melody."/>
+</node>
+  <node id="palestrina" label="Giovanni Pierluigi da Palestrina">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1525"/>
+    <att name="endyear" value="1594"/>
+    <att name="comments" value="Helped satisfy Pope Pius IV's Counter-Reformation by creating a spiritual style that legend says 'saved polyphony' exemplified in his famous and enchanting piece, Pope Marcellus Mass."/>
+</node>
+  <node id="missapapaemarcelli" label="Missa Papae Marcelli">
+	<att name="nodetype" value="piece"/>
+    <att name="startyear" value="1565"/>
+    <att name="endyear" value="1565"/>
+    <att name="comments" value="Palestrina's most famous work."/>
+</node>
+  <node id="castrationbegins" label="Castration begins">
+	<att name="nodetype" value="event"/>
+    <att name="startyear" value="1565"/>
+    <att name="endyear" value="1565"/>
+    <att name="comments" value="Castration emerges as a way of preserving the sound of a woman's voice in Italian music. St. Paul's dictum prohibited women from singing on stage in churches."/>
+</node>
+  <node id="castrationcommon" label="Castration becomes commonplace">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1574"/>
+    <att name="endyear" value="1574"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="madrigals" label="Madrigal movement begins">
+	<att name="nodetype" value="event"/>
+    <att name="startyear" value="1588"/>
+    <att name="endyear" value="1588"/>
+    <att name="comments" value="Led by Thomas Morley, the English Madrigal School is firmly established. Madrigals often told stories of love or grief."/>
+</node>
+  <node id="morley" label="Thomas Morley">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1557"/>
+    <att name="endyear" value="1602"/>
+    <att name="comments" value="Significant contributor to the development of the English madrigal, imitated from Italian models."/>
+</node>
+  <node id="opera" label="Opera">
+	<att name="nodetype" value="event"/>
+    <att name="startyear" value="1590"/>
+    <att name="endyear" value="1604"/>
+    <att name="comments" value="A group of musicians and intellectuals gather in Count Giovanni de Bardi's camerata (salon) and discuss and experiment with music drama. It is during this period that opera is born."/>
+</node>
+  <node id="daphne" label="Daphne">
+	<att name="nodetype" value="piece"/>
+    <att name="startyear" value="1598"/>
+    <att name="endyear" value="1598"/>
+    <att name="comments" value="Jacopo Peri composes the first opera (Italian)."/>
+</node>
+  <node id="baroque" label="Baroque">
+	<att name="nodetype" value="event"/>
+    <att name="startyear" value="1600"/>
+    <att name="endyear" value="1750"/>
+    <att name="comments" value="The word Baroque comes from the Portuguese word for 'misshapen pearl' often tied closely with the word 'ornate.'In general, the period desires to evoke emotional states by appealing to the senses."/>
+</node>
+  <node id="baroqueearly" label="Early Baroque">
+	<att name="nodetype" value="event"/>
+    <att name="startyear" value="1600"/>
+    <att name="endyear" value="1680"/>
+    <att name="comments" value="The most important figure of the Early Baroque period was Claudio Monteverdi, who had dramatic styles of madrigals."/>
+</node>
+  <node id="monteverdi" label="Claudio Monteverdi">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1567"/>
+    <att name="endyear" value="1643"/>
+    <att name="comments" value="The lead figure of Early Baroque, Monteverdi transformed music through his imaginative development of traditional forms. In particular, the dramatic styles of his madrigals (vocal compositions) anticipates the solo cantata and operatic recitative (a singing style that resembles speech) of the Late Baroque period. Monteverdi was also the earliest significant composer of opera."/>
+</node>
+  <node id="caccini" label="Francesca Caccini">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1587"/>
+    <att name="endyear" value="1640"/>
+    <att name="comments" value="The first known female composer of an opera. Her most famous work is La Liberazione di Ruggiero."/>
+</node>
+  <node id="baroquelate" label="Late Baroque">
+	<att name="nodetype" value="event"/>
+    <att name="startyear" value="1680"/>
+    <att name="endyear" value="1750"/>
+    <att name="comments" value="The greatest legacy handed down by this period is its enormous wealth of operas and oratorios. Other major musical contributions of the Late Baroque era were various dance forms such as the minuet, gigue, courante, allemande and sarabande. These dances reflected movements that were ornamental, which was another key feature of this particular time in the history of music. The concerto grosso, key instrumental form, reflects the contrast between two groups of instruments: the concertino/concertante (a small body of string soloists) and the ripieno, a larger section. It was from this early concerto form that the later Classical and Romantic concertos developed."/>
+</node>
+  <node id="vivaldi" label="Antonio Vivaldi">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1678"/>
+    <att name="endyear" value="1741"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="fourseason" label="The Four Seasons">
+	<att name="nodetype" value="piece"/>
+    <att name="startyear" value="1725"/>
+    <att name="endyear" value="1725"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="bach" label="Johann Sebastian Bach">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1685"/>
+    <att name="endyear" value="1750"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="handel" label="Georg Frideric Handel">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1685"/>
+    <att name="endyear" value="1750"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="messiah" label="Messiah">
+	<att name="nodetype" value="piece"/>
+    <att name="startyear" value="1741"/>
+    <att name="endyear" value="1741"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="classical" label="Classical">
+	<att name="nodetype" value="period"/>
+    <att name="startyear" value="1750"/>
+    <att name="endyear" value="1803"/>
+    <att name="comments" value="Music from the Classical period is distinguished by the use of dynamic contrast to accent suspension and return to the tonic. Baroque music is heavier with complex figurations and Romantic music is more emotionally intense with less predictable forms. Towards the end of the Baroque period, some composers were already setting off in new directions. The sons of Bach (CPE and JC) for example were already seeking new avenues away from the styles of their father, and a freer movement of artists and musicians between European countries helped to give them inspiration. During this classical period, the forms instigated by the church were still there, but for the most part the major composers of the day worked for the royalty or nobility of the time. Nevertheless public concerts were becoming more popular during this time, and concert halls and opera houses were attended in all major cities.\n\nIt is in this period that many familiar 'forms' were conceived, and the music of this time was often thought of as being abstract and pure rather than depicting anything in particular. Indeed instrumental music was more common than vocal forms. The concept of a 'Theme and Variations' reached its zenith in this period, 'Sonata Form' was the foundation of Symphonies, Concertos and String Quartets as well as Sonatas, and works were not given titles but merely called things like 'Piano Concerto No. 1 in C major.' Classical music was written specifcally for the sake of music; there is no grand design or emotion built into it. The strict definition of form (and the concept of music being abstract and detached) was seen as a major constraint by some later composers, but allowed the great composers of the day the creative tools to build many acknowledged masterpieces.\n\nThe great composers of this period were Carl Philipp Emmanuel Bach, Johann Christian Bach, Johann Stamitz, Franz Joseph Haydn, Wolfgang Amadeus Mozart, Luigi Boccherini and Christoph von Gluck with others such as Franz Schubert and especially Ludwig van Beethoven being seen as transitional and indeed instrumental in bringing about the Romantic period."/>
+</node>
+  <node id="haydn" label="Joseph Haydn">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1732"/>
+    <att name="endyear" value="1809"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="mozart" label="Wolfgang Amadeus Mozart">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1756"/>
+    <att name="endyear" value="1791"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="beethoven" label="Ludwig van Beethoven">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1770"/>
+    <att name="endyear" value="1827"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="eroica" label="'Eroica' Symphony No. 3 in E-flat">
+	<att name="nodetype" value="piece"/>
+    <att name="startyear" value="1803"/>
+    <att name="endyear" value="1803"/>
+    <att name="comments" value="This piece marks the beginning of the Romantic period, in which the formality of the Classical period is replaced by subjectivity."/>
+</node>
+  <node id="romantic" label="Romantic">
+	<att name="nodetype" value="period"/>
+    <att name="startyear" value="1803"/>
+    <att name="endyear" value="1910"/>
+    <att name="comments" value="The Romantic era was another period of rapid evolution in music. From the foundations laid down by the Classical masters, composers were now composing from the heart. The fact that composers were no longer employees but independent meant that they could follow their own direction, composing music that pleased themselves. Of course composers still had to live so they accepted commissions, made deals with publishing houses, composed music with commercial value, and promoted their own music through concerts across Europe and other parts of the world. Many composers of the time were also very skilled performers or conductors and would therefore go on tour with their new works. Thus composers were among the celebrities of the time, and there a degree of showmanship involved with ever longer and more elaborate works played by huge orchestras and choirs.\n\nPlayed using 'modern instruments' the music of this period is very familiar to us today, especially those 'popular favourites' which are still played frequently today. The language of this music is also familiar from its influence on music for film and television. That it was able to make this transition was the result of its dramatic power and ability to convey both the extremes and subtleties of emotion. This kind of power needed new techniques and audiences heard ever more complex harmonies and rhythms, and the 'leitmotif' was invented. Many composers sought new directions, and different 'schools of thought' branched out in different directions. Examples of this being the 'impressionists' who used notes to paint musical pictures or impressions, and the 'nationals' who embraced the folk tunes and styles of their own countries. Classical forms were also stretched so that for some composers the symphony became a symphonic or tone poem, which might tell a story for example. Not all the music of this time was orchestral. Chamber music for smaller forces was also very common, and musical miniatures for solo instruments or singers could be heard in smaller venues or played by ordinary people.\n\nAs well as Beethoven and Schubert, composers of the Romantic period include Frederic Chopin, Felix Mendelssohn, Hector Berlioz, Johannes Brahms, Edvard Grieg, Antonin Dvorak, Robert Schumann, Georges Bizet, Giuseppe Verdi, Richard Wagner, Franz Liszt, Pyotr Tchaikovsky, Anton Bruckner, Gustav Mahler, Erik Satie, Claude Debussy."/>
+</node>
+  <node id="symphony5" label="Symphony No. 5 in c">
+	<att name="nodetype" value="piece"/>
+    <att name="startyear" value="1807"/>
+    <att name="endyear" value="1807"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="nyphil" label="New York Philharmonic">
+	<att name="nodetype" value="event"/>
+    <att name="startyear" value="1839"/>
+    <att name="endyear" value="1839"/>
+    <att name="comments" value="New York Philharmonic established"/>
+</node>
+  <node id="wagner" label="Richard Wagner">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1813"/>
+    <att name="endyear" value="1883"/>
+    <att name="comments" value=""/>
+</node>
+  <node id="ringcycle" label="Der Ring des Nibelungen (The Ring Cycle)">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value="1853"/>
+    <att name="endyear" value="1853"/>
+    <att name="comments" value="The librettos to The Ring Cycle are published: Das Rheingold, Die Walkure, Seigfried and Die Gotterdamerung"/>
+</node>
+  <node id="modern" label="Modern or Contemporary">
+	<att name="nodetype" value="period"/>
+    <att name="startyear" value="1910"/>
+    <att name="endyear" value="timeline_end"/>
+    <att name="comments" value="If the Romantic period saw the start of some fragmentation into different schools, this trend continued and accelerated into the modern era. There were those who continued to develop older traditions: the neo-classicists, the late romantics and the impressionist schools still prevailed, and those who took a new path with atonal music, serialism and later with experimental and minimalist music. Some composers created thematic material which could hardly be called 'melodies,' introducing dissonant intervals and different scales, and unusual rhythms and cross-rhythms were explored. There were composers, considered extreme by some audiences, who used traditional instruments in unconventional ways, overturned principles previously considered fundamental, and questioned the roles of composer, musician and listener. Experimental composers used randomization techniques, or gave unusual instructions which might not include any conventional musical notation at all.\n\nWhile classical music became more elite, popular music (which had been around for centuries) found a new mass audience, with the advent of recordings, radio and television. These new media had an insatiable demand for music, and film music in particular required much original music and recruited composers educated in the classical traditions. Popular music in turn had a strong influence on serious music, and jazz and other ideas became incorporated into the concert repertoire. The same electricity which powered the new media, also fuelled new gadgets for amplification and powered new instruments such as the electric guitar and synthesisers. More recently it has become possible to create and manipulate sound solely within computers, in a similar way to their use for creating graphics and animations for those same media. With all these developments music is much more accessible around the world, and as styles and techniques are invented, re-invented and combined this in turn stimulates further invention and discovery.\n\nComposers of the modern period include Richard Strauss, Edward Elgar, William Walton, Ralph Vaughan Williams, Erich Wolfgang Korngold, Sergei Rachmaninov, Zoltan Kodaly, Igor Stravinsky, Bela Bartok, George Gershwin, Maurice Ravel, Francois Poulenc, Arnold Schoenberg, Alban Berg, Anton Webern, Sergei Prokofiev, Dmitri Shostakovich, John Cage, Philip Glass, Michael Nyman, Leonard Bernstein, Pierre Boulez, Benjamin Britten, Henryk Gorecki, John Corigliano, Aaron Copland, John Williams, Georges Auric, Darius Milhaud, Malcolm Arnold."/>
+</node>
+  <node id="" label="???">
+	<att name="nodetype" value="person"/>
+    <att name="startyear" value=""/>
+    <att name="endyear" value=""/>
+    <att name="comments" value=""/>
+</node>
+
+  <!-- edges -->
+  <edge source="al-shehhi" target="halghamdi" weight="1"></edge>
+  <edge source="al-shehhi" target="raissi" weight="2"></edge>
+</graph>
