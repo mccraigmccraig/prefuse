@@ -99,21 +99,28 @@ public class ForceDirectedLayout extends Layout {
     } //
 
     private void updateNodePositions() {
+        Rectangle2D bounds = getLayoutBounds(registry);
+        double x1=0, x2=0, y1=0, y2=0;
+        if ( bounds != null ) {
+            x1 = bounds.getMinX(); y1 = bounds.getMinY();
+            x2 = bounds.getMaxX(); y2 = bounds.getMaxY();
+        }
+        
         // update positions
         Iterator iter = registry.getNodeItems();
         while ( iter.hasNext() ) {
             NodeItem  nitem = (NodeItem)iter.next();
-            if ( nitem.isFixed() )
+            if ( nitem.isFixed() ) {
+                if ( Double.isNaN(nitem.getX()) )
+                    setLocation(nitem,null,0.0,0.0);
                 continue;
+            }
             
             ForceItem fitem = (ForceItem)nitem.getVizAttribute("forceItem");
             double x = fitem.location[0];
             double y = fitem.location[1];
             
-            if ( m_enforceBounds ) {
-                Rectangle2D bounds = getLayoutBounds(registry);
-                double x1 = bounds.getMinX(), y1 = bounds.getMinY();
-                double x2 = bounds.getMaxX(), y2 = bounds.getMaxY();
+            if ( m_enforceBounds && bounds != null) {
                 if ( x > x2 ) x = x2;
                 if ( x < x1 ) x = x1;
                 if ( y > y2 ) y = y2;
