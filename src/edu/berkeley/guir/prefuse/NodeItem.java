@@ -151,11 +151,11 @@ public class NodeItem extends GraphItem {
 		return m_edges.indexOf(e);
 	} //
 	
-	public void addEdge(EdgeItem e) {		
-		addEdge(m_edges.size(), e);
+	public boolean addEdge(EdgeItem e) {		
+		return addEdge(m_edges.size(), e);
 	} //
 	
-	public void addEdge(int i, EdgeItem e) {
+	public boolean addEdge(int i, EdgeItem e) {
 		NodeItem n1 = e.getFirstNode();
 		NodeItem n2 = e.getSecondNode();
 		if ( !e.isDirected() && n2 == this ) {
@@ -166,9 +166,10 @@ public class NodeItem extends GraphItem {
 			"Edge must be incident on this Node!");
 		}
 		if ( isIncidentEdge(e) || isNeighbor(n2) )
-			throw new IllegalStateException("Node is already a neighbor!");		
+			return false;		
 		m_edges.add(i,e);
-		m_neighbors.add(i,n2);		
+		m_neighbors.add(i,n2);
+        return true;
 	} //
 	
 	public boolean removeEdge(EdgeItem e) {
@@ -204,9 +205,9 @@ public class NodeItem extends GraphItem {
 		return m_children==null ? -1 : m_children.indexOf(child);
 	} //
 
-	public void addChild(EdgeItem e) {
+	public boolean addChild(EdgeItem e) {
 		int i = ( m_children == null ? 0 : m_children.size() );
-		addChild(i,e);
+		return addChild(i,e);
 	} //	
 
 	/**
@@ -214,14 +215,14 @@ public class NodeItem extends GraphItem {
 	 * @param i index at which to add the child
 	 * @param e the DefaultEdge to the child
 	 */
-	public void addChild(int i, EdgeItem e) {
+	public boolean addChild(int i, EdgeItem e) {
 		NodeItem n1 = e.getFirstNode();
 		NodeItem n2 = e.getSecondNode();
 		if ( e.isDirected() || !(n1 != this ^ n2 != this) )
 			throw new IllegalArgumentException("Not a valid Edge!");
 		NodeItem c = ( n1 == this ? n2 : n1 );
 		if ( getChildIndex(c) > -1 || getNeighborIndex(c) > -1 )
-			throw new IllegalStateException("Node is already a child!");
+			return false;
 		if ( m_children == null )
 			m_children = new ArrayList();
 		
@@ -231,6 +232,7 @@ public class NodeItem extends GraphItem {
 		
 		c.addEdge(e);
 		c.setParent(this);
+        return true;
 	} //
 	
 	public void removeChild(int idx) {
