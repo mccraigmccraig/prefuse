@@ -191,7 +191,7 @@ public class IndentedTreeLayout extends TreeLayout {
 				TreeNode n = (TreeNode)item.getEntity();
 				if ( aitem == null ) {
 					// get the new aggregate item when needed
-					aitem = m_registry.getAggregateItem(n, false);
+					aitem = m_registry.getAggregateItem(n);
 					if ( aitem != null )
 						m_registry.removeMappings(aitem);
 					aitem = m_registry.getAggregateItem(n, true);

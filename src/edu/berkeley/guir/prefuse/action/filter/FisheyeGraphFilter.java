@@ -115,7 +115,7 @@ public class FisheyeGraphFilter extends Filter {
             recurse = ( fitem==null || fitem.getDirty()>0 || fitem.getDOI()<0 );
             
             if (fitem==null || fitem.getDirty() > 0)
-                fitem = registry.getNodeItem(fnode, true);
+                fitem = registry.getNodeItem(fnode, true, true);
             
             fgraph.addNode(fitem);
             
@@ -139,7 +139,7 @@ public class FisheyeGraphFilter extends Filter {
                         
                         recurse = ( nni==null ||  nni.getDirty()>0 || nni.getDOI()<doi );
                         if ( nni == null || nni.getDirty() > 0)
-                            nni = registry.getNodeItem(nn, true);
+                            nni = registry.getNodeItem(nn, true, true);
                         fgraph.addNode(nni);
                         
                         if ( recurse ) {

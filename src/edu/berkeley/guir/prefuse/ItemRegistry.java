@@ -682,24 +682,27 @@ public class ItemRegistry {
      * @param entity the Entity that this VisualItem is visualizing
      * @param create indicates whether or not the VisualItem should be created
      *  if it doesn't already exist.
+     * @param clear indicates if the VisualItem should have any connections cleared.
+     * For example, a NodeItem would have any and all neighbors and connecting edges removed.
      * @return the requested VisualItem, or null if the VisualItem wasn't found
      *  and the create parameter is false.
      */
-	public synchronized VisualItem getItem(String itemClass, Entity entity, boolean create) {
+	public synchronized VisualItem getItem(String itemClass, Entity entity, boolean create, boolean clear) {
 		ItemEntry entry = (ItemEntry)m_entryMap.get(itemClass);
 		if ( entry != null ) {
 			VisualItem item = (VisualItem)entry.itemMap.get(entity);
-			if ( !create ) {
-				return item;
-			} else if ( item == null ) {
+			if ( create && item == null ) {
 				item = m_ifactory.getItem(itemClass);
 				item.init(this, itemClass, entity);
 				addItem(entry, entity, item);
 			}
-            if ( item instanceof NodeItem )
+            if ( clear && item instanceof NodeItem ) {
                 ((NodeItem)item).removeAllNeighbors();
-            item.setDirty(0);
-            item.setVisible(true);
+            }
+            if ( create ) {
+            	item.setDirty(0);
+            	item.setVisible(true);
+            }
 			return item;
 		} else {
 			throw new IllegalArgumentException("The input string must be a"
@@ -713,7 +716,7 @@ public class ItemRegistry {
 	 * @return NodeItem the NodeItem associated with the node, if any.
 	 */
 	public synchronized NodeItem getNodeItem(Node node) {
-		return (NodeItem)getItem(DEFAULT_NODE_CLASS, node, false);			
+		return (NodeItem)getItem(DEFAULT_NODE_CLASS, node, false, false);			
 	} //
 	
 	/**
@@ -725,7 +728,20 @@ public class ItemRegistry {
 	 * @return NodeItem the NodeItem associated with the node, if any
 	 */
 	public synchronized NodeItem getNodeItem(Node node, boolean create) {
-		return (NodeItem)getItem(DEFAULT_NODE_CLASS, node, create);		
+		return (NodeItem)getItem(DEFAULT_NODE_CLASS, node, create, false);		
+	} //
+	
+	/**
+	 * Returns the visualized NodeItem associated with the given Node, if any.
+	 * If create is true, creates the desired NodeItem and adds it to the
+	 * registry, and removes any previous bindings associated with the Node.
+	 * @param node the Node to look up
+	 * @param create if true, a new NodeItem will be allocated if necessary
+	 * @param clear if true, any connecting items will be cleared (e.g., all neighbors removed)
+	 * @return NodeItem the NodeItem associated with the node, if any
+	 */
+	public synchronized NodeItem getNodeItem(Node node, boolean create, boolean clear) {
+		return (NodeItem)getItem(DEFAULT_NODE_CLASS, node, create, clear);		
 	} //
 
 	/**
@@ -734,7 +750,7 @@ public class ItemRegistry {
 	 * @return EdgeItem the EdgeItem associated with the edge, if any
 	 */
 	public synchronized EdgeItem getEdgeItem(Edge edge) {
-		return (EdgeItem)getItem(DEFAULT_EDGE_CLASS, edge, false);
+		return (EdgeItem)getItem(DEFAULT_EDGE_CLASS, edge, false, false);
 	} //
 	
 	/**
@@ -746,7 +762,7 @@ public class ItemRegistry {
 	 * @return EdgeItem the EdgeItem associated with the edge, if any
 	 */
 	public synchronized EdgeItem getEdgeItem(Edge edge, boolean create) {
-		return (EdgeItem)getItem(DEFAULT_EDGE_CLASS, edge, create);		
+		return (EdgeItem)getItem(DEFAULT_EDGE_CLASS, edge, create, false);		
 	} //
 	
 	/**
@@ -756,7 +772,7 @@ public class ItemRegistry {
 	 * @return the AggregateItem associated with the entity, if any
 	 */
 	public synchronized AggregateItem getAggregateItem(Entity entity) {
-		return (AggregateItem)getItem(DEFAULT_AGGR_CLASS, entity, false);
+		return (AggregateItem)getItem(DEFAULT_AGGR_CLASS, entity, false, false);
 	} //
 	
 	/**
@@ -770,7 +786,22 @@ public class ItemRegistry {
 	 * @return AggregateItem the AggregateItem associated with the entity, if any
 	 */
 	public synchronized AggregateItem getAggregateItem(Entity entity, boolean create) {
-		return (AggregateItem)getItem(DEFAULT_AGGR_CLASS, entity, create);
+		return (AggregateItem)getItem(DEFAULT_AGGR_CLASS, entity, create, false);
+	} //
+	
+	/**
+	 * Returns the visualized AggregateItem associated with the given Entity, if
+	 * any. If create is true, creates the desired AggregateItem and adds it to
+	 * the registry, and removes any previous bindings associated with the
+	 * Entity.
+	 * @param entity the Entity to look up
+	 * @param create if true, a new AggregateItem will be allocated if 
+	 *  necessary
+	 * @param clear if true, any connecting items will be cleared (e.g., all neighbors removed)
+	 * @return AggregateItem the AggregateItem associated with the entity, if any
+	 */
+	public synchronized AggregateItem getAggregateItem(Entity entity, boolean create, boolean clear) {
+		return (AggregateItem)getItem(DEFAULT_AGGR_CLASS, entity, create, clear);
 	} //
 
 	/**

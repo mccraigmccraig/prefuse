@@ -65,14 +65,14 @@ public class TreeFilter extends Filter {
         // filter the nodes
         Iterator nodeIter = graph.getNodes();
         while ( nodeIter.hasNext() ) {
-            NodeItem item = registry.getNodeItem((Node)nodeIter.next(), true);
+            NodeItem item = registry.getNodeItem((Node)nodeIter.next(), true, true);
             if ( root == null ) root = item;
         }
         
         Iterator fiter = registry.getDefaultFocusSet().iterator();
         NodeItem focus = null;
         if ( fiter.hasNext() ) {
-            focus = registry.getNodeItem((Node)fiter.next(), true);
+            focus = registry.getNodeItem((Node)fiter.next(), true, true);
         }
         
         // update root node as necessary

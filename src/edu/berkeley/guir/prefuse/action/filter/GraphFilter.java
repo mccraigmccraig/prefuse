@@ -53,7 +53,7 @@ public class GraphFilter extends Filter {
         // filter the nodes
         Iterator nodeIter = graph.getNodes();
         while ( nodeIter.hasNext() ) {
-            NodeItem item = registry.getNodeItem((Node)nodeIter.next(), true);
+            NodeItem item = registry.getNodeItem((Node)nodeIter.next(), true, true);
             fgraph.addNode(item);
         }
         
