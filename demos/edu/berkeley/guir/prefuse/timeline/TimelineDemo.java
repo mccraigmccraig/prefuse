@@ -51,7 +51,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
     private final int timeline_end = 2005;
     private final int timelineSpan = timeline_end - timeline_start;
 
-    private final int timelineLength = appWidth * 3 / 4; // this factor ought to be
+    private final int timelineLength = appWidth * 9 / 10; // this factor ought to be
                                                  // shared across all
                                                  // timeline instances
     private final double yearPerPixel = (double) timelineSpan / timelineLength;
@@ -101,20 +101,22 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
 
         // 2. Create a new item registry
         final ItemRegistry registry = new ItemRegistry(graph, false);
-        registry.addItemClass(NOTCH_NODE_TYPE, NOTCH_NODE_ITEM_CLASS); // order matters
-        registry.addItemClass(NOTNOTCH_NODE_TYPE, NOTNOTCH_NODE_ITEM_CLASS);
+        //registry.addItemClass(NOTCH_NODE_TYPE, NOTCH_NODE_ITEM_CLASS); // order matters
+        //registry.addItemClass(NOTNOTCH_NODE_TYPE, NOTNOTCH_NODE_ITEM_CLASS);
         // XXX Gotta switch back later (comment out)
         registry.addItemClass(XMLGraphReader.XMLGraphHandler.NODE, NodeItem.class);
         registry.addItemClass(ItemRegistry.DEFAULT_EDGE_CLASS, EdgeItem.class);
         final TextItemRenderer nodeRenderer = new TimelineDataRenderer(
         		timeline_start, timeline_end, timelineLength);
-        nodeRenderer.setVerticalAlignment(TextItemRenderer.ALIGNMENT_CENTER);
+        //nodeRenderer.setVerticalAlignment(TextItemRenderer.ALIGNMENT_CENTER);
+        nodeRenderer.setHorizontalAlignment(TextItemRenderer.ALIGNMENT_CENTER);
 		registry.setRendererFactory(new DefaultRendererFactory(
                 nodeRenderer, new DefaultEdgeRenderer(), null));
 
         final Display display = new Display(registry);
         display.setUseCustomTooltips(true);
         display.setSize(appWidth, appHeight);
+        
         display.addControlListener(new DragControl());
 /*        display.addControlListener(new ControlAdapter() {
             private Point2D  m_tmp = new Point2D.Float();
@@ -128,14 +130,14 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         });*/
         
         final ActionList distort = new ActionList(registry);
-        distort.add(new TimelineGraphFilter());
+        distort.add(new /*Timeline*/GraphFilter());
         final FisheyeDistortion feye = new FisheyeDistortion(1,0,true);//NOTCH_NODE_TYPE);
         distort.add(feye);
-
+        distort.add(new ResizeBoundsFunction(feye));
         distort.add(new MusicHistoryColorFunction());
         distort.add(new RepaintAction());
         
-        // enable distortion mouse-over
+        // enable distortion mouse-over: should be only
         final TimelineInteractionListener mouseOverUpdates = 
             new TimelineInteractionListener(feye, distort, 10, timelineSpan, appWidth, timelineLength);
         display.addMouseListener(mouseOverUpdates);
@@ -149,9 +151,10 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
         frame.setVisible(true);
 
         final ActionList initialArrange = new ActionList(registry);
-        initialArrange.add(new /*Timeline*/GraphFilter());
+        initialArrange.add(new GraphFilter());
         initialArrange.add(new MusicHistoryColorFunction());
         initialArrange.add(new MusicHistoryLayout(timelineLength, notchIndex));
+        initialArrange.add(new SetBoundsFunction()); // after layout
         initialArrange.add(new RepaintAction());
         initialArrange.runNow();
     }
@@ -259,7 +262,7 @@ public class TimelineDemo extends JFrame implements TimelineConstants {
                                 + ((double) notchIndex / m_numDivisions * m_timelineLength);
                     }
                     setLocation(node, null, x, y);
-                } else {
+                } else { // regular data node
                     final String startYearString = node.getAttribute(START_YEAR);
                     final String endYearString = node.getAttribute(END_YEAR);
 
