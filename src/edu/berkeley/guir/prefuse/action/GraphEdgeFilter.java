@@ -53,11 +53,7 @@ public class GraphEdgeFilter extends Filter {
                 Node n = edge.getAdjacentNode(node);
                 if ( registry.isVisible(n) ) {
                     EdgeItem eitem = registry.getEdgeItem(edge, true);
-                    try {
-                        nitem.addEdge(eitem);
-                    } catch ( IllegalStateException e ) { 
-                        // already a neighbor
-                    }
+                    nitem.addEdge(eitem);
                     if ( !m_edgesVisible ) eitem.setVisible(false);
                 }
 			}
