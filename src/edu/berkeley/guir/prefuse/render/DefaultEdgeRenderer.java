@@ -32,6 +32,10 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	public static final int EDGE_TYPE_LINE  = 0;
 	public static final int EDGE_TYPE_CURVE = 1;
 	
+	public static final int WEIGHT_TYPE_NONE   = 0;
+	public static final int WEIGHT_TYPE_LINEAR = 1;
+	public static final int WEIGHT_TYPE_LOG    = 2;
+	
 	public static final int ALIGNMENT_LEFT   = 0;
 	public static final int ALIGNMENT_RIGHT  = 1;
 	public static final int ALIGNMENT_CENTER = 2;
@@ -42,6 +46,7 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	protected CubicCurve2D m_cubic = new CubicCurve2D.Float();
 
 	protected int     m_edgeType = EDGE_TYPE_LINE;
+	protected int     m_weightType = WEIGHT_TYPE_LINEAR;
 	protected int     m_xAlign1  = ALIGNMENT_CENTER;
 	protected int     m_yAlign1  = ALIGNMENT_CENTER;
 	protected int     m_xAlign2  = ALIGNMENT_CENTER;
@@ -51,6 +56,8 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	protected Point2D m_tmpPoints[]  = new Point2D[2];
 	protected Point2D m_ctrlPoints[] = new Point2D[2];
 	protected Point2D m_isctPoints[] = new Point2D[2];
+	
+	protected String  m_weightLabel = "weight";
 	
 	protected boolean m_directed = false;
 	protected Polygon m_arrowHead = DEFAULT_ARROW_HEAD;
@@ -68,6 +75,40 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 		m_isctPoints[1] = new Point2D.Float();		
 	} //
 
+	/**
+	 * Returns the attribute to use for the edge weight
+	 * @return the attribute to use for the edge weight
+	 */
+	public String getWeightAttributeName() {
+	    return m_weightLabel;
+	} //
+	
+	/**
+	 * Sets the attribute to use for the edge weight
+	 * @param attrName the name of the attribute to use for the edge weight
+	 */
+	public void setWeightAttributeName(String attrName) {
+	    m_weightLabel = attrName;
+	} //
+	
+	/**
+	 * Returns the weight type for this edge renderer, one of WEIGHT_TYPE_NONE,
+	 * WEIGHT_TYPE_LINEAR, or WEIGHT_TYPE_LOG.
+	 * @return an int signifiying the weight type
+	 */
+	public int getWeightType() {
+	    return m_weightType;
+	} //
+	
+	/**
+	 * Sets the weight type for this edge renderer, one of WEIGHT_TYPE_NONE,
+	 * WEIGHT_TYPE_LINEAR, or WEIGHT_TYPE_LOG.
+	 * @param type an int signifiying the weight type
+	 */
+	public void setWeightType(int type) {
+	    m_weightType = type;
+	} //
+	
 	/**
 	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRenderType()
 	 */
@@ -212,7 +253,25 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	 * @return the desired line width, in pixels
 	 */
 	protected int getLineWidth(VisualItem item) {
-		return m_width;
+	    if ( m_weightType == WEIGHT_TYPE_NONE ) {
+	        return m_width;
+	    } else {
+	        String wstr = item.getAttribute(m_weightLabel);
+	        if ( wstr != null ) {
+	            try {
+	                double w = Double.parseDouble(wstr);
+	                if ( m_weightType == WEIGHT_TYPE_LINEAR ) {
+	                    return (int)Math.round(w);
+	                } else if ( m_weightType == WEIGHT_TYPE_LOG ) {
+	                    return Math.max(1,1+(int)Math.round(Math.log(w)));
+	                }
+	            } catch ( Exception e ) {
+	                System.err.println("Weight value is not a valid number!");
+	                e.printStackTrace();
+	            }
+	        }
+	        return m_width;
+	    }
 	} //
     
     /**
