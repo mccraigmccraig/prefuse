@@ -21,14 +21,14 @@ import edu.berkeley.guir.prefuse.util.FocusSet;
  */
 public class MultiSelectFocusControl extends ControlAdapter {
 	// (( CONSTANTS )) \\
-    private final Object focusSetKey = FocusManager.SELECTION_KEY;
-	private final ItemRegistry registry;
+    private static final Object FOCUS_KEY = FocusManager.SELECTION_KEY;
+	private final ItemRegistry registry; // needed for clearing focusSet on mouseClicked
     
 	
 	// (( CONSTRUCTORS )) \\
     public MultiSelectFocusControl(final ItemRegistry registry) {
     	this.registry = registry;
-    	registry.getFocusManager().putFocusSet(focusSetKey, new DefaultFocusSet());
+    	registry.getFocusManager().putFocusSet(FOCUS_KEY, new DefaultFocusSet());
     }
     
     
@@ -39,16 +39,27 @@ public class MultiSelectFocusControl extends ControlAdapter {
      */
     public void itemClicked(VisualItem item, MouseEvent e) {
         if ( item instanceof NodeItem && 
-             SwingUtilities.isLeftMouseButton(e) &&
-			 e.isShiftDown())
+             SwingUtilities.isLeftMouseButton(e))
         {
-            final FocusSet focusSet = registry.getFocusManager().getFocusSet(focusSetKey);
+        	final FocusManager focusManager = registry.getFocusManager();
+            final FocusSet focusSet = focusManager.getFocusSet(FOCUS_KEY);
             final Entity node = item.getEntity();
-			if (focusSet.contains(node)) {
-            	focusSet.remove(node);
-            } else {
-            	focusSet.add(node);
-            }
+            
+            if (e.isShiftDown()) { // mode: adding to/removing from focus set
+				if (focusSet.contains(node)) {
+					focusSet.remove(node);
+				} else {
+					focusSet.add(node);
+				}
+			} else { // mode: doing something cool/resetting focus
+				if (focusManager.isFocus(FOCUS_KEY, node)) {
+					System.out.println("a selected item has been clicked"+item);
+					// bring up comparison pane
+					//addComparisonPane(focusSet);
+				} else {
+					focusSet.set(node);
+				}
+			}
             registry.touch(item.getItemClass());
         }
     } //
@@ -57,6 +68,6 @@ public class MultiSelectFocusControl extends ControlAdapter {
      * Clear the focus
      */
 	public void mouseClicked(MouseEvent e) {
-		registry.getFocusManager().getFocusSet(focusSetKey).clear();
+		registry.getFocusManager().getFocusSet(FOCUS_KEY).clear();
 	}
 }
