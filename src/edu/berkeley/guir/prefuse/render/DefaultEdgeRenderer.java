@@ -186,6 +186,22 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	protected AffineTransform getTransform(VisualItem item) {
 		return null;
 	} //
+    
+    /**
+     * @see edu.berkeley.guir.prefuse.render.Renderer#locatePoint(java.awt.geom.Point2D, edu.berkeley.guir.prefuse.VisualItem)
+     */
+    public boolean locatePoint(Point2D p, VisualItem item) {
+        Shape s = getShape(item);
+        if ( s == null ) {
+            return false;
+        } else {
+            double width = Math.max(2, getLineWidth(item));
+            double halfWidth = width/2.0;
+            return s.intersects(p.getX()-halfWidth,
+                                p.getY()-halfWidth,
+                                width,width);
+        }
+    } //
 
 	/**
 	 * Returns the line width to be used for this VisualItem. By default,
