@@ -25,6 +25,7 @@ import edu.berkeley.guir.prefuse.event.ControlAdapter;
 public class NeighborHighlightControl extends ControlAdapter {
 
     private Activity update = null;
+    private boolean highlightWithInvisibleEdge = false;
     
     /**
      * Creates a new highlight control.
@@ -64,14 +65,36 @@ public class NeighborHighlightControl extends ControlAdapter {
             while ( iter.hasNext() ) {
                 EdgeItem eitem = (EdgeItem)iter.next();
                 NodeItem nitem = (NodeItem)eitem.getAdjacentNode(n);
-                eitem.setHighlighted(state);
-                nitem.setHighlighted(state);
-                registry.touch(nitem.getItemClass());
-                registry.touch(eitem.getItemClass());
+                if (eitem.isVisible() || highlightWithInvisibleEdge) {
+                    eitem.setHighlighted(state);
+                    registry.touch(eitem.getItemClass());
+                    nitem.setHighlighted(state);
+                    registry.touch(nitem.getItemClass());
+                }
             }
         }
         if ( update != null )
             update.runNow();
+    } //
+    
+    /**
+     * Indicates if neighbor nodes with edges currently not visible still
+     * get highlighted.
+     * @return true if neighbors with invisible edges still get highlighted,
+     * false otherwise.
+     */
+    public boolean isHighlightWithInvisibleEdge() {
+        return highlightWithInvisibleEdge;
+    } //
+   
+    /**
+     * Determines if neighbor nodes with edges currently not visible still
+     * get highlighted.
+     * @param highlightWithInvisibleEdge assign true if neighbors with invisible
+     * edges should still get highlighted, false otherwise.
+     */
+    public void setHighlightWithInvisibleEdge(boolean highlightWithInvisibleEdge) {
+        this.highlightWithInvisibleEdge = highlightWithInvisibleEdge;
     } //
     
 } // end of class NeighborHighlightControl
