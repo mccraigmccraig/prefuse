@@ -34,6 +34,7 @@ import edu.berkeley.guir.prefuse.render.DefaultNodeRenderer;
 import edu.berkeley.guir.prefuse.render.DefaultRendererFactory;
 import edu.berkeley.guir.prefuse.render.TextItemRenderer;
 import edu.berkeley.guir.prefusex.controls.DragControl;
+import edu.berkeley.guir.prefusex.controls.FocusControl;
 import edu.berkeley.guir.prefusex.controls.NeighborHighlightControl;
 import edu.berkeley.guir.prefusex.controls.PanControl;
 import edu.berkeley.guir.prefusex.controls.ZoomControl;
@@ -79,6 +80,7 @@ public class ForceDemo extends Display {
         pan(350,350);
         this.addControlListener(new NeighborHighlightControl());
         this.addControlListener(new DragControl(false));
+        this.addControlListener(new FocusControl(0));
         this.addControlListener(new MouseOverControl());
         this.addControlListener(new PanControl(false));
         this.addControlListener(new ZoomControl(false));

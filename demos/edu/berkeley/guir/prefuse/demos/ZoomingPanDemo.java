@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.ActionMap;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
@@ -63,7 +64,7 @@ public class ZoomingPanDemo extends JFrame {
         
         registry.setRendererFactory(new DefaultRendererFactory(
             new TextItemRenderer() {
-                public int getRenderType() {
+                public int getRenderType(VisualItem item) {
                     return RENDER_TYPE_FILL;
                 } //
             },
