@@ -25,6 +25,14 @@ public class BalloonTreeLayout extends TreeLayout {
     private ItemRegistry m_registry;
     private int m_minRadius = 2;
     
+    public BalloonTreeLayout() {
+        this(2);
+    } //
+    
+    public BalloonTreeLayout(int minRadius) {
+        m_minRadius = 2;
+    } //
+    
     /**
      * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
      */
@@ -33,6 +41,14 @@ public class BalloonTreeLayout extends TreeLayout {
         Point2D anchor = getLayoutAnchor(registry);
         NodeItem n = getLayoutRoot(registry);
         layout(n,anchor.getX(),anchor.getY());
+    } //
+    
+    public int getMinRadius() {
+        return m_minRadius;
+    } //
+    
+    public void setMinRadius(int minRadius) {
+        m_minRadius = minRadius;
     } //
     
     public void layout(NodeItem n, double x, double y) {
