@@ -44,6 +44,14 @@ public class ForceSimulator {
         speedLimit = limit;
     } //
     
+    public Integrator getIntegrator() {
+        return integrator;
+    } //
+    
+    public void setIntegrator(Integrator intgr) {
+        integrator = intgr;
+    } //
+    
     public void clear() {
         items.clear();
         Iterator siter = springs.iterator();
