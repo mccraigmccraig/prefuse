@@ -41,4 +41,10 @@ public interface TimelineConstants {
 	public static final String NOTNOTCH_NODE_TYPE = "notnotchnode";
 	public static final Class NOTNOTCH_NODE_CLASS = NotNotchNode.class;
 	public static final Class NOTNOTCH_NODE_ITEM_CLASS = NotNotchNode.Item.class;
+
+	// Visual Node Attributes
+	public static final String LEFT_NORMAL = "left_normal";
+	public static final String RIGHT_NORMAL = "right_normal";
+	public static final String LEFT_DISTORTED = "left_distorted";
+	public static final String RIGHT_DISTORTED = "right_distorted";
 }
