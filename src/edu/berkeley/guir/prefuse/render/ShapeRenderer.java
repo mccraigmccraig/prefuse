@@ -1,5 +1,6 @@
 package edu.berkeley.guir.prefuse.render;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
@@ -38,19 +39,23 @@ public abstract class ShapeRenderer implements Renderer {
 	 * by subclasses in custom rendering routines. 
 	 */
 	protected void drawShape(Graphics2D g, GraphItem item, Shape shape) {
+        Color itemColor = item.getColor();
+        if ( itemColor == null ) itemColor = Color.BLACK;
+        Color fillColor = item.getFillColor();
+        if ( fillColor == null ) fillColor = Color.BLACK;
 		switch (getRenderType()) {
 			case RENDER_TYPE_DRAW :
-				g.setColor(item.getColor());
+				g.setColor(itemColor);
 				g.draw(shape);
 				break;
 			case RENDER_TYPE_FILL :
-				g.setColor(item.getFillColor());
+				g.setColor(fillColor);
 				g.fill(shape);
 				break;
 			case RENDER_TYPE_DRAW_AND_FILL :
-				g.setColor(item.getFillColor());
+				g.setColor(fillColor);
 				g.fill(shape);
-				g.setColor(item.getColor());
+				g.setColor(itemColor);
 				g.draw(shape);
 				break;
 		}		

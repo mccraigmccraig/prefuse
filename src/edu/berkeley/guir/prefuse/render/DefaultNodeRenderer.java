@@ -35,7 +35,7 @@ public class DefaultNodeRenderer extends ShapeRenderer {
 	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRenderType()
 	 */
 	protected int getRenderType() {
-		return RENDER_TYPE_FILL;
+		return RENDER_TYPE_DRAW_AND_FILL;
 	} //
 
 	/**
