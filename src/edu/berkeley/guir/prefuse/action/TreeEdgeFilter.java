@@ -10,14 +10,13 @@ import edu.berkeley.guir.prefuse.graph.TreeNode;
 
 /**
  * The TreeEdgeFilter determines which edges to visualize based on the nodes
- *  selected for visualization and the underlying tree structure.
- * 
- * Apr 25, 2003 - jheer - Created class
+ *  selected for visualization and the underlying tree structure. By default,
+ *  garbage collection on edge items is performed.
  * 
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class TreeEdgeFilter extends AbstractAction {
+public class TreeEdgeFilter extends Filter {
     
     private boolean m_edgesVisible;
     
@@ -36,6 +35,7 @@ public class TreeEdgeFilter extends AbstractAction {
      *  edges are visible in the display.
      */
     public TreeEdgeFilter(boolean edgesVisible) {
+        super(ItemRegistry.DEFAULT_EDGE_CLASS, true);
         m_edgesVisible = edgesVisible;
     } //
     

@@ -30,7 +30,6 @@ import edu.berkeley.guir.prefuse.GraphItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.ActionMap;
-import edu.berkeley.guir.prefuse.action.GarbageCollector;
 import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
 import edu.berkeley.guir.prefuse.action.GraphNodeFilter;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
@@ -126,9 +125,7 @@ public class GraphEditor extends JFrame {
 			// initialize filter
             ActionPipeline filter = new ActionPipeline(registry);
             filter.add(new GraphNodeFilter());
-            filter.add(new GarbageCollector(ItemRegistry.DEFAULT_NODE_CLASS));
             filter.add(new GraphEdgeFilter());
-            filter.add(new GarbageCollector(ItemRegistry.DEFAULT_EDGE_CLASS));
             activityMap.put("filter", filter);
             
             ActionPipeline update = new ActionPipeline(registry);
@@ -320,10 +317,11 @@ public class GraphEditor extends JFrame {
                 return;
             
 			drag = true;
-			int dx = e.getX() - xDown;
-			int dy = e.getY() - yDown;
-			Point2D p = item.getLocation();
-			item.setLocation(p.getX()+dx,p.getY()+dy);
+            Point2D p = item.getLocation();
+			double x = p.getX() + e.getX() - xDown;
+			double y = p.getY() + e.getY() - yDown;
+            item.updateLocation(x,y);
+			item.setLocation(x,y);
             activityMap.scheduleNow("update");
 			xDown = e.getX();
 			yDown = e.getY();
@@ -407,7 +405,8 @@ public class GraphEditor extends JFrame {
 			NodeItem item = registry.getNodeItem(n,true);
 			item.setColor(Color.BLACK);
 			item.setFillColor(Color.WHITE);
-			item.setLocation(x, y);
+            item.updateLocation(x,y);
+			item.setLocation(x,y);
 			return item;
 		} //
 		

@@ -10,12 +10,13 @@ import edu.berkeley.guir.prefuse.graph.Node;
 
 /**
  * The GraphEdgeFilter allows all edges adjacent to visualized 
- * nodes to be visualized.
+ * nodes to be visualized. By default, garbage collection on
+ * edge items is performed.
  * 
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class GraphEdgeFilter extends AbstractAction {
+public class GraphEdgeFilter extends Filter {
 
     private boolean m_edgesVisible;
     
@@ -34,6 +35,7 @@ public class GraphEdgeFilter extends AbstractAction {
      *  edges are visible in the display.
      */
     public GraphEdgeFilter(boolean edgesVisible) {
+        super(ItemRegistry.DEFAULT_EDGE_CLASS, true);
         m_edgesVisible = edgesVisible;
     } //
     
@@ -62,6 +64,9 @@ public class GraphEdgeFilter extends AbstractAction {
                 }
 			}
 		}
+        
+		// optional garbage collection
+        super.run(registry, frac);
 	} //
 
 } // end of class GraphEdgeFilter

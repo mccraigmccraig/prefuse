@@ -3,7 +3,6 @@ package edu.berkeley.guir.prefusex.layout;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 
-import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.TreeLayout;
@@ -22,26 +21,13 @@ public class BalloonTreeLayout extends TreeLayout {
     private ItemRegistry m_registry;
     private int m_minRadius = 2;
     
-    public Point2D getLayoutAnchor() {
-        Point2D anchor = super.getLayoutAnchor();
-        if ( anchor != null )
-            return anchor;
-        
-        double x = 0, y = 0;
-        if ( m_registry != null ) {
-            Display d = m_registry.getDisplay(0);
-            x = d.getWidth()/2; y = d.getHeight()/2;
-        }
-        return new Point2D.Double(x,y);
-    } //
-    
     
     /**
      * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
      */
     public void run(ItemRegistry registry, double frac) {
         m_registry = registry;
-        Point2D anchor = getLayoutAnchor();
+        Point2D anchor = getLayoutAnchor(registry);
         Tree tree = (Tree)registry.getGraph();
         NodeItem n = registry.getNodeItem(tree.getRoot());
         layout(n,anchor.getX(),anchor.getY());

@@ -6,20 +6,25 @@ import java.util.Iterator;
 import edu.berkeley.guir.prefuse.AggregateItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
-import edu.berkeley.guir.prefuse.action.AbstractAction;
 import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
 /**
- * Filter that adds aggregate items for elided subtrees.
- * 
- * Apr 30, 2003 - jheer - Created class
+ * Filter that adds aggregate items for elided subtrees. By default, garbage
+ * collection for aggregate items is performed.
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org
  */
-public class TreeAggregateFilter extends AbstractAction {
+public class TreeAggregateFilter extends Filter {
 
+    /**
+     * Constructor.
+     */
+    public TreeAggregateFilter() {
+       super(ItemRegistry.DEFAULT_AGGR_CLASS, true); 
+    } //
+    
 	/**
 	 * @see edu.berkeley.guir.prefuse.action.Action#run(edu.berkeley.guir.prefuse.ItemRegistry, double)
 	 */
@@ -46,6 +51,9 @@ public class TreeAggregateFilter extends AbstractAction {
 				aggr.setAggregateSize(node.getNumDescendants());
 			}
 		}
+        
+		// optional garbage collection
+        super.run(registry, frac);
 	} //
     
     protected void setOrientation(AggregateItem item) {

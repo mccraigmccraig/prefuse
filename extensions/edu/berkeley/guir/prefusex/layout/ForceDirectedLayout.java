@@ -109,8 +109,8 @@ public class ForceDirectedLayout extends Layout {
             NodeItem nitem = (NodeItem)iter.next();
             ForceItem fitem = (ForceItem)nitem.getVizAttribute("forceItem");
             if ( fitem != null ) {
-                fitem.location[0] = (float)nitem.getX();
-                fitem.location[1] = (float)nitem.getY();
+                fitem.location[0] = (float)nitem.getEndLocation().getX();
+                fitem.location[1] = (float)nitem.getEndLocation().getY();
                 fitem.force[0]    = fitem.force[1]    = 0;
                 fitem.velocity[0] = fitem.velocity[1] = 0;
             }

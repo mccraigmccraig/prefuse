@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Paint;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Iterator;
 
 import javax.swing.JFrame;
@@ -178,11 +176,7 @@ public class RadialGraphDemo extends JFrame {
 			registry.getDefaultFocusSet().set(tree.getRoot());			
 
 			// create and display application window
-			addWindowListener(new WindowAdapter() {
-				public void windowClosing(WindowEvent e) {
-					System.exit(0);
-				}
-			});
+            setDefaultCloseOperation(EXIT_ON_CLOSE);
 			getContentPane().add(display, BorderLayout.CENTER);
 			pack();
 			setVisible(true);

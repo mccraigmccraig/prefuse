@@ -9,14 +9,27 @@ import edu.berkeley.guir.prefuse.graph.Tree;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 
 /**
- * Filters nodes on a tree using the original Furnas fisheye.
- * 
- * Apr 22, 2003 - jheer - Created class
+ * Filters nodes on a tree using the original Furnas fisheye calculation,
+ * and sets DOI (degree-of-interest) values for each filtered node. Performs
+ * garbage collection of node items by default.
+ * <br/><br/>
+ * For more information about Furnas' fisheye view calculation and DOI values,
+ * take a look at G.W. Furnas, "The FISHEYE View: A New Look at Structured 
+ * Files," Bell Laboratories Tech. Report, Murray Hill, New Jersey, 1981. 
+ * Available online at <a href="http://citeseer.nj.nec.com/furnas81fisheye.html">
+ * http://citeseer.nj.nec.com/furnas81fisheye.html</a>.
+ * <br/><br/>
+ * For a more recent example of fisheye views and DOI functions in information
+ * visualization check out S.K. Card and D. Nation. "Degree-of-Interest 
+ * Trees: A Component of an Attention-Reactive User Interface," Advanced 
+ * Visual Interfaces, Trento, Italy, 2002. Available online at
+ * <a href="http://www2.parc.com/istl/projects/uir/pubs/items/UIR-2002-11-Card-AVI-DOITree.pdf">
+ * http://www2.parc.com/istl/projects/uir/pubs/items/UIR-2002-11-Card-AVI-DOITree.pdf</a>
  * 
  * @version 1.0
- * @author Jeffrey Heer <a href="mailto:jheer@acm.org">jheer@acm.org</a>
+ * @author <a href="http://jheer.org">Jeffrey Heer</a> - prefuse(AT)jheer.org
  */
-public class FisheyeTreeFilter extends AbstractAction {
+public class FisheyeTreeFilter extends Filter {
 
     public static final int DEFAULT_MIN_DOI = -2;
     
@@ -34,6 +47,7 @@ public class FisheyeTreeFilter extends AbstractAction {
     } //
     
     public FisheyeTreeFilter(int minDOI) {
+        super(ItemRegistry.DEFAULT_NODE_CLASS, true);
         m_minDOI = minDOI;
     } //
     
@@ -73,6 +87,9 @@ public class FisheyeTreeFilter extends AbstractAction {
         m_registry = null;
         m_tree = null;
         m_root = null;
+        
+        // optional garbage collection
+        super.run(registry, frac);
 	} //
 	
 	protected void visitDescendants(TreeNode node, NodeItem item, TreeNode skip) {

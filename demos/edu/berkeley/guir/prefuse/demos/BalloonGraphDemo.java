@@ -2,16 +2,11 @@ package edu.berkeley.guir.prefuse.demos;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.util.Iterator;
 
 import javax.swing.JFrame;
 
@@ -24,7 +19,7 @@ import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.action.ColorFunction;
 import edu.berkeley.guir.prefuse.action.ColorInterpolator;
 import edu.berkeley.guir.prefuse.action.FisheyeTreeFilter;
-import edu.berkeley.guir.prefuse.action.GarbageCollector;
+import edu.berkeley.guir.prefuse.action.GraphEdgeFilter;
 import edu.berkeley.guir.prefuse.action.LinearInterpolator;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
 import edu.berkeley.guir.prefuse.action.TreeEdgeFilter;
@@ -32,9 +27,11 @@ import edu.berkeley.guir.prefuse.activity.ActionPipeline;
 import edu.berkeley.guir.prefuse.activity.ActivityManager;
 import edu.berkeley.guir.prefuse.activity.SlowInSlowOutPacer;
 import edu.berkeley.guir.prefuse.collections.DOIItemComparator;
-import edu.berkeley.guir.prefuse.event.ControlAdapter;
+import edu.berkeley.guir.prefuse.event.FocusEvent;
+import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Tree;
+import edu.berkeley.guir.prefuse.graph.TreeLib;
 import edu.berkeley.guir.prefuse.graph.TreeNode;
 import edu.berkeley.guir.prefuse.graph.io.HDirTreeReader;
 import edu.berkeley.guir.prefuse.graph.io.TreeReader;
@@ -43,8 +40,12 @@ import edu.berkeley.guir.prefuse.render.DefaultNodeRenderer;
 import edu.berkeley.guir.prefuse.render.Renderer;
 import edu.berkeley.guir.prefuse.render.RendererFactory;
 import edu.berkeley.guir.prefuse.render.TextItemRenderer;
+import edu.berkeley.guir.prefuse.util.ColorMap;
 import edu.berkeley.guir.prefuse.util.StringAbbreviator;
 import edu.berkeley.guir.prefusex.layout.BalloonTreeLayout;
+import edu.berkeley.guir.prefusex.controls.DragControl;
+import edu.berkeley.guir.prefusex.controls.FocusControl;
+import edu.berkeley.guir.prefusex.controls.NeighborHighlightControl;
 import edu.berkeley.guir.prefusex.controls.PanHandler;
 import edu.berkeley.guir.prefusex.controls.ZoomHandler;
 
@@ -63,7 +64,8 @@ public class BalloonGraphDemo {
 	public static ItemRegistry registry;
 	public static Tree tree;
 	public static Display display;
-    public static ActionPipeline pipeline, animate, animate2;
+    public static ActionPipeline filter, update, animate;
+    //public static ActionPipeline pipeline, animate, animate2;
     
     private static Font frameCountFont = new Font("SansSerif", Font.PLAIN, 14);
 		
@@ -116,45 +118,51 @@ public class BalloonGraphDemo {
 			registry.setRendererFactory(new DemoRendererFactory(
 				nodeRenderer, nodeRenderer2, edgeRenderer));
 			
-			// initialize display
-			DemoController controller = new DemoController(); 
-			display.setRegistry(registry);
-			display.setSize(700,700);
-			display.setBackground(Color.WHITE);
-            display.setFont(new Font("SansSerif",Font.PLAIN,10));
-            display.getTextEditor().addKeyListener(controller);
-			display.addControlListener(controller);
-            display.addControlListener(new PanHandler());
-            display.addControlListener(new ZoomHandler());
-			
-			// initialize filter
-            ActionPipeline filter  = new ActionPipeline(registry);
+            // initialize action pipelines
+            filter  = new ActionPipeline(registry);
             filter.add(new FisheyeTreeFilter(-4));
-            filter.add(new GarbageCollector(ItemRegistry.DEFAULT_NODE_CLASS));
             filter.add(new TreeEdgeFilter());
-            filter.add(new GarbageCollector(ItemRegistry.DEFAULT_EDGE_CLASS));
             filter.add(new BalloonTreeLayout());
-            filter.add(new DemoColorFunction());
-   
+            filter.add(new GraphEdgeFilter());
+            filter.add(new DemoColorFunction(4));
+            
+            update = new ActionPipeline(registry);
+            update.add(new DemoColorFunction(4));
+            update.add(new RepaintAction());
+            
             animate = new ActionPipeline(registry, 1500, 20);
             animate.setPacingFunction(new SlowInSlowOutPacer());
             animate.add(new LinearInterpolator());
             animate.add(new ColorInterpolator());
             animate.add(new RepaintAction());
             
-            animate2 = new ActionPipeline(registry, 500, 20);
-            animate2.add(new LinearInterpolator());
-            animate2.add(new RepaintAction());
+            // initialize display
+            display.setRegistry(registry);
+            display.setSize(700,700);
+            display.setBackground(Color.WHITE);
+            display.addControlListener(new FocusControl());
+            display.addControlListener(new DragControl());
+            display.addControlListener(new PanHandler());
+            display.addControlListener(new ZoomHandler());
+            display.addControlListener(new NeighborHighlightControl(update));
+            			
+			// set up initial focus and focus listener
+            registry.getDefaultFocusSet().addFocusListener(new FocusListener() {
+                public void focusChanged(FocusEvent e) {
+                    if ( update.isScheduled() )
+                        update.cancel();
+                    TreeNode node = (TreeNode)e.getFirstAdded();
+                    if ( node != null && !node.equals(tree.getRoot()) ) {                           
+                        tree = TreeLib.breadthFirstTree(node);
+                        registry.setGraph(tree);
+                        ActivityManager.scheduleNow(filter);
+                        ActivityManager.scheduleNow(animate);                      
+                    }
+                } //
+            });
+            registry.getDefaultFocusSet().set(tree.getRoot());
             
-            //filter.setNextActivity(animate);
-            pipeline = filter;
-
-			// set initial focus
-			registry.getDefaultFocusSet().set(tree.getRoot());			
-
 			// create and display application window
-
-			
 			JFrame frame = new JFrame("BalloonTree");
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.getContentPane().add(display, BorderLayout.CENTER);
@@ -164,101 +172,13 @@ public class BalloonGraphDemo {
 			// because awt doesn't always give us 
 			// our graphics context right away...
 			while ( display.getGraphics() == null );
-			runPipeline();
+            ActivityManager.scheduleNow(filter);
+            ActivityManager.scheduleNow(animate);
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}	
 	} //
-    
-    public static void runPipeline() {
-        ActivityManager.scheduleNow(pipeline);
-        ActivityManager.scheduleNow(animate);
-    } //
 	
-	static class DemoController extends ControlAdapter implements KeyListener {
-		private Color highlightColor = new Color(150,150,255);
-		public void itemEntered(GraphItem item, MouseEvent e) {
-			if ( item instanceof NodeItem ) {
-				e.getComponent().setCursor(
-                    Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				
-				TreeNode n = (TreeNode)registry.getEntity(item);
-				Iterator iter = n.getNeighbors();
-				while ( iter.hasNext() ) {
-					TreeNode c = (TreeNode)iter.next();
-					EdgeItem eitem = registry.getEdgeItem(n.getEdge(c));
-					if ( eitem != null && eitem.isVisible() ) {
-						eitem.setColor(highlightColor);
-						eitem.setFillColor(highlightColor);
-						display.drawItem(eitem);	
-					}
-				}
-				iter = n.getNeighbors();
-				while ( iter.hasNext() ) {
-					TreeNode c = (TreeNode)iter.next();
-					NodeItem citem = registry.getNodeItem(c);
-					if ( citem != null && citem.isVisible() ) {
-						citem.setColor(Color.BLUE);
-						display.drawItem(citem);
-					}
-				}				
-				item.setColor(Color.RED);
-				display.drawItem(item);
-				display.repaintImmediate();
-				//container.setToolTipText(item.getAttribute(nameField));
-				//container.showToolTip((int)item.getX()+10,(int)item.getY()+10);
-			}
-		} //
-		public void itemExited(GraphItem item, MouseEvent e) {
-			if ( item instanceof NodeItem ) {
-				e.getComponent().setCursor(Cursor.getDefaultCursor());
-				
-				//container.hideToolTip();
-				TreeNode n = (TreeNode)registry.getEntity(item);
-				Iterator iter = n.getNeighbors();
-				while ( iter.hasNext() ) {
-					TreeNode c = (TreeNode)iter.next();
-					EdgeItem eitem = registry.getEdgeItem(n.getEdge(c));
-					if ( eitem != null && eitem.isVisible() ) {
-						eitem.setColor(eitem.getEndColor());
-						eitem.setFillColor(eitem.getEndFillColor());	
-					}					
-					NodeItem citem = registry.getNodeItem(c);
-					if ( citem != null && citem.isVisible() ) {
-						citem.setColor(citem.getEndColor());
-					}
-				}
-				item.setColor(item.getEndColor());
-				display.repaint();
-			}
-		} //
-		public void itemClicked(GraphItem item, MouseEvent e) {
-			int cc = e.getClickCount();
-			if ( item instanceof NodeItem ) {
-				if ( cc == 1 ) {
-					TreeNode node = (TreeNode)registry.getEntity(item);
-                    if ( node != null && !node.equals(tree.getRoot()) ) {                           
-                        tree.switchRoot(node);						
-						registry.getDefaultFocusSet().set(node);
-						runPipeline();						
-					}
-				} else if ( cc == 2 ) {
-					display.editText(item, nameField);
-				}
-			}
-		} //
-
-		public void keyPressed(KeyEvent e) {
-		} //
-		public void keyReleased(KeyEvent e) {
-			if ( e.getKeyCode() == KeyEvent.VK_ENTER ) {
-				display.stopEditing();
-				runPipeline();
-			}
-		} //
-		public void keyTyped(KeyEvent e) {
-		} //
-	} // end of inner class DemoController
 	
     static class DemoRendererFactory implements RendererFactory {
         private Renderer nodeRenderer1;
@@ -329,64 +249,51 @@ public class BalloonGraphDemo {
 
 	} // end of inner class DemoDisplay
 	
-    static class DemoColorFunction extends ColorFunction {
-	    private int  thresh = 3;
-	    private Color graphEdgeColor = Color.LIGHT_GRAY; //new Color(150,150,255);
-	    private Color nodeColors[];
-	   	private Color edgeColors[];
-	   
-	   	public DemoColorFunction() {
-	   		nodeColors = new Color[thresh];
-	   	    edgeColors = new Color[thresh];
-	   	    for ( int i = 0; i < thresh; i++ ) {
-	   	    	double frac = i / ((double)thresh);
-	   	    	nodeColors[i] = calcIntermediateColor(Color.RED, Color.BLACK, frac);
-	   	    	edgeColors[i] = calcIntermediateColor(Color.RED, Color.BLACK, frac);
-	   	    }
-	   	} //
-	   
-	   	public Paint getFillColor(GraphItem item) {
-	   		if ( item instanceof NodeItem ) {
-	   			return Color.WHITE;
-	   		} else if ( item instanceof AggregateItem ) {
-	   			return Color.LIGHT_GRAY;
-	   		} else if ( item instanceof EdgeItem ) {
-	   			return getColor(item);
-	   		} else {
-	   			return Color.BLACK;
-	   		}
-	   	} //
-	   
-		public Paint getColor(GraphItem item) {
-			if (item instanceof NodeItem) {
-				//int doi = (int)(-1 * ((NodeItem) item).getDOI());
-                int doi = ((NodeItem)item).getDepth();
-				if (doi > thresh - 1) {
-					doi = thresh - 1;
-				}
-				return nodeColors[doi];
-			} else if (item instanceof EdgeItem) {
-				EdgeItem e = (EdgeItem) item;
-				Edge edge = (Edge) registry.getEntity(e);
-				if (edge.isTreeEdge()) {
-					int doi, doi1, doi2;
-                    doi1 = e.getFirstNode().getDepth();
-                    doi2 = e.getSecondNode().getDepth();
-                    doi = Math.max(doi1, doi2);
-					//doi1 = (int)e.getFirstNode().getDOI();
-					//doi2 = (int)e.getSecondNode().getDOI();
-					//doi = -1 * (doi1 < doi2 ? doi1 : doi2);
-					if (doi > thresh - 1) {
-						doi = thresh - 1;
-					}
-					return edgeColors[doi];
-				} else {
-					return graphEdgeColor;
-				}
-			} else {
-				return Color.BLACK;
-			}
-		} //
-   } // end of inner class DemoColorFunction
+    static public class DemoColorFunction extends ColorFunction {
+        private Color graphEdgeColor = Color.LIGHT_GRAY;
+        private Color highlightColor = Color.BLUE;
+        private ColorMap cmap; 
+        
+        public DemoColorFunction(int thresh) {
+            cmap = new ColorMap(
+                ColorMap.getInterpolatedMap(Color.RED, Color.BLACK),0,thresh);
+        } //
+        
+        public Paint getFillColor(GraphItem item) {
+            if ( item instanceof NodeItem ) {
+                return Color.WHITE;
+            } else if ( item instanceof AggregateItem ) {
+                return Color.LIGHT_GRAY;
+            } else if ( item instanceof EdgeItem ) {
+                return getColor(item);
+            } else {
+                return Color.BLACK;
+            }
+        } //
+        
+        public Paint getColor(GraphItem item) {
+            Boolean hl = (Boolean)item.getVizAttribute("highlight");
+            if ( hl != null && hl.booleanValue() ) {
+                return Color.BLUE;
+            } else if (item instanceof NodeItem) {
+                int d = ((NodeItem)item).getDepth();
+                return cmap.getColor(d);
+            } else if (item instanceof EdgeItem) {
+                EdgeItem e = (EdgeItem) item;
+                Edge edge = (Edge) registry.getEntity(e);
+                if (edge.isTreeEdge()) {
+                    int d, d1, d2;
+                    d1 = e.getFirstNode().getDepth();
+                    d2 = e.getSecondNode().getDepth();
+                    d = Math.max(d1, d2);
+                    return cmap.getColor(d);
+                } else {
+                    return graphEdgeColor;
+                }
+            } else {
+                return Color.BLACK;
+            }
+        } //
+    } // end of inner class DemoColorFunction
 
 } // end of classs RadialGraphDemo
