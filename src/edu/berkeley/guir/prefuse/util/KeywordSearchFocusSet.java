@@ -2,10 +2,11 @@ package edu.berkeley.guir.prefuse.util;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.StringTokenizer;
 
+import edu.berkeley.guir.prefuse.event.FocusEvent;
 import edu.berkeley.guir.prefuse.event.FocusEventMulticaster;
 import edu.berkeley.guir.prefuse.event.FocusListener;
 import edu.berkeley.guir.prefuse.graph.Entity;
@@ -38,10 +39,18 @@ import edu.berkeley.guir.prefuse.graph.Tree;
 public class KeywordSearchFocusSet implements FocusSet {
 
     private FocusListener m_listener = null;
-    private HashSet m_set = new HashSet();
+    private LinkedHashSet m_set = new LinkedHashSet();
     private Trie m_trie;
     private Trie.TrieNode m_curNode;
-    private String m_delim = " ";
+    private String m_delim = ", ";
+    private String m_query = null;
+    
+    /**
+     * Creates a new KeywordSearchFocusSet that is not case sensitive.
+     */
+    public KeywordSearchFocusSet() {
+        this(false);
+    } //
     
     /**
      * Creates a new KeywordSearchFocusSet with the indicated case sensitivity.
@@ -90,6 +99,14 @@ public class KeywordSearchFocusSet implements FocusSet {
     } //
     
     /**
+     * Returns the current search query, if any
+     * @return the current;y active search query
+     */
+    public String getQuery() {
+        return m_query;
+    } //
+    
+    /**
      * Searches the indexed attributes of this FocusSet for matching
      * string prefixes, adding the Entity instances for each search match
      * to the FocusSet.
@@ -97,12 +114,18 @@ public class KeywordSearchFocusSet implements FocusSet {
      *  with a matching prefix will be added to the FocusSet.
      */
     public void search(String query) {
+        Entity[] rem = (Entity[])m_set.toArray(FocusEvent.EMPTY);
+        m_set.clear();
+        m_query = query;
         m_curNode = m_trie.find(query);
         if ( m_curNode != null ) {
-            Iterator iter = iterator();
+            Iterator iter = trieIterator();
             while ( iter.hasNext() )
                 m_set.add(iter.next());
         }
+        Entity[] add = (Entity[])m_set.toArray(FocusEvent.EMPTY);
+        FocusEvent fe = new FocusEvent(this, FocusEvent.FOCUS_SET, add, rem);
+        m_listener.focusChanged(fe);
     } //
     
     /**
@@ -128,15 +151,19 @@ public class KeywordSearchFocusSet implements FocusSet {
      * @param attrName the name of the attribute to index
      */
     public void index(Iterator entities, String attrName) {
-        String s;
         while ( entities.hasNext() ) {
             Entity e = (Entity)entities.next();
-            if ( (s=e.getAttribute(attrName)) == null ) continue;
-            StringTokenizer st = new StringTokenizer(s,m_delim);
-            while ( st.hasMoreTokens() ) {
-                String tok = st.nextToken();
-                addString(tok, e);
-            }
+            index(e, attrName);
+        }
+    } //
+    
+    public void index(Entity e, String attrName) {
+        String s;
+        if ( (s=e.getAttribute(attrName)) == null ) return;
+        StringTokenizer st = new StringTokenizer(s,m_delim);
+        while ( st.hasMoreTokens() ) {
+            String tok = st.nextToken();
+            addString(tok, e);
         }
     } //
     
@@ -150,7 +177,11 @@ public class KeywordSearchFocusSet implements FocusSet {
      */
     public void clear() {
         m_curNode = null;
+        m_query = null;
+        Entity[] rem = (Entity[])m_set.toArray(FocusEvent.EMPTY);
         m_set.clear();
+        FocusEvent fe = new FocusEvent(this, FocusEvent.FOCUS_REMOVED, null, rem);
+        m_listener.focusChanged(fe);
     } //
 
     /**
@@ -163,8 +194,12 @@ public class KeywordSearchFocusSet implements FocusSet {
         if ( m_curNode == null ) {
             return Collections.EMPTY_LIST.iterator();
         } else {
-            return m_trie.new TrieIterator(m_curNode);
+            return m_set.iterator();
         }
+    } //
+    
+    private Iterator trieIterator() {
+        return m_trie.new TrieIterator(m_curNode);
     } //
 
     /**
@@ -172,7 +207,7 @@ public class KeywordSearchFocusSet implements FocusSet {
      * @return the number of matches for the most recent search query.
      */
     public int size() {
-        return (m_curNode==null ? 0 : m_curNode.leafCount);
+        return (m_curNode==null ? 0 : m_set.size());
     } //
 
     /**

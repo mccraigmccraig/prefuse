@@ -10,8 +10,11 @@ import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
+import java.awt.geom.RoundRectangle2D;
 
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.util.FontLib;
@@ -40,13 +43,48 @@ public class TextImageItemRenderer extends ShapeRenderer {
 	protected int m_horizBorder = 3;
 	protected int m_vertBorder  = 0;
 	protected int m_imageMargin = 4;
+    
+    protected double m_imageSize = 1.0;
 	
-	protected Font m_font = new Font("SansSerif", Font.PLAIN, 10);	
-	protected Rectangle2D m_imageBox  = new Rectangle2D.Float();
-	protected Point2D     m_tmpPoint = new Point2D.Float();
+	protected Font m_font = new Font("SansSerif", Font.PLAIN, 10);
+    protected RectangularShape m_imageBox  = new Rectangle2D.Float();
+	protected Point2D     m_tmpPoint = new Point2D.Double();
+    protected AffineTransform m_transform = new AffineTransform();
 
+    /**
+     * Rounds the corners of the bounding rectangle in which the text
+     * string is rendered.
+     * @param arcWidth the width of the curved corner
+     * @param arcHeight the height of the curved corner
+     */
+    public void setRoundedCorner(int arcWidth, int arcHeight) {
+        if ( (arcWidth == 0 || arcHeight == 0) && 
+                !(m_imageBox instanceof Rectangle2D) ) {
+            m_imageBox = new Rectangle2D.Float();
+        } else {
+            if ( !(m_imageBox instanceof RoundRectangle2D) )
+                m_imageBox = new RoundRectangle2D.Float();
+            ((RoundRectangle2D)m_imageBox)
+                .setRoundRect(0,0,10,10,arcWidth,arcHeight);                    
+        }
+    } //
+    
+    /**
+     * Sets the display-time scaling factor for images. This scaling
+     * is applied at rendering time, to scale the image immediately upon
+     * loading instead, refer to the {@link #setMaxImageDimensions(int,int)
+     * setMaxImageDimensions} method.
+     * @param size the scaling factor for displaying images
+     */
+    public void setImageSize(double size) {
+        m_imageSize = size;
+    } //
+    
 	/**
 	 * Sets maximum image dimensions, used to control scaling of loaded images
+     * This scaling is enforced immediately upon loading of the image, to 
+     * scale the image at rendering time instead, refer to the 
+     * {@link #setImageSize(double) setImageSize} method.
 	 * @param width the max width of images (-1 for no limit)
 	 * @param height the max height of images (-1 for no limit)
 	 */
@@ -119,8 +157,9 @@ public class TextImageItemRenderer extends ShapeRenderer {
         
 		// get image dimensions
 		Image img = getImage(item);
-		double ih = (img==null ? 0 : size*img.getHeight(null));
-		double iw = (img==null ? 0 : size*img.getWidth(null));
+        double is = size*m_imageSize;
+		double ih = (img==null ? 0 : is*img.getHeight(null));
+		double iw = (img==null ? 0 : is*img.getWidth(null));
 		
 		// get text dimensions
 		m_font = item.getFont();
@@ -140,7 +179,7 @@ public class TextImageItemRenderer extends ShapeRenderer {
 		double h = Math.max(th, ih) + size*2*m_vertBorder;
 		
 		getAlignedPoint(m_tmpPoint, item, w, h, m_xAlign, m_yAlign);
-		m_imageBox.setRect(m_tmpPoint.getX(),m_tmpPoint.getY(),w,h);
+		m_imageBox.setFrame(m_tmpPoint.getX(),m_tmpPoint.getY(),w,h);
 		return m_imageBox;
 	} //
 	
@@ -176,7 +215,7 @@ public class TextImageItemRenderer extends ShapeRenderer {
         Paint fillColor = item.getFillColor();
         
         // render the fill
-        int type = getRenderType();
+        int type = getRenderType(item);
         if ( type==RENDER_TYPE_FILL || type==RENDER_TYPE_DRAW_AND_FILL ) {
             g.setPaint(fillColor);
             g.fill(shape);
@@ -189,8 +228,8 @@ public class TextImageItemRenderer extends ShapeRenderer {
 			return;
 						
 		Rectangle2D r = shape.getBounds2D();
-           double size = item.getSize();
-		double x = r.getX() + size*m_horizBorder;
+        double size = item.getSize();
+		double x = r.getMinX() + size*m_horizBorder;
 			
         // render image
 		if ( img != null ) {
@@ -206,19 +245,18 @@ public class TextImageItemRenderer extends ShapeRenderer {
 				}
 			}
             
-            double w = size*img.getWidth(null);
-            double h = size*img.getHeight(null);
-            double y = r.getY() + (r.getHeight()-h)/2;
+            double is = m_imageSize*size;
+            double w = is*img.getWidth(null);
+            double h = is*img.getHeight(null);
+            double y = r.getMinY() + (r.getHeight()-h)/2;
             
-            int ix = (int)Math.round(x), iy = (int)Math.round(y);
-            if ( size == 1 )
-                g.drawImage(img, ix, iy, null);
-            else
-                g.drawImage(img, ix, iy, (int)Math.round(w), 
-                        (int)Math.round(h), null);
+            m_transform.setTransform(is,0,0,is,x,y);
+            g.drawImage(img, m_transform, null);
+
 			x += w + (s!=null ? size*m_imageMargin : 0);
 			g.setComposite(comp);
 		}
+        
         // render text
 		if ( s != null ) {
 			g.setPaint(itemColor);

@@ -31,6 +31,10 @@ public abstract class DatabaseLoader extends GraphLoader {
         m_columns = columns;
     } //
     
+    public String[] getColumns() {
+        return m_columns;
+    } //
+    
     public void connect(String driver, String url, String user, String password)
         throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
     {

@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 
 import edu.berkeley.guir.prefuse.Display;
 import edu.berkeley.guir.prefuse.FocusManager;
+import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
@@ -62,9 +63,12 @@ public class FocusControl extends ControlAdapter {
             Display d = (Display)e.getSource();
             d.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             if ( ccount == 0 ) {
-                FocusManager fm = item.getItemRegistry().getFocusManager();
+                ItemRegistry registry = item.getItemRegistry();
+                FocusManager fm = registry.getFocusManager();
                 FocusSet fs = fm.getFocusSet(focusSetKey);
                 fs.set(item.getEntity());
+                registry.touch(item.getItemClass());
+                
             }
         }
     } //
@@ -74,9 +78,11 @@ public class FocusControl extends ControlAdapter {
             Display d = (Display)e.getSource();
             d.setCursor(Cursor.getDefaultCursor());
             if ( ccount == 0 ) {
-                FocusManager fm = item.getItemRegistry().getFocusManager();
+                ItemRegistry registry = item.getItemRegistry();
+                FocusManager fm = registry.getFocusManager();
                 FocusSet fs = fm.getFocusSet(focusSetKey);
                 fs.remove(item.getEntity());
+                registry.touch(item.getItemClass());
             }
         }
     } //
@@ -86,9 +92,11 @@ public class FocusControl extends ControlAdapter {
              SwingUtilities.isLeftMouseButton(e)    && 
              e.getClickCount() == ccount )
         {
-            FocusManager fm = item.getItemRegistry().getFocusManager();
+            ItemRegistry registry = item.getItemRegistry();
+            FocusManager fm = registry.getFocusManager();
             FocusSet fs = fm.getFocusSet(focusSetKey);
             fs.set(item.getEntity());
+            registry.touch(item.getItemClass());
         }
     } //
     

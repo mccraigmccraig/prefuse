@@ -7,7 +7,6 @@ import edu.berkeley.guir.prefuse.util.FocusSet;
 
 /**
  * 
- * Feb 20, 2004 - jheer - Created class
  *
  * @version 1.0
  * @author <a href="http://jheer.org">Jeffrey Heer</a> prefuse(AT)jheer.org

@@ -66,6 +66,8 @@ public class NeighborHighlightControl extends ControlAdapter {
                 NodeItem nitem = (NodeItem)eitem.getAdjacentNode(n);
                 eitem.setHighlighted(state);
                 nitem.setHighlighted(state);
+                registry.touch(nitem.getItemClass());
+                registry.touch(eitem.getItemClass());
             }
         }
         if ( update != null )

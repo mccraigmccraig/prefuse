@@ -65,7 +65,7 @@ public abstract class ShapeRenderer implements Renderer {
         Stroke s = g.getStroke();
         Stroke is = getStroke(item);
         if ( is != null ) g.setStroke(is);
-		switch (getRenderType()) {
+		switch (getRenderType(item)) {
 			case RENDER_TYPE_DRAW :
 				g.setPaint(itemColor);
 				g.draw(shape);
@@ -130,7 +130,7 @@ public abstract class ShapeRenderer implements Renderer {
      * fill, or both. The default is to draw both.
 	 * @return the rendering type
 	 */
-	public int getRenderType() {
+	public int getRenderType(VisualItem item) {
 		return m_renderType;
 	} //
     

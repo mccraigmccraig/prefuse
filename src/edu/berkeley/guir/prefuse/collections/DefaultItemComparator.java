@@ -34,6 +34,14 @@ public class DefaultItemComparator implements Comparator {
         else if ( !f1 && f2 )
             return -1;
         
+        boolean h1 = item1.isHighlighted();
+        boolean h2 = item2.isHighlighted();
+        
+        if ( h1 && !h2 )
+            return 1;
+        else if ( !h1 && h2 )
+            return -1;
+        
         boolean n1 = item1 instanceof NodeItem;
         boolean n2 = item2 instanceof NodeItem;
         

@@ -132,7 +132,7 @@ public class MultiLineTextItemRenderer extends TextItemRenderer {
 		Paint itemColor = item.getColor();
 		Shape shape = getShape(item);
 		if (shape != null) {
-			switch (getRenderType()) {
+			switch (getRenderType(item)) {
 				case RENDER_TYPE_DRAW :
 					g.setPaint(itemColor);
 					g.draw(shape);
