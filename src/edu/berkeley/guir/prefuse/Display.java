@@ -610,16 +610,23 @@ public class Display extends JComponent {
      * @return the debug string
      */
     protected String getDebugString() {
-        StringBuffer sb = new StringBuffer();
         float fr = Math.round(frameRate*100f)/100f;
+        Runtime rt = Runtime.getRuntime();
+        long tm = rt.totalMemory()/1000000L;
+        long mm = rt.maxMemory()/1000000L;
+        
+        StringBuffer sb = new StringBuffer();
         sb.append("frame rate: ").append(fr).append("fps - ");
         sb.append(m_registry.size()).append(" items (");
         sb.append(m_registry.size(ItemRegistry.DEFAULT_NODE_CLASS));
         sb.append(" nodes, ");
         sb.append(m_registry.size(ItemRegistry.DEFAULT_EDGE_CLASS));
-        sb.append(" edges) fontCache(").append(FontLib.getCacheMissCount());
-        sb.append(") colorCache(");
+        sb.append(" edges) fonts(").append(FontLib.getCacheMissCount());
+        sb.append(") colors(");
         sb.append(ColorLib.getCacheMissCount()).append(')');
+        sb.append(" mem(");
+        sb.append(tm).append("M / ");
+        sb.append(mm).append("M)");
         return sb.toString();
     } //
     
