@@ -28,22 +28,28 @@ public class TreeFilter extends Filter {
     
     // determines if filtered edges are visible by default
     private boolean m_edgesVisible;
+    private boolean m_useFocusAsRoot;
     private Node m_root;
     
     // ========================================================================
     // == CONSTRUCTORS ========================================================
     
     public TreeFilter() {
-        this(true,true);
+        this(false, true, true);
     } //
     
-    public TreeFilter(boolean edgesVisible) {
-        this(edgesVisible, true);
+    public TreeFilter(boolean useFocusAsRoot) {
+        this(useFocusAsRoot, true, true);
     } //
     
-    public TreeFilter(boolean edgesVisible, boolean garbageCollect) {
+    public TreeFilter(boolean useFocusAsRoot, boolean edgesVisible) {
+        this(useFocusAsRoot, edgesVisible, true);
+    } //
+    
+    public TreeFilter(boolean useFocusAsRoot, boolean edgesVisible, boolean garbageCollect) {
         super(ITEM_CLASSES, garbageCollect);
         m_edgesVisible = edgesVisible;
+        m_useFocusAsRoot = useFocusAsRoot;
     } //
     
     // ========================================================================
@@ -75,6 +81,12 @@ public class TreeFilter extends Filter {
             if ( root == null ) root = item;
         }
         
+        Iterator fiter = registry.getDefaultFocusSet().iterator();
+        NodeItem focus = null;
+        if ( fiter.hasNext() ) {
+            focus = registry.getNodeItem((Node)fiter.next(), true);
+        }
+        
         // update root node as necessary
         if ( m_root != null ) {
             Node r = (m_root instanceof NodeItem ? m_root : 
@@ -82,6 +94,8 @@ public class TreeFilter extends Filter {
             if ( r != root)
                 ftree = null;
             root = (NodeItem)r;
+        } else if ( focus != null && m_useFocusAsRoot ) {
+            root = focus;
         } else if ( isTree ) {
             root = registry.getNodeItem(((Tree)graph).getRoot());
             if ( ftree != null ) ftree.setRoot(root);

@@ -29,6 +29,7 @@ public class WindowedTreeFilter extends Filter {
     
     // determines if filtered edges are visible by default
     private boolean m_edgesVisible;
+    private boolean m_useFocusAsRoot;
     private double m_minDOI;
     private Node m_root;
     private List m_queue = new LinkedList();
@@ -41,16 +42,21 @@ public class WindowedTreeFilter extends Filter {
     } //
     
     public WindowedTreeFilter(int minDOI) {
-        this(minDOI, true);
+        this(minDOI, false);
     } //
     
-    public WindowedTreeFilter(int minDOI, boolean edgesVisible) {
-        this(minDOI, edgesVisible, true);
+    public WindowedTreeFilter(int minDOI, boolean useFocusAsRoot) {
+        this(minDOI, useFocusAsRoot, true);
     } //
     
-    public WindowedTreeFilter(int minDOI, boolean edgesVisible, boolean gc) {
+    public WindowedTreeFilter(int minDOI, boolean useFocusAsRoot, boolean edgesVisible) {
+        this(minDOI, useFocusAsRoot, edgesVisible, true);
+    } //
+    
+    public WindowedTreeFilter(int minDOI, boolean useFocusAsRoot, boolean edgesVisible, boolean gc) {
         super(ITEM_CLASSES, gc);
         m_minDOI = minDOI;
+        m_useFocusAsRoot = useFocusAsRoot;
         m_edgesVisible = edgesVisible;
     } //
     
@@ -77,12 +83,22 @@ public class WindowedTreeFilter extends Filter {
         
         NodeItem froot = null;
         
+        // get the current focus node, if there is one
+        Iterator fiter = registry.getDefaultFocusSet().iterator();
+        NodeItem focus = null;
+        if ( fiter.hasNext() ) {
+            focus = registry.getNodeItem((Node)fiter.next(), true);
+        }
+        
         // determine root node for filtered tree
         if ( m_root != null ) {
             // someone has set a root for us to use
             Node r = (m_root instanceof NodeItem ? m_root : 
                 registry.getNodeItem(m_root,true));
             froot = (NodeItem)r;
+        } else if ( focus != null && m_useFocusAsRoot ) {
+            // use the current focus as the root
+            froot = focus;
         } else if ( isTree ) {
             // the backing graph is a tree, so use its root
             froot = registry.getNodeItem(((Tree)graph).getRoot(),true);
