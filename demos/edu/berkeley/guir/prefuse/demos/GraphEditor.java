@@ -3,6 +3,7 @@ package edu.berkeley.guir.prefuse.demos;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,12 +30,14 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 import edu.berkeley.guir.prefuse.Display;
+import edu.berkeley.guir.prefuse.EdgeItem;
 import edu.berkeley.guir.prefuse.ItemRegistry;
 import edu.berkeley.guir.prefuse.NodeItem;
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.action.AbstractAction;
 import edu.berkeley.guir.prefuse.action.ActionMap;
 import edu.berkeley.guir.prefuse.action.RepaintAction;
+import edu.berkeley.guir.prefuse.action.assignment.ColorFunction;
 import edu.berkeley.guir.prefuse.action.assignment.FontFunction;
 import edu.berkeley.guir.prefuse.action.filter.GraphFilter;
 import edu.berkeley.guir.prefuse.activity.ActionList;
@@ -162,6 +165,18 @@ public class GraphEditor extends JFrame {
 					}
 				} //
 			});
+            update.add(new ColorFunction() {
+                public Paint getColor(VisualItem item) {
+                    return item.getColor();
+                } //
+                public Paint getFillColor(VisualItem item) {
+                    if ( item instanceof EdgeItem ) {
+                        return Color.BLACK;
+                    } else {
+                        return item.getFillColor();
+                    }
+                } //
+            });
             update.add(new RepaintAction());
             activityMap.put("update", update);
             
