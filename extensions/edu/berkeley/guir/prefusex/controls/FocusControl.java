@@ -102,6 +102,20 @@ public class FocusControl extends ControlAdapter {
      * clicked the specified number of times. A click value of zero indicates
      * that the focus should be changed in response to mouse-over events.
      * @param clicks the number of clicks needed to switch the focus.
+     * @param act an activity run to upon focus change 
+     * @param focusSetKey the key corresponding to the focus set to use
+     */
+    public FocusControl(int clicks, Activity act, Object focusSetKey) {
+        ccount = clicks;
+        activity = act;
+        this.focusSetKey = focusSetKey;
+    } //
+    
+    /**
+     * Creates a new FocusControl that changes the focus when an item is 
+     * clicked the specified number of times. A click value of zero indicates
+     * that the focus should be changed in response to mouse-over events.
+     * @param clicks the number of clicks needed to switch the focus.
      * @param focusSetKey the key corresponding to the focus set to use
      * @param types the VisualItem classes that eligible for focus status
      */
