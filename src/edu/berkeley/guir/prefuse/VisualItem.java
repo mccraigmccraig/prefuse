@@ -99,7 +99,9 @@ public abstract class VisualItem implements Entity {
      * @see java.lang.Object#toString()
      */
 	public String toString() {
-		return "VisualItem{"+m_entity+"}";
+		String fullClassName = this.getClass().getName();
+		String shortClassName = fullClassName.substring(fullClassName.lastIndexOf(".")+1);
+		return shortClassName+"{"+m_entity+"}";
 	} //
 	
 	/**
