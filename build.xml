@@ -54,7 +54,7 @@
     <echo message=""/>
     <echo message="   all        --> builds all the jars in ./build"/>
     <echo message="   prefuse    --> builds the prefuse.jar file in ./build"/>
-    <echo message="   extensions --> builds the prefusex.jar file in ./build"/>
+    <echo message="   ext        --> builds the prefusex.jar file in ./build"/>
     <echo message="   demos      --> builds the demos.jar file in ./build"/>
     <echo message="   compiledist--> creates the compiled distribution in ./dist"/>
     <echo message="   sourcedist --> creates the source distribution in ./dist"/>    
