@@ -104,23 +104,23 @@ public class ItemRegistry {
 		public Map     itemMap;
 	} // end of inner class ItemEntry
 	
-    private Graph           m_backingGraph;
-    private Graph           m_filteredGraph;
+    protected Graph           m_backingGraph;
+    protected Graph           m_filteredGraph;
     
-    private List            m_displays;
-    private FocusManager    m_fmanager;
-	private ItemFactory     m_ifactory;
-	private RendererFactory m_rfactory;
+    protected List            m_displays;
+    protected FocusManager    m_fmanager;
+    protected ItemFactory     m_ifactory;
+    protected RendererFactory m_rfactory;
 	
-	private List m_entryList; // list of ItemEntry instances
-	private Map  m_entryMap;  // maps from item class names to ItemEntry instances
-	private Map  m_entityMap; // maps from items back to their entities
-	private int  m_size;      // the number of items in this registry
+    protected List m_entryList; // list of ItemEntry instances
+    protected Map  m_entryMap;  // maps from item class names to ItemEntry instances
+    protected Map  m_entityMap; // maps from items back to their entities
+    protected int  m_size;      // the number of items in this registry
     
-	private Comparator m_comparator;
+    protected Comparator m_comparator;
   
-  	private ItemRegistryListener m_registryListener;
-  	private FocusListener        m_focusListener;
+    protected ItemRegistryListener m_registryListener;
+    protected FocusListener        m_focusListener;
 	
 	/**
 	 * Constructor. Creates an empty ItemRegistry and corresponding ItemFactory.
@@ -347,6 +347,15 @@ public class ItemRegistry {
 		m_comparator = comparator;
 	} //
 
+	/**
+	 * Returns this registry's backing item factory. The ItemFactory is
+	 * responsible for creating and pooling VisualItem instances.
+	 * @return the ItemFactory
+	 */
+	public synchronized ItemFactory getItemFactory() {
+	    return m_ifactory;
+	} //
+	
     /**
      * Returns the total number of VisualItems in the given item class.
      * @param itemClass the item class to look up the size for
@@ -787,7 +796,7 @@ public class ItemRegistry {
 	 * @param entity the graph Entity to add
 	 * @param item the VisualItem corresponding to the entity
 	 */
-	private synchronized void addMapping(ItemEntry entry, Entity entity, VisualItem item) {
+	protected synchronized void addMapping(ItemEntry entry, Entity entity, VisualItem item) {
 		entry.itemMap.put(entity, item);
 		if ( m_entityMap.containsKey(item) ) {
 			Object o = m_entityMap.get(item);
@@ -818,7 +827,7 @@ public class ItemRegistry {
 		}
 	} //
 	
-	private synchronized void removeMappings(ItemEntry entry, VisualItem item) {
+	protected synchronized void removeMappings(ItemEntry entry, VisualItem item) {
 		if ( m_entityMap.containsKey(item) ) {
 			Object o = m_entityMap.get(item);
 			m_entityMap.remove(item);
@@ -839,7 +848,7 @@ public class ItemRegistry {
 	 * @param entity the graph Entity to add
 	 * @param item the VisualItem corresponding to the entity
 	 */
-	private synchronized void addItem(ItemEntry entry, Entity entity, VisualItem item) {
+	protected synchronized void addItem(ItemEntry entry, Entity entity, VisualItem item) {
 		addItem(entry, item);
 		addMapping(entry, entity, item);
 	} //
@@ -849,7 +858,7 @@ public class ItemRegistry {
 	 * mappings.
 	 * @param item the item to add the the visualization queue
 	 */
-	private synchronized void addItem(ItemEntry entry, VisualItem item) {
+	protected synchronized void addItem(ItemEntry entry, VisualItem item) {
 		entry.itemList.add(item);
 		entry.modified = true;
         m_size++;
@@ -865,7 +874,7 @@ public class ItemRegistry {
      *  rendering queue. This option is available to avoid errors that
      *  arise when removing items coming from a currently active Iterator.
 	 */
-	private synchronized void removeItem(ItemEntry entry, VisualItem item, boolean lr) {
+	protected synchronized void removeItem(ItemEntry entry, VisualItem item, boolean lr) {
 		removeMappings(entry, item);
 		if (lr) entry.itemList.remove(item);
         m_size--;
