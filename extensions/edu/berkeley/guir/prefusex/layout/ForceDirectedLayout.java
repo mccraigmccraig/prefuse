@@ -46,6 +46,10 @@ public class ForceDirectedLayout extends Layout {
         m_fsim.addForce(new DragForce());
     } //
     
+    public ForceDirectedLayout(ForceSimulator fsim, boolean enforceBounds) {
+        this(fsim, enforceBounds, false);
+    } //
+    
     public ForceDirectedLayout(ForceSimulator fsim, 
             boolean enforceBounds, boolean runonce)
     {
@@ -97,6 +101,9 @@ public class ForceDirectedLayout extends Layout {
         }
         // clear temp member variable
         this.registry = null;
+        if ( frac == 1.0 ) {
+            reset(registry);
+        }
     } //
 
     private void updateNodePositions() {
