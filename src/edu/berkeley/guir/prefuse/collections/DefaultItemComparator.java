@@ -37,11 +37,6 @@ public class DefaultItemComparator implements Comparator {
         boolean h1 = item1.isHighlighted();
         boolean h2 = item2.isHighlighted();
         
-        if ( h1 && !h2 )
-            return 1;
-        else if ( !h1 && h2 )
-            return -1;
-        
         boolean n1 = item1 instanceof NodeItem;
         boolean n2 = item2 instanceof NodeItem;
         
@@ -50,9 +45,15 @@ public class DefaultItemComparator implements Comparator {
         else if ( !n1 && n2 )
             return -1;
         else if ( n1 && n2 ) {
-            boolean a1 = item1 instanceof AggregateItem;
-            boolean a2 = item2 instanceof AggregateItem;
-            return (a1 && !a2 ? -1 : (!a1 && a2 ? 1 : 0));
+            if ( h1 && !h2 )
+                return 1;
+            else if ( !h1 && h2 )
+                return -1;
+            else {
+                boolean a1 = item1 instanceof AggregateItem;
+                boolean a2 = item2 instanceof AggregateItem;
+                return (a1 && !a2 ? -1 : (!a1 && a2 ? 1 : 0));
+            }
         }
         
         boolean e1 = item1 instanceof EdgeItem;
@@ -62,8 +63,12 @@ public class DefaultItemComparator implements Comparator {
             return 1;
         else if ( !e1 && e2 )
             return -1;
+        else if ( h1 && !h2 )
+                return 1;
+        else if ( !h1 && h2 )
+            return -1;
         else
-            return 0;	
+            return 0;
 	} //
 
 } // end of class DefaultItemComparator
