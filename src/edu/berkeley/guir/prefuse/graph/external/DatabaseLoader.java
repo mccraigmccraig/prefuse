@@ -135,6 +135,8 @@ public abstract class DatabaseLoader extends GraphLoader {
             (ExternalEntity) new ExternalNode() : new ExternalTreeNode());
         for ( int i=0; i<m_columns.length; i++ ) {
             String value = rs.getString(m_columns[i]);
+            if ( value != null )
+                value = value.replaceAll("\r","");
             node.setAttribute(m_columns[i], value);
         }
         super.foundNode(type, src, node, null);
