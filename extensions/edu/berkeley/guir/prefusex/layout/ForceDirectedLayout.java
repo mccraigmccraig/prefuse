@@ -148,13 +148,20 @@ public class ForceDirectedLayout extends Layout {
         Iterator iter = registry.getNodeItems();
         while ( iter.hasNext() ) {
             NodeItem  nitem = (NodeItem)iter.next();
+            ForceItem fitem = (ForceItem)nitem.getVizAttribute("forceItem");
+            
             if ( nitem.isFixed() ) {
+                // clear any force computations
+                fitem.force[0] = 0.0f;
+                fitem.force[1] = 0.0f;
+                fitem.velocity[0] = 0.0f;
+                fitem.velocity[1] = 0.0f;
+                
                 if ( Double.isNaN(nitem.getX()) )
                     setLocation(nitem,referrer,0.0,0.0);
                 continue;
             }
             
-            ForceItem fitem = (ForceItem)nitem.getVizAttribute("forceItem");
             double x = fitem.location[0];
             double y = fitem.location[1];
             
@@ -192,6 +199,9 @@ public class ForceDirectedLayout extends Layout {
     protected void initSimulator(ItemRegistry registry, ForceSimulator fsim) {
        float startX = (referrer == null ? 0f : (float)referrer.getX());
        float startY = (referrer == null ? 0f : (float)referrer.getY());
+       startX = Float.isNaN(startX) ? 0f : startX;
+       startY = Float.isNaN(startY) ? 0f : startY;
+       
        Iterator iter = registry.getNodeItems();
        while ( iter.hasNext() ) {
            NodeItem nitem = (NodeItem)iter.next();
