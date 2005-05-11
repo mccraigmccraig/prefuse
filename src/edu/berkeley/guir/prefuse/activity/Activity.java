@@ -197,7 +197,7 @@ public abstract class Activity {
             m_nextTime = currentTime + m_stepTime;
         }
         
-        return m_stepTime;
+        return (m_nextTime-currentTime);
     } //
     
     /**

@@ -275,7 +275,9 @@ public class ActivityManager extends Thread {
                     // run the activity - the activity will check for
                     // itself if it should perform any action or not
                     Activity a = (Activity)m_tmp.get(i);
-                    t = Math.max(t, a.runActivity(currentTime));
+                    long s = a.runActivity(currentTime);
+                    // compute minimum time for next activity cycle
+                    t = (s<0 ? t : t<0 ? s : Math.min(t,s));
                 }
 
                 // clear the temporary list
