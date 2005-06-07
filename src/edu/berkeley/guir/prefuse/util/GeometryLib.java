@@ -1,5 +1,6 @@
 package edu.berkeley.guir.prefuse.util;
 
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -216,5 +217,59 @@ public class GeometryLib {
 	        pts[i+1] += amt*vy/norm;
 	    }
 	} //
+	
+	public static GeneralPath cardinalSpline(float pts[], float alpha, boolean closed) {
+	    if ( pts.length < 6 ) {
+	        throw new IllegalArgumentException(
+	                "To create spline requires at least 3 points");
+	    }
+	    GeneralPath p = new GeneralPath();
+	    p.moveTo(pts[0],pts[1]);
+	    
+	    float dx1, dy1, dx2, dy2;
+	    
+	    // compute first control point
+	    if ( closed ) {
+	        dx2 = pts[2]-pts[pts.length-2];
+	        dy2 = pts[3]-pts[pts.length-1];
+	    } else {
+	        dx2 = pts[4]-pts[0];
+	        dy2 = pts[5]-pts[1];
+	    }
+	    
+	    // repeatedly compute next control point and append curve
+	    int i;
+	    for ( i=2; i<pts.length-2; i+=2 ) {
+	        dx1 = dx2; dy1 = dy2;
+	        dx2 = pts[i+2]-pts[i-2];
+	        dy2 = pts[i+3]-pts[i-1];
+	        p.curveTo(pts[i-2]+alpha*dx1, pts[i-1]+alpha*dy1,
+	                  pts[i]  -alpha*dx2, pts[i+1]-alpha*dy2,
+	                  pts[i],             pts[i+1]);
+	    }
+	    
+	    // compute last control point
+	    if ( closed ) {
+	        dx1 = dx2; dy1 = dy2;
+	        dx2 = pts[0]-pts[i-2];
+	        dy2 = pts[1]-pts[i-1];
+	        p.curveTo(pts[i-2]+alpha*dx1, pts[i-1]+alpha*dy1,
+	                  pts[i]  -alpha*dx2, pts[i+1]-alpha*dy2,
+	                  pts[i],             pts[i+1]);
+	        
+	        dx1 = dx2; dy1 = dy2;
+	        dx2 = pts[2]-pts[pts.length-2];
+	        dy2 = pts[3]-pts[pts.length-1];
+	        p.curveTo(pts[pts.length-2]+alpha*dx1, pts[pts.length-1]+alpha*dy1,
+	                  pts[0]           -alpha*dx2, pts[1]           -alpha*dy2,
+	                  pts[0],                      pts[1]);
+	        p.closePath();
+	    } else {
+	        p.curveTo(pts[i-2]+alpha*dx2, pts[i-1]+alpha*dy2,
+	                  pts[i]  -alpha*dx2, pts[i+1]-alpha*dy2,
+	                  pts[i],             pts[i+1]);
+	    }
+	    return p;
+	}
 	
 } // end of class GeometryLib
