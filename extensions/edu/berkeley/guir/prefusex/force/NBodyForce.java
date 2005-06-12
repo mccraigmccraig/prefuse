@@ -8,12 +8,10 @@ import java.util.Random;
 /**
  * A quad-tree based implementation of the Barnes-Hut algorithm for
  *  efficient n-body force simulations. This can be used to create
- *  force-based layouts of graphs. All input NodeItems to the simulation
- *  are expected to have a "mass" attribute of type float, retrievable 
- *  by the call item.getVizAttribute("mass").
+ *  force-based layouts of graphs.
  * 
  * The Barnes-Hut algorithm originally appeared in <i>"A Hierarchical 
- *  O(n log n)force calculation algorithm" by J. Barnes and P. Hut, Nature, 
+ *  O(n log n) force calculation algorithm" by J. Barnes and P. Hut, Nature, 
  *  v.324, December 1986</i>. For more details on the algorithm, see one of
  *  the following links --
  * <ul>
