@@ -77,7 +77,7 @@ public class NBodyForce extends AbstractForce {
 	 * @param xMax the maximum x-coordinate
 	 * @param yMax the maximum y-coordinate
 	 */
-	private void setBounds(int xMin, int yMin, int xMax, int yMax) {
+	private void setBounds(float xMin, float yMin, float xMax, float yMax) {
 		this.xMin = xMin;
         this.yMin = yMin;
         this.xMax = xMax;
@@ -110,19 +110,19 @@ public class NBodyForce extends AbstractForce {
 		clear(); // clear internal state
         
         // compute and squarify bounds of quadtree
-        int x1 = Integer.MAX_VALUE, y1 = Integer.MAX_VALUE;
-        int x2 = Integer.MIN_VALUE, y2 = Integer.MIN_VALUE;
+        float x1 = Float.MAX_VALUE, y1 = Float.MAX_VALUE;
+        float x2 = Float.MIN_VALUE, y2 = Float.MIN_VALUE;
         Iterator itemIter = fsim.getItems();
         while ( itemIter.hasNext() ) {
             ForceItem item = (ForceItem)itemIter.next();
-            int x = (int)Math.round(item.location[0]);
-            int y = (int)Math.round(item.location[1]);
+            float x = item.location[0];
+            float y = item.location[1];
             if ( x < x1 ) x1 = x;
             if ( y < y1 ) y1 = y;
             if ( x > x2 ) x2 = x;
             if ( y > y2 ) y2 = y;
         }
-        int dx = x2-x1, dy = y2-y1;
+        float dx = x2-x1, dy = y2-y1;
         if ( dx > dy ) { y2 = y1 + dx; } else { x2 = x1 + dy; }
         setBounds(x1,y1,x2,y2);
         
@@ -148,6 +148,7 @@ public class NBodyForce extends AbstractForce {
 	    try {
 	        insert(item, root, xMin, yMin, xMax, yMax);
 	    } catch ( StackOverflowError e ) {
+	        // TODO: safe to remove?
 	        e.printStackTrace();
 	    }
 	} //
@@ -230,6 +231,7 @@ public class NBodyForce extends AbstractForce {
 	    try {
 	        forceHelper(item,root,xMin,yMin,xMax,yMax);
 	    } catch ( StackOverflowError e ) {
+	        // TODO: safe to remove?
 	        e.printStackTrace();
 	    }
 	} //
