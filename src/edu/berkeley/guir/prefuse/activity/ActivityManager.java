@@ -35,6 +35,7 @@ public class ActivityManager extends Thread {
     private ArrayList m_activities;
     private ArrayList m_tmp;
     private long      m_nextTime;
+    private boolean   m_stop = false;
     
     /**
      * Returns the active ActivityManager instance.
@@ -59,6 +60,16 @@ public class ActivityManager extends Thread {
         this.setDaemon(true);
         this.start();
     } //
+    
+    /**
+     * Instructs the the ActivityManager to shut down and die
+     */
+    public static void kill() {
+        ActivityManager instance = getInstance();
+        if ( instance.isAlive() ) {
+            getInstance()._stop();
+        }
+    }
     
     /**
      * Schedules an Activity with the manager.
@@ -144,6 +155,14 @@ public class ActivityManager extends Thread {
     public static int activityCount() {
         return getInstance()._activityCount();
     } //
+    
+    /**
+     * Instructs the the ActivityManager to shut down
+     */
+    private synchronized void _stop() {
+        m_stop = true;
+        this.notify();
+    }
     
     /**
      * Schedules an Activity with the manager.
@@ -261,6 +280,10 @@ public class ActivityManager extends Thread {
      */
     public void run() {
         while ( true ) {
+            if ( m_stop ) {
+                // stops the ActivityManager
+                break;
+            }
             if ( activityCount() > 0 ) {
                 long currentTime = System.currentTimeMillis();
                 long t = -1;
@@ -298,6 +321,11 @@ public class ActivityManager extends Thread {
                 } catch (InterruptedException e) { }
             }
         }
+
+        // reset the state
+        m_nextTime = Long.MAX_VALUE;
+        m_stop = false;
+        s_instance = null;
     } //
     
     public class ScheduleAfterActivity extends ActivityAdapter {
