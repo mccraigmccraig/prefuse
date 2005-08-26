@@ -107,7 +107,7 @@ public class GraphLib {
 
     private static void sortHelper(TreeNode node, EdgeNodeComparator c) {
         ArrayList list = new ArrayList();
-        Iterator iter = node.getChildren();
+        Iterator iter = node.getChildEdges();
         while ( iter.hasNext() )
             list.add(iter.next());
         c.setIgnoredNode(node);
