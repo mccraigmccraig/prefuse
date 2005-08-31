@@ -107,12 +107,20 @@ public class GraphLib {
 
     private static void sortHelper(TreeNode node, EdgeNodeComparator c) {
         ArrayList list = new ArrayList();
+        
+        // copy each child node into the buffer list
         Iterator iter = node.getChildEdges();
         while ( iter.hasNext() )
             list.add(iter.next());
+        
+        // set up the comparator, sort the list according to it
         c.setIgnoredNode(node);
         Collections.sort(list, c);
+        
+        // remove all children from the node
         node.removeAllChildren();
+        
+        // add the children back in their sorted order
         iter = list.iterator();
         while ( iter.hasNext() ) {
             Edge e = (Edge)iter.next();

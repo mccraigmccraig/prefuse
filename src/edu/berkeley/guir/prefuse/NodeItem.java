@@ -493,15 +493,14 @@ public class NodeItem extends VisualItem implements TreeNode {
      */
     public void removeAllChildren() {
         if ( m_children == null ) { return; }
-        Iterator iter = m_children.iterator();
-        while ( iter.hasNext() ) {
-            Edge e = (Edge)iter.next();
+        
+        while ( !m_children.isEmpty() ) {
+            Edge e = (Edge)m_children.get(m_children.size()-1);
             TreeNode c = (TreeNode)e.getAdjacentNode(this);
             c.setParentEdge(null);
             c.removeNeighbor(this);
             removeEdge(e);
         }
-        m_children.clear();
         int delta = m_numDescendants;
         for ( TreeNode p = this; p != null; p = p.getParent() )
             p.setDescendantCount(p.getDescendantCount()-delta);
