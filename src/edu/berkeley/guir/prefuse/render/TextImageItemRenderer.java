@@ -218,7 +218,7 @@ public class TextImageItemRenderer extends ShapeRenderer {
 		
         FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(m_font);
 		int th = fm.getHeight();
-		int tw = fm.stringWidth(s)+2;
+		int tw = fm.stringWidth(s)+4;
 		
 		double w = tw + iw + 
                 size*(2*m_horizBorder + (tw>0 && iw>0 ? m_imageMargin : 0));
