@@ -2,7 +2,6 @@ package edu.berkeley.guir.prefuse;
 
 import java.util.List;
 
-import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Entity;
 import edu.berkeley.guir.prefuse.graph.Node;
 
@@ -33,12 +32,7 @@ public class AggregateItem extends NodeItem {
 		}
 		super.init(registry, itemClass, entity);
 		
-		VisualItem item = null;
-		if ( entity instanceof Node ) {
-			item = m_registry.getNodeItem((Node)entity);
-		} else if ( entity instanceof Edge ) {
-			item = m_registry.getEdgeItem((Edge)entity);
-		}
+		VisualItem item = m_registry.getNodeItem((Node)entity);
 		if ( item != null ) {
 			setDOI(item.getDOI());
 			setStartLocation(item.getStartLocation());
