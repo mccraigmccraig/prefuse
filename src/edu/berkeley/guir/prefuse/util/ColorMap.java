@@ -14,6 +14,13 @@ import java.awt.Paint;
  */
 public class ColorMap {
 
+	/**
+	 * Default palette of category hues.
+	 */
+	public static final float[] CATEGORY_HUES = {
+		0f, 1f/12f, 1f/6f, 5f/24f, 1f/3f, 1f/2f, 2f/3f, 3f/4f, 5f/6f, 11f/12f
+	};
+	
     /**
      * The default length of a color map array if its size
      * is not otherwise specified.
@@ -187,6 +194,46 @@ public class ColorMap {
             cm[i] = ColorLib.getColor(Color.HSBtoRGB(h,s,b));
         }
         return cm;
+    } //
+    
+    /**
+     * Returns a color map array of given size tries to provide colors
+     * appropriate as category labels. There are 12 basic color hues
+     * (red, orange, yellow, olive, green, cyan, blue, purple, magenta,
+     * and pink). If the size is greater than 12, these colors will be
+     * continually repeated, but with varying saturation levels.
+     * @param size the size of the color map array
+     */
+    public static Paint[] getCategoryMap(int size) {
+    	return getCategoryMap(size, 1.f, 0.4f, 1.f, 255);
+    } //
+    
+    /**
+     * Returns a color map array of given size tries to provide colors
+     * appropriate as category labels. There are 12 basic color hues
+     * (red, orange, yellow, olive, green, cyan, blue, purple, magenta,
+     * and pink). If the size is greater than 12, these colors will be
+     * continually repeated, but with varying saturation levels.
+     * @param size the size of the color map array
+     * @param s1 the initial saturation to use
+     * @param s2 the final (most distant) saturation to use
+     * @param b the brightness value to use
+     * @param a the alpha value to use
+     */
+    public static Paint[] getCategoryMap(int size, 
+    		float s1, float s2, float b, int a)
+    {
+    	Paint[] cm = new Paint[size];
+    	float s = s1;
+    	for ( int i=0; i<size; i++ ) {
+    		int j = i % CATEGORY_HUES.length;
+    		if ( j == 0 )
+    			s = s1 + (((float)i)/size)*(s2-s1);
+    		int color = ((0xFF & a)<<24) | 
+    					 (0x00FFFFFF & Color.HSBtoRGB(CATEGORY_HUES[j],s,b));
+    		cm[i] = ColorLib.getColor(color);
+    	}
+    	return cm;
     } //
     
     /**
