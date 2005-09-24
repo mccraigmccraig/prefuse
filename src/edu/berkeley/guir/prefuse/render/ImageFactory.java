@@ -6,11 +6,9 @@ import java.awt.MediaTracker;
 import java.awt.Toolkit;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.graph.Entity;
@@ -43,8 +41,6 @@ public class ImageFactory {
 			}
 		};
 	private Map loadMap = new HashMap(50);
-    private Map loadingMap = new HashMap(50);
-    private Set loadingSet = new HashSet(50);
 
 	private final Component component = new Component() {};
 	private final MediaTracker tracker = new MediaTracker(component);
