@@ -58,7 +58,7 @@ public class GeometryLib {
 		if ( pts[0] == null ) pts[0] = new Point2D.Double();
 		if ( pts[1] == null ) pts[1] = new Point2D.Double();
 		
-		int result, i = 0;
+		int i = 0;
 		if ( intersectLineLine(mnx,mny,mxx,mny,a1x,a1y,a2x,a2y,pts[i]) > 0 ) i++;
 		if ( intersectLineLine(mxx,mny,mxx,mxy,a1x,a1y,a2x,a2y,pts[i]) > 0 ) i++;
 		if ( i == 2 ) return i;
@@ -77,7 +77,7 @@ public class GeometryLib {
 		if ( pts[0] == null ) pts[0] = new Point2D.Double();
 		if ( pts[1] == null ) pts[1] = new Point2D.Double();
 		
-		int result, i = 0;
+		int i = 0;
 		if ( intersectLineLine(mnx,mny,mxx,mny,a1x,a1y,a2x,a2y,pts[i]) > 0 ) i++;
 		if ( intersectLineLine(mxx,mny,mxx,mxy,a1x,a1y,a2x,a2y,pts[i]) > 0 ) i++;
 		if ( i == 2 ) return i;
@@ -95,13 +95,45 @@ public class GeometryLib {
 	 * The running time of this algorithm is O(n log n), where n is
 	 * the number of input points.
 	 * 
-	 * @param pts
+	 * @param pts the input points in [x0,y0,x1,y1,...] order
+	 * @param len the length of the pts array to consider (2 * #points)
 	 * @return
 	 */
 	public static double[] convexHull(double[] pts, int len) {
+		if (len < 6) {
+	        throw new IllegalArgumentException(
+	                "Input must have at least 3 points");
+	    }
+	    int plen = len/2-1;
+	    float[] angles = new float[plen];
+        int[] idx    = new int[plen];
+        int[] stack  = new int[len/2];
+        return convexHull(pts, len, angles, idx, stack);
+	}
+	
+	/**
+	 * Computes the 2D convex hull of a set of points using Graham's
+	 * scanning algorithm. The algorithm has been implemented as described
+	 * in Cormen, Leiserson, and Rivest's Introduction to Algorithms.
+	 * 
+	 * The running time of this algorithm is O(n log n), where n is
+	 * the number of input points.
+	 * 
+	 * @param pts
+	 * @return
+	 */
+	public static double[] convexHull(double[] pts, int len, 
+	        float[] angles, int[] idx, int[] stack)
+	{
+	    // check arguments
+	    int plen = len/2 - 1;
 	    if (len < 6) {
 	        throw new IllegalArgumentException(
 	                "Input must have at least 3 points");
+	    }
+	    if (angles.length < plen || idx.length < plen || stack.length < len/2) {
+	        throw new IllegalArgumentException(
+	                "Pre-allocated data structure too small");
 	    }
 	    
 	    int i0 = 0;
@@ -115,20 +147,18 @@ public class GeometryLib {
 	    }
 	    
 	    // calculate polar angles from ref point and sort
-	    float[] angles = new float[len/2 - 1];
-	    int[]   idx    = new int[len/2 - 1];
 	    for ( int i=0, j=0; i < len; i+=2 ) {
 	        if ( i == i0 ) continue;
 	        angles[j] = (float)Math.atan2(pts[i+1]-pts[i0+1], pts[i]-pts[i0]);
 	        idx[j] = i;
 	        j += 1;
 	    }
-	    ArrayLib.sort(angles,idx);
+	    ArrayLib.sort(angles,idx,plen);
 	    
 	    // toss out duplicated angles
 	    float angle = angles[0];
 	    int ti = 0;
-	    for ( int i=1; i<angles.length; i++ ) {
+	    for ( int i=1; i<plen; i++ ) {
 	        if ( angle == angles[i] ) {
 	            double d1 = Math.sqrt(pts[i]*pts[i]   + pts[i+1]*pts[i+1]);
 	            double d2 = Math.sqrt(pts[ti]*pts[ti] + pts[ti+1]*pts[ti+1]);
@@ -147,7 +177,6 @@ public class GeometryLib {
 	    
 	    // initialize our stack
 	    int sp = 0;
-	    int[] stack = new int[len/2];
 	    stack[sp++] = i0;
 	    int j = 0;
 	    for ( int k=0; k<2; j++ ) {
@@ -158,20 +187,21 @@ public class GeometryLib {
 	    }
 	    
 	    // do graham's scan
-	    for ( ; j < idx.length; j++ ) {
+	    for ( ; j < plen; j++ ) {
 	        if ( idx[j] == -1 ) continue; // skip tossed out points
 	        while ( isNonLeft(i0, stack[sp-2], stack[sp-1], idx[j], pts) ) {
 	            sp--;
 	        }
 	        stack[sp++] = idx[j];
 	    }
-	    
+
 	    // construct the hull
-	    double hull[] = new double[sp*2];
+	    double[] hull = new double[2*sp];
 	    for ( int i=0; i<sp; i++ ) {
-	        hull[2*i]  = pts[stack[i]];
+	        hull[2*i]   = pts[stack[i]];
 	        hull[2*i+1] = pts[stack[i]+1];
 	    }
+	    
 	    return hull;
 	} //
 
@@ -196,8 +226,8 @@ public class GeometryLib {
 	    }
 	} //
 	
-	public static double[] centroid(double pts[], int len) {
-	    double[] c = new double[] {0, 0};
+	public static float[] centroid(float pts[], int len) {
+	    float[] c = new float[] {0, 0};
 	    for ( int i=0; i < len; i+=2 ) {
 	        c[0] += pts[i];
 	        c[1] += pts[i+1];
@@ -207,31 +237,41 @@ public class GeometryLib {
 	    return c;
 	} //
 	
-	public static void growPolygon(double pts[], int len, double amt) {
-	    double[] c = centroid(pts, len);
+	public static void growPolygon(float pts[], int len, float amt) {
+	    float[] c = centroid(pts, len);
 	    for ( int i=0; i < len; i+=2 ) {
-	        double vx = pts[i]-c[0];
-	        double vy = pts[i+1]-c[1];
-	        double norm = Math.sqrt(vx*vx+vy*vy);
+	        float vx = pts[i]-c[0];
+	        float vy = pts[i+1]-c[1];
+	        float norm = (float)Math.sqrt(vx*vx+vy*vy);
 	        pts[i] += amt*vx/norm;
 	        pts[i+1] += amt*vy/norm;
 	    }
 	} //
 	
 	public static GeneralPath cardinalSpline(float pts[], float alpha, boolean closed) {
-	    if ( pts.length < 6 ) {
+	    GeneralPath path = new GeneralPath();
+	    return cardinalSpline(path, pts, alpha, closed, 0f, 0f);
+	} //
+	
+	public static GeneralPath cardinalSpline(GeneralPath p, 
+	        float pts[], float alpha, boolean closed, float tx, float ty)
+	{
+	    // compute the size of the path
+	    int len = 0;
+	    for ( ; len+2 <= pts.length && !Float.isNaN(pts[len]); len += 2);
+	    
+	    if ( len < 6 ) {
 	        throw new IllegalArgumentException(
 	                "To create spline requires at least 3 points");
 	    }
-	    GeneralPath p = new GeneralPath();
-	    p.moveTo(pts[0],pts[1]);
+	    p.moveTo(tx+pts[0],ty+pts[1]);
 	    
 	    float dx1, dy1, dx2, dy2;
 	    
 	    // compute first control point
 	    if ( closed ) {
-	        dx2 = pts[2]-pts[pts.length-2];
-	        dy2 = pts[3]-pts[pts.length-1];
+	        dx2 = pts[2]-pts[len-2];
+	        dy2 = pts[3]-pts[len-1];
 	    } else {
 	        dx2 = pts[4]-pts[0];
 	        dy2 = pts[5]-pts[1];
@@ -239,13 +279,13 @@ public class GeometryLib {
 	    
 	    // repeatedly compute next control point and append curve
 	    int i;
-	    for ( i=2; i<pts.length-2; i+=2 ) {
+	    for ( i=2; i<len-2; i+=2 ) {
 	        dx1 = dx2; dy1 = dy2;
 	        dx2 = pts[i+2]-pts[i-2];
 	        dy2 = pts[i+3]-pts[i-1];
-	        p.curveTo(pts[i-2]+alpha*dx1, pts[i-1]+alpha*dy1,
-	                  pts[i]  -alpha*dx2, pts[i+1]-alpha*dy2,
-	                  pts[i],             pts[i+1]);
+	        p.curveTo(tx+pts[i-2]+alpha*dx1, ty+pts[i-1]+alpha*dy1,
+	                  tx+pts[i]  -alpha*dx2, ty+pts[i+1]-alpha*dy2,
+	                  tx+pts[i],             ty+pts[i+1]);
 	    }
 	    
 	    // compute last control point
@@ -253,21 +293,21 @@ public class GeometryLib {
 	        dx1 = dx2; dy1 = dy2;
 	        dx2 = pts[0]-pts[i-2];
 	        dy2 = pts[1]-pts[i-1];
-	        p.curveTo(pts[i-2]+alpha*dx1, pts[i-1]+alpha*dy1,
-	                  pts[i]  -alpha*dx2, pts[i+1]-alpha*dy2,
-	                  pts[i],             pts[i+1]);
+	        p.curveTo(tx+pts[i-2]+alpha*dx1, ty+pts[i-1]+alpha*dy1,
+	                  tx+pts[i]  -alpha*dx2, ty+pts[i+1]-alpha*dy2,
+	                  tx+pts[i],             ty+pts[i+1]);
 	        
 	        dx1 = dx2; dy1 = dy2;
-	        dx2 = pts[2]-pts[pts.length-2];
-	        dy2 = pts[3]-pts[pts.length-1];
-	        p.curveTo(pts[pts.length-2]+alpha*dx1, pts[pts.length-1]+alpha*dy1,
-	                  pts[0]           -alpha*dx2, pts[1]           -alpha*dy2,
-	                  pts[0],                      pts[1]);
+	        dx2 = pts[2]-pts[len-2];
+	        dy2 = pts[3]-pts[len-1];
+	        p.curveTo(tx+pts[len-2]+alpha*dx1, ty+pts[len-1]+alpha*dy1,
+	                  tx+pts[0]    -alpha*dx2, ty+pts[1]    -alpha*dy2,
+	                  tx+pts[0],               ty+pts[1]);
 	        p.closePath();
 	    } else {
-	        p.curveTo(pts[i-2]+alpha*dx2, pts[i-1]+alpha*dy2,
-	                  pts[i]  -alpha*dx2, pts[i+1]-alpha*dy2,
-	                  pts[i],             pts[i+1]);
+	        p.curveTo(tx+pts[i-2]+alpha*dx2, ty+pts[i-1]+alpha*dy2,
+	                  tx+pts[i]  -alpha*dx2, ty+pts[i+1]-alpha*dy2,
+	                  tx+pts[i],             ty+pts[i+1]);
 	    }
 	    return p;
 	}
