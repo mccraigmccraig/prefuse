@@ -13,6 +13,7 @@ import java.util.Set;
 import edu.berkeley.guir.prefuse.graph.Edge;
 import edu.berkeley.guir.prefuse.graph.Graph;
 import edu.berkeley.guir.prefuse.graph.Node;
+import edu.berkeley.guir.prefuse.util.XMLLib;
 
 /**
  * Writes out a graph to an XGMML-format XML file. See
@@ -105,7 +106,7 @@ public class XMLGraphWriter extends AbstractGraphWriter {
 			String key = NODE_ATTR[i];
 			String val = n.getAttribute(key);
 			if ( val != null )
-				pw.print(" "+key+"=\""+val+"\"");
+				pw.print(" "+key+"=\""+XMLLib.EscapeString(val)+"\"");
 		}
 		pw.print(">");
 		
@@ -115,7 +116,7 @@ public class XMLGraphWriter extends AbstractGraphWriter {
 		while ( attrIter.hasNext() ) {
 			String key = (String)attrIter.next();
 			if ( contains(NODE_ATTR, key) ) continue;
-			String val = (String)attr.get(key);
+			String val = XMLLib.EscapeString((String)attr.get(key));
 			if ( !hadAttr ) {
 				pw.println(); hadAttr = true;
 			}
@@ -135,7 +136,7 @@ public class XMLGraphWriter extends AbstractGraphWriter {
 			String key = EDGE_ATTR[i];
 			String val = e.getAttribute(key);
 			if ( val != null )
-				pw.print(" "+key+"=\""+val+"\"");
+				pw.print(" "+key+"=\""+XMLLib.EscapeString(val)+"\"");
 		}
 		pw.print(">");
 		
@@ -145,7 +146,7 @@ public class XMLGraphWriter extends AbstractGraphWriter {
 		while ( attrIter.hasNext() ) {
 			String key = (String)attrIter.next();
 			if ( contains(EDGE_ATTR, key) ) continue;
-			String val = (String)attr.get(key);
+			String val = XMLLib.EscapeString((String)attr.get(key));
 			if ( !hadAttr ) {
 				pw.println(); hadAttr = true;
 			}
