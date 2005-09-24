@@ -28,7 +28,7 @@ public class DragControl extends ControlAdapter {
     protected Point2D down = new Point2D.Double();
     protected Point2D tmp = new Point2D.Double();
     protected boolean dragged;
-    private boolean fixOnMouseOver;
+    private boolean fixOnMouseOver = false;
     protected boolean repaint = true;
     
     /**
@@ -65,9 +65,14 @@ public class DragControl extends ControlAdapter {
         this.fixOnMouseOver = fixOnMouseOver;
     } //
     
-    
     public DragControl(Activity update) {
         this.repaint = false;
+        this.update = update;
+    } //
+    
+    public DragControl(Activity update, boolean fixOnMouseOver) {
+        this.repaint = false;
+        this.fixOnMouseOver = fixOnMouseOver;
         this.update = update;
     } //
     
@@ -113,11 +118,12 @@ public class DragControl extends ControlAdapter {
     public void itemReleased(VisualItem item, MouseEvent e) {
         if (!(item instanceof NodeItem)) return;
         if (!SwingUtilities.isLeftMouseButton(e)) return;
-        if ( dragged ) {
+        if ( dragged && !item.wasFixed() ) {
             activeItem = null;
             item.setFixed(item.wasFixed());
-            dragged = false;
         }
+        if ( dragged )
+            dragged = false;
     } //
     
     public void itemDragged(VisualItem item, MouseEvent e) {
