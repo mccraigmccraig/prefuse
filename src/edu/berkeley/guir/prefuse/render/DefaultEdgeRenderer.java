@@ -112,12 +112,8 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 	/**
 	 * @see edu.berkeley.guir.prefuse.render.ShapeRenderer#getRenderType()
 	 */
-	public int getRenderType() {
-		if ( m_directed ) {
-			return RENDER_TYPE_DRAW_AND_FILL;
-		} else {
-			return RENDER_TYPE_DRAW;
-		} 
+	public int getRenderType(VisualItem item) {
+	    return RENDER_TYPE_DRAW; 
 	} //
   	
   	/**
@@ -172,6 +168,9 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 			Point2D start = null, end = null;
 			int width;
 			
+            VisualItem item2 = (VisualItem)e.getSecondNode();
+            Rectangle2D r = item2.getBounds();
+            
 			String stype = (String)item.getVizAttribute(EDGE_TYPE);
 			int type = m_edgeType;
 			if ( stype != null ) {
@@ -186,15 +185,18 @@ public class DefaultEdgeRenderer extends ShapeRenderer {
 					width = m_width;
 					break;
 				case EDGE_TYPE_CURVE:
-					start = m_ctrlPoints[1];
+                    if ( !r.contains(m_ctrlPoints[1]) )
+                        start = m_ctrlPoints[1];
+                    else if ( !r.contains(m_ctrlPoints[0]) )
+                        start = m_ctrlPoints[0];
+                    else
+                        start = m_tmpPoints[0];
 					end   = m_tmpPoints[1];
 					width = 1;
 					break;
 				default:
 					throw new IllegalStateException("Unknown edge type.");
 			}
-			VisualItem item2 = (VisualItem)e.getSecondNode();
-			Rectangle2D r = item2.getBounds();
 			int i = GeometryLib.intersectLineRectangle(start, end, r, m_isctPoints);
 			if ( i > 0 )
 				end = m_isctPoints[0];

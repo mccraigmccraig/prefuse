@@ -99,7 +99,8 @@ public class DragControl extends ControlAdapter {
         if (!(item instanceof NodeItem)) return;
         if ( activeItem == item ) {
             activeItem = null;
-            item.setFixed(item.wasFixed());
+            if ( fixOnMouseOver )
+                item.setFixed(item.wasFixed());
         }
         Display d = (Display)e.getSource();
         d.setCursor(Cursor.getDefaultCursor());
@@ -118,10 +119,8 @@ public class DragControl extends ControlAdapter {
     public void itemReleased(VisualItem item, MouseEvent e) {
         if (!(item instanceof NodeItem)) return;
         if (!SwingUtilities.isLeftMouseButton(e)) return;
-        if ( dragged && !item.wasFixed() ) {
-            activeItem = null;
+        if ( !fixOnMouseOver )
             item.setFixed(item.wasFixed());
-        }
         if ( dragged )
             dragged = false;
     } //
