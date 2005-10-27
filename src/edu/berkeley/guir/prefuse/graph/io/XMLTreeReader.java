@@ -160,7 +160,7 @@ public class XMLTreeReader extends AbstractTreeReader implements TreeReader {
 		protected Edge parseEdge(Attributes atts) {
 			String alName;
 			String source = null, target = null;
-			String label;
+			String label = null;
 
 			for ( int i = 0; i < atts.getLength(); i++ ) {
 				alName = atts.getQName(i);
@@ -185,6 +185,9 @@ public class XMLTreeReader extends AbstractTreeReader implements TreeReader {
 			}
 
 			Edge e = new DefaultEdge(s,t,m_directed);
+            if ( label != null ) {
+                e.setAttribute(LABEL, label);
+            }
 			s.addChild(e);
 			return e;
 		} //
