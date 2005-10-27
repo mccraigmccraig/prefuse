@@ -59,9 +59,6 @@ public class TreeMLTreeReader extends AbstractTreeReader {
 		private Tree m_tree = null;
 		private TreeNode m_root = null;
 		private TreeNode m_activeNode = null;
-		private boolean m_directed = false;
-		
-		private boolean inNode, inEdge;
 		
 		public void startDocument() {
 			m_tree = null;
