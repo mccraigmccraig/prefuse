@@ -20,9 +20,11 @@ public class WheelZoomControl extends ControlAdapter {
 	
     private double minScale = 1E-3;
     private double maxScale = 75;
+	private boolean zoomOverItem = true;
 	
 	public void itemWheelMoved(VisualItem item, MouseWheelEvent e) {
-		zoom(e);
+		if ( zoomOverItem )
+			zoom(e);
 	} //
 	
 	public void mouseWheelMoved(MouseWheelEvent e) {
@@ -77,5 +79,24 @@ public class WheelZoomControl extends ControlAdapter {
     public void setMinScale(double minScale) {
         this.minScale = minScale;
     } //
-	
+
+    /**
+	 * Indicates if the zoom control will work while the mouse is
+	 * over a VisualItem.
+	 * @return true if the control still operates over a VisualItem
+	 */
+	public boolean isZoomOverItem() {
+		return zoomOverItem;
+	} //
+
+	/**
+	 * Determines if the zoom control will work while the mouse is
+	 * over a VisualItem
+	 * @param zoomOverItem true to indicate the control operates
+	 * over VisualItems, false otherwise
+	 */
+	public void setZoomOverItem(boolean zoomOverItem) {
+		this.zoomOverItem = zoomOverItem;
+	} //
+    
 } // end of class WheelZoomControl

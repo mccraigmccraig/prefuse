@@ -7,6 +7,7 @@ import java.awt.geom.Point2D;
 import javax.swing.SwingUtilities;
 
 import edu.berkeley.guir.prefuse.Display;
+import edu.berkeley.guir.prefuse.VisualItem;
 import edu.berkeley.guir.prefuse.event.ControlAdapter;
 
 /**
@@ -25,6 +26,7 @@ public class ZoomControl extends ControlAdapter {
     private int yLast;
     private Point2D down = new Point2D.Float();
     private boolean repaint = true;
+    private boolean zoomOverItem = true;
     private double minScale = 1E-3;
     private double maxScale = 75;
     
@@ -48,8 +50,8 @@ public class ZoomControl extends ControlAdapter {
         this.repaint = repaint;
     } //
     
-    public void mousePressed(MouseEvent e) {
-        if ( SwingUtilities.isRightMouseButton(e) ) {
+    private void start(MouseEvent e) {
+    	if ( SwingUtilities.isRightMouseButton(e) ) {
             Display display = (Display)e.getComponent();
             if (display.isTranformInProgress()) {
                 yLast = -1;
@@ -60,10 +62,10 @@ public class ZoomControl extends ControlAdapter {
             display.getAbsoluteCoordinate(e.getPoint(), down);
             yLast = e.getY();
         }
-    } //
+    }
     
-    public void mouseDragged(MouseEvent e) {
-        if ( SwingUtilities.isRightMouseButton(e) ) {
+    private void drag(MouseEvent e) {
+    	if ( SwingUtilities.isRightMouseButton(e) ) {
             Display display = (Display)e.getComponent();
             if (display.isTranformInProgress() || yLast == -1) {
                 yLast = -1;
@@ -95,13 +97,40 @@ public class ZoomControl extends ControlAdapter {
             if ( repaint )
                 display.repaint();
         }
+    }
+    
+    private void end(MouseEvent e) {
+    	if ( SwingUtilities.isRightMouseButton(e) ) {
+            e.getComponent().setCursor(Cursor.getDefaultCursor());
+        }
+    }
+    
+    public void mousePressed(MouseEvent e) {
+        start(e);
+    } //
+    
+    public void mouseDragged(MouseEvent e) {
+        drag(e);
     } //
     
     public void mouseReleased(MouseEvent e) {
-        if ( SwingUtilities.isRightMouseButton(e) ) {
-            e.getComponent().setCursor(Cursor.getDefaultCursor());
-        }
+        end(e);
     } //
+    
+    public void itemPressed(VisualItem item, MouseEvent e) {
+    	if ( zoomOverItem )
+    		start(e);
+    }
+
+    public void itemDragged(VisualItem item, MouseEvent e) {
+    	if ( zoomOverItem )
+    		drag(e);
+    }
+    
+    public void itemReleased(VisualItem item, MouseEvent e) {
+    	if ( zoomOverItem )
+    		end(e);
+    }
     
     /**
      * Gets the maximum scale value allowed by this zoom control
@@ -134,5 +163,24 @@ public class ZoomControl extends ControlAdapter {
     public void setMinScale(double minScale) {
         this.minScale = minScale;
     } //
+    
+    /**
+	 * Indicates if the zoom control will work while the mouse is
+	 * over a VisualItem.
+	 * @return true if the control still operates over a VisualItem
+	 */
+	public boolean isZoomOverItem() {
+		return zoomOverItem;
+	} //
+
+	/**
+	 * Determines if the zoom control will work while the mouse is
+	 * over a VisualItem
+	 * @param zoomOverItem true to indicate the control operates
+	 * over VisualItems, false otherwise
+	 */
+	public void setZoomOverItem(boolean zoomOverItem) {
+		this.zoomOverItem = zoomOverItem;
+	} //
     
 } // end of class ZoomControl
