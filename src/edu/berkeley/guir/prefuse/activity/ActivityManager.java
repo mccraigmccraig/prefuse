@@ -41,7 +41,7 @@ public class ActivityManager extends Thread {
      * Returns the active ActivityManager instance.
      * @return the ActivityManager
      */
-    private static ActivityManager getInstance() {
+    private synchronized static ActivityManager getInstance() {
         if ( s_instance == null || !s_instance.isAlive() ) {
             s_instance = new ActivityManager();
         }
