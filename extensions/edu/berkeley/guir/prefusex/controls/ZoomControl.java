@@ -25,7 +25,7 @@ public class ZoomControl extends ControlAdapter {
     private int yLast;
     private Point2D down = new Point2D.Float();
     private boolean repaint = true;
-    private double minScale = 1E-4;
+    private double minScale = 1E-3;
     private double maxScale = 75;
     
     /**
@@ -72,7 +72,7 @@ public class ZoomControl extends ControlAdapter {
             
             double scale = display.getScale();
             
-            int x = e.getX(), y = e.getY();
+            int y = e.getY();
             int dy = y-yLast;
             double zoom = 1 + ((double)dy) / 100;
             double result = scale*zoom;
