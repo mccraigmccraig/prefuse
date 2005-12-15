@@ -899,6 +899,16 @@ public class ItemRegistry {
     		m_registryListener.registryItemAdded(item);
 	} //
 	
+    protected void removeFromFilteredGraph(VisualItem item) {
+        if ( m_filteredGraph != null ) {
+            if ( item instanceof EdgeItem ) {
+                m_filteredGraph.removeEdge((EdgeItem)item);
+            } else if ( item instanceof NodeItem ) {
+                m_filteredGraph.removeNode((NodeItem)item);
+            }
+        }
+    }
+    
 	/**
 	 * Remove an item from the visualization queue.
 	 * @param entry the <code>ItemEntry</code> for this item's item class.
@@ -909,6 +919,7 @@ public class ItemRegistry {
 	 */
 	protected void removeItem(ItemEntry entry, VisualItem item, boolean lr) {
 		synchronized ( this ) {
+            removeFromFilteredGraph(item);
 		    removeMappings(entry, item);
 			if (lr) entry.itemList.remove(item);
 	        m_size--;
