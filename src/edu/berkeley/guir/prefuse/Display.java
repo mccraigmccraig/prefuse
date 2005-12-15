@@ -930,7 +930,6 @@ public class Display extends JComponent {
 
 		private VisualItem activeVI = null;
 		private boolean mouseDown = false;
-        private boolean itemDrag = false;
 
 		public void mouseDragged(MouseEvent e) {
             if (m_listener != null && activeVI != null) {
