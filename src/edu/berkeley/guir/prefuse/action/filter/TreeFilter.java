@@ -96,7 +96,6 @@ public class TreeFilter extends Filter {
             Iterator edgeIter = node.getEdges();
             while ( edgeIter.hasNext() ) {
                 Edge edge = (Edge)edgeIter.next();
-                Node n = edge.getAdjacentNode(node);
                 // filter the edge
                 EdgeItem eitem = registry.getEdgeItem(edge, true);
                 eitem.getFirstNode().addEdge(eitem);
