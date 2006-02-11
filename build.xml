@@ -4,41 +4,45 @@
   <!-- Initialization target                                               -->
   <!-- =================================================================== -->
   <target name="init">
-    <tstamp/>
+    <tstamp>
+   	  <format property="year" pattern="yyyy" locale="en"/>
+    </tstamp>
+  	
     <property name="Name" value="prefuse"/>
     <property name="name" value="prefuse"/>
-    <property name="version" value="1.0"/>
-    <property name="year" value="2004"/>
+    <property name="version" value="beta"/>
 
     <property name="build.compiler" value="modern"/>
     <property name="debug" value="off"/>
     <property name="optimize" value="on"/>
     <property name="deprecation" value="on"/>
-    <property name="packages" value="edu.berkeley.guir.*"/>
+    <property name="packages" value="prefuse.*"/>
 
     <!-- Define the source directories -->
     <property name="root.dir" value="./"/>
+  	<property name="data.dir" value="${root.dir}/data"/>
+  	<property name="demos.dir" value="${root.dir}/demos"/>
     <property name="doc.dir" value="${root.dir}/doc"/>
     <property name="lib.dir" value="${root.dir}/lib"/>
     <property name="src.dir" value="${root.dir}/src"/>
-    <property name="ext.dir" value="${root.dir}/extensions"/>
-    <property name="demos.dir" value="${root.dir}/demos"/>
+    <property name="test.dir" value="${root.dir}/test"/>
 
+  	<!-- Define path to required libraries -->
+  	<property name="lucene.lib" value="${root.dir}/lib/lucene-1.4.3.jar"/>
+  	
     <!-- Define the source build directories -->
     <property name="doc.apidocs" value="${doc.dir}/api"/>	   	
     <property name="build.dir" value="${root.dir}/build"/>
     <property name="build.lib" value="${root.dir}/build/lib"/>
     <property name="build.prefuse.src" value="${root.dir}/build/prefuse/src"/>
     <property name="build.prefuse.dest" value="${root.dir}/build/prefuse/classes"/>
-    <property name="build.ext.src" value="${root.dir}/build/extensions/src"/>
-    <property name="build.ext.dest" value="${root.dir}/build/extensions/classes"/>
     <property name="build.demos.src" value="${root.dir}/build/demos/src"/>
     <property name="build.demos.dest" value="${root.dir}/build/demos/classes"/>
     
     <!-- Define the distribution directories -->
     <property name="dist.root" value="${root.dir}/dist"/>
-    <property name="sourcedist.dir" value="${dist.root}/${name}-${version}/${name}-${version}"/>
-    <property name="compiledist.dir" value="${dist.root}/${name}-${version}-compiled/${name}-${version}"/>    
+    <property name="sourcedist.dir" value="${dist.root}/${name}-${version}/"/>
+    <property name="compiledist.dir" value="${dist.root}/${name}-${version}"/>    
   </target>
 
   <!-- =================================================================== -->
@@ -94,19 +98,7 @@
   </target>
 
   <!-- =================================================================== -->
-  <!-- Prepares the extensions code                                        -->
-  <!-- =================================================================== -->
-  <target name="prepare-ext" depends="prepare">
-    <mkdir dir="${build.ext.src}"/>
-
-    <copy todir="${build.ext.src}">
-      <fileset dir="${ext.dir}"/>
-    </copy>
-    
-  </target>
-
-  <!-- =================================================================== -->
-  <!-- Prepares the examples code                                          -->
+  <!-- Prepares the demos code                                             -->
   <!-- =================================================================== -->
   <target name="prepare-demos" depends="prepare">
     <mkdir dir="${build.demos.src}"/>
@@ -130,23 +122,7 @@
 
     <javac srcdir="${build.prefuse.src}"
            destdir="${build.prefuse.dest}"
-           debug="${debug}"
-           deprecation="${deprecation}"
-           optimize="${optimize}"/>
-  </target>
-
-  <!-- =================================================================== -->
-  <!-- Compiles the extensions directory                                   -->
-  <!-- =================================================================== -->
-  <target name="compile-ext" depends="compile-prefuse, prepare-ext">
-    <!-- copy resource files -->
-    <copy todir="${build.ext.dest}">
-      <fileset dir="${build.ext.src}" excludes="**/*.java"/>
-    </copy>
-
-    <javac srcdir="${build.ext.src}"
-           destdir="${build.prefuse.dest}"
-		   classpath="${build.prefuse.dest}"
+    	       classpath="${lucene.lib}"
            debug="${debug}"
            deprecation="${deprecation}"
            optimize="${optimize}"/>
@@ -160,6 +136,9 @@
     <copy todir="${build.demos.dest}">
       <fileset dir="${build.demos.src}" excludes="**/*.java"/>
     </copy>
+  	<copy todir="${build.demos.dest}">
+  	  <fileset dir="${data.dir}"/>
+  	</copy>
 
     <javac srcdir="${build.demos.src}"
            destdir="${build.demos.dest}"
@@ -172,19 +151,20 @@
   <!-- =================================================================== -->
   <!-- Creates the prefuse.jar in ./build                                  -->
   <!-- =================================================================== -->
-  <target name="prefuse" depends="compile-prefuse, compile-ext">
+  <target name="prefuse" depends="compile-prefuse">
     <jar jarfile="${build.dir}/${name}.jar"
          basedir="${build.prefuse.dest}"
          includes="**"/>
   </target>
-
+	
   <!-- =================================================================== -->
-  <!-- Creates the examples.jar in ./build                                 -->
+  <!-- Creates the demos.jar in ./build                                    -->
   <!-- =================================================================== -->
   <target name="demos" depends="compile-demos">
     <jar jarfile="${build.dir}/demos.jar"
          basedir="${build.demos.dest}"
          includes="**"/>
+  	<!--manifest="${demos.dir}/prefuse/demos/launcher/demos.manifest"-->
   </target>
   
   <!-- =================================================================== -->
@@ -195,21 +175,22 @@
   <!-- =================================================================== -->
   <!-- Creates the API documentation in ./doc/api/                         -->
   <!-- =================================================================== -->
-  <target name="api" depends="prepare-prefuse, prepare-ext, prepare-demos">
+  <target name="api" depends="prepare-prefuse, prepare-demos">
     <mkdir dir="${doc.apidocs}"/>
     <javadoc packagenames="${packages}"
-             sourcepath="${build.prefuse.src};${build.ext.src};${build.demos.src}"
+             sourcepath="${build.prefuse.src}"
+    	     classpath="${lucene.lib}"
              destdir="${doc.apidocs}"
              author="true"
              version="true"
-             use="true"
-	     breakiterator="yes"
+           	 use="true"
+	         breakiterator="yes"
              splitindex="true"
              noindex="false"
              windowtitle="${Name} API Documentation"
-             doctitle="&lt;font face='Verdana,Arial,Helvetica,Sans-Serif'>the ${Name} graph visualization toolkit&lt;/font>"
-             overview="${build.prefuse.src}/edu/berkeley/guir/prefuse/overview.html"
-             bottom="Copyright &#169; ${year} University of California, Berkeley."             
+             doctitle="&lt;font face='Verdana,Arial,sans-serif'>the ${Name} visualization toolkit&lt;/font>"
+             overview="${build.prefuse.src}/prefuse/overview.html"
+             bottom="Copyright &#169; ${year} Regents of the University of California"             
     />
   </target>
 
@@ -243,21 +224,30 @@
     <mkdir dir="${sourcedist.dir}"/>
 
     <copy todir="${sourcedist.dir}">
-      <fileset dir="${root.dir}"/>
+      <fileset dir="${root.dir}" excludes="**/.*" />
     </copy>
+  	<copy todir="${sourcedist.dir}">
+  		<fileset dir="${root.dir}" casesensitive="yes">
+  		  <include name=".project"/>
+  		  <include name=".classpath"/>
+  		</fileset>
+  	</copy>
 
     <!-- Now delete what we dont want, probably a better way to do this -->
     <delete dir="${sourcedist.dir}/dist"/>
+  	<delete dir="${sourcedist.dir}/classes"/>
+  	<delete dir="${sourcedist.dir}/build"/>
+  	<delete dir="${sourcedist.dir}/.settings"/>
 
     <fixcrlf srcdir="${sourcedist.dir}"
-       eol="lf" eof="remove"
-       includes="**/*.sh"
+    	eol="lf" eof="remove"
+    	tablength="4" tab="remove"
+        includes="**/*.sh"
     />
-    <zip zipfile="${dist.root}/${name}-${version}.zip"
-         basedir="${dist.root}/${name}-${version}"
+    <zip zipfile="${dist.root}/${name}-${version}-${DSTAMP}.zip"
+         basedir="${dist.root}"
          whenempty="create"
     />
-
   </target>
 	
 
@@ -274,17 +264,18 @@
 
     <!-- Now delete what we dont want, probably a better way to do this -->
     <delete dir="${compiledist.dir}/dist"/>
+  	<delete dir="${sourcedist.dir}/classes"/>
     <delete dir="${compiledist.dir}/build/demos"/>
     <delete dir="${compiledist.dir}/build/prefuse"/>
-    <delete dir="${compiledist.dir}/build/extentions"/>    
+  	<delete dir="${compiledist.dir}/build/lib"/>
 
     <fixcrlf srcdir="${compiledist.dir}"
        eol="lf" eof="remove"
        includes="**/*.sh"
     />
 
-    <zip zipfile="${dist.root}/${name}-${version}-compiled.zip"
-         basedir="${dist.root}/${name}-${version}-compiled"
+    <zip zipfile="${dist.root}/${name}-${version}-${DSTAMP}-bin.zip"
+         basedir="${dist.root}/${name}-${version}"
          whenempty="create"
     />
 
@@ -298,6 +289,19 @@
     <delete dir="${dist.root}"/>
     <delete dir="${doc.apidocs}"/>
   </target>
+
+  <!-- =================================================================== -->
+  <!-- Fix tabs and line endings on java source files                      -->
+  <!-- =================================================================== -->
+  <target name="fixtabs" depends="init">
+  	<fixcrlf srcdir="${src.dir}" eol="lf" eof="remove"
+  		tablength="4" tab="remove" includes="**/*.java"	/>
+  	<fixcrlf srcdir="${demos.dir}" eol="lf" eof="remove"
+  		tablength="4" tab="remove" includes="**/*.java"	/>
+  	<fixcrlf srcdir="${test.dir}" eol="lf" eof="remove"
+  		tablength="4" tab="remove" includes="**/*.java"	/>
+  </target>
+	
 </project>
 
 <!-- End of file -->
