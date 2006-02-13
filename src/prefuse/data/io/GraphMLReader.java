@@ -74,6 +74,16 @@ public class GraphMLReader extends AbstractGraphReader  implements GraphReader {
         public static final String TARGET = "target";
         public static final String DATA   = "data";
         public static final String TYPE   = "type";
+        
+        public static final String INT = "int";
+        public static final String INTEGER = "integer";
+        public static final String LONG = "long";
+        public static final String FLOAT = "float";
+        public static final String DOUBLE = "double";
+        public static final String REAL = "real";
+        public static final String BOOLEAN = "boolean";
+        public static final String STRING = "string";
+        public static final String DATE = "date";
     }
     
     /**
@@ -119,12 +129,10 @@ public class GraphMLReader extends AbstractGraphReader  implements GraphReader {
             m_nodeMap.clear();
             inSchema = true;
             
-            m_nsch.addColumn(ID, String.class);
             m_esch.addColumn(SRC, int.class);
             m_esch.addColumn(TRG, int.class);
             m_esch.addColumn(SRCID, String.class);
             m_esch.addColumn(TRGID, String.class);
-            m_esch.addColumn(DIRECTED, boolean.class);
         }
         
         public void endDocument() {
@@ -141,6 +149,8 @@ public class GraphMLReader extends AbstractGraphReader  implements GraphReader {
                 int t = ((Integer)m_nodeMap.get(trg)).intValue();
                 m_edges.setInt(r, TRG, t);
             }
+            m_edges.removeColumn(SRCID);
+            m_edges.removeColumn(TRGID);
             
             // now create the graph
             m_graph = new Graph(m_nodes, m_edges, m_directed);
@@ -179,7 +189,6 @@ public class GraphMLReader extends AbstractGraphReader  implements GraphReader {
                 m_row = m_nodes.addRow();
                 
                 String id = atts.getValue(ID);
-                m_nodes.setString(m_row, ID, id);
                 m_nodeMap.put(id, new Integer(m_row));
                 m_table = m_nodes;
             }
@@ -189,20 +198,24 @@ public class GraphMLReader extends AbstractGraphReader  implements GraphReader {
                 
                 m_row = m_edges.addRow();
                 
-                String id = atts.getValue(ID);
-                if ( id != null ) {
-                    if ( !m_edges.canGetString(ID) )
-                        m_edges.addColumn(ID, String.class);
-                    m_edges.setString(m_row, ID, id);
-                }
+                // do not use the id value
+//                String id = atts.getValue(ID);
+//                if ( id != null ) {
+//                    if ( !m_edges.canGetString(ID) )
+//                        m_edges.addColumn(ID, String.class);
+//                    m_edges.setString(m_row, ID, id);
+//                }
                 m_edges.setString(m_row, SRCID, atts.getValue(SRC));
                 m_edges.setString(m_row, TRGID, atts.getValue(TRG));
-                String dir = atts.getValue(DIRECTED);
-                boolean d = m_directed;
-                if ( dir != null ) {
-                    d = dir.equalsIgnoreCase("false");
-                }
-                m_edges.setBoolean(m_row, DIRECTED, d);
+                
+                // currently only global directedness is used
+                // ignore directed edge value for now
+//                String dir = atts.getValue(DIRECTED);
+//                boolean d = m_directed;
+//                if ( dir != null ) {
+//                    d = dir.equalsIgnoreCase("false");
+//                }
+//                m_edges.setBoolean(m_row, DIRECTED, d);
                 m_table = m_edges;
             }
             else if ( qName.equals(DATA) )
@@ -286,19 +299,19 @@ public class GraphMLReader extends AbstractGraphReader  implements GraphReader {
         
         protected Class parseType(String type) {
             type = type.toLowerCase();
-            if ( type.equals("int") || type.equals("integer") ) {
+            if ( type.equals(INT) || type.equals(INTEGER) ) {
                 return int.class;
-            } else if ( type.equals("long") ) {
+            } else if ( type.equals(LONG) ) {
                 return long.class;
-            } else if ( type.equals("float") ) {
+            } else if ( type.equals(FLOAT) ) {
                 return float.class;
-            } else if ( type.equals("double") || type.equals("real")) {
+            } else if ( type.equals(DOUBLE) || type.equals(REAL)) {
                 return double.class;
-            } else if ( type.equals("boolean") ) {
+            } else if ( type.equals(BOOLEAN) ) {
                 return boolean.class;
-            } else if ( type.equals("string") ) {
+            } else if ( type.equals(STRING) ) {
                 return String.class;
-            } else if ( type.equals("date") ) {
+            } else if ( type.equals(DATE) ) {
                 return Date.class;
             } else {
                 error("Unrecognized data type: "+type);

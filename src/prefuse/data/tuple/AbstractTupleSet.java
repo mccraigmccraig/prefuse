@@ -143,7 +143,7 @@ public abstract class AbstractTupleSet implements TupleSet {
             for ( int i=0; i<schema.getColumnCount(); ++i ) {
                 try {
                     addColumn(schema.getColumnName(i), 
-                              schema.getColumnClass(i),
+                              schema.getColumnType(i),
                               schema.getDefault(i));
                 } catch ( IllegalArgumentException iae ) {}
             }

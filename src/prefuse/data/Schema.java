@@ -261,7 +261,6 @@ public class Schema implements Cloneable {
         
         Integer idx = (Integer)m_lookup.get(field);
         return ( idx==null ? -1 : idx.intValue() );
-        
     }
     
     /**
@@ -269,7 +268,7 @@ public class Schema implements Cloneable {
      * @param col the column index
      * @return the column type
      */
-    public Class getColumnClass(int col) {
+    public Class getColumnType(int col) {
         return m_types[col];
     }
 
@@ -278,7 +277,7 @@ public class Schema implements Cloneable {
      * @param field the column name
      * @return the column type
      */
-    public Class getColumnClass(String field) {
+    public Class getColumnType(String field) {
         int idx = getColumnIndex(field);
         return ( idx<0 ? null : m_types[idx] );
     }
@@ -455,7 +454,7 @@ public class Schema implements Cloneable {
         
         for ( int i=0; i<m_size; ++i ) {
             if ( !(m_names[i].equals(s.getColumnName(i)) &&
-                   m_types[i].equals(s.getColumnClass(i)) &&
+                   m_types[i].equals(s.getColumnType(i)) &&
                    m_dflts[i].equals(s.getDefault(i))) )
             {
                 return false;
@@ -488,7 +487,7 @@ public class Schema implements Cloneable {
             if ( idx < 0 )
                 return false;
             
-            if ( !m_types[idx].equals(s.getColumnClass(i)) )
+            if ( !m_types[idx].equals(s.getColumnType(i)) )
                 return false;
         }
         return true;

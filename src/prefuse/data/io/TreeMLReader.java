@@ -20,7 +20,7 @@ import prefuse.data.parser.ParserFactory;
 
 /**
  * GraphReader instance that reads in tree-structured data in the
- * XML-based TreeML format. The TreeML format was originally created for
+ * XML-based TreeML format. TreeML is an XML format originally created for
  * the 2003 InfoVis conference contest. A DTD (Document Type Definition) for
  * TreeML is
  * <a href="http://www.nomencurator.org/InfoVis2003/download/treeml.dtd">
@@ -61,6 +61,19 @@ public class TreeMLReader extends AbstractGraphReader {
         
         public static final String DECLS  = "declarations";
         public static final String DECL   = "attributeDecl";
+        
+        public static final String INT = "Int";
+        public static final String INTEGER = "Integer";
+        public static final String LONG = "Long";
+        public static final String FLOAT = "Float";
+        public static final String REAL = "Real";
+        public static final String STRING = "String";
+        public static final String DATE = "Date";
+        public static final String CATEGORY = "Category";
+        
+        // prefuse-specific allowed types
+        public static final String BOOLEAN = "Boolean";
+        public static final String DOUBLE = "Double";
     }
     
     /**
@@ -152,20 +165,21 @@ public class TreeMLReader extends AbstractGraphReader {
         }
         
         protected Class parseType(String type) {
-            type = type.toLowerCase();
-            if ( type.equals("int") || type.equals("integer") ) {
+            type = Character.toUpperCase(type.charAt(0)) +
+                   type.substring(1).toLowerCase();
+            if ( type.equals(INT) || type.equals(INTEGER) ) {
                 return int.class;
-            } else if ( type.equals("long") ) {
+            } else if ( type.equals(LONG) ) {
                 return long.class;
-            } else if ( type.equals("float") ) {
+            } else if ( type.equals(FLOAT) ) {
                 return float.class;
-            } else if ( type.equals("double") || type.equals("real")) {
+            } else if ( type.equals(DOUBLE) || type.equals(REAL)) {
                 return double.class;
-            } else if ( type.equals("boolean") ) {
+            } else if ( type.equals(BOOLEAN) ) {
                 return boolean.class;
-            } else if ( type.equals("string") ) {
+            } else if ( type.equals(STRING) ) {
                 return String.class;
-            } else if ( type.equals("date") ) {
+            } else if ( type.equals(DATE) ) {
                 return Date.class;
             } else {
                 throw new RuntimeException("Unrecognized data type: "+type);

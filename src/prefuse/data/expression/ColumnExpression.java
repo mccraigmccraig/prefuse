@@ -35,7 +35,7 @@ public class ColumnExpression extends AbstractExpression implements Predicate {
      * @see prefuse.data.expression.Expression#getType(prefuse.data.Schema)
      */
     public Class getType(Schema s) {
-        return s.getColumnClass(m_field);
+        return s.getColumnType(m_field);
     }
 
     /**
