@@ -369,6 +369,8 @@ public class Graph extends CompositeTupleSet {
         int t = getTargetNode(e);
         if ( s < 0 || t < 0 ) return;
         updateDegrees(e, s, t, incr);
+        if ( incr < 0 )
+            m_edgeTuples.invalidate(e);
     }
     
     /**
@@ -448,8 +450,10 @@ public class Graph extends CompositeTupleSet {
     protected void updateNodeData(int r, boolean added) {
         if ( added )
             m_links.addRow();
-        else
+        else {
+            m_nodeTuples.invalidate(r);
             m_links.removeRow(r);
+        }
     }
     
     // ------------------------------------------------------------------------
@@ -565,9 +569,8 @@ public class Graph extends CompositeTupleSet {
      * node id was not found or was not valid
      */
     public boolean removeNode(int node) {
-        boolean rem = getNodeTable().removeRow(node);
-        if ( rem ) {
-            //updateNodeData(node, false);
+        Table nodeTable = getNodeTable();
+        if ( nodeTable.isValidRow(node) ) {
             int id = getInDegree(node);
             if ( id > 0 ) {
                 int[] links = (int[])m_links.get(node, INLINKS);
@@ -581,7 +584,7 @@ public class Graph extends CompositeTupleSet {
                     removeEdge(links[i]);
             }
         }
-        return rem;
+        return nodeTable.removeRow(node);
     }
     
     /**
@@ -602,9 +605,7 @@ public class Graph extends CompositeTupleSet {
      * edge was not found or was not valid
      */
     public boolean removeEdge(int edge) {
-        //updateDegrees(edge, -1);
-        // TODO update info appropriately
-        return getEdgeTable().removeRow(edge); 
+        return getEdgeTable().removeRow(edge);
     }
     
     /**
@@ -624,11 +625,11 @@ public class Graph extends CompositeTupleSet {
     protected void clearEdges() {
         getEdgeTable().clear();
         // TODO this can be removed after removeEdge fix is implemented
-        for ( IntIterator rows = m_links.rows(); rows.hasNext(); ) {
-            int row = rows.nextInt();
-            m_links.setInt(row, OUTDEGREE, 0);
-            m_links.setInt(row, INDEGREE, 0);
-        }
+//        for ( IntIterator rows = m_links.rows(); rows.hasNext(); ) {
+//            int row = rows.nextInt();
+//            m_links.setInt(row, OUTDEGREE, 0);
+//            m_links.setInt(row, INDEGREE, 0);
+//        }
     }
     
     // ------------------------------------------------------------------------
