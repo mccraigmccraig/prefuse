@@ -16,12 +16,14 @@ import prefuse.data.Node;
 public class TreeNodeIterator implements Iterator {
 
     private Node m_node;
+    private Node m_root;
     
     /**
      * Create a new TreeNodeIterator over the given subtree.
      * @param root the root of the subtree to traverse
      */
     public TreeNodeIterator(Node root) {
+        m_root = root;
         m_node = root;
     }
     
@@ -39,17 +41,19 @@ public class TreeNodeIterator implements Iterator {
         Node n, c;
         if ( (c=m_node.getChild(0)) != null ) {
             // do nothing
-        } else if ( (c=m_node.getNextSibling()) != null ) {
+        } else if ( m_node!=m_root && (c=m_node.getNextSibling()) != null ) {
             // do nothing
         } else {
             c = m_node.getParent();
-            while ( c != null ) {
+            while ( c!=m_root && c != null ) {
                 if ( (n=c.getNextSibling()) != null ) {
                     c = n;
                     break;
                 }
                 c = c.getParent();
             }
+            if ( c == m_root )
+                c = null;
         }
         n = m_node;
         m_node = c;
