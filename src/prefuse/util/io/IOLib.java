@@ -311,15 +311,17 @@ public class IOLib {
         
         // GraphML
         ff = new SimpleFileFilter("xml",
-                "GraphML File (*.xml)",
+                "GraphML File (*.xml, *.graphml)",
                 new GraphMLReader());
+        ff.addExtension("graphml");
         ff.addExtension("gz");
         jfc.setFileFilter(ff);
         
         // TreeML
         ff = new SimpleFileFilter("xml",
-                "TreeML File (*.xml)",
+                "TreeML File (*.xml, *.treeml)",
                 new TreeMLReader());
+        ff.addExtension("treeml");
         ff.addExtension("gz");
         jfc.setFileFilter(ff);
 
