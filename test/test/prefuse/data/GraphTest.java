@@ -7,6 +7,7 @@ import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Table;
+import prefuse.util.GraphLib;
 import test.prefuse.TestConfig;
 
 public class GraphTest extends TestCase implements GraphTestData {
@@ -137,4 +138,26 @@ public class GraphTest extends TestCase implements GraphTestData {
         }
     }
     
+    public void testRemoveNode() {
+        int cliqueSize = 5;
+        Graph g = GraphLib.getClique(cliqueSize);
+        Edge[] edges = new Edge[4];
+        
+        Node rem = (Node)g.nodes().next();
+        Iterator it = rem.edges();
+        for ( int i=0; it.hasNext(); ++i ) {
+            edges[i] = (Edge)it.next();
+        }
+        
+        assertEquals(true, g.removeNode(rem));
+        assertEquals(false, rem.isValid());
+        
+        Iterator nodes = g.nodes();
+        while ( nodes.hasNext() ) {
+            assertEquals(cliqueSize-2, ((Node)nodes.next()).getDegree());
+        }
+        for ( int i=0; i<edges.length; ++i ) {
+            assertEquals(false, edges[i].isValid());
+        }
+    }
 }
