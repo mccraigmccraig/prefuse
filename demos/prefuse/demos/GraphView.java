@@ -19,7 +19,6 @@ import prefuse.action.ActionList;
 import prefuse.action.RepaintAction;
 import prefuse.action.assignment.ColorAction;
 import prefuse.action.filter.GraphDistanceFilter;
-import prefuse.action.layout.GridLayout;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.activity.Activity;
 import prefuse.controls.DragControl;
@@ -79,6 +78,7 @@ public class GraphView {
         Graph g = null;
         if ( datafile == null ) {
             g = GraphLib.getGrid(15,15);
+            label = "label";
         } else {
             try {
                 g = new GraphMLReader().readGraph(datafile);
@@ -137,10 +137,6 @@ public class GraphView {
         draw.add(new ColorAction(edges, VisualItem.FILLCOLOR, ColorLib.gray(200)));
         draw.add(new ColorAction(edges, VisualItem.STROKECOLOR, ColorLib.gray(200)));
         
-        ActionList init = new ActionList();
-        init.add(new GridLayout(nodes));
-        init.add(draw);
-        
         ColorAction fill = new ColorAction(nodes, 
                 VisualItem.FILLCOLOR, ColorLib.rgb(200,200,255));
         fill.add(VisualItem.FIXED, ColorLib.rgb(255,100,100));
@@ -151,15 +147,13 @@ public class GraphView {
         animate.add(fill);
         animate.add(new RepaintAction());
         
-        
         // finally, we register our ActionList with the Visualization.
         // we can later execute our Actions by invoking a method on our
         // Visualization, using the name we've chosen below.
         vis.putAction("draw", draw);
-        vis.putAction("init", init);
         vis.putAction("layout", animate);
 
-        vis.runAfter("init", "layout");
+        vis.runAfter("draw", "layout");
         
         
         // --------------------------------------------------------------------
@@ -228,7 +222,7 @@ public class GraphView {
         split.setDividerLocation(700);
         
         // now we run our action list
-        vis.run("init");
+        vis.run("draw");
         
         return split;
     }
