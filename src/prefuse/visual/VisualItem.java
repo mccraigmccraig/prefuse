@@ -1,5 +1,6 @@
 package prefuse.visual;
 
+import java.awt.BasicStroke;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
@@ -636,7 +637,21 @@ public interface VisualItem extends Tuple {
      */
     public void setShape(int shape);
     
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
+    
+    /**
+     * Get the current stroke used to draw lines and shape outlines.
+     * @return the stroke used to draw lines and shape outlines
+     */
+    public BasicStroke getStroke();
+    
+    /**
+     * Set the current stroke used to draw lines and shape outlines.
+     * @param stroke the stroke to use to draw lines and shape outlines
+     */
+    public void setStroke(BasicStroke stroke);
+    
+    // ------------------------------------------------------------------------
     
     /**
      * Get the current font for the item. The font is used as the default
@@ -800,6 +815,9 @@ public interface VisualItem extends Tuple {
     /** The shape data field */
     public static final String SHAPE
         = PrefuseLib.FIELD_PREFIX+"shape";
+    /** The stroke data field */
+    public static final String STROKE
+        = PrefuseLib.FIELD_PREFIX+"stroke";
     /** The font data field */
     public static final String FONT
         = PrefuseLib.FIELD_PREFIX+"font";

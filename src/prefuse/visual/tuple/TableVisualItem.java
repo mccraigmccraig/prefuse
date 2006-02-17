@@ -1,5 +1,6 @@
 package prefuse.visual.tuple;
 
+import java.awt.BasicStroke;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
@@ -535,6 +536,23 @@ public class TableVisualItem extends TableTuple implements VisualItem {
      */
     public void setShape(int shape) {
         ((VisualTable)m_table).setShape(m_row, shape);
+    }
+    
+    // ------------------------------------------------------------------------
+    
+    
+    /**
+     * @see prefuse.visual.VisualItem#getStroke()
+     */
+    public BasicStroke getStroke() {
+        return ((VisualTable)m_table).getStroke(m_row);
+    }
+    
+    /**
+     * @see prefuse.visual.VisualItem#setStroke(java.awt.Stroke)
+     */
+    public void setStroke(BasicStroke stroke) {
+        ((VisualTable)m_table).setStroke(m_row, stroke);
     }
     
     // ------------------------------------------------------------------------    

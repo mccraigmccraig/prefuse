@@ -104,7 +104,7 @@ public class AxisRenderer extends AbstractShapeRenderer {
      */
     public void render(Graphics2D g, VisualItem item) {
         Shape s = getShape(item);
-        GraphicsLib.paint(g, item, m_line, getRenderType(item));
+        GraphicsLib.paint(g, item, m_line, getStroke(item), getRenderType(item));
         
         // check if we have a text label, if so, render it
         if ( s == m_box ) {
@@ -142,11 +142,11 @@ public class AxisRenderer extends AbstractShapeRenderer {
      */
     public void setBounds(VisualItem item) {
         if ( !m_manageBounds ) return;
-        Shape s = getShape(item);
-        if ( s == null ) {
+        Shape shape = getShape(item);
+        if ( shape == null ) {
             item.setBounds(item.getX(), item.getY(), 0, 0);
-        } else if ( s == m_line ) {
-            GraphicsLib.setBounds(item, s, getStroke(item));
+        } else if ( shape == m_line ) {
+            GraphicsLib.setBounds(item, shape, getStroke(item));
         } else {
             m_box.add(m_line.getX1(),m_line.getY1());
             m_box.add(m_line.getX2(),m_line.getY2());

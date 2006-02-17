@@ -36,8 +36,6 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     public static final String EDGE_TYPE = "edgeType";
     
     protected static final double HALF_PI = Math.PI / 2;
-    protected static final Polygon DEFAULT_ARROW_HEAD =
-        new Polygon(new int[] {0,-4,4,0}, new int[] {0,-12,-12,0}, 4);
     
     protected Line2D       m_line  = new Line2D.Float();
     protected CubicCurve2D m_cubic = new CubicCurve2D.Float();
@@ -48,15 +46,17 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     protected int     m_xAlign2   = Constants.CENTER;
     protected int     m_yAlign2   = Constants.CENTER;
     protected double  m_width     = 1;
-    protected int     m_curWidth  = 1;
+    protected float   m_curWidth  = 1;
     protected Point2D m_tmpPoints[]  = new Point2D[2];
     protected Point2D m_ctrlPoints[] = new Point2D[2];
     protected Point2D m_isctPoints[] = new Point2D[2];
     
-    protected String  m_weightLabel = "weight";
-    
-    protected int     m_edgeArrow = Constants.EDGE_ARROW_FORWARD;
-    protected Polygon m_arrowHead = DEFAULT_ARROW_HEAD;
+    // arrow head handling
+    protected int     m_edgeArrow   = Constants.EDGE_ARROW_FORWARD;
+    protected int     m_arrowWidth  = 8;
+    protected int     m_arrowHeight = 12;
+    protected Polygon m_arrowHead   = updateArrowHead(
+                                        m_arrowWidth, m_arrowHeight);
     protected AffineTransform m_arrowTrans = new AffineTransform();
     protected Shape   m_curArrow;
 
@@ -120,14 +120,42 @@ public class EdgeRenderer extends AbstractShapeRenderer {
                         m_xAlign1, m_yAlign1);
         getAlignedPoint(m_tmpPoints[1], item2.getBounds(),
                         m_xAlign2, m_yAlign2);
+        m_curWidth = (float)(m_width * getLineWidth(item));
+        
+        // create the arrow head, if needed
+        EdgeItem e = (EdgeItem)item;
+        if ( e.isDirected() && m_edgeArrow != Constants.EDGE_ARROW_NONE ) {
+            // get starting and ending edge endpoints
+            boolean forward = (m_edgeArrow == Constants.EDGE_ARROW_FORWARD);
+            Point2D start = null, end = null;
+            start = m_tmpPoints[forward?0:1];
+            end   = m_tmpPoints[forward?1:0];
+            
+            // compute the intersection with the target bounding box
+            VisualItem dest = forward ? e.getTargetItem() : e.getSourceItem();
+            int i = GraphicsLib.intersectLineRectangle(start, end,
+                    dest.getBounds(), m_isctPoints);
+            if ( i > 0 ) end = m_isctPoints[0];
+            
+            // create the arrow head shape
+            AffineTransform at = getArrowTrans(start, end, m_curWidth);
+            m_curArrow = at.createTransformedShape(m_arrowHead);
+            
+            // update the endpoints for the edge shape
+            // need to bias this by arrow head size
+            Point2D lineEnd = m_tmpPoints[forward?1:0]; 
+            lineEnd.setLocation(0, -m_arrowHeight);
+            at.transform(lineEnd, lineEnd);
+        } else {
+            m_curArrow = null;
+        }
+        
+        // create the edge shape
+        Shape shape = null;
         double n1x = m_tmpPoints[0].getX();
         double n1y = m_tmpPoints[0].getY();
         double n2x = m_tmpPoints[1].getX();
         double n2y = m_tmpPoints[1].getY();
-        m_curWidth = (int)Math.round(m_width * getLineWidth(item));
-        
-        // create the edge shape
-        Shape shape = null;
         switch ( type ) {
             case Constants.EDGE_TYPE_LINE:          
                 m_line.setLine(n1x, n1y, n2x, n2y);
@@ -145,36 +173,6 @@ public class EdgeRenderer extends AbstractShapeRenderer {
                 throw new IllegalStateException("Unknown edge type");
         }
         
-        // create the arrow head, if needed
-        EdgeItem e = (EdgeItem)item;
-        if ( e.isDirected() && m_edgeArrow != Constants.EDGE_ARROW_NONE ) {
-            boolean forward = (m_edgeArrow == Constants.EDGE_ARROW_FORWARD);
-            Point2D start = null, end = null;
-            double width = m_width * getLineWidth(item);
-
-            switch ( type ) {
-                case Constants.EDGE_TYPE_LINE:
-                    start = m_tmpPoints[forward?0:1];
-                    end   = m_tmpPoints[forward?1:0];
-                    break;
-                case Constants.EDGE_TYPE_CURVE:
-                    start = m_tmpPoints[forward?0:1];
-                    end   = m_tmpPoints[forward?1:0];
-                    break;
-                default:
-                    throw new IllegalStateException("Unknown edge type.");
-            }
-            VisualItem dest = forward ? e.getTargetItem() : e.getSourceItem();
-            // TODO: generalize this to work for curved edges, too.
-            int i = GraphicsLib.intersectLineRectangle(start, end,
-                    dest.getBounds(), m_isctPoints);
-            if ( i > 0 ) end = m_isctPoints[0];
-            AffineTransform at = getArrowTrans(start, end, width);
-            m_curArrow = at.createTransformedShape(m_arrowHead);
-        } else {
-            m_curArrow = null;
-        }
-
         // return the edge shape
         return shape;
     }
@@ -183,7 +181,9 @@ public class EdgeRenderer extends AbstractShapeRenderer {
      * @see prefuse.render.Renderer#render(java.awt.Graphics2D, prefuse.visual.VisualItem)
      */
     public void render(Graphics2D g, VisualItem item) {
+        // render the edge line
         super.render(g, item);
+        // render the edge arrow head, if appropriate
         if ( m_curArrow != null ) {
             g.setPaint(ColorLib.getColor(item.getFillColor()));
             g.fill(m_curArrow);
@@ -207,6 +207,29 @@ public class EdgeRenderer extends AbstractShapeRenderer {
         }
         return m_arrowTrans;
     }
+    
+    /**
+     * Update the dimensions of the arrow head, creating a new
+     * arrow head if necessary. The return value is also set
+     * as the member variable <code>m_arrowHead</code>
+     * @param w the width of the untransformed arrow head base, in pixels
+     * @param h the height of the untransformed arrow head, in pixels
+     * @return the untransformed arrow head shape
+     */
+    protected Polygon updateArrowHead(int w, int h) {
+        if ( m_arrowHead == null ) {
+            m_arrowHead = new Polygon();
+        } else {
+            m_arrowHead.reset();
+        }
+        m_arrowHead.addPoint(0, 0);
+        m_arrowHead.addPoint(-w/2, -h);
+        m_arrowHead.addPoint( w/2, -h);
+        m_arrowHead.addPoint(0, 0);
+        return m_arrowHead;
+    }
+        
+    
 
     /**
      * @see prefuse.render.AbstractShapeRenderer#getTransform(prefuse.visual.VisualItem)
@@ -236,12 +259,12 @@ public class EdgeRenderer extends AbstractShapeRenderer {
      */
     public void setBounds(VisualItem item) {
         if ( !m_manageBounds ) return;
-        Shape s = getShape(item);
-        if ( s == null ) {
+        Shape shape = getShape(item);
+        if ( shape == null ) {
             item.setBounds(item.getX(), item.getY(), 0, 0);
             return;
         }
-        GraphicsLib.setBounds(item, s, getStroke(item));
+        GraphicsLib.setBounds(item, shape, getStroke(item));
         if ( m_curArrow != null ) {
             Rectangle2D bbox = (Rectangle2D)item.get(VisualItem.BOUNDS);
             Rectangle2D.union(bbox, m_curArrow.getBounds2D(), bbox);
@@ -250,7 +273,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
 
     /**
      * Returns the line width to be used for this VisualItem. By default,
-     * returns the base width value set using the {@link #setBaseWidth(double)}
+     * returns the base width value set using the {@link #setDefaultLineWidth(double)}
      * method, scaled by the item size returned by
      * {@link VisualItem#getSize()}. Subclasses can override this method to
      * perform custom line width determination, however, the preferred
@@ -263,10 +286,16 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     }
     
     /**
+     * Returns the stroke value returned by {@link VisualItem#getStroke()},
+     * scaled by the current line width
+     * determined by the {@link #getLineWidth(VisualItem)} method. Subclasses
+     * may override this method to perform custom stroke assignment, but should
+     * respect the line width paremeter stored in the {@link #m_curWidth}
+     * member variable, which caches the result of <code>getLineWidth</code>.
      * @see prefuse.render.AbstractShapeRenderer#getStroke(prefuse.visual.VisualItem)
      */
     protected BasicStroke getStroke(VisualItem item) {
-        return (m_curWidth == 1 ? null : StrokeLib.getStroke(m_curWidth));
+        return StrokeLib.getDerivedStroke(item.getStroke(), m_curWidth);
     }
 
     /**
@@ -360,6 +389,39 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     }
     
     /**
+     * Sets the dimensions of an arrow head for a directed edge. This specifies
+     * the pixel dimensions when both the zoom level and the size factor
+     * (a combination of item size value and default stroke width) are 1.0.
+     * @param width the untransformed arrow head width, in pixels. This
+     * specifies the span of the base of the arrow head.
+     * @param height the untransformed arrow head height, in pixels. This
+     * specifies the distance from the point of the arrow to its base.
+     */
+    public void setArrowHeadSize(int width, int height) {
+        m_arrowWidth = width;
+        m_arrowHeight = height;
+        m_arrowHead = updateArrowHead(width, height);
+    }
+    
+    /**
+     * Get the height of the untransformed arrow head. This is the distance,
+     * in pixels, from the tip of the arrow to its base.
+     * @return the default arrow head height
+     */
+    public int getArrowHeadHeight() {
+        return m_arrowHeight;
+    }
+
+    /**
+     * Get the width of the untransformed arrow head. This is the length,
+     * in pixels, of the base of the arrow head.
+     * @return the default arrow head width
+     */
+    public int getArrowHeadWidth() {
+        return m_arrowWidth;
+    }
+    
+    /**
      * Get the horizontal aligment of the edge mount point with the first node.
      * @return the horizontal alignment, one of {@link prefuse.Constants#LEFT},
      * {@link prefuse.Constants#RIGHT}, or {@link prefuse.Constants#CENTER}.
@@ -438,22 +500,22 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     }
     
     /**
-     * Sets the base width of lines. This width value will
+     * Sets the default width of lines. This width value will
      * be scaled by the value of an item's size data field. The default
      * base width is 1.
-     * @param w the desired base line width, in pixels
+     * @param w the desired default line width, in pixels
      */
-    public void setBaseWidth(double w) {
+    public void setDefaultLineWidth(double w) {
         m_width = w;
     }
     
     /**
-     * Gets the base width of lines. This width value that will
+     * Gets the default width of lines. This width value that will
      * be scaled by the value of an item's size data field. The default
      * base width is 1.
-     * @return the base line width, in pixels
+     * @return the default line width, in pixels
      */
-    public double getBaseWidth() {
+    public double getDefaultLineWidth() {
         return m_width;
     }
 

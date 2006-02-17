@@ -1,6 +1,8 @@
 package prefuse.util;
 
+import java.awt.BasicStroke;
 import java.awt.Font;
+import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
 
 import prefuse.Constants;
@@ -387,6 +389,9 @@ public class PrefuseLib {
         // shape
         s.addColumn(VisualItem.SHAPE, int.class,
             new Integer(Constants.SHAPE_RECTANGLE));
+        
+        // stroke
+        s.addColumn(VisualItem.STROKE, Stroke.class, new BasicStroke());
         
         // font
         Font defFont = FontLib.getFont("SansSerif",Font.PLAIN,10);

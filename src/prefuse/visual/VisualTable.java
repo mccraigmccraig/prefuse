@@ -1,5 +1,6 @@
 package prefuse.visual;
 
+import java.awt.BasicStroke;
 import java.awt.Font;
 import java.awt.geom.Rectangle2D;
 
@@ -872,6 +873,25 @@ public class VisualTable extends CascadedTable implements VisualTupleSet {
      */
     public void setShape(int row, int shape) {
         setInt(row, VisualItem.SHAPE, shape);
+    }
+    
+    // ------------------------------------------------------------------------
+    
+    /**
+     * Get the current stroke used to draw lines and shape outlines for the
+     * item at the given row.
+     * @return the stroke used to draw lines and shape outlines
+     */
+    public BasicStroke getStroke(int row) {
+        return (BasicStroke)get(row, VisualItem.STROKE);
+    }
+    
+    /**
+     * Set the current stroke used to draw lines and shape outlines.
+     * @param stroke the stroke to use to draw lines and shape outlines
+     */
+    public void setStroke(int row, BasicStroke stroke) {
+        set(row, VisualItem.STROKE, stroke);
     }
     
     // ------------------------------------------------------------------------

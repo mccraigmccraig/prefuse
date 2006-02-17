@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
@@ -485,10 +486,10 @@ public class GraphicsLib {
      * @param shape a Shape from which to determine the item bounds
      * @param stroke the stroke type that will be used for drawing the object,
      * and may affect the final bounds. A null value indicates the
-     * default stroke is used.
+     * default (line width = 1) stroke is used.
      */
-    public static void setBounds(VisualItem item, 
-            Shape shape, BasicStroke stroke)
+    public static void setBounds(VisualItem item,
+                                 Shape shape, BasicStroke stroke)
     {
         double x, y, w, h, lw, lw2;
         
@@ -549,7 +550,8 @@ public class GraphicsLib {
      * @param g the graphics context to render to
      * @param item the item being represented by the shape, this instance is
      * used to get the correct color values for the drawing
-     * @param s the shape to render
+     * @param shape the shape to render
+     * @param stroke the stroke type to use for drawing the object.
      * @param type the rendering type indicating if the shape should be drawn,
      * filled, or both. One of
      * {@link prefuse.render.AbstractShapeRenderer#RENDER_TYPE_DRAW},
@@ -557,7 +559,9 @@ public class GraphicsLib {
      * {@link prefuse.render.AbstractShapeRenderer#RENDER_TYPE_DRAW_AND_FILL}, or
      * {@link prefuse.render.AbstractShapeRenderer#RENDER_TYPE_NONE}.
      */
-    public static void paint(Graphics2D g, VisualItem item, Shape s, int type) {
+    public static void paint(Graphics2D g, VisualItem item,
+                             Shape shape, BasicStroke stroke, int type)
+    {
         // if render type is NONE, then there is nothing to do
         if ( type == AbstractShapeRenderer.RENDER_TYPE_NONE )
             return;
@@ -573,23 +577,29 @@ public class GraphicsLib {
                         fillColor.getAlpha() != 0;
         if ( !(sdraw || fdraw) ) return;
         
+        Stroke origStroke = null;
+        if ( sdraw ) {
+            origStroke = g.getStroke();
+            g.setStroke(stroke);
+        }
+        
+        int x, y, w, h, aw, ah;
+        double xx, yy, ww, hh;
+
+        // see if an optimized (non-shape) rendering call is available for us
+        // these can speed things up significantly on the windows JRE
+        // it is stupid we have to do this, but we do what we must
         // if we are zoomed in, we have no choice but to use
         // full precision rendering methods.
         AffineTransform at = g.getTransform();
         double scale = Math.max(at.getScaleX(), at.getScaleY());
         if ( scale > 1.5 ) {
-            if (fdraw) { g.setPaint(fillColor);   g.fill(s); }
-            if (sdraw) { g.setPaint(strokeColor); g.draw(s); }
-            return;
+            if (fdraw) { g.setPaint(fillColor);   g.fill(shape); }
+            if (sdraw) { g.setPaint(strokeColor); g.draw(shape); }
         }
-        
-        // see if an optimized (non-shape) rendering call is available for us
-        // these can speed things up significantly on the windows JRE
-        // it is stupid we have to do this, but we do what we must
-        int x, y, w, h, aw, ah;
-        double xx, yy, ww, hh;
-        if ( s instanceof RectangularShape ) {
-            RectangularShape r = (RectangularShape)s;
+        else if ( shape instanceof RectangularShape )
+        {
+            RectangularShape r = (RectangularShape)shape;
             xx = r.getX(); ww = r.getWidth(); 
             yy = r.getY(); hh = r.getHeight();
             
@@ -598,7 +608,7 @@ public class GraphicsLib {
             w = (int)(ww+xx-x);
             h = (int)(hh+yy-y);
             
-            if ( s instanceof Rectangle2D ) {
+            if ( shape instanceof Rectangle2D ) {
                 if (fdraw) {
                     g.setPaint(fillColor);
                     g.fillRect(x, y, w, h);
@@ -607,8 +617,8 @@ public class GraphicsLib {
                     g.setPaint(strokeColor);
                     g.drawRect(x, y, w, h);
                 }
-            } else if ( s instanceof RoundRectangle2D ) {
-                RoundRectangle2D rr = (RoundRectangle2D)s;
+            } else if ( shape instanceof RoundRectangle2D ) {
+                RoundRectangle2D rr = (RoundRectangle2D)shape;
                 aw = (int)rr.getArcWidth();
                 ah = (int)rr.getArcHeight();
                 if (fdraw) {
@@ -619,7 +629,7 @@ public class GraphicsLib {
                     g.setPaint(strokeColor);
                     g.drawRoundRect(x, y, w, h, aw, ah);
                 }
-            } else if ( s instanceof Ellipse2D ) {
+            } else if ( shape instanceof Ellipse2D ) {
                 if (fdraw) {
                     g.setPaint(fillColor);
                     g.fillOval(x, y, w, h);
@@ -629,12 +639,12 @@ public class GraphicsLib {
                     g.drawOval(x, y, w, h);
                 }
             } else {
-                if (fdraw) { g.setPaint(fillColor);   g.fill(s); }
-                if (sdraw) { g.setPaint(strokeColor); g.draw(s); }
+                if (fdraw) { g.setPaint(fillColor);   g.fill(shape); }
+                if (sdraw) { g.setPaint(strokeColor); g.draw(shape); }
             }
-        } else if ( s instanceof Line2D ) {
+        } else if ( shape instanceof Line2D ) {
             if (sdraw) {
-                Line2D l = (Line2D)s;
+                Line2D l = (Line2D)shape;
                 x = (int)(l.getX1()+0.5);
                 y = (int)(l.getY1()+0.5);
                 w = (int)(l.getX2()+0.5);
@@ -643,8 +653,11 @@ public class GraphicsLib {
                 g.drawLine(x, y, w, h);
             }
         } else {
-            if (fdraw) { g.setPaint(fillColor);   g.fill(s); }
-            if (sdraw) { g.setPaint(strokeColor); g.draw(s); }
+            if (fdraw) { g.setPaint(fillColor);   g.fill(shape); }
+            if (sdraw) { g.setPaint(strokeColor); g.draw(shape); }
+        }
+        if ( sdraw ) {
+            g.setStroke(origStroke);
         }
     }
     

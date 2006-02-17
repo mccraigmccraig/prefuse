@@ -5,7 +5,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -320,7 +319,7 @@ public class LabelRenderer extends AbstractShapeRenderer {
         // fill the shape, if requested
         int type = getRenderType(item);
         if ( type==RENDER_TYPE_FILL || type==RENDER_TYPE_DRAW_AND_FILL )
-            GraphicsLib.paint(g, item, shape, RENDER_TYPE_FILL);
+            GraphicsLib.paint(g, item, shape, getStroke(item), RENDER_TYPE_FILL);
 
         // now render the image and text
         String text = getText(item);
@@ -373,12 +372,7 @@ public class LabelRenderer extends AbstractShapeRenderer {
     
         // draw border
         if (type==RENDER_TYPE_DRAW || type==RENDER_TYPE_DRAW_AND_FILL) {
-            Stroke stroke = g.getStroke();
-            Stroke itemStroke = getStroke(item);
-            if ( itemStroke != null )
-                g.setStroke(itemStroke);
-            GraphicsLib.paint(g, item, shape, RENDER_TYPE_DRAW);
-            g.setStroke(stroke);
+            GraphicsLib.paint(g,item,shape,getStroke(item),RENDER_TYPE_DRAW);
         }
     }
     

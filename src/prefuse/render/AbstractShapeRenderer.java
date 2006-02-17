@@ -3,7 +3,6 @@ package prefuse.render;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
@@ -61,14 +60,7 @@ public abstract class AbstractShapeRenderer implements Renderer {
      * can be called by subclasses in custom rendering routines. 
      */
     protected void drawShape(Graphics2D g, VisualItem item, Shape shape) {
-        // render the shape
-        Stroke s = g.getStroke();
-        Stroke is = getStroke(item);
-        if ( is != null ) g.setStroke(is);
-        
-        GraphicsLib.paint(g, item, shape, getRenderType(item));
-        
-        g.setStroke(s);
+        GraphicsLib.paint(g, item, shape, getStroke(item), getRenderType(item));
     }
 
     /**
@@ -84,23 +76,25 @@ public abstract class AbstractShapeRenderer implements Renderer {
     }
 
     /**
+     * Retursn the stroke to use for drawing lines and shape outlines. By
+     * default returns the value of {@link VisualItem#getStroke()}.
+     * Subclasses can override this method to implement custom stroke
+     * assignment, though changing the <code>VisualItem</code>'s stroke
+     * value is preferred.
+     * @param item the VisualItem
+     * @return the strok to use for drawing lines and shape outlines
+     */
+    protected BasicStroke getStroke(VisualItem item) {
+        return item.getStroke();
+    }
+    
+    /**
      * Return a non-transformed shape for the visual representation of the
      * item. Subclasses must implement this method.
      * @param item the VisualItem being drawn
      * @return the "raw", untransformed shape.
      */
     protected abstract Shape getRawShape(VisualItem item);
-
-    /**
-     * Returns the Stroke used to draw the shapes. By default, this method
-     * returns null to indicate the default stroke. Subclasses can override
-     * this method to control custom stroke assignment.
-     * @param item the VisualItem being drawn
-     * @return the Stroke to use for drawing the item
-     */
-    protected BasicStroke getStroke(VisualItem item) {
-        return null;
-    }
     
     /**
      * Return the graphics space transform applied to this item's shape, if any.
@@ -154,11 +148,11 @@ public abstract class AbstractShapeRenderer implements Renderer {
      */
     public void setBounds(VisualItem item) {
         if ( !m_manageBounds ) return;
-        Shape s = getShape(item);
-        if ( s == null ) {
+        Shape shape = getShape(item);
+        if ( shape == null ) {
             item.setBounds(item.getX(), item.getY(), 0, 0);
         } else {
-            GraphicsLib.setBounds(item, s, getStroke(item));
+            GraphicsLib.setBounds(item, shape, getStroke(item));
         }
     }
 
