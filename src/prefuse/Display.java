@@ -607,8 +607,13 @@ public class Display extends JComponent {
     /**
      * Creates a new buffered image to use as an offscreen buffer.
      */
-    protected BufferedImage getNewOffscreenBuffer() {
-        return (BufferedImage)createImage(getWidth(), getHeight());
+    protected BufferedImage getNewOffscreenBuffer(int width, int height) {
+        try {
+            return (BufferedImage)createImage(width, height);
+        } catch ( Exception e ) {
+            return new BufferedImage(width, height,
+                                     BufferedImage.TYPE_INT_RGB);
+        }
     }
     
     /**
@@ -625,18 +630,23 @@ public class Display extends JComponent {
     public boolean saveImage(OutputStream output, String format, double scale)
     {
         try {
+            // get an image to draw into
             Dimension d = new Dimension((int)(scale*getWidth()),
                                         (int)(scale*getHeight()));
-            BufferedImage img = (BufferedImage)createImage(d.width, d.height);
+            BufferedImage img = getNewOffscreenBuffer(d.width, d.height);
             Graphics2D g = (Graphics2D)img.getGraphics();
+            
+            // set up the display, render, then revert to normal settings
             Point2D p = new Point2D.Double(0,0);
-            zoom(p, scale);
+            zoom(p, scale); // also takes care of damage report
             boolean q = isHighQuality();
             setHighQuality(true);
-            paintDisplay(g,d);
+            paintDisplay(g, d);
             setHighQuality(q);
-            zoom(p, 1/scale);
-            ImageIO.write(img,format,output);
+            zoom(p, 1/scale); // also takes care of damage report
+            
+            // save the image and return
+            ImageIO.write(img, format, output);
             return true;
         } catch ( Exception e ) {
             e.printStackTrace();
@@ -712,7 +722,7 @@ public class Display extends JComponent {
      */
     public void paintComponent(Graphics g) {
         if (m_offscreen == null) {
-            m_offscreen = getNewOffscreenBuffer();
+            m_offscreen = getNewOffscreenBuffer(getWidth(), getHeight());
             damageReport();
         }
         Graphics2D g2D = (Graphics2D)g;
