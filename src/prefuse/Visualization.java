@@ -752,14 +752,9 @@ public class Visualization {
      * @param group the visual data group to invalidate
      */
     public void invalidate(String group) {
-        TupleSet ts = getGroup(group);
-        if ( ts == null ) {
-            // TODO exception here, or log warning?
-            return;
-        }
-        Iterator tuples = ts.tuples();
-        while ( tuples.hasNext() ) {
-            VisualItem item = (VisualItem)tuples.next();
+        Iterator items = items(ValidatedPredicate.TRUE);
+        while ( items.hasNext() ) {
+            VisualItem item = (VisualItem)items.next();
             item.setValidated(false);
         }
     }
