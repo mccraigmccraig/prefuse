@@ -540,7 +540,6 @@ public class TableVisualItem extends TableTuple implements VisualItem {
     
     // ------------------------------------------------------------------------
     
-    
     /**
      * @see prefuse.visual.VisualItem#getStroke()
      */
@@ -549,7 +548,7 @@ public class TableVisualItem extends TableTuple implements VisualItem {
     }
     
     /**
-     * @see prefuse.visual.VisualItem#setStroke(java.awt.Stroke)
+     * @see prefuse.visual.VisualItem#setStroke(java.awt.BasicStroke)
      */
     public void setStroke(BasicStroke stroke) {
         ((VisualTable)m_table).setStroke(m_row, stroke);
