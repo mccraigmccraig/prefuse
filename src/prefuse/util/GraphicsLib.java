@@ -328,17 +328,17 @@ public class GraphicsLib {
      * continuity, ensuring the connected spline segments form a differentiable
      * curve, ensuring at least a minimum level of smoothness.
      * @param pts the points to interpolate with a cardinal spline
-     * @param alpha a parameter controlling the "tightness" of the spline to
+     * @param slack a parameter controlling the "tightness" of the spline to
      * the control points, 0.10 is a typically suitable value
      * @param closed true if the cardinal spline should be closed (i.e. return
      * to the starting point), false for an open curve
      * @return the cardinal spline as a Java2D {@link java.awt.geom.GeneralPath}
      * instance.
      */
-    public static GeneralPath cardinalSpline(float pts[], float alpha, boolean closed) {
+    public static GeneralPath cardinalSpline(float pts[], float slack, boolean closed) {
         GeneralPath path = new GeneralPath();
         path.moveTo(pts[0], pts[1]);
-        return cardinalSpline(path, pts, alpha, closed, 0f, 0f);
+        return cardinalSpline(path, pts, slack, closed, 0f, 0f);
     }
     
     /**
@@ -349,7 +349,7 @@ public class GraphicsLib {
      * @param pts the points to interpolate with a cardinal spline
      * @param start the starting index from which to read points
      * @param npoints the number of points to consider
-     * @param alpha a parameter controlling the "tightness" of the spline to
+     * @param slack a parameter controlling the "tightness" of the spline to
      * the control points, 0.10 is a typically suitable value
      * @param closed true if the cardinal spline should be closed (i.e. return
      * to the starting point), false for an open curve
@@ -357,11 +357,11 @@ public class GraphicsLib {
      * instance.
      */
     public static GeneralPath cardinalSpline(float pts[], int start, int npoints,
-            float alpha, boolean closed)
+            float slack, boolean closed)
     {
         GeneralPath path = new GeneralPath();
         path.moveTo(pts[start], pts[start+1]);
-        return cardinalSpline(path, pts, start, npoints, alpha, closed, 0f, 0f);
+        return cardinalSpline(path, pts, start, npoints, slack, closed, 0f, 0f);
     }
     
     /**
@@ -371,7 +371,7 @@ public class GraphicsLib {
      * curve, ensuring at least a minimum level of smoothness.
      * @param p the GeneralPath instance to use to store the result
      * @param pts the points to interpolate with a cardinal spline
-     * @param alpha a parameter controlling the "tightness" of the spline to
+     * @param slack a parameter controlling the "tightness" of the spline to
      * the control points, 0.10 is a typically suitable value
      * @param closed true if the cardinal spline should be closed (i.e. return
      * to the starting point), false for an open curve
@@ -381,12 +381,12 @@ public class GraphicsLib {
      * instance.
      */
     public static GeneralPath cardinalSpline(GeneralPath p, 
-            float pts[], float alpha, boolean closed, float tx, float ty)
+            float pts[], float slack, boolean closed, float tx, float ty)
     {
         int npoints = 0;
         for ( ; npoints<pts.length; ++npoints )
             if ( Float.isNaN(pts[npoints]) ) break;
-        return cardinalSpline(p, pts, 0, npoints/2, alpha, closed, tx, ty);
+        return cardinalSpline(p, pts, 0, npoints/2, slack, closed, tx, ty);
     }
     
     /**
@@ -398,7 +398,7 @@ public class GraphicsLib {
      * @param pts the points to interpolate with a cardinal spline
      * @param start the starting index from which to read points
      * @param npoints the number of points to consider
-     * @param alpha a parameter controlling the "tightness" of the spline to
+     * @param slack a parameter controlling the "tightness" of the spline to
      * the control points, 0.10 is a typically suitable value
      * @param closed true if the cardinal spline should be closed (i.e. return
      * to the starting point), false for an open curve
@@ -409,7 +409,7 @@ public class GraphicsLib {
      */
     public static GeneralPath cardinalSpline(GeneralPath p, 
             float pts[], int start, int npoints,
-            float alpha, boolean closed, float tx, float ty)
+            float slack, boolean closed, float tx, float ty)
     {
         // compute the size of the path
         int len = 2*npoints;
@@ -437,8 +437,8 @@ public class GraphicsLib {
             dx1 = dx2; dy1 = dy2;
             dx2 = pts[i+2]-pts[i-2];
             dy2 = pts[i+3]-pts[i-1];
-            p.curveTo(tx+pts[i-2]+alpha*dx1, ty+pts[i-1]+alpha*dy1,
-                      tx+pts[i]  -alpha*dx2, ty+pts[i+1]-alpha*dy2,
+            p.curveTo(tx+pts[i-2]+slack*dx1, ty+pts[i-1]+slack*dy1,
+                      tx+pts[i]  -slack*dx2, ty+pts[i+1]-slack*dy2,
                       tx+pts[i],             ty+pts[i+1]);
         }
         
@@ -447,21 +447,139 @@ public class GraphicsLib {
             dx1 = dx2; dy1 = dy2;
             dx2 = pts[start]-pts[i-2];
             dy2 = pts[start+1]-pts[i-1];
-            p.curveTo(tx+pts[i-2]+alpha*dx1, ty+pts[i-1]+alpha*dy1,
-                      tx+pts[i]  -alpha*dx2, ty+pts[i+1]-alpha*dy2,
+            p.curveTo(tx+pts[i-2]+slack*dx1, ty+pts[i-1]+slack*dy1,
+                      tx+pts[i]  -slack*dx2, ty+pts[i+1]-slack*dy2,
                       tx+pts[i],             ty+pts[i+1]);
             
             dx1 = dx2; dy1 = dy2;
             dx2 = pts[start+2]-pts[end-2];
             dy2 = pts[start+3]-pts[end-1];
-            p.curveTo(tx+pts[end-2]+alpha*dx1, ty+pts[end-1]+alpha*dy1,
-                      tx+pts[0]    -alpha*dx2, ty+pts[1]    -alpha*dy2,
+            p.curveTo(tx+pts[end-2]+slack*dx1, ty+pts[end-1]+slack*dy1,
+                      tx+pts[0]    -slack*dx2, ty+pts[1]    -slack*dy2,
                       tx+pts[0],               ty+pts[1]);
             p.closePath();
         } else {
-            p.curveTo(tx+pts[i-2]+alpha*dx2, ty+pts[i-1]+alpha*dy2,
-                      tx+pts[i]  -alpha*dx2, ty+pts[i+1]-alpha*dy2,
+            p.curveTo(tx+pts[i-2]+slack*dx2, ty+pts[i-1]+slack*dy2,
+                      tx+pts[i]  -slack*dx2, ty+pts[i+1]-slack*dy2,
                       tx+pts[i],             ty+pts[i+1]);
+        }
+        return p;
+    }
+    
+    /**
+     * Computes a set of curves using the cardinal spline approach, but
+     * using straight lines for completely horizontal or vertical segments.
+     * @param p the GeneralPath instance to use to store the result
+     * @param pts the points to interpolate with the spline
+     * @param epsilon threshold value under which to treat the difference
+     * between two values to be zero. Used to determine which segments to
+     * treat as lines rather than curves.
+     * @param slack a parameter controlling the "tightness" of the spline to
+     * the control points, 0.10 is a typically suitable value
+     * @param closed true if the spline should be closed (i.e. return
+     * to the starting point), false for an open curve
+     * @param tx a value by which to translate the curve along the x-dimension
+     * @param ty a value by which to translate the curve along the y-dimension
+     * @return the stack spline as a Java2D {@link java.awt.geom.GeneralPath}
+     * instance.
+     */
+    public static GeneralPath stackSpline(GeneralPath p, float[] pts, 
+            float epsilon, float slack, boolean closed, float tx, float ty)
+    {
+        int npoints = 0;
+        for ( ; npoints<pts.length; ++npoints )
+            if ( Float.isNaN(pts[npoints]) ) break;
+        return stackSpline(p,pts,0,npoints/2,epsilon,slack,closed,tx,ty);
+    }
+    
+    /**
+     * Computes a set of curves using the cardinal spline approach, but
+     * using straight lines for completely horizontal or vertical segments.
+     * @param p the GeneralPath instance to use to store the result
+     * @param pts the points to interpolate with the spline
+     * @param start the starting index from which to read points
+     * @param npoints the number of points to consider
+     * @param epsilon threshold value under which to treat the difference
+     * between two values to be zero. Used to determine which segments to
+     * treat as lines rather than curves.
+     * @param slack a parameter controlling the "tightness" of the spline to
+     * the control points, 0.10 is a typically suitable value
+     * @param closed true if the spline should be closed (i.e. return
+     * to the starting point), false for an open curve
+     * @param tx a value by which to translate the curve along the x-dimension
+     * @param ty a value by which to translate the curve along the y-dimension
+     * @return the stack spline as a Java2D {@link java.awt.geom.GeneralPath}
+     * instance.
+     */
+    public static GeneralPath stackSpline(GeneralPath p, 
+            float pts[], int start, int npoints, float epsilon,
+            float slack, boolean closed, float tx, float ty)
+    {
+        // compute the size of the path
+        int len = 2*npoints;
+        int end = start+len;
+        
+        if ( len < 6 ) {
+            throw new IllegalArgumentException(
+                    "To create spline requires at least 3 points");
+        }
+        
+        float dx1, dy1, dx2, dy2;
+        // compute first control point
+        if ( closed ) {
+            dx2 = pts[start+2]-pts[end-2];
+            dy2 = pts[start+3]-pts[end-1];
+        } else {
+            dx2 = pts[start+4]-pts[start];
+            dy2 = pts[start+5]-pts[start+1];
+        }
+        
+        // repeatedly compute next control point and append curve
+        int i;
+        for ( i=start+2; i<end-2; i+=2 ) {
+            dx1 = dx2; dy1 = dy2;
+            dx2 = pts[i+2]-pts[i-2];
+            dy2 = pts[i+3]-pts[i-1];            
+            if ( Math.abs(pts[i]  -pts[i-2]) < epsilon ||
+                 Math.abs(pts[i+1]-pts[i-1]) < epsilon )
+            {
+                p.lineTo(tx+pts[i], ty+pts[i+1]);
+            } else {
+                p.curveTo(tx+pts[i-2]+slack*dx1, ty+pts[i-1]+slack*dy1,
+                          tx+pts[i]  -slack*dx2, ty+pts[i+1]-slack*dy2,
+                          tx+pts[i],             ty+pts[i+1]);
+            }
+        }
+        
+        // compute last control point
+        dx1 = dx2; dy1 = dy2;
+        dx2 = pts[start]-pts[i-2];
+        dy2 = pts[start+1]-pts[i-1];
+        if ( Math.abs(pts[i]  -pts[i-2]) < epsilon ||
+             Math.abs(pts[i+1]-pts[i-1]) < epsilon )
+        {
+             p.lineTo(tx+pts[i], ty+pts[i+1]);
+        } else {
+            p.curveTo(tx+pts[i-2]+slack*dx1, ty+pts[i-1]+slack*dy1,
+                      tx+pts[i]  -slack*dx2, ty+pts[i+1]-slack*dy2,
+                      tx+pts[i],             ty+pts[i+1]);
+        }
+        
+        // close the curve if requested
+        if ( closed ) {    
+            if ( Math.abs(pts[end-2]-pts[0]) < epsilon ||
+                 Math.abs(pts[end-1]-pts[1]) < epsilon )
+            {
+                p.lineTo(tx+pts[0], ty+pts[1]);
+            } else {
+                dx1 = dx2; dy1 = dy2;
+                dx2 = pts[start+2]-pts[end-2];
+                dy2 = pts[start+3]-pts[end-1];
+                p.curveTo(tx+pts[end-2]+slack*dx1, ty+pts[end-1]+slack*dy1,
+                          tx+pts[0]    -slack*dx2, ty+pts[1]    -slack*dy2,
+                          tx+pts[0],               ty+pts[1]);
+            }
+            p.closePath();
         }
         return p;
     }
