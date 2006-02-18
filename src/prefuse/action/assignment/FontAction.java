@@ -119,7 +119,7 @@ public class FontAction extends ItemAction {
     }
 
     /**
-     * Add a shape mapping rule to this FontAction. VisualItems that match
+     * Add a font mapping rule to this FontAction. VisualItems that match
      * the provided expression will be assigned the given font value (assuming
      * they do not match an earlier rule). The provided expression String will
      * be parsed to generate the needed rule Predicate.

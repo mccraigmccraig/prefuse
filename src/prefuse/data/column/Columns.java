@@ -45,6 +45,26 @@ public class Columns {
         return array;
     }
     
+    /**
+     * Get an array of doubles containing all column values for a given table
+     * and field. The {@link Table#canGetDouble(String)} method must return
+     * true for the given column name, otherwise an exception will be thrown.
+     * @param t the data table
+     * @param col the column / data field name
+     * @return an array of doubles containing the column values
+     */
+    public static double[] toDoubleArray(Table t, String col) {
+        if ( !t.canGetDouble(col) )
+            throw new IllegalArgumentException("The table column must support "+
+                "returning values of type double");
+        IntIterator rows = t.rows();
+        double[] array = new double[t.getRowCount()];
+        for ( int i=0; rows.hasNext(); ++i ) {
+            array[i] = t.getDouble(rows.nextInt(), col);
+        }
+        return array;
+    }
+    
     // ------------------------------------------------------------------------
     
     /**

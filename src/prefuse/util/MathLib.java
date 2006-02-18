@@ -1,5 +1,7 @@
 package prefuse.util;
 
+import java.util.Arrays;
+
 import prefuse.Constants;
 
 /**
@@ -67,25 +69,35 @@ public class MathLib {
     }
     
     /**
-     * Interpolates a value between a given minimum and maximum value using
-     * a specified scale.
+     * Interpolates a value within a range using a specified scale,
+     * returning the fractional position of the value within that scale.
      * @param scale The scale on which to perform the interpolation, one of
      * {@link prefuse.Constants#LINEAR_SCALE},
-     * {@link prefuse.Constants#LOG_SCALE}, or
-     * {@link prefuse.Constants#SQRT_SCALE}.
+     * {@link prefuse.Constants#LOG_SCALE},
+     * {@link prefuse.Constants#SQRT_SCALE}, or
+     * {@link prefuse.Constants#QUANTILE_SCALE}.
      * @param val the interpolation value, a fraction between 0 and 1.0.
-     * @param min the minimum value of the interpolation range
-     * @param max the maximum value of the interpolation range
-     * @return the resulting interpolated value
+     * @param dist a double array describing the distribution of the data.
+     * For the {@link prefuse.Constants#QUANTILE_SCALE} option, this should
+     * be a collection of quantile boundaries, as determined by the
+     * {@link #quantiles(int, double[])} method. For any other scale type,
+     * the first value of the array must contain the minimum value of the
+     * distribution and the last value of the array must contain the
+     * maximum value of the distribution; all values in between will be
+     * ignored.
+     * @return the fractional position of the value within the scale,
+     * a double between 0 and 1.
      */
-    public static double interp(int scale, double val, double min, double max) {
+    public static double interp(int scale, double val, double dist[]) {
         switch ( scale ) {
         case Constants.LINEAR_SCALE:
-            return linearInterp(val, min, max);
+            return linearInterp(val, dist[0], dist[dist.length-1]);
         case Constants.LOG_SCALE:
-            return logInterp(val, min, max);
+            return logInterp(val, dist[0], dist[dist.length-1]);
         case Constants.SQRT_SCALE:
-            return sqrtInterp(val, min, max);
+            return sqrtInterp(val, dist[0], dist[dist.length-1]);
+        case Constants.QUANTILE_SCALE:
+            return quantile(val, dist);
         }
         throw new IllegalArgumentException("Unrecognized scale value: "+scale);
     }
@@ -126,6 +138,56 @@ public class MathLib {
     public static double sqrtInterp(double val, double min, double max) {
         double sqrtMin = safeSqrt(min);
         return (safeSqrt(val)-sqrtMin) / (safeSqrt(max)-sqrtMin);
+    }
+    
+    /**
+     * Compute the n-quantile boundaries for a set of values. The result is
+     * an n+1 size array holding the minimum value in the first entry and
+     * then n quantile boundaries in the subsequent entries.
+     * @param n the number of quantile boundaries. For example, a value of 4
+     * will break up the values into quartiles, while a value of 100 will break
+     * up the values into percentiles.
+     * @param values the array of double values to divide into quantiles
+     * @return an n+1 array of doubles containing the minimum value and
+     * the quantile boundary values, in that order
+     */
+    public static double[] quantiles(int n, double[] values) {
+        values = (double[])values.clone();
+        Arrays.sort(values);
+        double[] qtls = new double[n+1];
+        for ( int i=0; i<=n; ++i ) {
+            qtls[i] = values[((values.length-1)*i)/n];
+        }
+        return qtls;
+    }
+    
+    /**
+     * Get the quantile measure, as a value between 0 and 1, for a given
+     * value and set of quantile boundaries. For example, if the input value
+     * is the median of the distribution described by the quantile boundaries,
+     * this method will return 0.5. As another example, if the quantile
+     * boundaries represent percentiles, this value will return the percentile
+     * ranking of the input value according to the given boundaries.
+     * @param val the value for which to return the quantile ranking
+     * @param quantiles an array of quantile boundaries of a distribution
+     * @return the quantile ranking, a value between 0 and 1
+     * @see #quantiles(int, double[])
+     */
+    public static double quantile(double val, double[] quantiles) {
+        int x1 = 1;
+        int x2 = quantiles.length;
+        int i = x2 / 2;
+        while (x1 < x2) {
+            if (quantiles[i] == val) {
+                break;
+            } else if (quantiles[i] < val) {
+                x1 = i + 1;
+            } else {
+                x2 = i;
+            }
+            i = x1 + (x2 - x1) / 2;
+        }
+        return ((double)i)/(quantiles.length-1);
     }
     
 } // end of class MathLib

@@ -58,13 +58,15 @@ public interface Constants {
     public static final int POLY_TYPE_COUNT = 3;
     
     /** A linear scale */
-    public static final int LINEAR_SCALE = 0;
+    public static final int LINEAR_SCALE   = 0;
     /** A logarithmic (base 10) scale */
-    public static final int LOG_SCALE    = 1;
+    public static final int LOG_SCALE      = 1;
     /** A square root scale */
-    public static final int SQRT_SCALE   = 2;
+    public static final int SQRT_SCALE     = 2;
+    /** A qunatile scale, based on the underlying distribution */
+    public static final int QUANTILE_SCALE = 3;
     /** The total number of scale type values */
-    public static final int SCALE_COUNT  = 3;
+    public static final int SCALE_COUNT    = 4;
     
     /** An unknown data type */
     public static final int UNKNOWN = -1;

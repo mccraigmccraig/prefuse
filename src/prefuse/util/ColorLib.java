@@ -528,8 +528,8 @@ public class ColorLib {
     }
 
     /**
-     * Returns a color palette of specified size that ranges from black to
-     * white through shades of gray.
+     * Returns a color palette of specified size that ranges from white to
+     * black through shades of gray.
      * @param size the size of the color palette
      * @return the color palette
      */
@@ -537,14 +537,14 @@ public class ColorLib {
         int[] cm = new int[size];
         for ( int i=0, g; i<size; i++ ) {
             g = (int)Math.round(255*(0.2f + 0.6f*((float)i)/(size-1)));
-            cm[i] = gray(g);
+            cm[size-i-1] = gray(g);
         }
         return cm;
     }
 
     /**
-     * Returns a color palette of default size that ranges from black to
-     * white through shades of gray.
+     * Returns a color palette of default size that ranges from white to
+     * black through shades of gray.
      * @return the color palette
      */
     public static int[] getGrayscalePalette() {

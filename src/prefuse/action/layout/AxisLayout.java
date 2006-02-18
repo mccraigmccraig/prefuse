@@ -37,6 +37,9 @@ public class AxisLayout extends Layout {
     private double m_min;
     private double m_range;
     
+    // value range / distribution
+    private double[] m_dist = new double[2];
+    
     /**
      * Create a new AxisLayout. Defaults to using the x-axis.
      * @param group the data group to layout
@@ -252,28 +255,27 @@ public class AxisLayout extends Layout {
      * Compute a quantitative axis layout.
      */
     protected void numericalLayout(Table t) {
-        double lo, hi;
         if ( !m_modelSet ) {
             ColumnMetadata md = t.getMetadata(m_field);
-            lo = t.getDouble(md.getMinimumRow(), m_field);
-            hi = t.getDouble(md.getMaximumRow(), m_field);
+            m_dist[0] = t.getDouble(md.getMinimumRow(), m_field);
+            m_dist[1] = t.getDouble(md.getMaximumRow(), m_field);
             
-            Double dlo = new Double(lo), dhi = new Double(hi);
+            double lo = m_dist[0], hi = m_dist[1];
             if ( m_model == null ) {
-                m_model = new NumberRangeModel(lo,hi,lo,hi);
+                m_model = new NumberRangeModel(lo, hi, lo, hi);
             } else {
-                ((NumberRangeModel)m_model).setValueRange(dlo, dhi, dlo, dhi);
+                ((NumberRangeModel)m_model).setValueRange(lo, hi, lo, hi);
             }
         } else {
-            lo = ((Number)m_model.getLowValue()).doubleValue();
-            hi = ((Number)m_model.getHighValue()).doubleValue();
+            m_dist[0] = ((Number)m_model.getLowValue()).doubleValue();
+            m_dist[1] = ((Number)m_model.getHighValue()).doubleValue();
         }
         
         Iterator iter = m_vis.items(m_group, m_filter);
         while ( iter.hasNext() ) {
             VisualItem item = (VisualItem)iter.next();
             double v = item.getDouble(m_field);
-            double f = MathLib.interp(m_scale, v, lo, hi);
+            double f = MathLib.interp(m_scale, v, m_dist);
             set(item, f);
         }
     }

@@ -1,10 +1,12 @@
 package prefuse.action.assignment;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import prefuse.Constants;
 import prefuse.data.Table;
 import prefuse.data.column.ColumnMetadata;
+import prefuse.data.column.Columns;
 import prefuse.data.tuple.TupleSet;
 import prefuse.util.ColorLib;
 import prefuse.util.ColorMap;
@@ -16,13 +18,28 @@ import prefuse.visual.VisualItem;
  * Assignment Action that assigns color values for a group of items based upon
  * a data field. The type of color encoding used is dependent upon the
  * reported data type. Nominal (categorical) data is encoded using a different
- * hue for each unique data value. Ordinal (ordered) data is shown using
- * a grayscale color ramp. Numerical (quantitative) data is mapped into
- * a color spectrum based on the range of the values. The color spectrum
- * is continuous by default, but can also be binned into a few discrete
- * steps (see {@link #setBinCount(int)}). In all cases, the default color
- * palette used by this Action can be replaced with a user-specified palette
- * provided to the DataColorAction constructor.
+ * hue for each unique data value. Ordinal (ordered) and Numerical
+ * (quantitative) data is shown using a grayscale color ramp. In all cases,
+ * the default color palette used by this Action can be replaced with a
+ * client-specified palette provided to the DataColorAction constructor.
+ * </p>
+ * 
+ * <p>
+ * The color spectra for numerical data is continuous by default, but can also
+ * be binned into a few discrete steps (see {@link #setBinCount(int)}).
+ * Quantitative data can also be colored on different numerical scales. The
+ * default scale is a linear scale (specified by
+ * {@link Constants#LINEAR_SCALE}), but logarithmic and square root scales can
+ * be used (specified by {@link Constants#LOG_SCALE} and
+ * {@link Constants#SQRT_SCALE} respectively. Finally, the scale can be broken
+ * into quantiles, reflecting the statistical distribution of the values rather
+ * than just the total data value range, using the
+ * {@link Constants#QUANTILE_SCALE} value. For the quantile scale to work, you
+ * also need to specify the number of bins to use {@link #setBinCount(int)}.
+ * This value will determine the number of quantiles that the data should be
+ * divided into. 
+ * </p>
+ * 
  * </p>
  * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
@@ -33,8 +50,7 @@ public class DataColorAction extends ColorAction {
     private int    m_type;
     private int    m_scale = Constants.LINEAR_SCALE;
     
-    private double   m_min;
-    private double   m_max;
+    private double[] m_dist;
     private int      m_bins = Constants.CONTINUOUS;
     private Map      m_omap;
     private ColorMap m_cmap = new ColorMap(null,0,1);
@@ -45,9 +61,9 @@ public class DataColorAction extends ColorAction {
      * @param group the data group to process
      * @param dataField the data field to base size assignments on
      * @param dataType the data type to use for the data field. One of
-     * {@link prefuse.Constants#LINEAR_SCALE},
-     * {@link prefuse.Constants#LOG_SCALE}, or
-     * {@link prefuse.Constants#SQRT_SCALE}. 
+     * {@link prefuse.Constants#NOMINAL}, {@link prefuse.Constants#ORDINAL},
+     * or {@link prefuse.Constants#NUMERICAL}, for whether the data field
+     * represents categories, an ordered sequence, or numerical values.
      * @param colorField the color field to assign
      */
     public DataColorAction(String group, String dataField, 
@@ -63,9 +79,9 @@ public class DataColorAction extends ColorAction {
      * @param group the data group to process
      * @param dataField the data field to base size assignments on
      * @param dataType the data type to use for the data field. One of
-     * {@link prefuse.Constants#LINEAR_SCALE},
-     * {@link prefuse.Constants#LOG_SCALE}, or
-     * {@link prefuse.Constants#SQRT_SCALE}. 
+     * {@link prefuse.Constants#NOMINAL}, {@link prefuse.Constants#ORDINAL},
+     * or {@link prefuse.Constants#NUMERICAL}, for whether the data field
+     * represents categories, an ordered sequence, or numerical values.
      * @param colorField the color field to assign
      * @param palette the color palette to use. See
      * {@link prefuse.util.ColorLib} for color palette generators.
@@ -100,8 +116,7 @@ public class DataColorAction extends ColorAction {
     /**
      * Return the data type used by this action. This value is one of
      * {@link prefuse.Constants#NOMINAL}, {@link prefuse.Constants#ORDINAL},
-     * {@link prefuse.Constants#NUMERICAL}, or
-     * {@link prefuse.Constants#UNKNOWN}.
+     * or {@link prefuse.Constants#NUMERICAL}.
      * @return the data type used by this action
      */
     public int getDataType() {
@@ -112,8 +127,7 @@ public class DataColorAction extends ColorAction {
      * Set the data type used by this action.
      * @param type the data type used by this action, one of
      * {@link prefuse.Constants#NOMINAL}, {@link prefuse.Constants#ORDINAL},
-     * {@link prefuse.Constants#NUMERICAL}, or
-     * {@link prefuse.Constants#UNKNOWN}.
+     * or {@link prefuse.Constants#NUMERICAL}.
      */
     public void setDataType(int type) {
         if ( type < 0 || type >= Constants.DATATYPE_COUNT )
@@ -127,9 +141,10 @@ public class DataColorAction extends ColorAction {
      * This value is only used for {@link prefuse.Constants#NUMERICAL}
      * data.
      * @return the scale type. One of
-     * {@link prefuse.Constants#LINEAR_SCALE}, 
-     * {@link prefuse.Constants#SQRT_SCALE}, or
-     * {@link prefuse.Constants#LOG_SCALE}.
+     * {@link prefuse.Constants#LINEAR_SCALE},
+     * {@link prefuse.Constants#LOG_SCALE}, 
+     * {@link prefuse.Constants#SQRT_SCALE},
+     * {@link prefuse.Constants#QUANTILE_SCALE}.
      */
     public int getScale() {
         return m_scale;
@@ -141,8 +156,12 @@ public class DataColorAction extends ColorAction {
      * {@link prefuse.Constants#NUMERICAL} data.
      * @param scale the scale type to use. This value should be one of
      * {@link prefuse.Constants#LINEAR_SCALE}, 
-     * {@link prefuse.Constants#SQRT_SCALE}, or
-     * {@link prefuse.Constants#LOG_SCALE}.
+     * {@link prefuse.Constants#SQRT_SCALE},
+     * {@link prefuse.Constants#LOG_SCALE},
+     * {@link prefuse.Constants#QUANTILE_SCALE}.
+     * If {@link prefuse.Constants#QUANTILE_SCALE} is used, the number of
+     * bins to use must also be specified to a value greater than zero using
+     * the {@link #setBinCount(int)} method.
      */
     public void setScale(int scale) {
         if ( scale < 0 || scale >= Constants.SCALE_COUNT )
@@ -164,9 +183,17 @@ public class DataColorAction extends ColorAction {
      * Sets the number of "bins" or or discrete steps of color. This value
      * is only used for numerical data.
      * @param count the number of bins to set. The value 
-     * {@link Constants#CONTINUOUS} indicates not to use any binning.
+     * {@link Constants#CONTINUOUS} indicates not to use any binning. If the
+     * scale type set using the {@link #setScale(int)} method is
+     * {@link Constants#QUANTILE_SCALE}, the bin count <strong>must</strong>
+     * be greater than zero.
      */
     public void setBinCount(int count) {
+        if ( m_scale == Constants.QUANTILE_SCALE && count <= 0 ) {
+            throw new IllegalArgumentException(
+                "The quantile scale can not be used without binning. " +
+                "Use a bin value greater than zero.");
+        }
         m_bins = count;
     }
     
@@ -182,14 +209,22 @@ public class DataColorAction extends ColorAction {
         Table t = (Table)ts;
         setup(t);
         
+        int scale = m_scale;
+        if ( m_scale == Constants.QUANTILE_SCALE && m_bins <= 0 ) {
+            Logger.getLogger(getClass().getName()).warning("Can't use quantile"
+                    +"scale with no binning, defaulting to linear scale");
+            m_scale = Constants.LINEAR_SCALE;
+        }
+        
         super.run(frac);
+        
+        m_scale = scale;
     }
     
     /**
      * Set up the state of this function for the provided Table.
      */
     protected void setup(Table t) {
-        ColumnMetadata md = t.getMetadata(m_dataField);
         int size = 64;
         
         int[] palette = m_palette;
@@ -197,36 +232,51 @@ public class DataColorAction extends ColorAction {
         switch ( m_type ) {
         case Constants.NOMINAL:
         case Constants.ORDINAL:
-            m_omap = md.getOrdinalMap(); 
-            m_min = 0;
-            m_max = size = m_omap.size()-1;
-            palette = (m_palette!=null ? m_palette 
-                                       : createPalette(m_type, size));
+            m_dist = getDistribution(t);
+            size = m_omap.size()-1;
+            palette = (m_palette!=null ? m_palette : createPalette(size));
             m_cmap.setColorPalette(palette);
-            m_cmap.setMinValue(m_min); m_cmap.setMaxValue(m_max);
+            m_cmap.setMinValue(m_dist[0]);
+            m_cmap.setMaxValue(m_dist[1]);
             return;
         case Constants.NUMERICAL:
-            m_min = t.getDouble(md.getMinimumRow(), m_dataField);
-            m_max = t.getDouble(md.getMaximumRow(), m_dataField);
-            m_omap = null;
+            m_dist = getDistribution(t);
             size = m_bins > 0 ? m_bins : size;
-            palette = (m_palette!=null ? m_palette 
-                                       : createPalette(m_type, size));
+            palette = (m_palette!=null ? m_palette : createPalette(size));
             m_cmap.setColorPalette(palette);
-            m_cmap.setMinValue(0.0); m_cmap.setMaxValue(1.0);
+            m_cmap.setMinValue(0.0);
+            m_cmap.setMaxValue(1.0);
             return;
+        }
+    }
+    
+    protected double[] getDistribution(Table t) {
+        ColumnMetadata md = t.getMetadata(m_dataField);
+        if ( m_type == Constants.NUMERICAL ) {
+            m_omap = null;
+            if ( m_scale == Constants.QUANTILE_SCALE && m_bins > 0 ) {
+                double[] values = Columns.toDoubleArray(t, m_dataField);
+                return MathLib.quantiles(m_bins, values);
+            } else {
+                double[] dist = new double[2];
+                dist[0] = t.getDouble(md.getMinimumRow(), m_dataField);
+                dist[1] = t.getDouble(md.getMaximumRow(), m_dataField);
+                return dist;
+            }
+        } else {
+            m_omap = md.getOrdinalMap();
+            return new double[] { 0, m_omap.size()-1 };
         }
     }
     
     /**
      * Create a color palette of the requested type and size.
      */
-    protected static int[] createPalette(int type, int size) {
-        switch ( type ) {
+    protected int[] createPalette(int size) {
+        switch ( m_type ) {
         case Constants.NOMINAL:
             return ColorLib.getCategoryPalette(size);
         case Constants.NUMERICAL:
-            return ColorLib.getHotPalette(size);
         case Constants.ORDINAL:
         default:
             return ColorLib.getGrayscalePalette(size);
@@ -240,7 +290,7 @@ public class DataColorAction extends ColorAction {
         switch ( m_type ) {
         case Constants.NUMERICAL:
             double v = item.getDouble(m_dataField);
-            double f = MathLib.interp(m_scale, v, m_min, m_max);
+            double f = MathLib.interp(m_scale, v, m_dist);
             return m_cmap.getColor(f);
         default:
             Integer idx = (Integer)m_omap.get(item.get(m_dataField));

@@ -1,8 +1,11 @@
 package prefuse.action.assignment;
 
+import java.util.logging.Logger;
+
 import prefuse.Constants;
 import prefuse.data.Table;
 import prefuse.data.column.ColumnMetadata;
+import prefuse.data.column.Columns;
 import prefuse.data.tuple.TupleSet;
 import prefuse.util.MathLib;
 import prefuse.util.PrefuseLib;
@@ -16,6 +19,22 @@ import prefuse.visual.VisualItem;
  * a continuous scale, or can be binned into discrete size groups. Both 1D 
  * (length) and 2D (area) encodings are supported by this function.
  * 2D is assumed by default; use the setIs2DArea method to change this.</p>
+ * 
+ * <p>
+ * The size assignments for numerical data are continuous by default, but can
+ * be binned into a few discrete steps (see {@link #setBinCount(int)}).
+ * Quantitative data can also be sized on different numerical scales. The
+ * default scale is a linear scale (specified by
+ * {@link Constants#LINEAR_SCALE}), but logarithmic and square root scales can
+ * be used (specified by {@link Constants#LOG_SCALE} and
+ * {@link Constants#SQRT_SCALE} respectively. Finally, the scale can be broken
+ * into quantiles, reflecting the statistical distribution of the values rather
+ * than just the total data value range, using the
+ * {@link Constants#QUANTILE_SCALE} value. For the quantile scale to work, you
+ * also need to specify the number of bins to use {@link #setBinCount(int)}.
+ * This value will determine the number of quantiles that the data should be
+ * divided into. 
+ * </p>
  * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
@@ -34,8 +53,7 @@ public class DataSizeAction extends SizeAction {
     
     protected boolean m_inferBounds = true;
     protected boolean m_is2DArea = true;
-    protected double m_minValue;
-    protected double m_maxValue;
+    protected double[] m_dist;
     
     /**
      * Create a new DataSizeAction.
@@ -64,8 +82,10 @@ public class DataSizeAction extends SizeAction {
      * @param bins the number of discrete size values to use
      * @param scale the scale type to use. One of
      * {@link prefuse.Constants#LINEAR_SCALE},
-     * {@link prefuse.Constants#LOG_SCALE}, or
-     * {@link prefuse.Constants#SQRT_SCALE}. 
+     * {@link prefuse.Constants#LOG_SCALE},
+     * {@link prefuse.Constants#SQRT_SCALE}, or
+     * {@link prefuse.Constants#QUANTILE_SCALE}. If a quantile scale is
+     * used, the number of bins must be greater than zero. 
      */
     public DataSizeAction(String group, String field, int bins, int scale) {
         super(group);
@@ -95,9 +115,10 @@ public class DataSizeAction extends SizeAction {
     /**
      * Returns the scale type used for encoding size values from the data.
      * @return the scale type. One of
-     * {@link prefuse.Constants#LINEAR_SCALE}, 
-     * {@link prefuse.Constants#SQRT_SCALE}, or
-     * {@link prefuse.Constants#LOG_SCALE}.
+     * {@link prefuse.Constants#LINEAR_SCALE},
+     * {@link prefuse.Constants#LOG_SCALE}, 
+     * {@link prefuse.Constants#SQRT_SCALE},
+     * {@link prefuse.Constants#QUANTILE_SCALE}.
      */
     public int getScale() {
         return m_scale;
@@ -108,8 +129,12 @@ public class DataSizeAction extends SizeAction {
      * values from the data.
      * @param scale the scale type to use. This value should be one of
      * {@link prefuse.Constants#LINEAR_SCALE}, 
-     * {@link prefuse.Constants#SQRT_SCALE}, or
-     * {@link prefuse.Constants#LOG_SCALE}.
+     * {@link prefuse.Constants#SQRT_SCALE},
+     * {@link prefuse.Constants#LOG_SCALE},
+     * {@link prefuse.Constants#QUANTILE_SCALE}.
+     * If {@link prefuse.Constants#QUANTILE_SCALE} is used, the number of
+     * bins to use must also be specified to a value greater than zero using
+     * the {@link #setBinCount(int)} method.
      */
     public void setScale(int scale) {
         if ( scale < 0 || scale >= Constants.SCALE_COUNT )
@@ -128,10 +153,18 @@ public class DataSizeAction extends SizeAction {
 
     /**
      * Sets the number of "bins" or distinct categories of sizes
-     * @param count the number of bins to set. The value
-     * {@link Constants#CONTINUOUS} indicates not to use any binning.
+     * @param count the number of bins to set. The value 
+     * {@link Constants#CONTINUOUS} indicates not to use any binning. If the
+     * scale type set using the {@link #setScale(int)} method is
+     * {@link Constants#QUANTILE_SCALE}, the bin count <strong>must</strong>
+     * be greater than zero.
      */
     public void setBinCount(int count) {
+        if ( m_scale == Constants.QUANTILE_SCALE && count <= 0 ) {
+            throw new IllegalArgumentException(
+                "The quantile scale can not be used without binning. " +
+                "Use a bin value greater than zero.");
+        }
         m_bins = count;
     }
     
@@ -192,15 +225,35 @@ public class DataSizeAction extends SizeAction {
         if ( !t.canGetDouble(m_dataField) ) 
             return; // TODO: exception ?
         
+        // cache the scale value in case it gets changed due to error
+        int scale = m_scale;
+        
         ColumnMetadata md = t.getMetadata(m_dataField);
         if ( m_inferBounds ) {
-            int minRow = md.getMinimumRow();
-            int maxRow = md.getMaximumRow();
-            m_minValue = t.getDouble(minRow, m_dataField);
-            m_maxValue = t.getDouble(maxRow, m_dataField);
-            m_sizeRange = m_maxValue/m_minValue - m_baseSize;
+            if ( m_scale == Constants.QUANTILE_SCALE && m_bins > 0 ) {
+                double[] values = Columns.toDoubleArray(t, m_dataField);
+                m_dist = MathLib.quantiles(m_bins, values);
+            } else {
+                // check for non-binned quantile scale error
+                if ( m_scale == Constants.QUANTILE_SCALE ) {
+                    Logger.getLogger(getClass().getName()).warning(
+                            "Can't use quantile scale with no binning. " +
+                            "Defaulting to linear scale. Set the bin value " +
+                            "greater than zero to use a quantile scale.");
+                    m_scale = Constants.LINEAR_SCALE;
+                }
+                int minRow = md.getMinimumRow();
+                int maxRow = md.getMaximumRow();
+                m_dist = new double[2];
+                m_dist[0] = t.getDouble(minRow, m_dataField);
+                m_dist[1] = t.getDouble(maxRow, m_dataField);
+            }
+            m_sizeRange = m_dist[m_dist.length-1]/m_dist[0] - m_baseSize;
         }
         super.run(frac);
+        
+        // reset scale in case it needed to be changed due to errors
+        m_scale = scale;
     }
     
     /**
@@ -208,7 +261,7 @@ public class DataSizeAction extends SizeAction {
      */
     public double getSize(VisualItem item) {
         double v = item.getDouble(m_dataField);
-        double f = MathLib.interp(m_scale, v, m_minValue, m_maxValue);
+        double f = MathLib.interp(m_scale, v, m_dist);
         if ( m_bins < 1 ) {
             // continuous scale
             v = m_baseSize + f * m_sizeRange;
