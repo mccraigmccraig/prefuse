@@ -261,18 +261,18 @@ public class IOLib {
                 new CSVTableReader());
         ff.addExtension("gz");
         jfc.setFileFilter(ff);
-        
-        // Tab-Delimited
-        ff = new SimpleFileFilter("txt",
-                "Tab-Delimited Text File (*.txt)",
-                new DelimitedTextTableReader());
-        ff.addExtension("gz");
-        jfc.setFileFilter(ff);
-        
+
         // Pipe-Delimited
         ff = new SimpleFileFilter("txt",
                 "Pipe-Delimited Text File (*.txt)",
                 new DelimitedTextTableReader("|"));
+        ff.addExtension("gz");
+        jfc.setFileFilter(ff);
+
+        // Tab-Delimited
+        ff = new SimpleFileFilter("txt",
+                "Tab-Delimited Text File (*.txt)",
+                new DelimitedTextTableReader());
         ff.addExtension("gz");
         jfc.setFileFilter(ff);
         
@@ -308,6 +308,14 @@ public class IOLib {
         
         // TODO: have this generate automatically
         // tie into PrefuseConfig??
+
+        // TreeML
+        ff = new SimpleFileFilter("xml",
+                "TreeML File (*.xml, *.treeml)",
+                new TreeMLReader());
+        ff.addExtension("treeml");
+        ff.addExtension("gz");
+        jfc.setFileFilter(ff);
         
         // GraphML
         ff = new SimpleFileFilter("xml",
@@ -317,14 +325,6 @@ public class IOLib {
         ff.addExtension("gz");
         jfc.setFileFilter(ff);
         
-        // TreeML
-        ff = new SimpleFileFilter("xml",
-                "TreeML File (*.xml, *.treeml)",
-                new TreeMLReader());
-        ff.addExtension("treeml");
-        ff.addExtension("gz");
-        jfc.setFileFilter(ff);
-
         int retval = jfc.showOpenDialog(c);
         if (retval != JFileChooser.APPROVE_OPTION)
             return null;
