@@ -134,10 +134,20 @@ public class VisualTable extends CascadedTable implements VisualTupleSet {
      */
     protected void fireTableEvent(int row0, int row1, int col, int type) {
         // table attributes changed, so we invalidate the bounds
-        if ( type==EventConstants.UPDATE && col!=VisualItem.IDX_VALIDATED )
+        if ( type==EventConstants.UPDATE )
         {
-            for ( int r=row0; r<=row1; ++r )
-                setValidated(r,false);
+            if ( col != VisualItem.IDX_VALIDATED ) {
+                for ( int r=row0; r<=row1; ++r )
+                    setValidated(r,false);
+            } else {
+                // change in validated status
+                for ( int r=row0; r<=row1; ++r ) {
+                    if ( !isValidated(r) ) {
+                        // retrieve the old bounds to report damage
+                        m_vis.damageReport(getItem(r), getBounds(r));
+                    }
+                }
+            }
         }
         else if ( type==EventConstants.DELETE && col==EventConstants.ALL_COLUMNS)
         {

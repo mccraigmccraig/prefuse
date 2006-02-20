@@ -104,11 +104,7 @@ public class TableVisualItem extends TableTuple implements VisualItem {
         if ( isValidated() ) return getBounds();
         
         Visualization v = getVisualization();
-        
-        // retrieve the old bounds to report damage
-        // access through the table to avoid infinite recursion
-        v.damageReport(this, ((VisualTable)m_table).getBounds(m_row));
-        
+                
         // set the new bounds from the renderer and validate
         getRenderer().setBounds(this);
         setValidated(true);
