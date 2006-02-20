@@ -1,5 +1,7 @@
 package prefuse.util;
 
+import java.util.ArrayList;
+
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Schema;
@@ -105,6 +107,62 @@ public class GraphLib {
         return g;
     }
     
+    public static Graph getHoneycomb(int levels) {
+        Graph g = new Graph();
+        g.getNodeTable().addColumns(LABEL_SCHEMA);
+        ArrayList layer1 = halfcomb(g, levels);
+        ArrayList layer2 = halfcomb(g, levels);
+        for ( int i=0; i<(levels<<1); ++i ) {
+            Node n1 = (Node)layer1.get(i);
+            Node n2 = (Node)layer2.get(i);
+            g.addEdge(n1, n2);
+        }
+        return g;
+    }
+    
+    private static ArrayList halfcomb(Graph g, int levels) {
+        ArrayList top   = new ArrayList();
+        ArrayList layer = new ArrayList();
+        
+        int label = 0;
+        
+        for ( int i=0; i<levels; ++i ) {
+            Node n = g.addNode();
+            n.setString(LABEL, String.valueOf(label++));
+            top.add(n);
+        }
+        for ( int i=0; i<levels; ++i ) {
+            Node n = null;
+            for ( int j=0; j<top.size(); ++j ) {
+                Node p = (Node)top.get(j);
+                if ( n == null ) {
+                    n = g.addNode();
+                    n.setString(LABEL, String.valueOf(label++));
+                    layer.add(n);
+                }
+                g.addEdge(p, n);
+                n = g.addNode();
+                n.setString(LABEL, String.valueOf(label++));
+                layer.add(n);
+                g.addEdge(p, n);
+            }
+            if ( i == levels-1 ) {
+                return layer;
+            }
+            top.clear();
+            for ( int j=0; j<layer.size(); ++j ) {
+                Node p = (Node)layer.get(j);
+                n = g.addNode();
+                n.setString(LABEL, String.valueOf(label++));
+                top.add(n);
+                g.addEdge(p, n);
+            }
+            layer.clear();
+        }
+        // should never happen
+        return top;
+    }
+    
     /**
      * Returns a balanced tree of the requested breadth and depth.
      * @param breadth the breadth of each level of the tree
@@ -182,7 +240,9 @@ public class GraphLib {
         r.setString(LABEL, "0,0");
         
         Node left = t.addChild(r);
+        left.setString(LABEL, "1,0");
         Node right = t.addChild(r);
+        right.setString(LABEL, "1,1");
         
         deepHelper(t, left, b, d1-2, true);
         deepHelper(t, right, b, d1-2, false);
@@ -206,11 +266,10 @@ public class GraphLib {
         if ( left && depth > 0 )
             deepHelper(t, c, breadth, depth-1, left);
         
-        for ( int i=1; i<breadth-1; ++i )
-            t.addChild(n);
-        
-        c = t.addChild(n);
-        c.setString(LABEL, "1,"+c.getDepth());
+        for ( int i=1; i<breadth; ++i ) {
+            c = t.addChild(n);
+            c.setString(LABEL, i+","+c.getDepth());
+        }
         if ( !left && depth > 0 )
             deepHelper(t, c, breadth, depth-1, left);
     }
