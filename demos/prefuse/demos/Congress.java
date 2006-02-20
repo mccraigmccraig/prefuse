@@ -168,7 +168,9 @@ public class Congress extends JPanel {
         yaxis.setLayoutBounds(m_dataB);
         
         AxisLabelLayout ylabels = new AxisLabelLayout("ylab", yaxis, m_ylabB);
-        ylabels.setNumberFormat(NumberFormat.getCurrencyInstance());
+        NumberFormat nf = NumberFormat.getCurrencyInstance();
+        nf.setMaximumFractionDigits(0);
+        ylabels.setNumberFormat(nf);
         
         AxisLabelLayout xlabels = new AxisLabelLayout("xlab", xaxis, m_xlabB, 15);
         vis.putAction("xlabels", xlabels);
@@ -328,7 +330,7 @@ public class Congress extends JPanel {
         int h = m_display.getHeight();
         int iw = i.left+i.right;
         int ih = i.top+i.bottom;
-        int aw = 100;
+        int aw = 85;
         int ah = 15;
         
         m_dataB.setRect(i.left, i.top, w-iw-aw, h-ih-ah);
