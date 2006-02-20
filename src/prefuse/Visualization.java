@@ -18,6 +18,7 @@ import prefuse.data.Tuple;
 import prefuse.data.expression.Expression;
 import prefuse.data.expression.Predicate;
 import prefuse.data.expression.parser.ExpressionParser;
+import prefuse.data.tuple.CompositeTupleSet;
 import prefuse.data.tuple.DefaultTupleSet;
 import prefuse.data.tuple.TupleManager;
 import prefuse.data.tuple.TupleSet;
@@ -213,7 +214,7 @@ public class Visualization {
      * @return a visual abstraction of the input data, a VisualTupleSet
      * instance
      */
-    public VisualTupleSet add(String group, TupleSet data) {
+    public synchronized VisualTupleSet add(String group, TupleSet data) {
         return add(group, data, null);
     }
 
@@ -229,7 +230,9 @@ public class Visualization {
      * @return a visual abstraction of the input data, a VisualTupleSet
      * instance
      */
-    public VisualTupleSet add(String group, TupleSet data, Predicate filter) {
+    public synchronized VisualTupleSet add(
+            String group, TupleSet data, Predicate filter)
+    {
         if ( data instanceof Table ) {
             return addTable(group, (Table)data, filter);
         } else if ( data instanceof Tree ) {
@@ -250,7 +253,7 @@ public class Visualization {
      * @param group the data group name for the visualized data
      * @return the added VisualTable
      */
-    public VisualTable addTable(String group) {
+    public synchronized VisualTable addTable(String group) {
         VisualTable vt = new VisualTable(this, group);
         m_visual.put(group, vt);
         return vt;
@@ -266,7 +269,7 @@ public class Visualization {
      * @param schema the data schema to use for the VisualTable
      * @return the added VisualTable
      */
-    public VisualTable addTable(String group, Schema schema) {
+    public synchronized VisualTable addTable(String group, Schema schema) {
         VisualTable vt = new VisualTable(this, group, schema);
         m_visual.put(group, vt);
         return vt;
@@ -280,7 +283,7 @@ public class Visualization {
      * @param group the data group name for the visualized data
      * @param table the data table to visualize
      */
-    public VisualTable addTable(String group, Table table) {
+    public synchronized VisualTable addTable(String group, Table table) {
         return addTable(group, table, (Predicate)null);
     }
     
@@ -294,7 +297,9 @@ public class Visualization {
      * @param filter a filter Predicate determining which data Tuples in the
      * input table are visualized
      */
-    public VisualTable addTable(String group, Table table, Predicate filter) {
+    public synchronized VisualTable addTable(
+            String group, Table table, Predicate filter)
+    {
         VisualTable vt = new VisualTable(table, this, group, filter);
         m_visual.put(group, vt);
         m_source.put(group, table);
@@ -310,7 +315,9 @@ public class Visualization {
      * @param table the data table to visualize
      * @param schema the data schema to use for the created VisualTable
      */
-    public VisualTable addTable(String group, Table table, Schema schema) {
+    public synchronized VisualTable addTable(
+            String group, Table table, Schema schema)
+    {
         return addTable(group, table, null, schema);
     }
     
@@ -325,8 +332,8 @@ public class Visualization {
      * input table are visualized
      * @param schema the data schema to use for the created VisualTable
      */
-    public VisualTable addTable(String group, Table table, 
-                                Predicate filter, Schema schema)
+    public synchronized VisualTable addTable(
+            String group, Table table, Predicate filter, Schema schema)
     {
         VisualTable vt = new VisualTable(table, this, group, filter, schema);
         m_visual.put(group, vt);
@@ -346,7 +353,7 @@ public class Visualization {
      * subgroups.
      * @param graph the graph to visualize
      */
-    public VisualGraph addGraph(String group, Graph graph) {
+    public synchronized VisualGraph addGraph(String group, Graph graph) {
         return addGraph(group, graph, null);
     }
     
@@ -362,7 +369,9 @@ public class Visualization {
      * @param filter a filter Predicate determining which data Tuples in the
      * input graph are visualized
      */
-    public VisualGraph addGraph(String group, Graph graph, Predicate filter) {
+    public synchronized VisualGraph addGraph(
+            String group, Graph graph, Predicate filter)
+    {
         return addGraph(group, graph, filter, VisualItem.SCHEMA, VisualItem.SCHEMA);
     }
     
@@ -380,8 +389,8 @@ public class Visualization {
      * @param nodeSchema the data schema to use for the visual node table
      * @param edgeSchema the data schema to use for the visual edge table
      */
-    public VisualGraph addGraph(String group, Graph graph, Predicate filter,
-                                Schema nodeSchema, Schema edgeSchema)
+    public synchronized VisualGraph addGraph(String group, Graph graph,
+            Predicate filter, Schema nodeSchema, Schema edgeSchema)
     {
         String ngroup = PrefuseLib.getGroupName(group, Graph.NODES); 
         String egroup = PrefuseLib.getGroupName(group, Graph.EDGES);
@@ -418,7 +427,7 @@ public class Visualization {
      * subgroups.
      * @param tree the tree to visualize
      */
-    public VisualTree addTree(String group, Tree tree) {
+    public synchronized VisualTree addTree(String group, Tree tree) {
         return addTree(group, tree, null);
     }
     
@@ -434,7 +443,9 @@ public class Visualization {
      * @param filter a filter Predicate determining which data Tuples in the
      * input graph are visualized
      */
-    public VisualTree addTree(String group, Tree tree, Predicate filter) {
+    public synchronized VisualTree addTree(
+            String group, Tree tree, Predicate filter)
+    {
         return addTree(group, tree, filter, VisualItem.SCHEMA, VisualItem.SCHEMA);
     }
     
@@ -452,8 +463,8 @@ public class Visualization {
      * @param nodeSchema the data schema to use for the visual node table
      * @param edgeSchema the data schema to use for the visual edge table
      */
-    public VisualTree addTree(String group, Tree tree, Predicate filter,
-            Schema nodeSchema, Schema edgeSchema)
+    public synchronized VisualTree addTree(String group, Tree tree,
+            Predicate filter, Schema nodeSchema, Schema edgeSchema)
     {
         String ngroup = PrefuseLib.getGroupName(group, Graph.NODES); 
         String egroup = PrefuseLib.getGroupName(group, Graph.EDGES);
@@ -486,7 +497,7 @@ public class Visualization {
      * @return the generated AggregateTable
      * @see prefuse.visual.AggregateTable
      */
-    public AggregateTable addAggregates(String group) {
+    public synchronized AggregateTable addAggregates(String group) {
         return addAggregates(group, VisualItem.SCHEMA);
     }
     
@@ -498,7 +509,9 @@ public class Visualization {
      * @return the generated AggregateTable
      * @see prefuse.visual.AggregateTable
      */
-    public AggregateTable addAggregates(String group, Schema schema) {
+    public synchronized AggregateTable addAggregates(String group,
+                                                     Schema schema)
+    {
         AggregateTable vat = new AggregateTable(this, group, schema);
         m_visual.put(group, vat);
         return vat;
@@ -519,8 +532,8 @@ public class Visualization {
      * should not be inherited, but managed locally by the derived group
      * @return the derived VisualTable
      */
-    public VisualTable addDerivedTable(String group, String source,
-            Predicate filter, Schema override)
+    public synchronized VisualTable addDerivedTable(
+            String group, String source, Predicate filter, Schema override)
     {
         VisualTable src = (VisualTable)getGroup(source);
         VisualTable vt = new VisualTable(src, this, group, filter, override);
@@ -542,7 +555,7 @@ public class Visualization {
      * @param source the source data group to decorate
      * @return the generated VisualTable of DecoratorItem instances
      */
-    public VisualTable addDecorators(String group, String source) {
+    public synchronized VisualTable addDecorators(String group,String source) {
         return addDecorators(group, source, (Predicate)null);
     }
     
@@ -560,7 +573,9 @@ public class Visualization {
      * by the generated VisualTable
      * @return the generated VisualTable of DecoratorItem instances
      */
-    public VisualTable addDecorators(String group, String source, Schema schema) {
+    public synchronized VisualTable addDecorators(
+            String group, String source, Schema schema)
+    {
         return addDecorators(group, source, null, schema);
     }
     
@@ -577,8 +592,8 @@ public class Visualization {
      * source group should be inheritable by the new group
      * @return the generated VisualTable of DecoratorItem instances
      */
-    public VisualTable addDecorators(String group, String source, 
-                                     Predicate filter)
+    public synchronized VisualTable addDecorators(
+            String group, String source, Predicate filter)
     {
         VisualTable t = addDerivedTable(group,source,filter,VisualItem.SCHEMA);
         t.setTupleManager(new TupleManager(t, null, TableDecoratorItem.class));
@@ -601,12 +616,65 @@ public class Visualization {
      * by the generated VisualTable
      * @return the generated VisualTable of DecoratorItem instances
      */
-    public VisualTable addDecorators(String group, String source, 
-                                     Predicate filter, Schema schema)
+    public synchronized VisualTable addDecorators(
+            String group, String source, Predicate filter, Schema schema)
     {
         VisualTable t = addDerivedTable(group, source, filter, schema);
         t.setTupleManager(new TupleManager(t, null, TableDecoratorItem.class));
         return t;
+    }
+    
+    /**
+     * Removes a data group from this Visualization. If the group is a focus
+     * group, the group will simply be removed, and any subsequent attempts to
+     * retrieve the group will return null. If the group is a primary group, it
+     * will be removed, and any members of the group will also be removed
+     * from any registered focus groups.
+     * @param group the data group to remove
+     * @return true if the group was found and removed, false if the group
+     * was not found in this visualization.
+     */
+    public synchronized boolean removeGroup(String group) {
+        // check for focus group first
+        TupleSet ts = getFocusGroup(group);
+        if ( ts != null ) {
+            // invalidate the item to reflect group membership change
+            for ( Iterator items = ts.tuples(ValidatedPredicate.TRUE);
+                  items.hasNext(); )
+            {
+                ((VisualItem)items.next()).setValidated(false);
+            }
+            ts.clear(); // trigger group removal callback
+            m_focus.remove(group);
+            return true;
+        }
+        
+        // focus group not found, check for primary group
+        ts = getVisualGroup(group);
+        if ( ts == null ) {
+            // exit with false if group not found
+            return false;
+        }
+        // remove group members from focus sets and invalidate them
+        TupleSet[] focus = new TupleSet[m_focus.size()];
+        m_focus.values().toArray(focus);
+        for ( Iterator items = ts.tuples(); items.hasNext(); ) {
+            VisualItem item = (VisualItem)items.next();
+            for ( int j=0; j<focus.length; ++j ) {
+                focus[j].removeTuple(item);
+            }
+            item.setValidated(false);
+        }
+        // remove data
+        if ( ts instanceof CompositeTupleSet ) {
+            CompositeTupleSet cts = (CompositeTupleSet)ts;
+            for ( Iterator names = cts.setNames(); names.hasNext(); ) {
+                String name = (String)names.next();
+                m_visual.remove(PrefuseLib.getGroupName(group,name));
+            }
+        }
+        m_visual.remove(group);
+        return true;
     }
     
     /**
