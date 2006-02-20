@@ -35,9 +35,9 @@ import prefuse.visual.VisualItem;
  * into quantiles, reflecting the statistical distribution of the values rather
  * than just the total data value range, using the
  * {@link Constants#QUANTILE_SCALE} value. For the quantile scale to work, you
- * also need to specify the number of bins to use {@link #setBinCount(int)}.
- * This value will determine the number of quantiles that the data should be
- * divided into. 
+ * also need to specify the number of bins to use (see
+ * {@link #setBinCount(int)}). This value will determine the number of
+ * quantiles that the data should be divided into. 
  * </p>
  * 
  * </p>

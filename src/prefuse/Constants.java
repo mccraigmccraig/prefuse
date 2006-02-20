@@ -63,7 +63,7 @@ public interface Constants {
     public static final int LOG_SCALE      = 1;
     /** A square root scale */
     public static final int SQRT_SCALE     = 2;
-    /** A qunatile scale, based on the underlying distribution */
+    /** A quantile scale, based on the underlying distribution */
     public static final int QUANTILE_SCALE = 3;
     /** The total number of scale type values */
     public static final int SCALE_COUNT    = 4;
