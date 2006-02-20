@@ -96,6 +96,22 @@ public class CompositeTupleSet extends AbstractTupleSet {
     }
     
     /**
+     * Get an iterator over the names of all the TupleSets in this composite.
+     * @return the iterator over contained set names.
+     */
+    public Iterator setNames() {
+        return m_map.keySet().iterator();
+    }
+
+    /**
+     * Get an iterator over all the TupleSets in this composite.
+     * @return the iterator contained sets.
+     */
+    public Iterator sets() {
+        return m_map.values().iterator();
+    }
+    
+    /**
      * Remove the TupleSet with the given name from this composite.
      * @param name the name of the TupleSet to remove
      * @return the removed TupleSet, or null if not found
