@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import prefuse.Constants;
@@ -15,11 +16,13 @@ import prefuse.Visualization;
 import prefuse.action.ActionList;
 import prefuse.action.RepaintAction;
 import prefuse.action.assignment.ColorAction;
+import prefuse.action.assignment.DataShapeAction;
 import prefuse.action.filter.VisibilityFilter;
 import prefuse.action.layout.AxisLayout;
 import prefuse.controls.ToolTipControl;
 import prefuse.data.Table;
 import prefuse.data.expression.AndPredicate;
+import prefuse.data.io.DelimitedTextTableReader;
 import prefuse.data.query.RangeQueryBinding;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.ShapeRenderer;
@@ -42,6 +45,10 @@ public class ScatterPlot extends JPanel {
     private ShapeRenderer m_shapeR = new ShapeRenderer(2);
     
     public ScatterPlot(Table t, String xfield, String yfield) {
+        this(t, xfield, yfield, null);
+    }
+    
+    public ScatterPlot(Table t, String xfield, String yfield, String sfield) {
         super(new BorderLayout());
         
         // --------------------------------------------------------------------
@@ -74,11 +81,15 @@ public class ScatterPlot extends JPanel {
         y_axis.setRangeModel(yaxisQ.getModel());
 
         ColorAction color = new ColorAction(group, 
-                VisualItem.FILLCOLOR, ColorLib.rgb(100,100,255));
+                VisualItem.STROKECOLOR, ColorLib.rgb(100,100,255));
+
+        DataShapeAction shape = new DataShapeAction(group, sfield);
         
         ActionList draw = new ActionList();
         draw.add(x_axis);
         draw.add(y_axis);
+        if ( sfield != null )
+            draw.add(shape);
         draw.add(color);
         draw.add(new RepaintAction());
         m_vis.putAction("draw", draw);
@@ -155,6 +166,45 @@ public class ScatterPlot extends JPanel {
     
     public Display getDisplay() {
         return m_display;
+    }
+    
+    // ------------------------------------------------------------------------
+    
+    public static void main(String[] argv) {
+        String data = "/fisher.iris.txt";
+        String xfield = "SepalLength";
+        String yfield = "PetalLength";
+        String sfield = "Species";
+        if ( argv.length >= 3 ) {
+            data = argv[0];
+            xfield = argv[1];
+            yfield = argv[2];
+            sfield = ( argv.length > 3 ? argv[3] : null );
+        }
+        JFrame frame = new JFrame("p r e f u s e  |  s c a t t e r");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setContentPane(demo(data, xfield, yfield, sfield));
+        frame.pack();
+        frame.setVisible(true);
+    }
+    
+    public static ScatterPlot demo(String data, String xfield, String yfield) {
+        return demo(data, xfield, yfield, null);
+    }
+    
+    public static ScatterPlot demo(String data, String xfield,
+                                   String yfield, String sfield)
+    {
+        Table table = null;
+        try {
+            table = new DelimitedTextTableReader().readTable(data);
+        } catch ( Exception e ) {
+            e.printStackTrace();
+            return null;
+        }
+        ScatterPlot scatter = new ScatterPlot(table, xfield, yfield, sfield);
+        scatter.setPointSize(10);
+        return scatter;
     }
     
 } // end of class ScatterPlot
