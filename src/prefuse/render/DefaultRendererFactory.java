@@ -96,6 +96,16 @@ public class DefaultRendererFactory implements RendererFactory {
     }
     
     /**
+     * Gets the default renderer. This renderer will be returned by
+     * {@link #getRenderer(VisualItem)} whenever there are no matching
+     * predicates and the input item <em>is not</em> an EdgeItem.
+     * @return the default Renderer for non-edge VisualItems
+     */
+    public Renderer getDefaultRenderer() {
+        return m_itemRenderer;
+    }
+    
+    /**
      * Sets the default edge renderer. This renderer will be returned by
      * {@link #getRenderer(VisualItem)} whenever there are no matching
      * predicates and the input item <em>is</em> an EdgeItem. To set the
@@ -106,6 +116,16 @@ public class DefaultRendererFactory implements RendererFactory {
      */
     public void setDefaultEdgeRenderer(Renderer r) {
         m_edgeRenderer = r;
+    }
+    
+    /**
+     * Gets the default edge renderer. This renderer will be returned by
+     * {@link #getRenderer(VisualItem)} whenever there are no matching
+     * predicates and the input item <em>is</em> an EdgeItem.
+     * @return the default Renderer for EdgeItems
+     */
+    public Renderer getDefaultEdgeRenderer() {
+        return m_edgeRenderer;
     }
     
     /**
