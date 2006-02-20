@@ -326,6 +326,7 @@ public class ForceDirectedLayout extends Layout {
     protected void initSimulator(ForceSimulator fsim) {
         // make sure we have force items to work with
         TupleSet ts = m_vis.getGroup(m_nodeGroup);
+        if ( ts == null ) return;
         try {
             ts.addColumns(FORCEITEM_SCHEMA);
         } catch ( IllegalArgumentException iae ) {}
@@ -337,7 +338,7 @@ public class ForceDirectedLayout extends Layout {
        
         Iterator iter = m_vis.visibleItems(m_nodeGroup);
         while ( iter.hasNext() ) {
-            VisualItem item = (NodeItem)iter.next();
+            VisualItem item = (VisualItem)iter.next();
             ForceItem fitem = (ForceItem)item.get(FORCEITEM);
             fitem.mass = getMassValue(item);
             double x = item.getEndX();
