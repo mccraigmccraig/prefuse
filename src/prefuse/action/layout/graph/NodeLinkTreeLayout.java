@@ -506,4 +506,4 @@ public class NodeLinkTreeLayout extends TreeLayout {
         }
     }
     
-} // end of class ReingoldTilfordLayout
+} // end of class NodeLinkTreeLayout
