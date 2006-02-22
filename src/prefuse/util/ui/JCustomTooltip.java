@@ -22,7 +22,27 @@ import javax.swing.event.AncestorListener;
 
 /**
  * Tooltip component that allows arbitrary Swing components to be
- * used within tooltips.
+ * used within tooltips. To use this class, provide the constructor
+ * with both the source component (the component to provide the
+ * tooltip for) and the tooltip component (a JComponent to use as the
+ * displayed tooltip). This class can be used to provide
+ * a custom tooltip for a prefuse {@link prefuse.Display} instance,
+ * by registering it with the
+ * {@link prefuse.Display#setCustomToolTip(JToolTip)} method.
+ * 
+ * <p>In general, <code>JCustomTooltip</code> can be used with any Swing
+ * widget. This is done by  overriding JComponent's <code>createToolTip</code>
+ * method such that it returns the custom tooltip instance.</p>
+ * 
+ * <p>Before using this class, you might first check if you can
+ * achieve your desired custom tooltip by using HTML formatting.
+ * As with JLabel instances, the standard Swing tooltip mechanism includes
+ * support for HTML tooltip text, allowing multi-line tooltips using
+ * coloring and various fonts to be created. See
+ * See <a href="http://examples.oreilly.com/jswing2/code/ch04/HtmlLabel.java">
+ * this example</a> for an instance of using HTML formatting in
+ * a JLabel. The same HTML string could be used as the input to
+ * JComponent's <code>setToolTipText</code> method.</p>
  * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */

@@ -31,6 +31,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToolTip;
 import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 
@@ -141,6 +142,9 @@ public class Display extends JComponent {
     protected int nframes = 0;
     private int sampleInterval = 10;
     private long mark = -1L;
+    
+    /* Custom tooltip, null to use regular tooltip mechanisms */
+    protected JToolTip m_customToolTip = null;
     
     // text editing variables
     private JTextComponent m_editor;
@@ -491,6 +495,50 @@ public class Display extends JComponent {
         m_bgpainter = bg;
         if ( bg != null )
             addPaintListener(bg);
+    }
+    
+    // ------------------------------------------------------------------------
+    // ToolTips
+
+    /**
+     * Returns the tooltip instance to use for this Display. By default, uses
+     * the normal Swing tooltips, returning the result of this same method
+     * invoked on the JComponent super-class. If a custom tooltip has been
+     * set, that is returned instead.
+     * @see #setCustomToolTip(JToolTip)
+     * @see javax.swing.JComponent#createToolTip()
+     */
+    public JToolTip createToolTip() {
+        if ( m_customToolTip == null ) {
+            return super.createToolTip();
+        } else {
+            return m_customToolTip;
+        }
+    }
+    
+    /**
+     * Set a custom tooltip to use for this Display. To trigger tooltip
+     * display, you must still use the <code>setToolTipText</code> method
+     * as usual. The actual text will no longer have any effect, other
+     * than that a null text value will result in no tooltip display
+     * while a non-null text value will result in a tooltip being
+     * shown. Clients are responsible for setting the tool tip
+     * text to enable/disable tooltips as well as updating the content
+     * of their own custom tooltip instance.
+     * @param tooltip the tooltip component to use
+     * @see prefuse.util.ui.JCustomTooltip
+     */
+    public void setCustomToolTip(JToolTip tooltip) {
+        m_customToolTip = tooltip;
+    }
+    
+    /**
+     * Get the custom tooltip used by this Display. Returns null if normal
+     * tooltips are being used.
+     * @return the custom tooltip used by this Display, or null if none
+     */
+    public JToolTip getCustomToolTip() {
+        return m_customToolTip;
     }
     
     // ------------------------------------------------------------------------
