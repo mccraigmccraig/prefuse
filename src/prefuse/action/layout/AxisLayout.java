@@ -226,9 +226,9 @@ public class AxisLayout extends Layout {
     }
     
     /**
-     * Set the minimum and maximum axis values.
+     * Set the minimum and maximum pixel values.
      */
-    protected void setMinMax() {
+    private void setMinMax() {
         Rectangle2D b = getLayoutBounds();
         if ( m_axis == Constants.X_AXIS ) {
             m_min = b.getMinX();
