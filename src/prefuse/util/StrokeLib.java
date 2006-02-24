@@ -52,13 +52,13 @@ public class StrokeLib {
      * Get a non-dashed stroke of the given width, cap, and join
      * @param width the requested stroke width
      * @param cap the requested cap type, one of
-     * {@link java.awt.BasicStroke#JOIN_BEVEL},
-     * {@link java.awt.BasicStroke#JOIN_MITER}, or
-     * {@link java.awt.BasicStroke#JOIN_ROUND}
-     * @param join the requested join type, one of
      * {@link java.awt.BasicStroke#CAP_BUTT},
      * {@link java.awt.BasicStroke#CAP_ROUND}, or
      * {@link java.awt.BasicStroke#CAP_SQUARE}
+     * @param join the requested join type, one of
+     * {@link java.awt.BasicStroke#JOIN_BEVEL},
+     * {@link java.awt.BasicStroke#JOIN_MITER}, or
+     * {@link java.awt.BasicStroke#JOIN_ROUND} 
      * @return the stroke
      */
     public static BasicStroke getStroke(float width, int cap, int join) {
@@ -70,13 +70,13 @@ public class StrokeLib {
      * and dashing attributes.
      * @param width the requested stroke width
      * @param cap the requested cap type, one of
-     * {@link java.awt.BasicStroke#JOIN_BEVEL},
-     * {@link java.awt.BasicStroke#JOIN_MITER}, or
-     * {@link java.awt.BasicStroke#JOIN_ROUND}
-     * @param join the requested join type, one of
      * {@link java.awt.BasicStroke#CAP_BUTT},
      * {@link java.awt.BasicStroke#CAP_ROUND}, or
      * {@link java.awt.BasicStroke#CAP_SQUARE}
+     * @param join the requested join type, one of
+     * {@link java.awt.BasicStroke#JOIN_BEVEL},
+     * {@link java.awt.BasicStroke#JOIN_MITER}, or
+     * {@link java.awt.BasicStroke#JOIN_ROUND} 
      * @param miterLimit the miter limit at which to bevel miter joins
      * @param dashes an array describing the alternation pattern of
      * a dashed line. For example [5f, 3f] will create dashes of length 5
