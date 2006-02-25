@@ -692,13 +692,15 @@ public class Visualization {
             TupleSet ts = (TupleSet)entry.getValue();
             ts.clear();
         }
-        // now clear out all the visual data groups
-        iter = m_visual.entrySet().iterator();
-        while ( iter.hasNext() ) {
-            Map.Entry entry = (Map.Entry)iter.next();
-            TupleSet ts = (TupleSet)entry.getValue();
-            ts.clear();
-        }
+        // TODO is all this clearing completely unnecessary?
+        // comment out for now, add test cases for this
+//        // now clear out all the visual data groups
+//        iter = m_visual.entrySet().iterator();
+//        while ( iter.hasNext() ) {
+//            Map.Entry entry = (Map.Entry)iter.next();
+//            TupleSet ts = (TupleSet)entry.getValue();
+//            ts.clear();
+//        }
         // finally clear out all map entries
         m_visual.clear();
         m_source.clear();
