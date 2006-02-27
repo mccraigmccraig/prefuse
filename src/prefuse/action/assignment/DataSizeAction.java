@@ -55,6 +55,8 @@ public class DataSizeAction extends SizeAction {
     protected boolean m_is2DArea = true;
     protected double[] m_dist;
     
+    protected int m_tempScale;
+    
     /**
      * Create a new DataSizeAction.
      * @param group the data group to process
@@ -212,11 +214,11 @@ public class DataSizeAction extends SizeAction {
     }    
     
     // ------------------------------------------------------------------------
-
+    
     /**
-     * @see prefuse.action.Action#run(double)
+     * @see prefuse.action.EncoderAction#setup()
      */
-    public void run(double frac) {
+    protected void setup() {
         TupleSet ts = m_vis.getGroup(m_group);
         if ( !(ts instanceof Table) )
             return; // TODO: exception?
@@ -226,7 +228,7 @@ public class DataSizeAction extends SizeAction {
             return; // TODO: exception ?
         
         // cache the scale value in case it gets changed due to error
-        int scale = m_scale;
+        m_tempScale = m_scale;
         
         ColumnMetadata md = t.getMetadata(m_dataField);
         if ( m_inferBounds ) {
@@ -250,10 +252,14 @@ public class DataSizeAction extends SizeAction {
             }
             m_sizeRange = m_dist[m_dist.length-1]/m_dist[0] - m_baseSize;
         }
-        super.run(frac);
-        
+    }
+    
+    /**
+     * @see prefuse.action.EncoderAction#finish()
+     */
+    protected void finish() {
         // reset scale in case it needed to be changed due to errors
-        m_scale = scale;
+        m_scale = m_tempScale;
     }
     
     /**

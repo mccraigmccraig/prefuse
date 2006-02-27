@@ -83,11 +83,11 @@ public class DataShapeAction extends ShapeAction {
     }
     
     // ------------------------------------------------------------------------
-
+    
     /**
-     * @see prefuse.action.Action#run(double)
+     * @see prefuse.action.EncoderAction#setup()
      */
-    public void run(double frac) {
+    protected void setup() {
         TupleSet ts = m_vis.getGroup(m_group);
         if ( !(ts instanceof Table) )
             return; // TODO: exception?
@@ -95,8 +95,6 @@ public class DataShapeAction extends ShapeAction {
         
         ColumnMetadata md = t.getMetadata(m_dataField);
         m_ordinalMap = md.getOrdinalMap();
-        
-        super.run(frac);
     }
     
     /**

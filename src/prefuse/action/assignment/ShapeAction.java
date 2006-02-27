@@ -3,10 +3,9 @@ package prefuse.action.assignment;
 import java.util.logging.Logger;
 
 import prefuse.Constants;
-import prefuse.action.ItemAction;
+import prefuse.action.EncoderAction;
 import prefuse.data.expression.Predicate;
 import prefuse.data.expression.parser.ExpressionParser;
-import prefuse.util.PredicateChain;
 import prefuse.visual.VisualItem;
 
 
@@ -44,9 +43,8 @@ import prefuse.visual.VisualItem;
  * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class ShapeAction extends ItemAction {
+public class ShapeAction extends EncoderAction {
 
-    protected PredicateChain m_chain = null;
     protected int m_defaultShape = Constants.SHAPE_RECTANGLE;
     
     /**
@@ -99,8 +97,7 @@ public class ShapeAction extends ItemAction {
      * @param shape the shape value
      */
     public void add(Predicate p, int shape) {
-        if ( m_chain == null ) m_chain = new PredicateChain();
-        m_chain.add(p, new Integer(shape));
+        super.add(p, new Integer(shape));
     }
 
     /**
@@ -126,8 +123,7 @@ public class ShapeAction extends ItemAction {
      * @param f the delegate ShapeAction to use
      */
     public void add(Predicate p, ShapeAction f) {
-        if ( m_chain == null ) m_chain = new PredicateChain();
-        m_chain.add(p, f);
+        super.add(p, f);
     }
 
     /**
@@ -142,7 +138,7 @@ public class ShapeAction extends ItemAction {
      */
     public void add(String expr, ShapeAction f) {
         Predicate p = (Predicate)ExpressionParser.parse(expr);
-        add(p, f);
+        super.add(p, f);
     }
     
     // ------------------------------------------------------------------------
@@ -160,17 +156,15 @@ public class ShapeAction extends ItemAction {
      * @return the shape value for the item
      */
     public int getShape(VisualItem item) {
-        if ( m_chain != null ) {
-            Object o = m_chain.get(item);
-            if ( o != null ) {
-                if ( o instanceof ShapeAction ) {
-                    return ((ShapeAction)o).getShape(item);
-                } else if ( o instanceof Number ) {
-                    return ((Number)o).intValue();
-                } else {
-                    Logger.getLogger(this.getClass().getName())
-                        .warning("Unrecognized Object from predicate chain.");
-                }
+        Object o = lookup(item);
+        if ( o != null ) {
+            if ( o instanceof ShapeAction ) {
+                return ((ShapeAction)o).getShape(item);
+            } else if ( o instanceof Number ) {
+                return ((Number)o).intValue();
+            } else {
+                Logger.getLogger(this.getClass().getName())
+                    .warning("Unrecognized Object from predicate chain.");
             }
         }
         return m_defaultShape;   

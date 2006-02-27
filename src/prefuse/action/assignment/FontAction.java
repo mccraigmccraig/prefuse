@@ -3,11 +3,10 @@ package prefuse.action.assignment;
 import java.awt.Font;
 import java.util.logging.Logger;
 
-import prefuse.action.ItemAction;
+import prefuse.action.EncoderAction;
 import prefuse.data.expression.Predicate;
 import prefuse.data.expression.parser.ExpressionParser;
 import prefuse.util.FontLib;
-import prefuse.util.PredicateChain;
 import prefuse.visual.VisualItem;
 
 
@@ -30,9 +29,8 @@ import prefuse.visual.VisualItem;
  * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class FontAction extends ItemAction {
+public class FontAction extends EncoderAction {
 
-    protected PredicateChain m_chain = null;
     protected Font defaultFont = FontLib.getFont("SansSerif",Font.PLAIN,10);
     
     /**
@@ -87,8 +85,7 @@ public class FontAction extends ItemAction {
      * @param font the font
      */
     public void add(Predicate p, Font font) {
-        if ( m_chain == null ) m_chain = new PredicateChain();
-        m_chain.add(p, font);
+        super.add(p, font);
     }
 
     /**
@@ -103,7 +100,7 @@ public class FontAction extends ItemAction {
      */
     public void add(String expr, Font font) {
         Predicate p = (Predicate)ExpressionParser.parse(expr);
-        add(p, font);       
+        super.add(p, font);       
     }
     
     /**
@@ -114,8 +111,7 @@ public class FontAction extends ItemAction {
      * @param f the delegate FontAction to use
      */
     public void add(Predicate p, FontAction f) {
-        if ( m_chain == null ) m_chain = new PredicateChain();
-        m_chain.add(p, f);
+        super.add(p, f);
     }
 
     /**
@@ -130,7 +126,7 @@ public class FontAction extends ItemAction {
      */
     public void add(String expr, FontAction f) {
         Predicate p = (Predicate)ExpressionParser.parse(expr);
-        add(p, f);
+        super.add(p, f);
     }
     
     // ------------------------------------------------------------------------
@@ -153,17 +149,15 @@ public class FontAction extends ItemAction {
      * @return the Font for the given item
      */
     public Font getFont(VisualItem item) {
-        if ( m_chain != null ) {
-            Object o = m_chain.get(item);
-            if ( o != null ) {
-                if ( o instanceof FontAction ) {
-                    return ((FontAction)o).getFont(item);
-                } else if ( o instanceof Font ) {
-                    return (Font)o;
-                } else {
-                    Logger.getLogger(this.getClass().getName())
-                        .warning("Unrecognized Object from predicate chain.");
-                }
+        Object o = lookup(item);
+        if ( o != null ) {
+            if ( o instanceof FontAction ) {
+                return ((FontAction)o).getFont(item);
+            } else if ( o instanceof Font ) {
+                return (Font)o;
+            } else {
+                Logger.getLogger(this.getClass().getName())
+                    .warning("Unrecognized Object from predicate chain.");
             }
         }
         return defaultFont;   

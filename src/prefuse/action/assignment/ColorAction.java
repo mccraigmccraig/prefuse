@@ -6,11 +6,10 @@ package prefuse.action.assignment;
 
 import java.util.logging.Logger;
 
-import prefuse.action.ItemAction;
+import prefuse.action.EncoderAction;
 import prefuse.data.expression.Predicate;
 import prefuse.data.expression.parser.ExpressionParser;
 import prefuse.util.ColorLib;
-import prefuse.util.PredicateChain;
 import prefuse.util.PrefuseLib;
 import prefuse.visual.VisualItem;
 
@@ -45,9 +44,8 @@ import prefuse.visual.VisualItem;
  * @see prefuse.util.ColorLib
  * @see DataColorAction
  */
-public class ColorAction extends ItemAction {
+public class ColorAction extends EncoderAction {
     
-    protected PredicateChain m_chain = null;
     protected String m_colorField;
     protected String m_startField;
     protected String m_endField;
@@ -116,8 +114,7 @@ public class ColorAction extends ItemAction {
      * @param color the color value
      */
     public void add(Predicate p, int color) {
-        if ( m_chain == null ) m_chain = new PredicateChain();
-        m_chain.add(p, new Integer(color));
+        super.add(p, new Integer(color));
     }
 
     /**
@@ -143,8 +140,7 @@ public class ColorAction extends ItemAction {
      * @param f the delegate ColorAction to use
      */
     public void add(Predicate p, ColorAction f) {
-        if ( m_chain == null ) m_chain = new PredicateChain();
-        m_chain.add(p, f);
+        super.add(p, f);
     }
 
     /**
@@ -159,7 +155,7 @@ public class ColorAction extends ItemAction {
      */
     public void add(String expr, ColorAction f) {
         Predicate p = (Predicate)ExpressionParser.parse(expr);
-        add(p, f);
+        super.add(p, f);
     }
     
     // ------------------------------------------------------------------------
@@ -184,17 +180,15 @@ public class ColorAction extends ItemAction {
      * @return the color value for the item
      */
     public int getColor(VisualItem item) {
-        if ( m_chain != null ) {
-            Object o = m_chain.get(item);
-            if ( o != null ) {
-                if ( o instanceof ColorAction ) {
-                    return ((ColorAction)o).getColor(item);
-                } else if ( o instanceof Integer ) {
-                    return ((Integer)o).intValue();
-                } else {
-                    Logger.getLogger(this.getClass().getName())
-                        .warning("Unrecognized Object from predicate chain.");
-                }
+        Object o =lookup(item);
+        if ( o != null ) {
+            if ( o instanceof ColorAction ) {
+                return ((ColorAction)o).getColor(item);
+            } else if ( o instanceof Integer ) {
+                return ((Integer)o).intValue();
+            } else {
+                Logger.getLogger(this.getClass().getName())
+                    .warning("Unrecognized Object from predicate chain.");
             }
         }
         return m_defaultColor;   

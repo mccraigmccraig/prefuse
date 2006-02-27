@@ -49,12 +49,14 @@ public class DataColorAction extends ColorAction {
     private String m_dataField;
     private int    m_type;
     private int    m_scale = Constants.LINEAR_SCALE;
+    private int    m_tempScale;
     
     private double[] m_dist;
     private int      m_bins = Constants.CONTINUOUS;
     private Map      m_omap;
     private ColorMap m_cmap = new ColorMap(null,0,1);
     private int[]    m_palette;
+    
     
     /**
      * Create a new DataColorAction
@@ -200,47 +202,37 @@ public class DataColorAction extends ColorAction {
     // ------------------------------------------------------------------------    
     
     /**
-     * @see prefuse.action.Action#run(double)
+     * Set up the state of this encoding Action.
+     * @see prefuse.action.EncoderAction#setup()
      */
-    public void run(double frac) {
-        TupleSet ts = m_vis.getGroup(m_group);
-        if ( !(ts instanceof Table) )
-            return; // TODO: exception?
-        Table t = (Table)ts;
-        setup(t);
-        
-        int scale = m_scale;
-        if ( m_scale == Constants.QUANTILE_SCALE && m_bins <= 0 ) {
-            Logger.getLogger(getClass().getName()).warning("Can't use quantile"
-                    +"scale with no binning, defaulting to linear scale");
-            m_scale = Constants.LINEAR_SCALE;
-        }
-        
-        super.run(frac);
-        
-        m_scale = scale;
-    }
-    
-    /**
-     * Set up the state of this function for the provided Table.
-     */
-    protected void setup(Table t) {
+    protected void setup() {
         int size = 64;
         
         int[] palette = m_palette;
         
+        // switch up scale if necessary
+        m_tempScale = m_scale;
+        if ( m_scale == Constants.QUANTILE_SCALE && m_bins <= 0 ) {
+            Logger.getLogger(getClass().getName()).warning(
+                    "Can't use quantile scale with no binning. " +
+                    "Defaulting to linear scale. Set the bin value " +
+                    "greater than zero to use a quantile scale.");
+            m_scale = Constants.LINEAR_SCALE;
+        }
+        
+        // compute distribution and color map
         switch ( m_type ) {
         case Constants.NOMINAL:
         case Constants.ORDINAL:
-            m_dist = getDistribution(t);
-            size = m_omap.size()-1;
+            m_dist = getDistribution();
+            size = m_omap.size();
             palette = (m_palette!=null ? m_palette : createPalette(size));
             m_cmap.setColorPalette(palette);
             m_cmap.setMinValue(m_dist[0]);
             m_cmap.setMaxValue(m_dist[1]);
             return;
         case Constants.NUMERICAL:
-            m_dist = getDistribution(t);
+            m_dist = getDistribution();
             size = m_bins > 0 ? m_bins : size;
             palette = (m_palette!=null ? m_palette : createPalette(size));
             m_cmap.setColorPalette(palette);
@@ -250,8 +242,22 @@ public class DataColorAction extends ColorAction {
         }
     }
     
-    protected double[] getDistribution(Table t) {
+    protected void finish() {
+        // reset scale in case it needed to be changed due to errors
+        m_scale = m_tempScale;
+    }
+    
+    /**
+     * Computes the distribution (either min/max or quantile values) used to
+     * help assign colors to data values.
+     */
+    protected double[] getDistribution() {
+        TupleSet ts = m_vis.getGroup(m_group);
+        if ( !(ts instanceof Table) )
+            throw new RuntimeException("Can only be used to encode a Table");
+        Table t = (Table)ts;
         ColumnMetadata md = t.getMetadata(m_dataField);
+
         if ( m_type == Constants.NUMERICAL ) {
             m_omap = null;
             if ( m_scale == Constants.QUANTILE_SCALE && m_bins > 0 ) {

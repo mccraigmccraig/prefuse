@@ -4,10 +4,9 @@ import java.awt.BasicStroke;
 import java.awt.Stroke;
 import java.util.logging.Logger;
 
-import prefuse.action.ItemAction;
+import prefuse.action.EncoderAction;
 import prefuse.data.expression.Predicate;
 import prefuse.data.expression.parser.ExpressionParser;
-import prefuse.util.PredicateChain;
 import prefuse.util.StrokeLib;
 import prefuse.visual.VisualItem;
 
@@ -33,9 +32,8 @@ import prefuse.visual.VisualItem;
  * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class StrokeAction extends ItemAction {
+public class StrokeAction extends EncoderAction {
 
-    protected PredicateChain m_chain = null;
     protected BasicStroke defaultStroke = StrokeLib.getStroke(1.0f);
     
     /**
@@ -90,8 +88,7 @@ public class StrokeAction extends ItemAction {
      * @param stroke the BasicStroke
      */
     public void add(Predicate p, BasicStroke stroke) {
-        if ( m_chain == null ) m_chain = new PredicateChain();
-        m_chain.add(p, stroke);
+        super.add(p, stroke);
     }
 
     /**
@@ -117,8 +114,7 @@ public class StrokeAction extends ItemAction {
      * @param f the delegate StrokeAction to use
      */
     public void add(Predicate p, StrokeAction f) {
-        if ( m_chain == null ) m_chain = new PredicateChain();
-        m_chain.add(p, f);
+        super.add(p, f);
     }
 
     /**
@@ -133,7 +129,7 @@ public class StrokeAction extends ItemAction {
      */
     public void add(String expr, StrokeAction f) {
         Predicate p = (Predicate)ExpressionParser.parse(expr);
-        add(p, f);
+        super.add(p, f);
     }
     
     // ------------------------------------------------------------------------
@@ -152,17 +148,15 @@ public class StrokeAction extends ItemAction {
      * @return the BasicStroke for the given item
      */
     public BasicStroke getStroke(VisualItem item) {
-        if ( m_chain != null ) {
-            Object o = m_chain.get(item);
-            if ( o != null ) {
-                if ( o instanceof StrokeAction ) {
-                    return ((StrokeAction)o).getStroke(item);
-                } else if ( o instanceof Stroke ) {
-                    return (BasicStroke)o;
-                } else {
-                    Logger.getLogger(this.getClass().getName())
-                        .warning("Unrecognized Object from predicate chain.");
-                }
+        Object o = lookup(item);
+        if ( o != null ) {
+            if ( o instanceof StrokeAction ) {
+                return ((StrokeAction)o).getStroke(item);
+            } else if ( o instanceof Stroke ) {
+                return (BasicStroke)o;
+            } else {
+                Logger.getLogger(this.getClass().getName())
+                    .warning("Unrecognized Object from predicate chain.");
             }
         }
         return defaultStroke;   
