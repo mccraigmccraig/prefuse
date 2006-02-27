@@ -160,7 +160,8 @@ public class ExpressionColumn extends AbstractColumn {
             return m_cache.get(row);
         }
         Object val = m_expr.get(m_table.getTuple(row));
-        if ( m_cache.canSet(val.getClass()) ) {
+        Class type = val==null ? Object.class : val.getClass();
+        if ( m_cache.canSet(type) ) {
             m_cache.set(val, row);
             m_valid.set(row);
         }
@@ -199,6 +200,19 @@ public class ExpressionColumn extends AbstractColumn {
         }
     }
 
+    private void computeNumber(int row) {
+        if ( m_columnClass == int.class ) {
+            m_cache.setInt(m_expr.getInt(m_table.getTuple(row)), row);
+        } else if ( m_columnClass == long.class ) {
+            m_cache.setLong(m_expr.getLong(m_table.getTuple(row)), row);
+        } else if ( m_columnClass == float.class ) {
+            m_cache.setFloat(m_expr.getFloat(m_table.getTuple(row)), row);
+        } else {
+            m_cache.setDouble(m_expr.getDouble(m_table.getTuple(row)), row);
+        }
+        m_valid.set(row);
+    }
+    
     /**
      * @see prefuse.data.column.Column#getInt(int)
      */
@@ -207,14 +221,9 @@ public class ExpressionColumn extends AbstractColumn {
             throw new DataTypeException(int.class);
         rangeCheck(row);
         
-        if ( isCacheValid(row) ) {
-            return m_cache.getInt(row);
-        } else {
-            int value = m_expr.getInt(m_table.getTuple(row));
-            m_cache.setInt(value, row);
-            m_valid.set(row);
-            return value;
-        }
+        if ( !isCacheValid(row) )
+            computeNumber(row);
+        return m_cache.getInt(row);
     }
 
     /**
@@ -225,14 +234,9 @@ public class ExpressionColumn extends AbstractColumn {
             throw new DataTypeException(double.class);
         rangeCheck(row);
         
-        if ( isCacheValid(row) ) {
-            return m_cache.getDouble(row);
-        } else {
-            double value = m_expr.getDouble(m_table.getTuple(row));
-            m_cache.setDouble(value, row);
-            m_valid.set(row);
-            return value;
-        }
+        if ( !isCacheValid(row) )
+            computeNumber(row);
+        return m_cache.getDouble(row);
     }
 
     /**
@@ -243,14 +247,9 @@ public class ExpressionColumn extends AbstractColumn {
             throw new DataTypeException(float.class);
         rangeCheck(row);
         
-        if ( isCacheValid(row) ) {
-            return m_cache.getFloat(row);
-        } else {
-            float value = m_expr.getFloat(m_table.getTuple(row));
-            m_cache.setFloat(value, row);
-            m_valid.set(row);
-            return value;
-        }
+        if ( !isCacheValid(row) )
+            computeNumber(row);
+        return m_cache.getFloat(row);
     }
 
     /**
@@ -261,14 +260,9 @@ public class ExpressionColumn extends AbstractColumn {
             throw new DataTypeException(long.class);
         rangeCheck(row);
         
-        if ( isCacheValid(row) ) {
-            return m_cache.getLong(row);
-        } else {
-            long value = m_expr.getLong(m_table.getTuple(row));
-            m_cache.setLong(value, row);
-            m_valid.set(row);
-            return value;
-        }
+        if ( !isCacheValid(row) )
+            computeNumber(row);
+        return m_cache.getLong(row);
     }
     
     // ------------------------------------------------------------------------

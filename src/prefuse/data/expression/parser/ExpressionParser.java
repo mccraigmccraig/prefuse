@@ -103,10 +103,13 @@ import prefuse.util.StringLib;
  *   Numbers with decimals or exponents in scientific notation are parsed as numbers of type <code>double</code>
  * </li>
  * <li><strong>Float literals (<code>1.0f, 3.1415f, 1e-35f, 2.3e6f</code>)</strong><br/>
- *   Floating-point values decorated with the suffix "f" are parsed as number of type <code>float</code>
+ *   Floating-point values decorated with the suffix "f" are parsed as numbers of type <code>float</code>
  * </li>
  * <li><strong>String literals (<code>"some text", 'a label'</code>)</strong><br/>
  *   Text strings placed in double (") or single (') quotations are parsed as <code>String</code> literals
+ * </li>
+ * <li><strong>Null literal  (<code>null</code>)</strong><br/>
+ *   The string <code>null</code> is parsed as an ObjectLiteral of type null.
  * </li>
  * <li><strong>Data field references (<code>_strokeColor, [a data field]</code>)</strong><br/>
  *   Free-standing strings or those placed within brackets are parsed as a reference to the
@@ -179,7 +182,15 @@ import prefuse.util.StringLib;
  *     to <code>9</code>.
  * </li>
  * </ul>
- * 
+ *
+ * <h2>General Functions</h2> 
+ * <p>General purpose functions.</p>
+ * <ul>
+ *   <li><strong><code>ROW()</code></strong><br/>
+ *     Returns the table row number (or -1 if none) of the current Tuple.
+ *   </li>
+ * </ul>
+ *
  * <h2>Mathematical Functions</h2>
  * <p>Functions for performing mathematical calculations.</p>
  * <ul>
@@ -842,6 +853,7 @@ public class ExpressionParser implements ExpressionParserConstants {
       break;
     case TRUE:
     case FALSE:
+    case NULL:
     case IF:
     case INT:
     case LONG:
@@ -883,6 +895,7 @@ public class ExpressionParser implements ExpressionParserConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TRUE:
     case FALSE:
+    case NULL:
     case INT:
     case LONG:
     case DOUBLE:
@@ -945,6 +958,10 @@ public class ExpressionParser implements ExpressionParserConstants {
       jj_consume_token(FALSE);
               {if (true) return new BooleanLiteral(false);}
       break;
+    case NULL:
+      jj_consume_token(NULL);
+             {if (true) return new ObjectLiteral(null);}
+      break;
     default:
       jj_la1[14] = jj_gen;
       jj_consume_token(-1);
@@ -969,6 +986,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case TRUE:
         case FALSE:
+        case NULL:
         case IF:
         case NOT:
         case INT:
@@ -986,14 +1004,14 @@ public class ExpressionParser implements ExpressionParserConstants {
           label_8:
           while (true) {
             switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-            case 42:
+            case 43:
               ;
               break;
             default:
               jj_la1[15] = jj_gen;
               break label_8;
             }
-            jj_consume_token(42);
+            jj_consume_token(43);
             e = Expression();
                               f.addParameter(e);
           }
@@ -1046,10 +1064,10 @@ public class ExpressionParser implements ExpressionParserConstants {
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x1000,0x4000,0x800,0x40000000,0x40000000,0x80000000,0x80000000,0x0,0x0,0x0,0x0,0x0,0x13b8a1c0,0x13b881c0,0xb880c0,0x0,0x13b8a1c0,0x10000000,0x3000000,};
+      jj_la1_0 = new int[] {0x2000,0x8000,0x1000,0x80000000,0x80000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x277143c0,0x277103c0,0x17101c0,0x0,0x277143c0,0x20000000,0x6000000,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x8,0x8,0x7,0x7,0x230,0x230,0x1c0,0x1c0,0x30,0x30,0x0,0x0,0x400,0x30,0x0,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x10,0x10,0xf,0xf,0x460,0x460,0x380,0x380,0x60,0x60,0x0,0x0,0x800,0x60,0x0,0x0,};
    }
 
   public ExpressionParser(java.io.InputStream stream) {
@@ -1169,8 +1187,8 @@ public class ExpressionParser implements ExpressionParserConstants {
 
   static public ParseException generateParseException() {
     jj_expentries.removeAllElements();
-    boolean[] la1tokens = new boolean[43];
-    for (int i = 0; i < 43; i++) {
+    boolean[] la1tokens = new boolean[44];
+    for (int i = 0; i < 44; i++) {
       la1tokens[i] = false;
     }
     if (jj_kind >= 0) {
@@ -1189,7 +1207,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         }
       }
     }
-    for (int i = 0; i < 43; i++) {
+    for (int i = 0; i < 44; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

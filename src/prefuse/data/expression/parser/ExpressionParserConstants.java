@@ -6,40 +6,41 @@ public interface ExpressionParserConstants {
   int EOF = 0;
   int TRUE = 6;
   int FALSE = 7;
-  int IF = 8;
-  int THEN = 9;
-  int ELSE = 10;
-  int AND = 11;
-  int OR = 12;
-  int NOT = 13;
-  int XOR = 14;
-  int INT = 15;
-  int DECIMAL_LITERAL = 16;
-  int HEX_LITERAL = 17;
-  int OCTAL_LITERAL = 18;
-  int LONG = 19;
-  int DOUBLE = 20;
-  int FLOAT = 21;
-  int EXPONENT = 22;
-  int STRING = 23;
-  int QUOTED = 24;
-  int IDENTIFIER = 25;
-  int LETTER = 26;
-  int DIGIT = 27;
-  int LPAREN = 28;
-  int RPAREN = 29;
-  int EQ = 30;
-  int GT = 31;
-  int LT = 32;
-  int LE = 33;
-  int GE = 34;
-  int NE = 35;
-  int ADD = 36;
-  int SUB = 37;
-  int MUL = 38;
-  int DIV = 39;
-  int POW = 40;
-  int MOD = 41;
+  int NULL = 8;
+  int IF = 9;
+  int THEN = 10;
+  int ELSE = 11;
+  int AND = 12;
+  int OR = 13;
+  int NOT = 14;
+  int XOR = 15;
+  int INT = 16;
+  int DECIMAL_LITERAL = 17;
+  int HEX_LITERAL = 18;
+  int OCTAL_LITERAL = 19;
+  int LONG = 20;
+  int DOUBLE = 21;
+  int FLOAT = 22;
+  int EXPONENT = 23;
+  int STRING = 24;
+  int QUOTED = 25;
+  int IDENTIFIER = 26;
+  int LETTER = 27;
+  int DIGIT = 28;
+  int LPAREN = 29;
+  int RPAREN = 30;
+  int EQ = 31;
+  int GT = 32;
+  int LT = 33;
+  int LE = 34;
+  int GE = 35;
+  int NE = 36;
+  int ADD = 37;
+  int SUB = 38;
+  int MUL = 39;
+  int DIV = 40;
+  int POW = 41;
+  int MOD = 42;
 
   int DEFAULT = 0;
 
@@ -52,6 +53,7 @@ public interface ExpressionParserConstants {
     "\"\\f\"",
     "<TRUE>",
     "<FALSE>",
+    "<NULL>",
     "<IF>",
     "<THEN>",
     "<ELSE>",
@@ -74,7 +76,7 @@ public interface ExpressionParserConstants {
     "<DIGIT>",
     "\"(\"",
     "\")\"",
-    "\"=\"",
+    "<EQ>",
     "\">\"",
     "\"<\"",
     "\"<=\"",

@@ -153,6 +153,15 @@ abstract class DoubleFunction extends FunctionExpression {
     public Object get(Tuple t) {
         return new Double(getDouble(t));
     }
+    public int getInt(Tuple t) {
+        return (int)getDouble(t);
+    }
+    public long getLong(Tuple t) {
+        return (long)getDouble(t);
+    }
+    public float getFloat(Tuple t) {
+        return (float)getDouble(t);
+    }
 }
 abstract class IntFunction extends FunctionExpression {
     protected IntFunction(int parameterCount) {
@@ -163,6 +172,24 @@ abstract class IntFunction extends FunctionExpression {
     }
     public Object get(Tuple t) {
         return new Integer(getInt(t));
+    }
+    public long getLong(Tuple t) {
+        return (long)getInt(t);
+    }
+    public float getFloat(Tuple t) {
+        return (float)getFloat(t);
+    }
+    public double getDouble(Tuple t) {
+        return (double)getInt(t);
+    }
+}
+
+//ROW()
+class RowFunction extends IntFunction {
+    public RowFunction() { super(0); }
+    public String getName() { return "ROW"; }
+    public int getInt(Tuple t) {
+        return t.getRow();
     }
 }
 

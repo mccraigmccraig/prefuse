@@ -25,6 +25,9 @@ public class FunctionTable {
     private static HashMap s_functionTable;
     static {
         s_functionTable = new HashMap();
+        // tuple functions
+        addFunction("ROW", RowFunction.class);
+        
         // numeric functions
         addFunction("ABS", AbsFunction.class);
         addFunction("ACOS", AcosFunction.class);

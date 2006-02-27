@@ -27,7 +27,7 @@ public class ObjectLiteral extends Literal {
      * @see prefuse.data.expression.Expression#getType(prefuse.data.Schema)
      */
     public Class getType(Schema s) {
-        return m_value.getClass();
+        return m_value==null ? Object.class : m_value.getClass();
     }
 
     /**

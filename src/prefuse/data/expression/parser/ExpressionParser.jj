@@ -114,10 +114,13 @@ import prefuse.util.StringLib;
  *   Numbers with decimals or exponents in scientific notation are parsed as numbers of type <code>double</code>
  * </li>
  * <li><strong>Float literals (<code>1.0f, 3.1415f, 1e-35f, 2.3e6f</code>)</strong><br/>
- *   Floating-point values decorated with the suffix "f" are parsed as number of type <code>float</code>
+ *   Floating-point values decorated with the suffix "f" are parsed as numbers of type <code>float</code>
  * </li>
  * <li><strong>String literals (<code>"some text", 'a label'</code>)</strong><br/>
  *   Text strings placed in double (") or single (') quotations are parsed as <code>String</code> literals
+ * </li>
+ * <li><strong>Null literal  (<code>null</code>)</strong><br/>
+ *   The string <code>null</code> is parsed as an ObjectLiteral of type null.
  * </li>
  * <li><strong>Data field references (<code>_strokeColor, [a data field]</code>)</strong><br/>
  *   Free-standing strings or those placed within brackets are parsed as a reference to the
@@ -190,7 +193,15 @@ import prefuse.util.StringLib;
  *     to <code>9</code>.
  * </li>
  * </ul>
- * 
+ *
+ * <h2>General Functions</h2> 
+ * <p>General purpose functions.</p>
+ * <ul>
+ *   <li><strong><code>ROW()</code></strong><br/>
+ *     Returns the table row number (or -1 if none) of the current Tuple.
+ *   </li>
+ * </ul>
+ *
  * <h2>Mathematical Functions</h2>
  * <p>Functions for performing mathematical calculations.</p>
  * <ul>
@@ -539,6 +550,7 @@ SKIP : { " " | "\t" | "\n" | "\r" | "\f" }
 TOKEN : {
     < TRUE : "TRUE"|"true" >
 |   < FALSE : "FALSE"|"false" >
+|   < NULL : "NULL"|"null" >
 |   < IF : "IF"|"if" >
 |   < THEN : "THEN"|"then" >
 |   < ELSE : "ELSE"|"else" >
@@ -859,6 +871,7 @@ Expression Literal() :
 |   t=<STRING> { return new ObjectLiteral(t.image.substring(1,t.image.length()-1)); }
 |   <TRUE> { return new BooleanLiteral(true); }
 |   <FALSE> { return new BooleanLiteral(false); }
+|   <NULL> { return new ObjectLiteral(null); }
 }
 
 Expression Identifier() :
