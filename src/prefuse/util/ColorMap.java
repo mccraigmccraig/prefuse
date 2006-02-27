@@ -41,8 +41,8 @@ public class ColorMap {
         } else if ( val > maxValue ) {
             return palette[palette.length-1];
         } else {
-            int idx = (int)Math.round((palette.length-1) *
-                          (val-minValue)/(maxValue-minValue));
+            int idx = (int)((palette.length-1) *
+                            (val-minValue)/(maxValue-minValue));
             return palette[idx];
         }
     }
