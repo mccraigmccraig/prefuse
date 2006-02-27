@@ -203,6 +203,17 @@ public class ForceDirectedLayout extends Layout {
         m_iterations = iter;
     }
     
+    /**
+     * Explicitly sets the node and edge groups to use for this layout,
+     * overriding the group setting passed to the constructor.
+     * @param nodeGroup the node data group
+     * @param edgeGroup the edge data group
+     */
+    public void setDataGroups(String nodeGroup, String edgeGroup) {
+        m_nodeGroup = nodeGroup;
+        m_edgeGroup = edgeGroup;
+    }
+    
     // ------------------------------------------------------------------------
     
     /**
