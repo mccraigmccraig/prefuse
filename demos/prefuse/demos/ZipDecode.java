@@ -278,6 +278,14 @@ public class ZipDecode extends Display implements Constants {
         }
     }
     
+    public static JFrame demo() {
+        try {
+            return demo(ZIPCODES);
+        } catch ( Exception e ) {
+            return null;
+        }
+    }
+    
     public static JFrame demo(String table) throws DataIOException {
         DelimitedTextTableReader tr = new DelimitedTextTableReader();
         Table t = tr.readTable(table);        

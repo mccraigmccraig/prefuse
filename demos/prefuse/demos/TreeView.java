@@ -272,6 +272,10 @@ public class TreeView extends Display {
         frame.setVisible(true);
     }
     
+    public static JComponent demo() {
+        return demo(TREE_CHI, "name");
+    }
+    
     public static JComponent demo(String datafile, final String label) {
         Color BACKGROUND = Color.WHITE;
         Color FOREGROUND = Color.BLACK;

@@ -6,6 +6,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.AbstractAction;
@@ -244,7 +246,29 @@ public class GraphView extends JPanel {
             datafile = args[0];
             label = args[1];
         }
-        GraphView view = demo(datafile, label);
+        
+        JFrame frame = demo(datafile, label);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+    
+    public static JFrame demo() {
+        return demo(null, "label");
+    }
+    
+    public static JFrame demo(String datafile, String label) {
+        Graph g = null;
+        if ( datafile == null ) {
+            g = GraphLib.getGrid(15,15);
+            label = "label";
+        } else {
+            try {
+                g = new GraphMLReader().readGraph(datafile);
+            } catch ( Exception e ) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+        }
+        final GraphView view = new GraphView(g, label);
         
         // set up menu
         JMenu dataMenu = new JMenu("Data");
@@ -279,27 +303,21 @@ public class GraphView extends JPanel {
         
         // launch window
         JFrame frame = new JFrame("p r e f u s e  |  g r a p h v i e w");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(menubar);
         frame.setContentPane(view);
         frame.pack();
         frame.setVisible(true);
-    }
-
-    public static GraphView demo(String datafile, String label) {
-        Graph g = null;
-        if ( datafile == null ) {
-            g = GraphLib.getGrid(15,15);
-            label = "label";
-        } else {
-            try {
-                g = new GraphMLReader().readGraph(datafile);
-            } catch ( Exception e ) {
-                e.printStackTrace();
-                System.exit(1);
+        
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowActivated(WindowEvent e) {
+                view.m_vis.run("layout");
             }
-        }
-        return new GraphView(g, label);
+            public void windowDeactivated(WindowEvent e) {
+                view.m_vis.cancel("layout");
+            }
+        });
+        
+        return frame;
     }
     
     

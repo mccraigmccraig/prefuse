@@ -47,9 +47,9 @@ import prefuse.data.search.PrefixSearchTupleSet;
 import prefuse.data.search.SearchTupleSet;
 import prefuse.data.tuple.DefaultTupleSet;
 import prefuse.data.tuple.TupleSet;
+import prefuse.render.AbstractShapeRenderer;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.EdgeRenderer;
-import prefuse.render.AbstractShapeRenderer;
 import prefuse.render.LabelRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
@@ -223,6 +223,10 @@ public class RadialGraphView extends Display {
         frame.setContentPane(demo(infile, label));
         frame.pack();
         frame.setVisible(true);
+    }
+    
+    public static JPanel demo() {
+        return demo(DATA_FILE, "name");
     }
     
     public static JPanel demo(String datafile, final String label) {

@@ -151,7 +151,6 @@ public class FisheyeMenu extends Display {
         JFrame f = new JFrame("p r e f u s e  |  f i s h e y e");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.getContentPane().add(fm);
-        fm.getVisualization().run("init");
         f.pack();
         f.setVisible(true);
     }
@@ -169,6 +168,7 @@ public class FisheyeMenu extends Display {
                 }
             });
         }
+        fm.getVisualization().run("init");
         return fm;
     }
     
