@@ -670,10 +670,13 @@ public class Visualization {
             CompositeTupleSet cts = (CompositeTupleSet)ts;
             for ( Iterator names = cts.setNames(); names.hasNext(); ) {
                 String name = (String)names.next();
-                m_visual.remove(PrefuseLib.getGroupName(group,name));
+                String subgroup = PrefuseLib.getGroupName(group,name); 
+                m_visual.remove(subgroup);
+                m_source.remove(subgroup);
             }
         }
         m_visual.remove(group);
+        m_source.remove(group);
         return true;
     }
     
@@ -692,19 +695,9 @@ public class Visualization {
             TupleSet ts = (TupleSet)entry.getValue();
             ts.clear();
         }
-        // TODO is all this clearing completely unnecessary?
-        // comment out for now, add test cases for this
-//        // now clear out all the visual data groups
-//        iter = m_visual.entrySet().iterator();
-//        while ( iter.hasNext() ) {
-//            Map.Entry entry = (Map.Entry)iter.next();
-//            TupleSet ts = (TupleSet)entry.getValue();
-//            ts.clear();
-//        }
         // finally clear out all map entries
         m_visual.clear();
         m_source.clear();
-        
     }
     
     // ------------------------------------------------------------------------
@@ -720,6 +713,15 @@ public class Visualization {
     }
     
     /**
+     * Get the source data TupleSet backing the given visual tuple set.
+     * @return the backing source data set, or null if there is no such
+     * data set
+     */
+    public TupleSet getSourceData(VisualTupleSet ts) {
+        return (TupleSet)m_source.get(ts.getGroup());
+    }
+    
+    /**
      * Get the Tuple from a backing source data set that corresponds most
      * closely to the given VisualItem.
      * @param item the VisualItem for which to retreive the source tuple
@@ -727,11 +729,34 @@ public class Visualization {
      * be found
      */
     public Tuple getSourceTuple(VisualItem item) {
+        // get the source group and tuple set, exit if none
         String group = item.getGroup();
-        Table source = (Table)getSourceData(group);
+        TupleSet source = getSourceData(group);
         if ( source == null ) return null;
-        VisualTable table = (VisualTable)item.getTable();
-        return source.getTuple(table.getParentRow(item.getRow()));
+        
+        // first get the source table and row value
+        int row = item.getRow();
+        Table t = item.getTable();
+        while ( t instanceof VisualTable ) {
+            VisualTable vt = (VisualTable)t;
+            row = vt.getParentRow(row);
+            t   = vt.getParentTable();
+        }
+        
+        // now get the appropriate source tuple
+        // graphs maintain their own tuple managers so treat them specially
+        String cgroup = PrefuseLib.getChildGroup(group);
+        if ( cgroup != null ) {
+            String pgroup = PrefuseLib.getParentGroup(group);
+            Graph g = (Graph)getSourceData(pgroup);
+            if ( t == g.getNodeTable() ) {
+                return g.getNode(row);
+            } else {
+                return g.getEdge(row);
+            }
+        } else {
+            return t.getTuple(row);
+        }
     }
     
     /**
@@ -792,7 +817,7 @@ public class Visualization {
      */
     public int size(String group) {
         TupleSet tset = getGroup(group);
-        return ( tset==null ? -1 : tset.getTupleCount() );
+        return ( tset==null ? 0 : tset.getTupleCount() );
     }
     
     /**

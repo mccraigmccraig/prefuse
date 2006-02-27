@@ -18,7 +18,7 @@ public class VisualAggregateTableTest extends TestCase {
         Visualization v = new Visualization();
         m_items = v.addTable("items", TableTest.getTestCaseTable());
         
-        m_agg = v.addAggregates("aggregates", null);
+        m_agg = v.addAggregates("aggregates", VisualItem.SCHEMA);
         m_agg.addRow();
         m_agg.addRow();
         

@@ -8,6 +8,7 @@ import java.awt.geom.Rectangle2D;
 import prefuse.Visualization;
 import prefuse.data.Schema;
 import prefuse.data.Tuple;
+import prefuse.data.tuple.TupleSet;
 import prefuse.render.Renderer;
 import prefuse.util.PrefuseLib;
 
@@ -60,6 +61,25 @@ public interface VisualItem extends Tuple {
      * @return true if this item is in the group, false otherwise.
      */
     public boolean isInGroup(String group);
+    
+    /**
+     * Returns the original backing data set from which this VisualItem is
+     * derived. This could be a Table, Graph, or Tree instance. This method
+     * returns null if this VisualItem is not derived from backing data.
+     * @return the backing data set from which this VisualItem is derived,
+     * or null if none.
+     */
+    public TupleSet getSourceData();
+
+    /**
+     * Returns the original backing data tuple from which this VisualItem is
+     * derived. This could be a Tuple, Node, or Edge instance. This method
+     * returns null if this VisualItem is not derived from backing data.
+     * @return the backing data tuple from which this VisualItem is derived,
+     * or null if none.
+     */
+    public Tuple getSourceTuple();
+    
     
     // ------------------------------------------------------------------------
     // VisualItem Methods

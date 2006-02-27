@@ -8,7 +8,9 @@ import java.awt.geom.Rectangle2D;
 import prefuse.Visualization;
 import prefuse.data.Graph;
 import prefuse.data.Table;
+import prefuse.data.Tuple;
 import prefuse.data.tuple.TableTuple;
+import prefuse.data.tuple.TupleSet;
 import prefuse.render.Renderer;
 import prefuse.visual.VisualItem;
 import prefuse.visual.VisualTable;
@@ -53,6 +55,22 @@ public class TableVisualItem extends TableTuple implements VisualItem {
      */
     public boolean isInGroup(String group) {
         return getVisualization().isInGroup(this, group);
+    }
+    
+    /**
+     * @see prefuse.visual.VisualItem#getSourceData()
+     */
+    public TupleSet getSourceData() {
+        VisualTable vt = (VisualTable)m_table;
+        return vt.getVisualization().getSourceData(vt.getGroup());
+    }
+
+    /**
+     * @see prefuse.visual.VisualItem#getSourceTuple()
+     */
+    public Tuple getSourceTuple() {
+        VisualTable vt = (VisualTable)m_table;
+        return vt.getVisualization().getSourceTuple(this);
     }
     
     /**

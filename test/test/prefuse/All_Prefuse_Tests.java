@@ -12,6 +12,7 @@ public class All_Prefuse_Tests {
         suite.addTest(test.prefuse.data.column.All_PrefuseDataColumn_Tests.suite());
         suite.addTest(test.prefuse.data.io.All_PrefuseDataIO_Tests.suite());
         suite.addTest(test.prefuse.data.util.All_PrefuseDataUtil_Tests.suite());
+        suite.addTest(test.prefuse.visual.All_PrefuseVisual_Tests.suite());
         //$JUnit-END$
         return suite;
     }

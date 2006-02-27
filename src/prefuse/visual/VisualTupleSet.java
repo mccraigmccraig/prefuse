@@ -21,4 +21,10 @@ public interface VisualTupleSet extends TupleSet {
      */
     public Visualization getVisualization();
     
+    /**
+     * Get the data group name for this VisualTupleSet.
+     * @return the data group name
+     */
+    public String getGroup();
+    
 } // end of interface VisualTupleSet
