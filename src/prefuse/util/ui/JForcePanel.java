@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -86,5 +87,20 @@ public class JForcePanel extends JPanel {
             f.setParameter(p.intValue(), val);
         }
     } // end of inner class ForcePanelChangeListener
+    
+    /**
+     * Create and displays a new window showing a configuration panel
+     * for the given ForceSimulator.
+     * @param fsim the force simulator
+     * @return a JFrame instance containing a configuration interface
+     * for the force simulator
+     */
+    public static JFrame showForcePanel(ForceSimulator fsim) {
+        JFrame frame = new JFrame("prefuse Force Simulator");
+        frame.setContentPane(new JForcePanel(fsim));
+        frame.pack();
+        frame.setVisible(true);
+        return frame;
+    }
     
 } // end of class JForcePanel
