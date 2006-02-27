@@ -111,7 +111,10 @@ public class MathLib {
      * @return the resulting interpolated value
      */
     public static double linearInterp(double val, double min, double max) {
-        return (val-min)/(max-min);
+        double denominator = (max-min);
+        if ( denominator == 0 )
+            return 0;
+        return (val-min)/denominator;
     }
     
     /**
@@ -124,7 +127,10 @@ public class MathLib {
      */
     public static double logInterp(double val, double min, double max) {
         double logMin = safeLog10(min);
-        return (safeLog10(val)-logMin) / (safeLog10(max)-logMin); 
+        double denominator = (safeLog10(max)-logMin);
+        if ( denominator == 0 )
+            return 0;
+        return (safeLog10(val)-logMin) / denominator; 
     }
     
     /**
@@ -137,7 +143,10 @@ public class MathLib {
      */
     public static double sqrtInterp(double val, double min, double max) {
         double sqrtMin = safeSqrt(min);
-        return (safeSqrt(val)-sqrtMin) / (safeSqrt(max)-sqrtMin);
+        double denominator = (safeSqrt(max)-sqrtMin);
+        if ( denominator == 0 )
+            return 0;
+        return (safeSqrt(val)-sqrtMin) / denominator;
     }
     
     /**
