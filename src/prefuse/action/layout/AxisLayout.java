@@ -5,11 +5,13 @@ import java.util.Iterator;
 
 import prefuse.Constants;
 import prefuse.data.Table;
+import prefuse.data.Tuple;
 import prefuse.data.column.ColumnMetadata;
 import prefuse.data.expression.Predicate;
 import prefuse.data.query.NumberRangeModel;
 import prefuse.data.query.ObjectRangeModel;
 import prefuse.data.tuple.TupleSet;
+import prefuse.util.DataLib;
 import prefuse.util.MathLib;
 import prefuse.util.ui.ValuedRangeModel;
 import prefuse.visual.VisualItem;
@@ -195,27 +197,34 @@ public class AxisLayout extends Layout {
      */
     public void run(double frac) {
         TupleSet ts = m_vis.getGroup(m_group);
-        if ( !(ts instanceof Table) ) {
-            throw new IllegalStateException(); // TODO: flesh this out?
-        }
         setMinMax();
         
-        Table t = (Table)ts;
-        switch ( getDataType(t) ) {
+        switch ( getDataType(ts) ) {
         case Constants.NUMERICAL:
-            numericalLayout(t);
+            numericalLayout(ts);
             break;
         default:
-            ordinalLayout(t);
+            ordinalLayout(ts);
         }
     }
     
     /**
      * Retrieve the data type.
      */
-    protected int getDataType(Table t) {
+    protected int getDataType(TupleSet ts) {
         if ( m_type == Constants.UNKNOWN ) {
-            if ( t.canGetDouble(m_field) ) {
+            boolean numbers = true;
+            if ( ts instanceof Table ) {
+                numbers = ((Table)ts).canGetDouble(m_field);
+            } else {
+                for ( Iterator it = ts.tuples(); it.hasNext(); ) {
+                    if ( !((Tuple)it.next()).canGetDouble(m_field) ) {
+                        numbers = false;
+                        break;
+                    }
+                }
+            }
+            if ( numbers ) {
                 return Constants.NUMERICAL;
             } else {
                 return Constants.ORDINAL;
@@ -254,11 +263,19 @@ public class AxisLayout extends Layout {
     /**
      * Compute a quantitative axis layout.
      */
-    protected void numericalLayout(Table t) {
+    protected void numericalLayout(TupleSet ts) {
         if ( !m_modelSet ) {
-            ColumnMetadata md = t.getMetadata(m_field);
-            m_dist[0] = t.getDouble(md.getMinimumRow(), m_field);
-            m_dist[1] = t.getDouble(md.getMaximumRow(), m_field);
+            if ( ts instanceof Table ) {
+                Table t = (Table)ts;
+                ColumnMetadata md = t.getMetadata(m_field);
+                m_dist[0] = t.getDouble(md.getMinimumRow(), m_field);
+                m_dist[1] = t.getDouble(md.getMaximumRow(), m_field);
+            } else {
+                Tuple mint = DataLib.min(ts.tuples(), m_field);
+                Tuple maxt = DataLib.max(ts.tuples(), m_field);
+                m_dist[0] = mint.getDouble(m_field);
+                m_dist[1] = maxt.getDouble(m_field);
+            }
             
             double lo = m_dist[0], hi = m_dist[1];
             if ( m_model == null ) {
@@ -283,10 +300,14 @@ public class AxisLayout extends Layout {
     /**
      * Compute an ordinal axis layout.
      */
-    protected void ordinalLayout(Table t) {
+    protected void ordinalLayout(TupleSet ts) {
         if ( !m_modelSet) {
-            ColumnMetadata md = t.getMetadata(m_field);
-            Object[] array = md.getOrdinalArray();
+            Object[] array;
+            if ( ts instanceof Table ) {
+                array = ((Table)ts).getMetadata(m_field).getOrdinalArray();
+            } else {
+                array = DataLib.ordinalArray(ts.tuples(), m_field);
+            }
             if ( m_model == null ) {
                 m_model = new ObjectRangeModel(array);
             } else {
