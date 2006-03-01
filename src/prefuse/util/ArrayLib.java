@@ -609,6 +609,25 @@ public abstract class ArrayLib {
             return b;
         }
     }
+    
+    /**
+     * Trims an array to be exactly the target a size.
+     * @param a the array to trim
+     * @param size the desired size of the array. This value must be lesser
+     * than or equal to the size of the input array.
+     * @return a trimmed array instance
+     */
+    public static final Object[] trim(Object[] a, int size) {
+        //assert (size <= a.length);
+        if ( a.length == size ) {
+            return a;
+        } else {
+            Object[] b = new Object[size];
+            System.arraycopy(a, 0, b, 0, size);
+            return b;
+        }
+    }
+    
     //// -----------------------------------------------
     //// -- Sorting Functions --------------------------
 
