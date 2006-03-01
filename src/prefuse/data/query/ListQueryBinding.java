@@ -30,6 +30,7 @@ public class ListQueryBinding extends DynamicQueryBinding {
     private Class m_type;
     private ListModel m_model;
     private Listener m_lstnr;
+    private boolean m_includeAll;
     
     /**
      * Create a new ListQueryBinding over the given table and data field.
@@ -37,9 +38,21 @@ public class ListQueryBinding extends DynamicQueryBinding {
      * @param field the data field (Table column) to query
      */
     public ListQueryBinding(Table t, String field) {
+        this(t, field, true);
+    }
+    
+    /**
+     * Create a new ListQueryBinding over the given table and data field.
+     * @param t the Table to query
+     * @param field the data field (Table column) to query
+     * @param includeAllOption indicates if the dynamic queries should
+     * include an "All" option for including all data values
+     */
+    public ListQueryBinding(Table t, String field, boolean includeAllOption) {
         super(t, field);
         m_type = t.getColumnType(field);
         m_lstnr = new Listener();
+        m_includeAll = includeAllOption;
         initPredicate();
         initModel();
     }
@@ -60,8 +73,10 @@ public class ListQueryBinding extends DynamicQueryBinding {
         Object[] o = md.getOrdinalArray();
         m_model = new ListModel(o);
         m_model.addListSelectionListener(m_lstnr);
-        m_model.insertElementAt(ALL, 0);
-        m_model.setSelectedItem(ALL);
+        if ( m_includeAll ) {
+            m_model.insertElementAt(ALL, 0);
+            m_model.setSelectedItem(ALL);
+        }
     }
 
     // ------------------------------------------------------------------------    
@@ -137,7 +152,7 @@ public class ListQueryBinding extends DynamicQueryBinding {
             {
                 orP.clear();
             }
-            else if ( model.isSelectedIndex(0) )
+            else if ( m_includeAll && model.isSelectedIndex(0) )
             {
                 orP.set(BooleanLiteral.TRUE);
             }
