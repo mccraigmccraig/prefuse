@@ -19,6 +19,17 @@ public class FloatParser implements DataParser {
     }
     
     /**
+     * @see prefuse.data.parser.DataParser#format(java.lang.Object)
+     */
+    public String format(Object value) {
+        if ( value == null ) return null;
+        if ( !(value instanceof Number) )
+            throw new IllegalArgumentException(
+              "This class can only format Objects of type Number.");
+        return String.valueOf(((Number)value).floatValue())+"f";
+    }
+    
+    /**
      * @see prefuse.data.parser.DataParser#canParse(java.lang.String)
      */
     public boolean canParse(String text) {        
@@ -29,7 +40,7 @@ public class FloatParser implements DataParser {
             return false;
         }
     }
-    
+
     /**
      * @see prefuse.data.parser.DataParser#parse(java.lang.String)
      */

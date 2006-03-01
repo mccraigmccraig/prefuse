@@ -170,7 +170,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      * @return the data type (as a Java Class) of the column
      */
     public Class getColumnType(int col) {
-        return getColumn(col).getColumnClass();
+        return getColumn(col).getColumnType();
     }
 
     /**
@@ -180,7 +180,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public Class getColumnType(String field) {
         Column c = getColumn(field); 
-        return (c==null ? null : c.getColumnClass());
+        return (c==null ? null : c.getColumnType());
     }
 
     /**

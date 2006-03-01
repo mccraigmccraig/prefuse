@@ -6,6 +6,7 @@ import java.util.Map;
 import prefuse.data.Table;
 import prefuse.data.event.ColumnListener;
 import prefuse.data.util.Index;
+import prefuse.util.DataLib;
 import prefuse.util.TypeLib;
 import prefuse.util.collections.DefaultLiteralComparator;
 
@@ -16,7 +17,7 @@ import prefuse.util.collections.DefaultLiteralComparator;
 public class ColumnMetadata implements ColumnListener {
 
     private Table   m_table;
-    private String  m_column;
+    private String  m_field;
     private boolean m_dynamic;
     private boolean m_init;
 
@@ -43,13 +44,13 @@ public class ColumnMetadata implements ColumnListener {
             Comparator cmp, boolean dynamic)
     {
         m_table = table;
-        m_column = column;
+        m_field = column;
         m_cmp = cmp;
         m_dynamic = dynamic;
     }
     
     public void dispose() {
-        m_table.getColumn(m_column).removeColumnListener(this);
+        m_table.getColumn(m_field).removeColumnListener(this);
     }
 
     // ------------------------------------------------------------------------
@@ -74,7 +75,7 @@ public class ColumnMetadata implements ColumnListener {
         getMaximumRow();
         getMedianRow();
         getUniqueCount();
-        if ( TypeLib.isNumericType(m_table.getColumnType(m_column)) ) {
+        if ( TypeLib.isNumericType(m_table.getColumnType(m_field)) ) {
             getMean();
             getDeviation();
             getSum();
@@ -90,7 +91,7 @@ public class ColumnMetadata implements ColumnListener {
         
         if ( m_dynamic ) {
           clearCachedValues();
-          m_table.getColumn(m_column).addColumnListener(this);
+          m_table.getColumn(m_field).addColumnListener(this);
         } else {
           calculateValues();
         }
@@ -115,11 +116,11 @@ public class ColumnMetadata implements ColumnListener {
     public int getMinimumRow() {
         accessCheck();
         if ( m_min == -1 && m_dynamic ) {
-            Index idx = m_table.getIndex(m_column);
+            Index idx = m_table.getIndex(m_field);
             if ( idx != null ) {
                 m_min = idx.minimum();
             } else {
-                m_min = Columns.min(m_table, m_column, m_cmp);
+                m_min = DataLib.min(m_table.tuples(), m_field, m_cmp).getRow();
             }
         }
         return m_min;
@@ -128,11 +129,11 @@ public class ColumnMetadata implements ColumnListener {
     public int getMaximumRow() {
         accessCheck();
         if ( m_max == -1 && m_dynamic ) {
-            Index idx = m_table.getIndex(m_column);
+            Index idx = m_table.getIndex(m_field);
             if ( idx != null ) {
                 m_max = idx.maximum();
             } else {
-                m_max = Columns.max(m_table, m_column, m_cmp);
+                m_max = DataLib.max(m_table.tuples(), m_field, m_cmp).getRow();
             }
         }
         return m_max;
@@ -141,11 +142,12 @@ public class ColumnMetadata implements ColumnListener {
     public int getMedianRow() {
         accessCheck();
         if ( m_median == -1 && m_dynamic ) {
-            Index idx = m_table.getIndex(m_column);
+            Index idx = m_table.getIndex(m_field);
             if ( idx != null ) {
                 m_max = idx.median();
             } else {
-                m_median = Columns.median(m_table, m_column, m_cmp);
+                m_median = DataLib.median(
+                                m_table.tuples(), m_field, m_cmp).getRow();
             }
         }
         return m_median;
@@ -154,11 +156,11 @@ public class ColumnMetadata implements ColumnListener {
     public int getUniqueCount() {
         accessCheck();
         if ( m_unique == -1 && m_dynamic ) {
-            Index idx = m_table.getIndex(m_column);
+            Index idx = m_table.getIndex(m_field);
             if ( idx != null ) {
                 m_unique = idx.uniqueCount();
             } else {
-                m_unique = Columns.uniqueCount(m_table, m_column);
+                m_unique = DataLib.uniqueCount(m_table.tuples(), m_field);
             }
         }
         return m_unique;
@@ -167,7 +169,7 @@ public class ColumnMetadata implements ColumnListener {
     public double getMean() {
         accessCheck();
         if ( m_mean == null && m_dynamic ) {
-            m_mean = new Double(Columns.mean(m_table, m_column));
+            m_mean = new Double(DataLib.mean(m_table.tuples(), m_field));
         }
         return m_mean.doubleValue();
     }
@@ -176,7 +178,7 @@ public class ColumnMetadata implements ColumnListener {
         accessCheck();
         if ( m_stdev == null && m_dynamic ) {
             m_stdev = new Double(
-                Columns.deviation(m_table, m_column, getMean()));
+                    DataLib.deviation(m_table.tuples(), m_field, getMean()));
         }
         return m_stdev.doubleValue();
     }
@@ -184,7 +186,7 @@ public class ColumnMetadata implements ColumnListener {
     public double getSum() {
         accessCheck();
         if ( m_sum == null && m_dynamic ) {
-            m_sum = new Double(Columns.sum(m_table, m_column));
+            m_sum = new Double(DataLib.sum(m_table.tuples(), m_field));
         }
         return m_sum.doubleValue();
     }
@@ -192,7 +194,7 @@ public class ColumnMetadata implements ColumnListener {
     public Object[] getOrdinalArray() {
         accessCheck();
         if ( m_ordinalA == null && m_dynamic ) {
-            m_ordinalA = Columns.ordinalArray(m_table, m_column, m_cmp);
+            m_ordinalA = DataLib.ordinalArray(m_table.tuples(),m_field,m_cmp);
         }
         return m_ordinalA;
     }
@@ -200,7 +202,7 @@ public class ColumnMetadata implements ColumnListener {
     public Map getOrdinalMap() {
         accessCheck();
         if ( m_ordinalM == null && m_dynamic ) {
-            m_ordinalM = Columns.ordinalMap(m_table, m_column, m_cmp);
+            m_ordinalM = DataLib.ordinalMap(m_table.tuples(), m_field, m_cmp);
         }
         return m_ordinalM;
     }

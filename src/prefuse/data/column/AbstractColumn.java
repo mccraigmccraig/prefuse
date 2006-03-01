@@ -4,6 +4,10 @@ import java.util.Date;
 
 import prefuse.data.DataTypeException;
 import prefuse.data.event.ColumnListener;
+import prefuse.data.parser.DataParseException;
+import prefuse.data.parser.DataParser;
+import prefuse.data.parser.ObjectParser;
+import prefuse.data.parser.ParserFactory;
 import prefuse.util.TypeLib;
 import prefuse.util.collections.CopyOnWriteArrayList;
 
@@ -15,10 +19,11 @@ import prefuse.util.collections.CopyOnWriteArrayList;
  */
 public abstract class AbstractColumn implements Column {
 
-    protected final Class  m_columnClass;
-    protected Object m_defaultValue;
-    
+    protected final Class  m_columnType;
+    protected DataParser   m_parser;
+    protected Object       m_defaultValue;
     protected boolean      m_readOnly;
+    
     protected CopyOnWriteArrayList m_listeners;
     
     /**
@@ -42,7 +47,11 @@ public abstract class AbstractColumn implements Column {
      * @param defaultValue the default data value to use
      */
     public AbstractColumn(Class columnType, Object defaultValue) {
-        m_columnClass = columnType;
+        m_columnType = columnType;
+        
+        DataParser p = ParserFactory.getDefaultFactory().getParser(columnType);
+        m_parser = ( p==null ? new ObjectParser() : p );
+        
         setDefaultValue(defaultValue);
         m_readOnly = false;
         m_listeners = new CopyOnWriteArrayList();
@@ -81,10 +90,28 @@ public abstract class AbstractColumn implements Column {
      * Returns the most specific superclass for the values in the column
      * @return the Class of the column's data values
      */
-    public Class getColumnClass() {
-        return m_columnClass;
+    public Class getColumnType() {
+        return m_columnType;
     }
     
+    /**
+     * @see prefuse.data.column.Column#getParser()
+     */
+    public DataParser getParser() {
+        return m_parser;
+    }
+    
+    /**
+     * @see prefuse.data.column.Column#setParser(prefuse.data.parser.DataParser)
+     */
+    public void setParser(DataParser parser) {
+        if ( !m_columnType.isAssignableFrom(parser.getType()) ) {
+            throw new IllegalArgumentException(
+               "Parser type ("+parser.getType().getName()+") incompatible with"
+               +" this column's data type ("+m_columnType.getName()+")");
+        }
+        m_parser = parser;
+    }
     
     // ------------------------------------------------------------------------
     // Listener Methods
@@ -198,13 +225,13 @@ public abstract class AbstractColumn implements Column {
      * @param dflt
      */
     public void setDefaultValue(Object dflt) {
-        boolean prim = m_columnClass.isPrimitive();
+        boolean prim = m_columnType.isPrimitive();
         if ( dflt != null &&
-            ((!prim && !m_columnClass.isInstance(dflt)) ||
-             (prim && !TypeLib.isWrapperInstance(m_columnClass, dflt))) )
+            ((!prim && !m_columnType.isInstance(dflt)) ||
+             (prim && !TypeLib.isWrapperInstance(m_columnType, dflt))) )
         {
             throw new IllegalArgumentException(
-                "Default value is not of type " + m_columnClass.getName());
+                "Default value is not of type " + m_columnType.getName());
         }
         m_defaultValue = dflt;
     }
@@ -226,16 +253,16 @@ public abstract class AbstractColumn implements Column {
     public boolean canGet(Class type) {
         if ( type == null ) return false;
         
-        if ( m_columnClass.isPrimitive() ) {
-            boolean primTypes = type.isAssignableFrom(m_columnClass) || 
-                    (TypeLib.isNumericType(m_columnClass) 
+        if ( m_columnType.isPrimitive() ) {
+            boolean primTypes = type.isAssignableFrom(m_columnType) || 
+                    (TypeLib.isNumericType(m_columnType) 
                      && TypeLib.isNumericType(type));
              
             return primTypes
-                || type.isAssignableFrom(TypeLib.getWrapperType(m_columnClass))
+                || type.isAssignableFrom(TypeLib.getWrapperType(m_columnType))
                 || type.isAssignableFrom(String.class);
         } else {
-            return type.isAssignableFrom(m_columnClass);
+            return type.isAssignableFrom(m_columnType);
         }
     }
     
@@ -248,12 +275,12 @@ public abstract class AbstractColumn implements Column {
     public boolean canSet(Class type) {
         if ( type == null ) return false;
         
-        if ( m_columnClass.isPrimitive() ) {
-            return m_columnClass.isAssignableFrom(type)
-                || TypeLib.getWrapperType(m_columnClass).isAssignableFrom(type)
+        if ( m_columnType.isPrimitive() ) {
+            return m_columnType.isAssignableFrom(type)
+                || TypeLib.getWrapperType(m_columnType).isAssignableFrom(type)
                 || String.class.isAssignableFrom(type);
         } else {
-            return m_columnClass.isAssignableFrom(type);
+            return m_columnType.isAssignableFrom(type);
         }
     }
     
@@ -520,7 +547,8 @@ public abstract class AbstractColumn implements Column {
      * @return true if getString is supported, false otherwise
      */
     public boolean canGetString() {
-        return canGet(String.class);
+        return true;
+        //return canGet(String.class);
     }
     
     /**
@@ -529,7 +557,8 @@ public abstract class AbstractColumn implements Column {
      * @return true if setString is supported, false otherwise
      */
     public boolean canSetString() {
-        return canSet(String.class);
+        return m_parser != null && !(m_parser instanceof ObjectParser);
+        //return canSet(String.class);
     }
     
     /**
@@ -541,8 +570,7 @@ public abstract class AbstractColumn implements Column {
      */
     public String getString(int row) throws DataTypeException {
         if ( canGetString() ) {
-            Object obj = get(row);
-            return obj==null ? "" : obj.toString();
+            return m_parser.format(get(row));
         } else {
             throw new DataTypeException(String.class);
         }
@@ -556,7 +584,11 @@ public abstract class AbstractColumn implements Column {
      *  support the String type
      */
     public void setString(String val, int row) throws DataTypeException {
-        set(val, row);
+        try {
+            set(m_parser.parse(val), row);
+        } catch (DataParseException e) {
+            throw new DataTypeException(e);
+        }
     }
     
     // -- Date ----------------------------------------------------------------

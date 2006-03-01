@@ -5,11 +5,12 @@ import java.util.logging.Logger;
 
 import prefuse.Constants;
 import prefuse.data.Table;
+import prefuse.data.Tuple;
 import prefuse.data.column.ColumnMetadata;
-import prefuse.data.column.Columns;
 import prefuse.data.tuple.TupleSet;
 import prefuse.util.ColorLib;
 import prefuse.util.ColorMap;
+import prefuse.util.DataLib;
 import prefuse.util.MathLib;
 import prefuse.visual.VisualItem;
 
@@ -253,24 +254,34 @@ public class DataColorAction extends ColorAction {
      */
     protected double[] getDistribution() {
         TupleSet ts = m_vis.getGroup(m_group);
-        if ( !(ts instanceof Table) )
-            throw new RuntimeException("Can only be used to encode a Table");
-        Table t = (Table)ts;
-        ColumnMetadata md = t.getMetadata(m_dataField);
 
         if ( m_type == Constants.NUMERICAL ) {
             m_omap = null;
             if ( m_scale == Constants.QUANTILE_SCALE && m_bins > 0 ) {
-                double[] values = Columns.toDoubleArray(t, m_dataField);
+                double[] values =
+                        DataLib.toDoubleArray(ts.tuples(), m_dataField);
                 return MathLib.quantiles(m_bins, values);
             } else {
                 double[] dist = new double[2];
-                dist[0] = t.getDouble(md.getMinimumRow(), m_dataField);
-                dist[1] = t.getDouble(md.getMaximumRow(), m_dataField);
+                if ( ts instanceof Table ) {
+                    Table t = (Table)ts;
+                    ColumnMetadata md = t.getMetadata(m_dataField);
+                    dist[0] = t.getDouble(md.getMinimumRow(), m_dataField);
+                    dist[1] = t.getDouble(md.getMaximumRow(), m_dataField);
+                } else {
+                    Tuple mint = DataLib.min(ts.tuples(), m_dataField);
+                    Tuple maxt = DataLib.max(ts.tuples(), m_dataField);
+                    dist[0] = mint.getDouble(m_dataField);
+                    dist[1] = maxt.getDouble(m_dataField);
+                }
                 return dist;
             }
         } else {
-            m_omap = md.getOrdinalMap();
+            if ( ts instanceof Table ) {
+                m_omap = ((Table)ts).getMetadata(m_dataField).getOrdinalMap();
+            } else {
+                m_omap = DataLib.ordinalMap(ts.tuples(), m_dataField);
+            }
             return new double[] { 0, m_omap.size()-1 };
         }
     }

@@ -18,6 +18,17 @@ public class StringParser implements DataParser {
     }
     
     /**
+     * @see prefuse.data.parser.DataParser#format(java.lang.Object)
+     */
+    public String format(Object value) {
+        if ( value == null ) return null;
+        if ( !(value instanceof String) )
+            throw new IllegalArgumentException(
+              "This class can only format Objects of type String.");
+        return (String)value;
+    }
+    
+    /**
      * @see prefuse.data.parser.DataParser#canParse(java.lang.String)
      */
     public boolean canParse(String text) {

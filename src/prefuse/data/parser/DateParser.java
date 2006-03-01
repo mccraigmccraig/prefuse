@@ -45,6 +45,13 @@ public class DateParser implements DataParser {
     }
     
     /**
+     * @see prefuse.data.parser.DataParser#format(java.lang.Object)
+     */
+    public String format(Object value) {
+        return value==null ? null : m_dfmt.format(value);
+    }
+    
+    /**
      * @see prefuse.data.parser.DataParser#canParse(java.lang.String)
      */
     public boolean canParse(String text) {

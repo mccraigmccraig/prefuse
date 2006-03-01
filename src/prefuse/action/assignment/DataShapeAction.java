@@ -6,6 +6,7 @@ import prefuse.Constants;
 import prefuse.data.Table;
 import prefuse.data.column.ColumnMetadata;
 import prefuse.data.tuple.TupleSet;
+import prefuse.util.DataLib;
 import prefuse.visual.VisualItem;
 
 /**
@@ -89,12 +90,13 @@ public class DataShapeAction extends ShapeAction {
      */
     protected void setup() {
         TupleSet ts = m_vis.getGroup(m_group);
-        if ( !(ts instanceof Table) )
-            return; // TODO: exception?
-        Table t = (Table)ts;
         
-        ColumnMetadata md = t.getMetadata(m_dataField);
-        m_ordinalMap = md.getOrdinalMap();
+        if ( ts instanceof Table ) {
+            ColumnMetadata md = ((Table)ts).getMetadata(m_dataField);
+            m_ordinalMap = md.getOrdinalMap();
+        } else {
+            m_ordinalMap = DataLib.ordinalMap(ts.tuples(), m_dataField);
+        }
     }
     
     /**

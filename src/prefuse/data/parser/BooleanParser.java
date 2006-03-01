@@ -23,6 +23,17 @@ public class BooleanParser implements DataParser {
     }
     
     /**
+     * @see prefuse.data.parser.DataParser#format(java.lang.Object)
+     */
+    public String format(Object value) {
+        if ( value == null ) return null;
+        if ( !(value instanceof Boolean) )
+            throw new IllegalArgumentException(
+              "This class can only format Objects of type Boolean.");
+        return ((Boolean)value).toString();
+    }
+    
+    /**
      * @see prefuse.data.parser.DataParser#canParse(java.lang.String)
      */
     public boolean canParse(String text) {

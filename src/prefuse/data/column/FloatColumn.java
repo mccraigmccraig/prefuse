@@ -136,19 +136,19 @@ public class FloatColumn extends AbstractColumn {
         fireColumnEvent(row, prev);
     }
     
-    /**
-     * @see prefuse.data.column.AbstractColumn#getString(int)
-     */
-    public String getString(int row) throws DataTypeException {
-        return String.valueOf(getFloat(row));
-    }
-
-    /**
-     * @see prefuse.data.column.AbstractColumn#setString(java.lang.String, int)
-     */
-    public void setString(String val, int row) throws DataTypeException {
-        setFloat(Float.parseFloat(val), row);
-    }
+//    /**
+//     * @see prefuse.data.column.AbstractColumn#getString(int)
+//     */
+//    public String getString(int row) throws DataTypeException {
+//        return String.valueOf(getFloat(row));
+//    }
+//
+//    /**
+//     * @see prefuse.data.column.AbstractColumn#setString(java.lang.String, int)
+//     */
+//    public void setString(String val, int row) throws DataTypeException {
+//        setFloat(Float.parseFloat(val), row);
+//    }
     
     // ------------------------------------------------------------------------
     

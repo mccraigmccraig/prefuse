@@ -56,7 +56,7 @@ public class ExpressionColumn extends AbstractColumn {
         init();
         
         int nrows = m_table.getRowCount();
-        m_cache = ColumnFactory.getColumn(getColumnClass(), nrows);
+        m_cache = ColumnFactory.getColumn(getColumnType(), nrows);
         m_valid = new BitSet(nrows);
         m_expr.addExpressionListener(m_lstnr);
     }
@@ -201,11 +201,11 @@ public class ExpressionColumn extends AbstractColumn {
     }
 
     private void computeNumber(int row) {
-        if ( m_columnClass == int.class ) {
+        if ( m_columnType == int.class ) {
             m_cache.setInt(m_expr.getInt(m_table.getTuple(row)), row);
-        } else if ( m_columnClass == long.class ) {
+        } else if ( m_columnType == long.class ) {
             m_cache.setLong(m_expr.getLong(m_table.getTuple(row)), row);
-        } else if ( m_columnClass == float.class ) {
+        } else if ( m_columnType == float.class ) {
             m_cache.setFloat(m_expr.getFloat(m_table.getTuple(row)), row);
         } else {
             m_cache.setDouble(m_expr.getDouble(m_table.getTuple(row)), row);
@@ -279,7 +279,7 @@ public class ExpressionColumn extends AbstractColumn {
                 // invalidate the cache index
                 invalidateCache(start, end);
                 // fire change event including previous value
-                Class type = getColumnClass();
+                Class type = getColumnType();
                 if ( int.class == type ) {
                     fireColumnEvent(start, m_cache.getInt(start));
                 } else if ( long.class == type ) {

@@ -123,6 +123,7 @@ public abstract class AbstractTextTableReader extends AbstractTableReader {
                 header = getDefaultHeader(i);
             }
             table.addColumn(header, di.getType(i));
+            table.getColumn(i).setParser(di.getParser(i));
         }
         
         // reset dim array, will hold row/col indices

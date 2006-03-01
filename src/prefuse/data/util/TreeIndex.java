@@ -49,7 +49,7 @@ public class TreeIndex implements Index, ColumnListener, TableListener {
         m_rows = rows;
         m_col = col;
         
-        m_index = SortedMapFactory.getMap(col.getColumnClass(), cmp, false);
+        m_index = SortedMapFactory.getMap(col.getColumnType(), cmp, false);
         index();
         
         m_col.addColumnListener(this);

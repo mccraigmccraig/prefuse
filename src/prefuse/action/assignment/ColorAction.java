@@ -180,7 +180,7 @@ public class ColorAction extends EncoderAction {
      * @return the color value for the item
      */
     public int getColor(VisualItem item) {
-        Object o =lookup(item);
+        Object o = lookup(item);
         if ( o != null ) {
             if ( o instanceof ColorAction ) {
                 return ((ColorAction)o).getColor(item);

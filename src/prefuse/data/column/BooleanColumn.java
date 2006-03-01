@@ -133,27 +133,27 @@ public class BooleanColumn extends AbstractColumn {
         fireColumnEvent(row, prev);
     }
     
-    /**
-     * @see prefuse.data.column.AbstractColumn#getString(int)
-     */
-    public String getString(int row) throws DataTypeException {
-        return String.valueOf(getBoolean(row));
-    }
-
-    /**
-     * @see prefuse.data.column.AbstractColumn#setString(java.lang.String, int)
-     */
-    public void setString(String val, int row) throws DataTypeException {
-        boolean b;
-        if ( "true".equalsIgnoreCase(val) ) {
-            b = true;
-        } else if ( "false".equalsIgnoreCase(val) ) {
-            b = false;
-        } else {
-            throw new IllegalArgumentException(
-                "Input string does not represent a boolean value.");
-        }
-        setBoolean(b, row);
-    }
+//    /**
+//     * @see prefuse.data.column.AbstractColumn#getString(int)
+//     */
+//    public String getString(int row) throws DataTypeException {
+//        return String.valueOf(getBoolean(row));
+//    }
+//
+//    /**
+//     * @see prefuse.data.column.AbstractColumn#setString(java.lang.String, int)
+//     */
+//    public void setString(String val, int row) throws DataTypeException {
+//        boolean b;
+//        if ( "true".equalsIgnoreCase(val) ) {
+//            b = true;
+//        } else if ( "false".equalsIgnoreCase(val) ) {
+//            b = false;
+//        } else {
+//            throw new IllegalArgumentException(
+//                "Input string does not represent a boolean value.");
+//        }
+//        setBoolean(b, row);
+//    }
 
 } // end of class BooleanColumn

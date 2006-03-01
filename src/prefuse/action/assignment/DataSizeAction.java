@@ -4,9 +4,10 @@ import java.util.logging.Logger;
 
 import prefuse.Constants;
 import prefuse.data.Table;
+import prefuse.data.Tuple;
 import prefuse.data.column.ColumnMetadata;
-import prefuse.data.column.Columns;
 import prefuse.data.tuple.TupleSet;
+import prefuse.util.DataLib;
 import prefuse.util.MathLib;
 import prefuse.util.PrefuseLib;
 import prefuse.visual.VisualItem;
@@ -220,20 +221,14 @@ public class DataSizeAction extends SizeAction {
      */
     protected void setup() {
         TupleSet ts = m_vis.getGroup(m_group);
-        if ( !(ts instanceof Table) )
-            return; // TODO: exception?
-        Table t = (Table)ts;
-        
-        if ( !t.canGetDouble(m_dataField) ) 
-            return; // TODO: exception ?
         
         // cache the scale value in case it gets changed due to error
         m_tempScale = m_scale;
         
-        ColumnMetadata md = t.getMetadata(m_dataField);
         if ( m_inferBounds ) {
             if ( m_scale == Constants.QUANTILE_SCALE && m_bins > 0 ) {
-                double[] values = Columns.toDoubleArray(t, m_dataField);
+                double[] values =
+                    DataLib.toDoubleArray(ts.tuples(), m_dataField);
                 m_dist = MathLib.quantiles(m_bins, values);
             } else {
                 // check for non-binned quantile scale error
@@ -244,11 +239,18 @@ public class DataSizeAction extends SizeAction {
                             "greater than zero to use a quantile scale.");
                     m_scale = Constants.LINEAR_SCALE;
                 }
-                int minRow = md.getMinimumRow();
-                int maxRow = md.getMaximumRow();
                 m_dist = new double[2];
-                m_dist[0] = t.getDouble(minRow, m_dataField);
-                m_dist[1] = t.getDouble(maxRow, m_dataField);
+                if ( ts instanceof Table ) {
+                    Table t = (Table)ts;
+                    ColumnMetadata md = t.getMetadata(m_dataField);
+                    m_dist[0] = t.getDouble(md.getMinimumRow(), m_dataField);
+                    m_dist[1] = t.getDouble(md.getMaximumRow(), m_dataField);
+                } else {
+                    Tuple mint = DataLib.min(ts.tuples(), m_dataField);
+                    Tuple maxt = DataLib.max(ts.tuples(), m_dataField);
+                    m_dist[0] = mint.getDouble(m_dataField);
+                    m_dist[1] = maxt.getDouble(m_dataField);
+                }
             }
             m_sizeRange = m_dist[m_dist.length-1]/m_dist[0] - m_baseSize;
         }

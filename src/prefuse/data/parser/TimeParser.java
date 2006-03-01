@@ -2,7 +2,6 @@ package prefuse.data.parser;
 
 import java.sql.Time;
 import java.text.DateFormat;
-import java.text.ParsePosition;
 
 /**
  * DataParser instance that parses Date values as java.util.Time instances,
@@ -17,9 +16,6 @@ import java.text.ParsePosition;
  */
 public class TimeParser extends DateParser {
 
-    protected DateFormat    m_dfmt;
-    protected ParsePosition m_pos;
-
     /**
      * Create a new TimeParser.
      */
@@ -32,8 +28,7 @@ public class TimeParser extends DateParser {
      * @param dateFormat the DateFormat instance to use for parsing
      */
     public TimeParser(DateFormat dateFormat) {
-        m_dfmt = dateFormat;
-        m_pos = new ParsePosition(0);
+        super(dateFormat);
     }
     
     /**

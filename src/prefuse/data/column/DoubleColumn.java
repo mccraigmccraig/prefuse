@@ -136,19 +136,19 @@ public class DoubleColumn extends AbstractColumn {
         fireColumnEvent(row, prev);
     }
     
-    /**
-     * @see prefuse.data.column.AbstractColumn#getString(int)
-     */
-    public String getString(int row) throws DataTypeException {
-        return String.valueOf(getDouble(row));
-    }
-
-    /**
-     * @see prefuse.data.column.AbstractColumn#setString(java.lang.String, int)
-     */
-    public void setString(String val, int row) throws DataTypeException {
-        setDouble(Double.parseDouble(val), row);
-    }
+//    /**
+//     * @see prefuse.data.column.AbstractColumn#getString(int)
+//     */
+//    public String getString(int row) throws DataTypeException {
+//        return String.valueOf(getDouble(row));
+//    }
+//
+//    /**
+//     * @see prefuse.data.column.AbstractColumn#setString(java.lang.String, int)
+//     */
+//    public void setString(String val, int row) throws DataTypeException {
+//        setDouble(Double.parseDouble(val), row);
+//    }
 
     // ------------------------------------------------------------------------
     

@@ -4,6 +4,7 @@ import java.util.Date;
 
 import prefuse.data.DataTypeException;
 import prefuse.data.event.ColumnListener;
+import prefuse.data.parser.DataParser;
 
 
 /**
@@ -52,8 +53,21 @@ public interface Column {
      * Returns the most specific superclass for the values in the column
      * @return the Class of the column's data values
      */
-    public Class getColumnClass();
+    public Class getColumnType();
     
+    /**
+     * Get the data parser used to map String values to and from the values
+     * stored by this Column.
+     * @return the DataParser used by this Column
+     */
+    public DataParser getParser();
+
+    /**
+     * Set the data parser used to map String values to and from the values
+     * stored by this Column.
+     * @param parser the DataParser to use
+     */
+    public void setParser(DataParser parser);
     
     // ------------------------------------------------------------------------
     // Listener Methods

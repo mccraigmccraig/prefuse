@@ -8,60 +8,32 @@ import prefuse.data.Table;
 import prefuse.util.collections.IntIterator;
 
 /**
- * TableWriter that writes out a delimited text table, using a designated
- * character string to demarcate data columns. By default, a header row
- * containing the column names is included in the output.
+ * TableWriter that writes out a text table in the comma-separated-values
+ * format. By default, a header row containing the column names is included
+ * in the output.
  * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class DelimitedTextTableWriter extends AbstractTableWriter {
+public class CSVTableWriter extends AbstractTableWriter {
 
-    private String  m_delim;
     private boolean m_printHeader;
     
     /**
-     * Create a new DelimitedTextTableWriter that writes tab-delimited
-     * text files.
+     * Create a new CSVTableWriter that writes comma separated values files.
      */
-    public DelimitedTextTableWriter() {
-        this("\t");
+    public CSVTableWriter() {
+        this(true);
     }
     
     /**
-     * Create a new DelimitedTextTableWriter.
-     * @param delimiter the delimiter string to use between columns
-     */
-    public DelimitedTextTableWriter(String delimiter) {
-        this(delimiter, true);
-    }
-    
-    /**
-     * Create a new DelimitedTextTableWriter.
-     * @param delimiter the delimiter string to use between columns
+     * Create a new CSVTableWriter.
      * @param printHeader indicates if a header row should be printed
      */
-    public DelimitedTextTableWriter(String delimiter, boolean printHeader) {
-        m_delim = delimiter;
+    public CSVTableWriter(boolean printHeader) {
         m_printHeader = printHeader;
     }
 
-    // ------------------------------------------------------------------------    
-    
-    /**
-     * Get the delimiter used to separate data fields.
-     * @return the delimiter string
-     */
-    public String getDelimiter() {
-        return m_delim;
-    }
-
-    /**
-     * Set the delimiter used to separate data fields.
-     * @param delimiter the delimiter string
-     */
-    public void setDelimeter(String delimiter) {
-        m_delim = delimiter;
-    }
+    // ------------------------------------------------------------------------
 
     /**
      * Indicates if this writer will write a header row with the column names.
@@ -92,8 +64,8 @@ public class DelimitedTextTableWriter extends AbstractTableWriter {
             // write out header row
             if ( m_printHeader ) {
                 for ( int i=0; i<table.getColumnCount(); ++i ) {
-                    if ( i>0 ) out.print(m_delim);
-                    out.print(table.getColumnName(i));
+                    if ( i>0 ) out.print(',');
+                    out.print(makeCSVSafe(table.getColumnName(i)));
                 }
                 out.println();
             }
@@ -102,8 +74,9 @@ public class DelimitedTextTableWriter extends AbstractTableWriter {
             for ( IntIterator rows = table.rows(); rows.hasNext(); ) {
                 int row = rows.nextInt();
                 for ( int i=0; i<table.getColumnCount(); ++i ) {
-                    if ( i>0 ) out.print(m_delim);
-                    out.print(table.getString(row, table.getColumnName(i)));
+                    if ( i>0 ) out.print(',');
+                    String str = table.getString(row, table.getColumnName(i));
+                    out.print(makeCSVSafe(str));
                 }
                 out.println();
             }
@@ -114,5 +87,18 @@ public class DelimitedTextTableWriter extends AbstractTableWriter {
             throw new DataIOException(e);
         }
     }
+    
+    private String makeCSVSafe(String s) {
+        int q = -1;
+        if ( (q=s.indexOf('\"')) >= 0 ||
+             s.indexOf(',')  >= 0 || s.indexOf('\n') >= 0 ||
+             Character.isWhitespace(s.charAt(0)) ||
+             Character.isWhitespace(s.charAt(s.length()-1)) )
+        {
+            if ( q >= 0 ) s = s.replaceAll("\"", "\"\"");
+            s = "\""+s+"\"";
+        }
+        return s;
+    }
 
-} // end of class DelimitedTextTableWriter
+} // end of class CSVTableWriter
