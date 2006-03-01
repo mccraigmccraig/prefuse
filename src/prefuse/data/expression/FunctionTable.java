@@ -27,6 +27,8 @@ public class FunctionTable {
         s_functionTable = new HashMap();
         // tuple functions
         addFunction("ROW", RowFunction.class);
+        addFunction("ISNODE", IsNodeFunction.class);
+        addFunction("ISEDGE", IsEdgeFunction.class);
         
         // numeric functions
         addFunction("ABS", AbsFunction.class);

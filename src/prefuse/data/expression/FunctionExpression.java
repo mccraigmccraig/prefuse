@@ -3,6 +3,8 @@ package prefuse.data.expression;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import prefuse.data.Edge;
+import prefuse.data.Node;
 import prefuse.data.Schema;
 import prefuse.data.Tuple;
 import prefuse.util.ColorLib;
@@ -183,6 +185,19 @@ abstract class IntFunction extends FunctionExpression {
         return (double)getInt(t);
     }
 }
+abstract class BooleanFunction extends FunctionExpression
+    implements Predicate
+{
+    protected BooleanFunction(int parameterCount) {
+        super(parameterCount);
+    }
+    public Class getType(Schema s) {
+        return boolean.class;
+    }
+    public Object get(Tuple t) {
+        return getBoolean(t) ? Boolean.TRUE : Boolean.FALSE;
+    }
+}
 
 //ROW()
 class RowFunction extends IntFunction {
@@ -190,6 +205,23 @@ class RowFunction extends IntFunction {
     public String getName() { return "ROW"; }
     public int getInt(Tuple t) {
         return t.getRow();
+    }
+}
+//ISNODE()
+class IsNodeFunction extends BooleanFunction {
+    public IsNodeFunction() { super(0); }
+    public Class getType(Schema s) { return boolean.class; }
+    public String getName() { return "ISNODE"; }
+    public boolean getBoolean(Tuple t) {
+        return (t instanceof Node);
+    }
+}
+//ISEDGE()
+class IsEdgeFunction extends BooleanFunction {
+    public IsEdgeFunction() { super(0); }
+    public String getName() { return "ISEDGE"; }
+    public boolean getBoolean(Tuple t) {
+        return (t instanceof Edge);
     }
 }
 

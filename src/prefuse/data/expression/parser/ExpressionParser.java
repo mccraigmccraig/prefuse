@@ -190,6 +190,16 @@ import prefuse.util.StringLib;
  *     Returns the table row number (or -1 if none) of the current Tuple.
  *   </li>
  * </ul>
+ * <ul>
+ *   <li><strong><code>ISNODE()</code></strong><br/>
+ *     Returns true if the current Tuple is a graph Node.
+ *   </li>
+ * </ul>
+ * <ul>
+ *   <li><strong><code>ISEDGE()</code></strong><br/>
+ *     Returns true if the current Tuple is a graph Edge.
+ *   </li>
+ * </ul>
  *
  * <h2>Mathematical Functions</h2>
  * <p>Functions for performing mathematical calculations.</p>
