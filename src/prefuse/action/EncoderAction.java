@@ -58,8 +58,8 @@ public abstract class EncoderAction extends ItemAction {
     
     /**
      * Create a new EncoderAction that processes the specified group.
+     * @param vis the {@link prefuse.Visualization} to process
      * @param group the data group to process
-     * @param defaultFont the default Font to assign
      */
     public EncoderAction(Visualization vis, String group) {
         super(vis, group);
