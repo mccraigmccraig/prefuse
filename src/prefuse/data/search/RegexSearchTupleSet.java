@@ -123,5 +123,14 @@ public class RegexSearchTupleSet extends SearchTupleSet {
     public boolean isUnindexSupported() {
         return true;
     }
+    
+    /**
+     * Removes all search hits and clears out the index.
+     * @see prefuse.data.tuple.TupleSet#clear()
+     */
+    public void clear() {
+        m_source.clear();
+        super.clear();
+    }
 
 } // end of class RegexSearchTupleSet

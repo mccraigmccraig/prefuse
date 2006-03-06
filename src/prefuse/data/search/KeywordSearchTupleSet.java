@@ -173,4 +173,13 @@ public class KeywordSearchTupleSet extends SearchTupleSet {
         return (IntObjectHashMap)m_map.clone();
     }
     
+    /**
+     * Removes all search hits and clears out the index.
+     * @see prefuse.data.tuple.TupleSet#clear()
+     */
+    public void clear() {
+        m_lucene = new LuceneSearcher();
+        super.clear();
+    }
+    
 }  // end of class KeywordSearchTupleSet

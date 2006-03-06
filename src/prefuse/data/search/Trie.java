@@ -107,6 +107,15 @@ public class Trie {
     }
     
     /**
+     * Indicates if this Trie's index takes the case of letters
+     * into account.
+     * @return true if the index is case-sensitive, false otherwise
+     */
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
+    
+    /**
      * Add a new word to the trie, associated with the given Tuple.
      * @param word the word to add to the Trie
      * @param t the Tuple associated with the word

@@ -158,6 +158,15 @@ public class PrefixSearchTupleSet extends SearchTupleSet {
         }
     }
     
+    /**
+     * Removes all search hits and clears out the index.
+     * @see prefuse.data.tuple.TupleSet#clear()
+     */
+    public void clear() {
+        m_trie = new Trie(m_trie.isCaseSensitive());
+        super.clear();
+    }
+    
     private void removeString(String s, Tuple t) {
         m_trie.removeString(s,t);
     }
