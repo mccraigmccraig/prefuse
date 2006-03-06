@@ -27,9 +27,9 @@ public interface Constants {
     /** A center alignment */
     public static final int CENTER = 2;
     /** A bottom alignment */
-    public static final int BOTTOM = 1;
+    public static final int BOTTOM = 3;
     /** A top alignment */
-    public static final int TOP    = 0;
+    public static final int TOP    = 4;
     
     /** A straight-line edge type */
     public static final int EDGE_TYPE_LINE  = 0;
