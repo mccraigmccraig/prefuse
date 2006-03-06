@@ -71,6 +71,9 @@ public class DefaultLiteralComparator implements LiteralComparator {
             return ((Comparable)o1).compareTo(o2);
         } else if ( o2 instanceof Comparable ) {
             return -1*((Comparable)o2).compareTo(o1);
+        } else if ( o1 instanceof Boolean && o2 instanceof Boolean ) {
+            // unfortunate hack necessary for Java 1.4 compatibility
+            return compare(((Boolean)o1).booleanValue(), ((Boolean)o2).booleanValue());
         } else {
             throw new IllegalArgumentException("Incomparable arguments.");
         }
