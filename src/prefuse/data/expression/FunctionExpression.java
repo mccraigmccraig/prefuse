@@ -210,7 +210,6 @@ class RowFunction extends IntFunction {
 //ISNODE()
 class IsNodeFunction extends BooleanFunction {
     public IsNodeFunction() { super(0); }
-    public Class getType(Schema s) { return boolean.class; }
     public String getName() { return "ISNODE"; }
     public boolean getBoolean(Tuple t) {
         return (t instanceof Node);
@@ -222,6 +221,46 @@ class IsEdgeFunction extends BooleanFunction {
     public String getName() { return "ISEDGE"; }
     public boolean getBoolean(Tuple t) {
         return (t instanceof Edge);
+    }
+}
+//DEGREE()
+class DegreeFunction extends IntFunction {
+    public DegreeFunction() { super(0); }
+    public String getName() { return "DEGREE"; }
+    public int getInt(Tuple t) {
+        return (t instanceof Node ? ((Node)t).getDegree() : 0 );
+    }
+}
+//INDEGREE()
+class InDegreeFunction extends IntFunction {
+    public InDegreeFunction() { super(0); }
+    public String getName() { return "INDEGREE"; }
+    public int getInt(Tuple t) {
+        return (t instanceof Node ? ((Node)t).getInDegree() : 0 );
+    }
+}
+//OUTDEGREE()
+class OutDegreeFunction extends IntFunction {
+    public OutDegreeFunction() { super(0); }
+    public String getName() { return "OUTDEGREE"; }
+    public int getInt(Tuple t) {
+        return (t instanceof Node ? ((Node)t).getOutDegree() : 0 );
+    }
+}
+//CHILDCOUNT()
+class ChildCountFunction extends IntFunction {
+    public ChildCountFunction() { super(0); }
+    public String getName() { return "CHILDCOUNT"; }
+    public int getInt(Tuple t) {
+        return (t instanceof Node ? ((Node)t).getChildCount() : 0 );
+    }
+}
+//TREEDEPTH()
+class TreeDepthFunction extends IntFunction {
+    public TreeDepthFunction() { super(0); }
+    public String getName() { return "TREEDEPTH"; }
+    public int getInt(Tuple t) {
+        return (t instanceof Node ? ((Node)t).getDepth() : 0 );
     }
 }
 

@@ -29,6 +29,11 @@ public class FunctionTable {
         addFunction("ROW", RowFunction.class);
         addFunction("ISNODE", IsNodeFunction.class);
         addFunction("ISEDGE", IsEdgeFunction.class);
+        addFunction("DEGREE", DegreeFunction.class);
+        addFunction("INDEGREE", InDegreeFunction.class);
+        addFunction("OUTDEGREE", OutDegreeFunction.class);
+        addFunction("CHILDCOUNT", ChildCountFunction.class);
+        addFunction("TREEDEPTH", TreeDepthFunction.class);
         
         // numeric functions
         addFunction("ABS", AbsFunction.class);

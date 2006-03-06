@@ -190,7 +190,6 @@ import prefuse.util.StringLib;
  *     Returns the table row number (or -1 if none) of the current Tuple.
  *   </li>
  * </ul>
- * <ul>
  *   <li><strong><code>ISNODE()</code></strong><br/>
  *     Returns true if the current Tuple is a graph Node.
  *   </li>
@@ -198,6 +197,47 @@ import prefuse.util.StringLib;
  * <ul>
  *   <li><strong><code>ISEDGE()</code></strong><br/>
  *     Returns true if the current Tuple is a graph Edge.
+ *   </li>
+ * </ul>
+ * <ul>
+ *   <li><strong><code>DEGREE()</code></strong><br/>
+ *     If the current Tuple is graph Node, returns the Node degree
+ *     (the total number of incident edges). Otherwise returns 0.
+ *   </li>
+ * </ul>
+ * <ul>
+ *   <li><strong><code>INDEGREE()</code></strong><br/>
+ *     If the current Tuple is graph Node, returns the Node indegree
+ *     (the number of incident edges pointing towards this node).
+ *     Otherwise returns 0.
+ *   </li>
+ * </ul>
+ * <ul>
+ *   <li><strong><code>OUTDEGREE()</code></strong><br/>
+ *     If the current Tuple is graph Node, returns the Node outdegree
+ *     (the number of incident edges pointing away from the node).
+ *     Otherwise returns 0.
+ *   </li>
+ * </ul>
+ * <ul>
+ *   <li><strong><code>CHILDCOUNT()</code></strong><br/>
+ *     If the current Tuple is graph Node, returns the number of tree
+ *     children nodes. If the Tuple is not a Node, this method returns 0.
+ *     If the Node is part of a Graph (not a Tree), the number of children
+ *     nodes in the current spanning tree is returned. If no spanning tree has
+ *     been computed, a new spanning tree will be computed using the default
+ *     method. See {@link prefuse.data.Graph#getSpanningTree()} for more.
+ *   </li>
+ * </ul>
+ * <ul>
+ *   <li><strong><code>TREEDEPTH()</code></strong><br/>
+ *     If the current Tuple is graph Node, returns the depth of this Node
+ *     in its Tree or SpanningTree. If the Tuple is not a Node, this method
+ *     returns 0. If the Node is part of a Graph (not a Tree), the tree depth
+ *     of the node in the current spanning tree is returned. If no spanning
+ *     tree has been computed, a new spanning tree will be computed using the
+ *     default method. See {@link prefuse.data.Graph#getSpanningTree()} for
+ *     more.
  *   </li>
  * </ul>
  *
@@ -465,7 +505,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         }
         // attempt to parse the expression
         try {
-            Expression e = Expression();
+            Expression e = Parse();
             s_error = null;
             s_logger.info("Parsed Expression: "+e);
             return e;
@@ -501,38 +541,47 @@ public class ExpressionParser implements ExpressionParserConstants {
     }
 
     /**
-     * Test method.
+     * Replace escape sequences with represented characters. This
+     * includes newlines, tabs, and quotes.
+     * @param s the input String, possibly with escape sequences
+     * @return a String with recognized escape sequences properly replaced
      */
-    public static void main(String[] argv) {
-        String[] expr = new String[] {
-            "District <= 0",
-            "IF x < 0 THEN x^2 ELSE x%0",
-            "ABS(3+5*EXP(3)/SIN(5)*SIGN(32.3f)-ROUND(23.2e-1))",
-            "x && y",
-            "x & y",
-            "if x<0 else x^2 then x%0",
-            "((3+6)*(4+1))",
-            "2*3%6",
-            "2+3%6",
-            "2*3^6"
-        };
-        boolean[] results = new boolean[] {
-            true,true,true,true,false,false,true,true,true,true
-        };
-        for ( int i=0; i<expr.length; ++i ) {
-            try {
-                System.out.println("-> "+expr[i]);
-                Expression e = parse(expr[i]);
-                System.out.print("   PARSE_SUCCESSFUL ");
-                System.out.println(results[i]?"GOOD":"BAD");
-                System.out.println("   "+e);
-            } catch ( Throwable t ) {
-                System.out.print("   PARSE_FAILED ");
-                System.out.println(!results[i]?"GOOD":"BAD");
-                if ( results[i] )
-                    System.out.println("   "+StringLib.getStackTrace(t));
+    private static String unescape(String s) {
+        int len = s.length(), base = 0, idx;
+        String escapes = "tnrbf\\\"'";
+        String chars = "\t\n\r\b\f\\\"'";
+
+        StringBuffer sbuf = null;
+
+        while ( (idx=s.indexOf('\\',base)) != -1) {
+            if ( sbuf != null )
+                sbuf.append(s.substring(base, idx));
+
+            if (idx+1 == len) break;
+
+            // find escape character
+            char c = s.charAt(idx+1);
+
+            // find the index of the escape character
+            int cidx = escapes.indexOf(c);
+            if (cidx == -1) {
+                // no match, so continue
+                sbuf.append('\\');
+                sbuf.append(c);
+            } else {
+                // replace escape sequence with true char
+                if ( sbuf == null )
+                    sbuf = new StringBuffer(s.substring(base, idx));
+                sbuf.append(chars.charAt(cidx));
             }
+
+            // skip over escape sequence
+            base = idx + 2;
         }
+        if ( sbuf != null && base < len )
+            sbuf.append(s.substring(base));
+
+        return ( sbuf == null ? s : sbuf.toString() );
     }
 
   // ----------------------------------------------------------------------------
@@ -548,6 +597,40 @@ public class ExpressionParser implements ExpressionParserConstants {
   Token t;
     t = jj_consume_token(QUOTED);
                {if (true) return t.image.substring(1,t.image.length()-1);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public Expression Parse() throws ParseException {
+  Expression e;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TRUE:
+    case FALSE:
+    case NULL:
+    case IF:
+    case NOT:
+    case INT:
+    case LONG:
+    case DOUBLE:
+    case FLOAT:
+    case STRING:
+    case QUOTED:
+    case IDENTIFIER:
+    case LPAREN:
+    case ADD:
+    case SUB:
+      e = Expression();
+      jj_consume_token(0);
+                         {if (true) return e;}
+      break;
+    case 0:
+      jj_consume_token(0);
+          {if (true) throw new ParseException("No expression provided");}
+      break;
+    default:
+      jj_la1[0] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
     throw new Error("Missing return statement in function");
   }
 
@@ -568,7 +651,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         ;
         break;
       default:
-        jj_la1[0] = jj_gen;
+        jj_la1[1] = jj_gen;
         break label_1;
       }
       jj_consume_token(OR);
@@ -593,7 +676,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         ;
         break;
       default:
-        jj_la1[1] = jj_gen;
+        jj_la1[2] = jj_gen;
         break label_2;
       }
       jj_consume_token(XOR);
@@ -618,7 +701,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         ;
         break;
       default:
-        jj_la1[2] = jj_gen;
+        jj_la1[3] = jj_gen;
         break label_3;
       }
       jj_consume_token(AND);
@@ -644,7 +727,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         ;
         break;
       default:
-        jj_la1[3] = jj_gen;
+        jj_la1[4] = jj_gen;
         break label_4;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -655,7 +738,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         t = jj_consume_token(NE);
         break;
       default:
-        jj_la1[4] = jj_gen;
+        jj_la1[5] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -680,7 +763,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         ;
         break;
       default:
-        jj_la1[5] = jj_gen;
+        jj_la1[6] = jj_gen;
         break label_5;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -697,7 +780,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         t = jj_consume_token(GE);
         break;
       default:
-        jj_la1[6] = jj_gen;
+        jj_la1[7] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -734,7 +817,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         ;
         break;
       default:
-        jj_la1[7] = jj_gen;
+        jj_la1[8] = jj_gen;
         break label_6;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -748,7 +831,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         t = jj_consume_token(MOD);
         break;
       default:
-        jj_la1[8] = jj_gen;
+        jj_la1[9] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -782,7 +865,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         ;
         break;
       default:
-        jj_la1[9] = jj_gen;
+        jj_la1[10] = jj_gen;
         break label_7;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -796,7 +879,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         t = jj_consume_token(POW);
         break;
       default:
-        jj_la1[10] = jj_gen;
+        jj_la1[11] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -831,7 +914,7 @@ public class ExpressionParser implements ExpressionParserConstants {
         t = jj_consume_token(SUB);
         break;
       default:
-        jj_la1[11] = jj_gen;
+        jj_la1[12] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -877,7 +960,7 @@ public class ExpressionParser implements ExpressionParserConstants {
                             {if (true) return e;}
       break;
     default:
-      jj_la1[12] = jj_gen;
+      jj_la1[13] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -930,7 +1013,7 @@ public class ExpressionParser implements ExpressionParserConstants {
                                        {if (true) return e;}
       break;
     default:
-      jj_la1[13] = jj_gen;
+      jj_la1[14] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -958,7 +1041,8 @@ public class ExpressionParser implements ExpressionParserConstants {
       break;
     case STRING:
       t = jj_consume_token(STRING);
-                 {if (true) return new ObjectLiteral(t.image.substring(1,t.image.length()-1));}
+                String s = unescape(t.image.substring(1, t.image.length()-1));
+                {if (true) return new ObjectLiteral(s);}
       break;
     case TRUE:
       jj_consume_token(TRUE);
@@ -973,7 +1057,7 @@ public class ExpressionParser implements ExpressionParserConstants {
              {if (true) return new ObjectLiteral(null);}
       break;
     default:
-      jj_la1[14] = jj_gen;
+      jj_la1[15] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1018,7 +1102,7 @@ public class ExpressionParser implements ExpressionParserConstants {
               ;
               break;
             default:
-              jj_la1[15] = jj_gen;
+              jj_la1[16] = jj_gen;
               break label_8;
             }
             jj_consume_token(43);
@@ -1027,19 +1111,19 @@ public class ExpressionParser implements ExpressionParserConstants {
           }
           break;
         default:
-          jj_la1[16] = jj_gen;
+          jj_la1[17] = jj_gen;
           ;
         }
         jj_consume_token(RPAREN);
         break;
       default:
-        jj_la1[17] = jj_gen;
+        jj_la1[18] = jj_gen;
         ;
       }
       {if (true) return f==null ? new ColumnExpression(s) : (Expression)f;}
       break;
     default:
-      jj_la1[18] = jj_gen;
+      jj_la1[19] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1066,7 +1150,7 @@ public class ExpressionParser implements ExpressionParserConstants {
   static public Token token, jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[19];
+  static final private int[] jj_la1 = new int[20];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -1074,10 +1158,10 @@ public class ExpressionParser implements ExpressionParserConstants {
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x2000,0x8000,0x1000,0x80000000,0x80000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x277143c0,0x277103c0,0x17101c0,0x0,0x277143c0,0x20000000,0x6000000,};
+      jj_la1_0 = new int[] {0x277143c1,0x2000,0x8000,0x1000,0x80000000,0x80000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x277143c0,0x277103c0,0x17101c0,0x0,0x277143c0,0x20000000,0x6000000,};
    }
    private static void jj_la1_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x10,0x10,0xf,0xf,0x460,0x460,0x380,0x380,0x60,0x60,0x0,0x0,0x800,0x60,0x0,0x0,};
+      jj_la1_1 = new int[] {0x60,0x0,0x0,0x0,0x10,0x10,0xf,0xf,0x460,0x460,0x380,0x380,0x60,0x60,0x0,0x0,0x800,0x60,0x0,0x0,};
    }
 
   public ExpressionParser(java.io.InputStream stream) {
@@ -1093,7 +1177,7 @@ public class ExpressionParser implements ExpressionParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   static public void ReInit(java.io.InputStream stream) {
@@ -1102,7 +1186,7 @@ public class ExpressionParser implements ExpressionParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   public ExpressionParser(java.io.Reader stream) {
@@ -1118,7 +1202,7 @@ public class ExpressionParser implements ExpressionParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   static public void ReInit(java.io.Reader stream) {
@@ -1127,7 +1211,7 @@ public class ExpressionParser implements ExpressionParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   public ExpressionParser(ExpressionParserTokenManager tm) {
@@ -1142,7 +1226,7 @@ public class ExpressionParser implements ExpressionParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(ExpressionParserTokenManager tm) {
@@ -1150,7 +1234,7 @@ public class ExpressionParser implements ExpressionParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 19; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   static final private Token jj_consume_token(int kind) throws ParseException {
@@ -1205,7 +1289,7 @@ public class ExpressionParser implements ExpressionParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 19; i++) {
+    for (int i = 0; i < 20; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
