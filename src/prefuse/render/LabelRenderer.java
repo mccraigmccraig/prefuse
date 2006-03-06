@@ -1,5 +1,6 @@
 package prefuse.render;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -28,7 +29,9 @@ import prefuse.visual.VisualItem;
  * appropriate constructor or use the {@link #setTextField(String)} method.
  * To perform custom String selection, subclass this Renderer and override the 
  * {@link #getText(VisualItem)} method. When the text field is
- * <code>null</code>, no text label will be shown.</p>
+ * <code>null</code>, no text label will be shown. Labels can span multiple
+ * lines of text, determined by the presence of newline characters ('\n')
+ * within the text string.</p>
  * 
  * <p>By default, no image is shown. To show an image, the image field needs
  * to be set, either using the appropriate constructor or the
@@ -39,21 +42,36 @@ import prefuse.visual.VisualItem;
  * internally by an {@link ImageFactory} instance, which maintains a
  * cache of loaded images.</p>
  * 
+ * <p>The position of the image relative to text can be set using the
+ * {@link #setImagePosition(int)} method. Images can be placed to the
+ * left, right, above, or below the text. The horizontal and vertical
+ * alignments of either the text or the image can be set explicitly
+ * using the appropriate methods of this class (e.g.,
+ * {@link #setHorizontalTextAlignment(int)}). By default, both the
+ * text and images are centered along both the horizontal and
+ * vertical directions.</p>
+ * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class LabelRenderer extends AbstractShapeRenderer {
 
     protected ImageFactory m_images = null;
+    protected String m_delim = "\n";
     
     protected String m_labelName = "label";
     protected String m_imageName = null;
     
     protected int m_xAlign = Constants.CENTER;
     protected int m_yAlign = Constants.CENTER;
+    protected int m_hTextAlign = Constants.CENTER;
+    protected int m_vTextAlign = Constants.CENTER;
+    protected int m_hImageAlign = Constants.CENTER;
+    protected int m_vImageAlign = Constants.CENTER;
+    protected int m_imagePos = Constants.LEFT;
     
     protected int m_horizBorder = 2;
     protected int m_vertBorder  = 0;
-    protected int m_imageMargin = 0;
+    protected int m_imageMargin = 2;
     protected int m_arcWidth    = 0;
     protected int m_arcHeight   = 0;
 
@@ -66,7 +84,8 @@ public class LabelRenderer extends AbstractShapeRenderer {
     protected RectangularShape m_bbox  = new Rectangle2D.Double();
     protected Point2D m_pt = new Point2D.Double(); // temp point
     protected Font    m_font; // temp font holder
-    
+    protected String    m_text; // label text
+    protected Dimension m_textDim = new Dimension(); // text width / height
 
     /**
      * Create a new LabelRenderer. By default the field "label" is used
@@ -157,14 +176,7 @@ public class LabelRenderer extends AbstractShapeRenderer {
     protected String getText(VisualItem item) {
         String s = null;
         if ( item.canGetString(m_labelName) ) {
-            s = item.getString(m_labelName);
-            if ( m_maxTextWidth > -1 ) {
-                Font font = item.getFont();
-                FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(font);
-                if ( fm.stringWidth(s) > m_maxTextWidth ) {
-                    s = StringLib.abbreviate(s, fm, m_maxTextWidth);       
-                }
-            }
+            return item.getString(m_labelName);            
         }
         return s;
     }
@@ -234,14 +246,67 @@ public class LabelRenderer extends AbstractShapeRenderer {
     // ------------------------------------------------------------------------
     // Rendering
     
+    private String computeTextDimensions(VisualItem item, String text,
+                                         double size)
+    {
+        // put item font in temp member variable
+        m_font = item.getFont();
+        // scale the font as needed
+        if ( size != 1 ) {
+            m_font = FontLib.getFont(m_font.getName(), m_font.getStyle(),
+                                     size*m_font.getSize());
+        }
+        
+        FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(m_font);
+        StringBuffer str = null;
+        
+        // compute the number of lines and the maximum width
+        int nlines = 1, w = 0, start = 0, end = text.indexOf(m_delim);
+        m_textDim.width = 0;
+        String line;
+        for ( ; end >= 0; ++nlines ) {
+            w = fm.stringWidth(line=text.substring(start,end));
+            // abbreviate line as needed
+            if ( m_maxTextWidth > -1 && w > m_maxTextWidth ) {
+                if ( str == null )
+                    str = new StringBuffer(text.substring(0,start));
+                str.append(StringLib.abbreviate(line, fm, m_maxTextWidth));
+                str.append(m_delim);
+                w = m_maxTextWidth;
+            } else if ( str != null ) {
+                str.append(line).append(m_delim);
+            }
+            // update maximum width and substring indices
+            m_textDim.width = Math.max(m_textDim.width, w);
+            start = end+1;
+            end = text.indexOf(m_delim, start);
+        }
+        w = fm.stringWidth(line=text.substring(start));
+        // abbreviate line as needed
+        if ( m_maxTextWidth > -1 && w > m_maxTextWidth ) {
+            if ( str == null )
+                str = new StringBuffer(text.substring(0,start));
+            str.append(StringLib.abbreviate(line, fm, m_maxTextWidth));
+            w = m_maxTextWidth;
+        } else if ( str != null ) {
+            str.append(line);
+        }
+        // update maximum width
+        m_textDim.width = Math.max(m_textDim.width, w);
+        
+        // compute the text height
+        m_textDim.height = fm.getHeight() * nlines;
+        
+        return str==null ? text : str.toString();
+    }
+    
     /**
      * @see prefuse.render.AbstractShapeRenderer#getRawShape(prefuse.visual.VisualItem)
      */
     protected Shape getRawShape(VisualItem item) {
-        String text = getText(item);
+        m_text = getText(item);
         Image  img  = getImage(item);
         double size = item.getSize();
-        boolean sizeAdjust = (size != 1);
         
         // get image dimensions
         double iw=0, ih=0;
@@ -252,23 +317,31 @@ public class LabelRenderer extends AbstractShapeRenderer {
         
         // get text dimensions
         int tw=0, th=0;
-        if ( text != null ) {
-            // put item font in temp member variable
-            m_font = item.getFont();
-            // scale the font as needed
-            if ( sizeAdjust ) {
-                m_font = FontLib.getFont(m_font.getName(), m_font.getStyle(),
-                                         size*m_font.getSize());
-            }
-            FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(m_font);
-            th = fm.getHeight();
-            tw = fm.stringWidth(text);    
+        if ( m_text != null ) {
+            m_text = computeTextDimensions(item, m_text, size);
+            th = m_textDim.height;
+            tw = m_textDim.width;   
         }
         
         // get bounding box dimensions
-        double w = tw + size*(iw + 2*m_horizBorder
-                      + (tw>0 && iw>0 ? m_imageMargin : 0));
-        double h = Math.max(th, size*ih) + size*2*m_vertBorder;
+        double w=0, h=0;
+        switch ( m_imagePos ) {
+        case Constants.LEFT:
+        case Constants.RIGHT:
+            w = tw + size*(iw +2*m_horizBorder
+                   + (tw>0 && iw>0 ? m_imageMargin : 0));
+            h = Math.max(th, size*ih) + size*2*m_vertBorder;
+            break;
+        case Constants.TOP:
+        case Constants.BOTTOM:
+            w = Math.max(tw, size*iw) + size*2*m_horizBorder;
+            h = th + size*(ih + 2*m_vertBorder
+                   + (th>0 && ih>0 ? m_imageMargin : 0));
+            break;
+        default:
+            throw new IllegalStateException(
+                "Unrecognized image alignment setting.");
+        }
         
         // get the top-left point, using the current alignment settings
         getAlignedPoint(m_pt, item, w, h, m_xAlign, m_yAlign);
@@ -322,7 +395,7 @@ public class LabelRenderer extends AbstractShapeRenderer {
             GraphicsLib.paint(g, item, shape, getStroke(item), RENDER_TYPE_FILL);
 
         // now render the image and text
-        String text = getText(item);
+        String text = m_text;
         Image  img  = getImage(item);
         
         if ( text == null && img == null )
@@ -332,47 +405,158 @@ public class LabelRenderer extends AbstractShapeRenderer {
         boolean useInt = 1.5 > Math.max(g.getTransform().getScaleX(),
                                         g.getTransform().getScaleY());
         double x = shape.getMinX() + size*m_horizBorder;
-            
+        double y = shape.getMinY() + size*m_vertBorder;
+        
         // render image
         if ( img != null ) {            
             double w = size * img.getWidth(null);
             double h = size * img.getHeight(null);
-            double y = shape.getMinY() + (shape.getHeight()-h)/2;
+            double ix=x, iy=y;
+            
+            // determine one co-ordinate based on the image position
+            switch ( m_imagePos ) {
+            case Constants.LEFT:
+                x += w + size*m_imageMargin;
+                break;
+            case Constants.RIGHT:
+                ix = shape.getMaxX() - size*m_horizBorder - w;
+                break;
+            case Constants.TOP:
+                y += h + size*m_imageMargin;
+                break;
+            case Constants.BOTTOM:
+                iy = shape.getMaxY() - size*m_vertBorder - h;
+                break;
+            default:
+                throw new IllegalStateException(
+                        "Unrecognized image alignment setting.");
+            }
+            
+            // determine the other coordinate based on image alignment
+            switch ( m_imagePos ) {
+            case Constants.LEFT:
+            case Constants.RIGHT:
+                // need to set image y-coordinate
+                switch ( m_vImageAlign ) {
+                case Constants.TOP:
+                    break;
+                case Constants.BOTTOM:
+                    iy = shape.getMaxY() - size*m_vertBorder - h;
+                    break;
+                case Constants.CENTER:
+                    iy = shape.getCenterY() - h/2;
+                    break;
+                }
+                break;
+            case Constants.TOP:
+            case Constants.BOTTOM:
+                // need to set image x-coordinate
+                switch ( m_hImageAlign ) {
+                case Constants.LEFT:
+                    break;
+                case Constants.RIGHT:
+                    ix = shape.getMaxX() - size*m_horizBorder - w;
+                    break;
+                case Constants.CENTER:
+                    ix = shape.getCenterX() - w/2;
+                    break;
+                }
+                break;
+            }
             
             if ( useInt && size == 1.0 ) {
                 // if possible, use integer precision
                 // results in faster, flicker-free image rendering
-                g.drawImage(img, (int)x, (int)y, null);
+                g.drawImage(img, (int)ix, (int)iy, null);
             } else {
-                m_transform.setTransform(size,0,0,size,x,y);
+                m_transform.setTransform(size,0,0,size,ix,iy);
                 g.drawImage(img, m_transform, null);
             }
-            
-            x += w + (text!=null && w>0 ? size*m_imageMargin : 0);
         }
         
         // render text
-        if ( text != null ) {
-            int textColor = item.getTextColor();
-            if ( ColorLib.alpha(textColor) > 0 ) {
-                g.setPaint(ColorLib.getColor(textColor));
-                g.setFont(m_font);
-                FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(m_font);
-                double y = shape.getCenterY() - 
-                            ((fm.getHeight()>>1)-fm.getAscent());
-                if ( useInt ) {
-                    // use integer precision unless zoomed-in
-                    // results in more stable drawing
-                    g.drawString(text, (int)x, (int)y);
-                } else {
-                    g.drawString(text, (float)x, (float)y);
-                }
+        int textColor = item.getTextColor();
+        if ( text != null && ColorLib.alpha(textColor) > 0 ) {
+            g.setPaint(ColorLib.getColor(textColor));
+            g.setFont(m_font);
+            FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(m_font);
+
+            // compute available width
+            double tw;
+            switch ( m_imagePos ) {
+            case Constants.TOP:
+            case Constants.BOTTOM:
+                tw = shape.getWidth() - 2*size*m_horizBorder;
+                break;
+            default:
+                tw = m_textDim.width;
             }
+            
+            // compute available height
+            double th;
+            switch ( m_imagePos ) {
+            case Constants.LEFT:
+            case Constants.RIGHT:
+                th = shape.getHeight() - 2*size*m_vertBorder;
+                break;
+            default:
+                th = m_textDim.height;
+            }
+            
+            // compute starting y-coordinate
+            y += fm.getAscent();
+            switch ( m_vTextAlign ) {
+            case Constants.TOP:
+                break;
+            case Constants.BOTTOM:
+                y += th - m_textDim.height;
+                break;
+            case Constants.CENTER:
+                y += (th - m_textDim.height)/2;
+            }
+            
+            // render each line of text
+            int lh = fm.getHeight(); // the line height
+            int start = 0, end = text.indexOf(m_delim);
+            for ( ; end >= 0; y += lh ) {
+                drawString(g, fm, text.substring(start, end), useInt, x, y, tw);
+                start = end+1;
+                end = text.indexOf(m_delim, start);   
+            }
+            drawString(g, fm, text.substring(start), useInt, x, y, tw);
         }
     
         // draw border
         if (type==RENDER_TYPE_DRAW || type==RENDER_TYPE_DRAW_AND_FILL) {
             GraphicsLib.paint(g,item,shape,getStroke(item),RENDER_TYPE_DRAW);
+        }
+    }
+    
+    private final void drawString(Graphics2D g, FontMetrics fm, String text,
+            boolean useInt, double x, double y, double w)
+    {
+        // compute the x-coordinate
+        double tx;
+        switch ( m_hTextAlign ) {
+        case Constants.LEFT:
+            tx = x;
+            break;
+        case Constants.RIGHT:
+            tx = x + w - fm.stringWidth(text);
+            break;
+        case Constants.CENTER:
+            tx = x + (w - fm.stringWidth(text)) / 2;
+            break;
+        default:
+            throw new IllegalStateException(
+                    "Unrecognized text alignment setting.");
+        }
+        // use integer precision unless zoomed-in
+        // results in more stable drawing
+        if ( useInt ) {
+            g.drawString(text, (int)tx, (int)y);
+        } else {
+            g.drawString(text, (float)tx, (float)y);
         }
     }
     
@@ -393,9 +577,142 @@ public class LabelRenderer extends AbstractShapeRenderer {
         m_images = ifact;
     }
     
+    // ------------------------------------------------------------------------
+    
     /**
-     * Get the horizontal alignment of this node with respect to it's
-     * location co-ordinate.
+     * Get the horizontal text alignment within the layout. One of
+     * {@link prefuse.Constants#LEFT}, {@link prefuse.Constants#RIGHT}, or
+     * {@link prefuse.Constants#CENTER}. The default is centered text.
+     * @return the horizontal text alignment
+     */
+    public int getHorizontalTextAlignment() {
+        return m_hTextAlign;
+    }
+    
+    /**
+     * Set the horizontal text alignment within the layout. One of
+     * {@link prefuse.Constants#LEFT}, {@link prefuse.Constants#RIGHT}, or
+     * {@link prefuse.Constants#CENTER}. The default is centered text.
+     * @param halign the desired horizontal text alignment
+     */
+    public void setHorizontalTextAlignment(int halign) {
+        if ( halign != Constants.LEFT &&
+             halign != Constants.RIGHT &&
+             halign != Constants.CENTER )
+           throw new IllegalArgumentException(
+                   "Illegal horizontal text alignment value.");
+        m_hTextAlign = halign;
+    }
+    
+    /**
+     * Get the vertical text alignment within the layout. One of
+     * {@link prefuse.Constants#TOP}, {@link prefuse.Constants#BOTTOM}, or
+     * {@link prefuse.Constants#CENTER}. The default is centered text.
+     * @return the vertical text alignment
+     */
+    public int getVerticalTextAlignment() {
+        return m_vTextAlign;
+    }
+    
+    /**
+     * Set the vertical text alignment within the layout. One of
+     * {@link prefuse.Constants#TOP}, {@link prefuse.Constants#BOTTOM}, or
+     * {@link prefuse.Constants#CENTER}. The default is centered text.
+     * @param valign the desired vertical text alignment
+     */
+    public void setVerticalTextAlignment(int valign) {
+        if ( valign != Constants.TOP &&
+             valign != Constants.BOTTOM &&
+             valign != Constants.CENTER )
+            throw new IllegalArgumentException(
+                    "Illegal vertical text alignment value.");
+        m_vTextAlign = valign;
+    }
+    
+    /**
+     * Get the horizontal image alignment within the layout. One of
+     * {@link prefuse.Constants#LEFT}, {@link prefuse.Constants#RIGHT}, or
+     * {@link prefuse.Constants#CENTER}. The default is a centered image.
+     * @return the horizontal image alignment
+     */
+    public int getHorizontalImageAlignment() {
+        return m_hImageAlign;
+    }
+    
+    /**
+     * Set the horizontal image alignment within the layout. One of
+     * {@link prefuse.Constants#LEFT}, {@link prefuse.Constants#RIGHT}, or
+     * {@link prefuse.Constants#CENTER}. The default is a centered image.
+     * @param halign the desired horizontal image alignment
+     */
+    public void setHorizontalImageAlignment(int halign) {
+        if ( halign != Constants.LEFT &&
+             halign != Constants.RIGHT &&
+             halign != Constants.CENTER )
+           throw new IllegalArgumentException(
+                   "Illegal horizontal text alignment value.");
+        m_hImageAlign = halign;
+    }
+    
+    /**
+     * Get the vertical image alignment within the layout. One of
+     * {@link prefuse.Constants#TOP}, {@link prefuse.Constants#BOTTOM}, or
+     * {@link prefuse.Constants#CENTER}. The default is a centered image.
+     * @return the vertical image alignment
+     */
+    public int getVerticalImageAlignment() {
+        return m_vImageAlign;
+    }
+    
+    /**
+     * Set the vertical image alignment within the layout. One of
+     * {@link prefuse.Constants#TOP}, {@link prefuse.Constants#BOTTOM}, or
+     * {@link prefuse.Constants#CENTER}. The default is a centered image.
+     * @param valign the desired vertical image alignment
+     */
+    public void setVerticalImageAlignment(int valign) {
+        if ( valign != Constants.TOP &&
+             valign != Constants.BOTTOM &&
+             valign != Constants.CENTER )
+            throw new IllegalArgumentException(
+                    "Illegal vertical text alignment value.");
+        m_vImageAlign = valign;
+    }
+    
+    /**
+     * Get the image position, determining where the image is placed with
+     * respect to the text. One of {@link Constants#LEFT},
+     * {@link Constants#RIGHT}, {@link Constants#TOP}, or
+     * {@link Constants#BOTTOM}.  The default is left.
+     * @return the image position
+     */
+    public int getImagePosition() {
+        return m_imagePos;
+    }
+    
+    /**
+     * Set the image position, determining where the image is placed with
+     * respect to the text. One of {@link Constants#LEFT},
+     * {@link Constants#RIGHT}, {@link Constants#TOP}, or
+     * {@link Constants#BOTTOM}.  The default is left.
+     * @param pos the desired image position
+     */
+    public void setImagePosition(int pos) {
+        if ( pos != Constants.TOP &&
+             pos != Constants.BOTTOM &&
+             pos != Constants.LEFT &&
+             pos != Constants.RIGHT &&
+             pos != Constants.CENTER )
+           throw new IllegalArgumentException(
+                   "Illegal image position value.");
+        m_imagePos = pos;
+    }
+    
+    // ------------------------------------------------------------------------
+    
+    /**
+     * Get the horizontal alignment of this node with respect to its
+     * x, y coordinates.
      * @return the horizontal alignment, one of
      * {@link prefuse.Constants#LEFT}, {@link prefuse.Constants#RIGHT}, or
      * {@link prefuse.Constants#CENTER}.
@@ -405,8 +722,8 @@ public class LabelRenderer extends AbstractShapeRenderer {
     }
     
     /**
-     * Get the vertical alignment of this node with respect to it's
-     * location co-ordinate.
+     * Get the vertical alignment of this node with respect to its
+     * x, y coordinates.
      * @return the vertical alignment, one of
      * {@link prefuse.Constants#TOP}, {@link prefuse.Constants#BOTTOM}, or
      * {@link prefuse.Constants#CENTER}.
@@ -416,8 +733,8 @@ public class LabelRenderer extends AbstractShapeRenderer {
     }
     
     /**
-     * Set the horizontal alignment of this node with respect to it's
-     * location co-ordinate.
+     * Set the horizontal alignment of this node with respect to its
+     * x, y coordinates.
      * @param align the horizontal alignment, one of
      * {@link prefuse.Constants#LEFT}, {@link prefuse.Constants#RIGHT}, or
      * {@link prefuse.Constants#CENTER}.
@@ -427,8 +744,8 @@ public class LabelRenderer extends AbstractShapeRenderer {
     }
     
     /**
-     * Set the vertical alignment of this node with respect to it's
-     * location co-ordinate.
+     * Set the vertical alignment of this node with respect to its
+     * x, y coordinates.
      * @param align the vertical alignment, one of
      * {@link prefuse.Constants#TOP}, {@link prefuse.Constants#BOTTOM}, or
      * {@link prefuse.Constants#CENTER}.
@@ -438,7 +755,7 @@ public class LabelRenderer extends AbstractShapeRenderer {
     }
     
     /**
-     * Returns the amount of padding in pixels between text 
+     * Returns the amount of padding in pixels between the content 
      * and the border of this item along the horizontal dimension.
      * @return the horizontal padding
      */
@@ -447,7 +764,7 @@ public class LabelRenderer extends AbstractShapeRenderer {
     }
     
     /**
-     * Sets the amount of padding in pixels between text 
+     * Sets the amount of padding in pixels between the content 
      * and the border of this item along the horizontal dimension.
      * @param xpad the horizontal padding to set
      */
@@ -456,7 +773,7 @@ public class LabelRenderer extends AbstractShapeRenderer {
     }
     
     /**
-     * Returns the amount of padding in pixels between text 
+     * Returns the amount of padding in pixels between the content 
      * and the border of this item along the vertical dimension.
      * @return the vertical padding
      */
@@ -465,12 +782,28 @@ public class LabelRenderer extends AbstractShapeRenderer {
     }
     
     /**
-     * Sets the amount of padding in pixels between text 
+     * Sets the amount of padding in pixels between the content 
      * and the border of this item along the vertical dimension.
      * @param ypad the vertical padding
      */
     public void setVerticalPadding(int ypad) {
         m_vertBorder = ypad;
+    }
+    
+    /**
+     * Get the padding, in pixels, between an image and text.
+     * @return the padding between an image and text
+     */
+    public int getImageTextPadding() {
+        return m_imageMargin;
+    }
+    
+    /**
+     * Set the padding, in pixels, between an image and text.
+     * @param pad the padding to use between an image and text
+     */
+    public void setImageTextPadding(int pad) {
+        m_imageMargin = pad;
     }
     
 } // end of class LabelRenderer
