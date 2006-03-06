@@ -1204,7 +1204,7 @@ public class Visualization {
      * {@link prefuse.Display#setVisualization(Visualization)} method.
      * @param display the Display to add
      */
-    public void addDisplay(Display display) {
+    void addDisplay(Display display) {
         m_displays.add(display);
     }
     
@@ -1223,7 +1223,7 @@ public class Visualization {
      * @param display the display to remove
      * @return true if the display was removed, false if it was not found
      */
-    public boolean removeDisplay(Display display) {
+    boolean removeDisplay(Display display) {
         return m_displays.remove(display);
     }
     
