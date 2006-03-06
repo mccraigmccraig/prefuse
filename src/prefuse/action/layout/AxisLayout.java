@@ -6,7 +6,6 @@ import java.util.Iterator;
 import prefuse.Constants;
 import prefuse.data.Table;
 import prefuse.data.Tuple;
-import prefuse.data.column.ColumnMetadata;
 import prefuse.data.expression.Predicate;
 import prefuse.data.query.NumberRangeModel;
 import prefuse.data.query.ObjectRangeModel;
@@ -265,17 +264,8 @@ public class AxisLayout extends Layout {
      */
     protected void numericalLayout(TupleSet ts) {
         if ( !m_modelSet ) {
-            if ( ts instanceof Table ) {
-                Table t = (Table)ts;
-                ColumnMetadata md = t.getMetadata(m_field);
-                m_dist[0] = t.getDouble(md.getMinimumRow(), m_field);
-                m_dist[1] = t.getDouble(md.getMaximumRow(), m_field);
-            } else {
-                Tuple mint = DataLib.min(ts.tuples(), m_field);
-                Tuple maxt = DataLib.max(ts.tuples(), m_field);
-                m_dist[0] = mint.getDouble(m_field);
-                m_dist[1] = maxt.getDouble(m_field);
-            }
+            m_dist[0] = DataLib.min(ts, m_field).getDouble(m_field);
+            m_dist[1] = DataLib.max(ts, m_field).getDouble(m_field);
             
             double lo = m_dist[0], hi = m_dist[1];
             if ( m_model == null ) {
@@ -302,12 +292,8 @@ public class AxisLayout extends Layout {
      */
     protected void ordinalLayout(TupleSet ts) {
         if ( !m_modelSet) {
-            Object[] array;
-            if ( ts instanceof Table ) {
-                array = ((Table)ts).getMetadata(m_field).getOrdinalArray();
-            } else {
-                array = DataLib.ordinalArray(ts.tuples(), m_field);
-            }
+            Object[] array = DataLib.ordinalArray(ts, m_field);
+            
             if ( m_model == null ) {
                 m_model = new ObjectRangeModel(array);
             } else {

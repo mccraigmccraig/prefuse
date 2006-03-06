@@ -4,9 +4,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import prefuse.Constants;
-import prefuse.data.Table;
-import prefuse.data.Tuple;
-import prefuse.data.column.ColumnMetadata;
 import prefuse.data.tuple.TupleSet;
 import prefuse.util.ColorLib;
 import prefuse.util.ColorMap;
@@ -263,25 +260,12 @@ public class DataColorAction extends ColorAction {
                 return MathLib.quantiles(m_bins, values);
             } else {
                 double[] dist = new double[2];
-                if ( ts instanceof Table ) {
-                    Table t = (Table)ts;
-                    ColumnMetadata md = t.getMetadata(m_dataField);
-                    dist[0] = t.getDouble(md.getMinimumRow(), m_dataField);
-                    dist[1] = t.getDouble(md.getMaximumRow(), m_dataField);
-                } else {
-                    Tuple mint = DataLib.min(ts.tuples(), m_dataField);
-                    Tuple maxt = DataLib.max(ts.tuples(), m_dataField);
-                    dist[0] = mint.getDouble(m_dataField);
-                    dist[1] = maxt.getDouble(m_dataField);
-                }
+                dist[0] = DataLib.min(ts, m_dataField).getDouble(m_dataField);
+                dist[1] = DataLib.max(ts, m_dataField).getDouble(m_dataField);
                 return dist;
             }
         } else {
-            if ( ts instanceof Table ) {
-                m_omap = ((Table)ts).getMetadata(m_dataField).getOrdinalMap();
-            } else {
-                m_omap = DataLib.ordinalMap(ts.tuples(), m_dataField);
-            }
+            m_omap = DataLib.ordinalMap(ts, m_dataField);
             return new double[] { 0, m_omap.size()-1 };
         }
     }

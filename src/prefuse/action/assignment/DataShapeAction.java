@@ -3,8 +3,6 @@ package prefuse.action.assignment;
 import java.util.Map;
 
 import prefuse.Constants;
-import prefuse.data.Table;
-import prefuse.data.column.ColumnMetadata;
 import prefuse.data.tuple.TupleSet;
 import prefuse.util.DataLib;
 import prefuse.visual.VisualItem;
@@ -90,13 +88,7 @@ public class DataShapeAction extends ShapeAction {
      */
     protected void setup() {
         TupleSet ts = m_vis.getGroup(m_group);
-        
-        if ( ts instanceof Table ) {
-            ColumnMetadata md = ((Table)ts).getMetadata(m_dataField);
-            m_ordinalMap = md.getOrdinalMap();
-        } else {
-            m_ordinalMap = DataLib.ordinalMap(ts.tuples(), m_dataField);
-        }
+        m_ordinalMap = DataLib.ordinalMap(ts, m_dataField);
     }
     
     /**

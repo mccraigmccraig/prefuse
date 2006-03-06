@@ -3,9 +3,6 @@ package prefuse.action.assignment;
 import java.util.logging.Logger;
 
 import prefuse.Constants;
-import prefuse.data.Table;
-import prefuse.data.Tuple;
-import prefuse.data.column.ColumnMetadata;
 import prefuse.data.tuple.TupleSet;
 import prefuse.util.DataLib;
 import prefuse.util.MathLib;
@@ -240,17 +237,8 @@ public class DataSizeAction extends SizeAction {
                     m_scale = Constants.LINEAR_SCALE;
                 }
                 m_dist = new double[2];
-                if ( ts instanceof Table ) {
-                    Table t = (Table)ts;
-                    ColumnMetadata md = t.getMetadata(m_dataField);
-                    m_dist[0] = t.getDouble(md.getMinimumRow(), m_dataField);
-                    m_dist[1] = t.getDouble(md.getMaximumRow(), m_dataField);
-                } else {
-                    Tuple mint = DataLib.min(ts.tuples(), m_dataField);
-                    Tuple maxt = DataLib.max(ts.tuples(), m_dataField);
-                    m_dist[0] = mint.getDouble(m_dataField);
-                    m_dist[1] = maxt.getDouble(m_dataField);
-                }
+                m_dist[0]= DataLib.min(ts, m_dataField).getDouble(m_dataField);
+                m_dist[1]= DataLib.max(ts, m_dataField).getDouble(m_dataField);
             }
             m_sizeRange = m_dist[m_dist.length-1]/m_dist[0] - m_baseSize;
         }
