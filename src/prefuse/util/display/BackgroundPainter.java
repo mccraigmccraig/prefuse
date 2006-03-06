@@ -10,7 +10,6 @@ import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
-import java.net.URL;
 
 import prefuse.Display;
 import prefuse.util.io.IOLib;
@@ -51,17 +50,9 @@ public class BackgroundPainter implements PaintListener {
      */
     public BackgroundPainter(String imageLocation, boolean fixed, boolean tile)
     {
-        URL url = IOLib.urlFromString(imageLocation);
-        m_img = Toolkit.getDefaultToolkit().getImage(url);
-        MediaTracker mt = new MediaTracker(new Container());
-        mt.addImage(m_img, 0);
-        try {
-            mt.waitForID(0);
-        } catch ( Exception e ) { e.printStackTrace(); }
-        mt.removeImage(m_img, 0);
-        
-        m_fixed = fixed;
-        m_tiled = tile;        
+        this(Toolkit.getDefaultToolkit()
+                .getImage(IOLib.urlFromString(imageLocation)),
+             fixed, tile);        
     }
     
     /**
@@ -75,6 +66,15 @@ public class BackgroundPainter implements PaintListener {
      */
     public BackgroundPainter(Image image, boolean fixed, boolean tile) {
         m_img = image;
+        
+        // make sure the image is completely loaded
+        MediaTracker mt = new MediaTracker(new Container());
+        mt.addImage(m_img, 0);
+        try {
+            mt.waitForID(0);
+        } catch ( Exception e ) { e.printStackTrace(); }
+        mt.removeImage(m_img, 0);
+        
         m_fixed = fixed;
         m_tiled = tile;
     }
