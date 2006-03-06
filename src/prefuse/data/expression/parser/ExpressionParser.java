@@ -189,38 +189,26 @@ import prefuse.util.StringLib;
  *   <li><strong><code>ROW()</code></strong><br/>
  *     Returns the table row number (or -1 if none) of the current Tuple.
  *   </li>
- * </ul>
- * <ul>
  *   <li><strong><code>ISNODE()</code></strong><br/>
  *     Returns true if the current Tuple is a graph Node.
  *   </li>
- * </ul>
- * <ul>
  *   <li><strong><code>ISEDGE()</code></strong><br/>
  *     Returns true if the current Tuple is a graph Edge.
  *   </li>
- * </ul>
- * <ul>
  *   <li><strong><code>DEGREE()</code></strong><br/>
  *     If the current Tuple is graph Node, returns the Node degree
  *     (the total number of incident edges). Otherwise returns 0.
  *   </li>
- * </ul>
- * <ul>
  *   <li><strong><code>INDEGREE()</code></strong><br/>
  *     If the current Tuple is graph Node, returns the Node indegree
  *     (the number of incident edges pointing towards this node).
  *     Otherwise returns 0.
  *   </li>
- * </ul>
- * <ul>
  *   <li><strong><code>OUTDEGREE()</code></strong><br/>
  *     If the current Tuple is graph Node, returns the Node outdegree
  *     (the number of incident edges pointing away from the node).
  *     Otherwise returns 0.
  *   </li>
- * </ul>
- * <ul>
  *   <li><strong><code>CHILDCOUNT()</code></strong><br/>
  *     If the current Tuple is graph Node, returns the number of tree
  *     children nodes. If the Tuple is not a Node, this method returns 0.
@@ -229,8 +217,6 @@ import prefuse.util.StringLib;
  *     been computed, a new spanning tree will be computed using the default
  *     method. See {@link prefuse.data.Graph#getSpanningTree()} for more.
  *   </li>
- * </ul>
- * <ul>
  *   <li><strong><code>TREEDEPTH()</code></strong><br/>
  *     If the current Tuple is graph Node, returns the depth of this Node
  *     in its Tree or SpanningTree. If the Tuple is not a Node, this method
