@@ -2,7 +2,6 @@ package prefuse.data.query;
 
 import javax.swing.JComponent;
 
-import prefuse.data.Table;
 import prefuse.data.Tuple;
 import prefuse.data.event.TupleSetListener;
 import prefuse.data.expression.AbstractPredicate;
@@ -10,7 +9,7 @@ import prefuse.data.search.PrefixSearchTupleSet;
 import prefuse.data.search.SearchTupleSet;
 import prefuse.data.tuple.TupleSet;
 import prefuse.util.ui.JSearchPanel;
-import prefuse.visual.VisualTable;
+import prefuse.visual.VisualTupleSet;
 
 /**
  * DynamicQueryBinding supporting text search over data values. Implementations
@@ -28,34 +27,34 @@ public class SearchQueryBinding extends DynamicQueryBinding {
     private Object m_lock;
     
     /**
-     * Create a new SearchQueryBinding over the given table and data field.
-     * @param t the Table to query
+     * Create a new SearchQueryBinding over the given set and data field.
+     * @param ts the TupleSet to query
      * @param field the data field (Table column) to query
      */
-    public SearchQueryBinding(Table t, String field) {
-        this(t, field, new PrefixSearchTupleSet());
+    public SearchQueryBinding(TupleSet ts, String field) {
+        this(ts, field, new PrefixSearchTupleSet());
     }
     
     /**
-     * Create a new SearchQueryBinding over the given table and data field, using
-     * the specified SearchTupleSet instance. Use this constructor to choose
-     * the type of search engine used, and to potentially reuse the same search
-     * set over multiple dynamic query bindings.
-     * @param t the Table to query
+     * Create a new SearchQueryBinding over the given set and data field,
+     * using the specified SearchTupleSet instance. Use this constructor to
+     * choose the type of search engine used, and to potentially reuse the
+     * same search set over multiple dynamic query bindings.
+     * @param ts the TupleSet to query
      * @param field the data field (Table column) to query
      * @param set the {@link prefuse.data.search.SearchTupleSet} to use.
      */
-    public SearchQueryBinding(Table t, String field, SearchTupleSet set) {
-        super(t, field);
+    public SearchQueryBinding(TupleSet ts, String field, SearchTupleSet set) {
+        super(ts, field);
         m_lstnr = new Listener();
         setPredicate(new SearchBindingPredicate());
         
         m_set = set;
-        m_set.index(t.tuples(), field);
+        m_set.index(ts.tuples(), field);
         m_set.addTupleSetListener(m_lstnr);
         
-        if ( t instanceof VisualTable )
-            m_lock = ((VisualTable)t).getVisualization();
+        if ( ts instanceof VisualTupleSet )
+            m_lock = ((VisualTupleSet)ts).getVisualization();
     }
     
     /**

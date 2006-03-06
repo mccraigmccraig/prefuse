@@ -2,8 +2,8 @@ package prefuse.data.query;
 
 import javax.swing.JComponent;
 
-import prefuse.data.Table;
 import prefuse.data.expression.Predicate;
+import prefuse.data.tuple.TupleSet;
 
 /**
  * <p>Abstract base class for dynamic query bindings, which support
@@ -26,18 +26,18 @@ public abstract class DynamicQueryBinding {
     
     /** The actual query over Table data. */
     protected Predicate m_query;
-    /** The Table processed by the query. */
-    protected Table m_table;
-    /** The data field (Table column) processed by the query. */
+    /** The TupleSet processed by the query. */
+    protected TupleSet m_tuples;
+    /** The data field processed by the query. */
     protected String m_field;
     
     /**
      * Create a new DynamicQueryBinding. Called by subclasses.
-     * @param table the Table to query
+     * @param tupleSet the TupleSet to query
      * @param field the data field (Table column) to query
      */
-    protected DynamicQueryBinding(Table table, String field) {
-        m_table = table;
+    protected DynamicQueryBinding(TupleSet tupleSet, String field) {
+        m_tuples = tupleSet;
         m_field = field;
     }
     

@@ -8,11 +8,11 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import prefuse.data.Table;
-import prefuse.data.column.ColumnMetadata;
 import prefuse.data.expression.ColumnExpression;
 import prefuse.data.expression.Literal;
 import prefuse.data.expression.RangePredicate;
+import prefuse.data.tuple.TupleSet;
+import prefuse.util.DataLib;
 import prefuse.util.TypeLib;
 import prefuse.util.ui.JRangeSlider;
 import prefuse.util.ui.ValuedRangeModel;
@@ -32,18 +32,18 @@ public class RangeQueryBinding extends DynamicQueryBinding {
     private static FocusListener s_sliderAdj;
     
     /**
-     * Create a new RangeQueryBinding over the given table and data field.
-     * @param t the Table to query
+     * Create a new RangeQueryBinding over the given set and data field.
+     * @param ts the TupleSet to query
      * @param field the data field (Table column) to query
      */
-    public RangeQueryBinding(Table t, String field) {
-        this(t, field, false);
+    public RangeQueryBinding(TupleSet ts, String field) {
+        this(ts, field, false);
     }
     
     /**
-     * Create a new RangeQueryBinding over the given table and data field,
+     * Create a new RangeQueryBinding over the given set and data field,
      * optionally forcing an ordinal treatment of data.
-     * @param t the Table to query
+     * @param ts the TupleSet to query
      * @param field the data field (Table column) to query
      * @param forceOrdinal if true, forces all items in the range to be
      * treated in strictly ordinal fashion. That means that if the data
@@ -53,9 +53,9 @@ public class RangeQueryBinding extends DynamicQueryBinding {
      * a {@link NumberRangeModel} will be used to represent the data. If
      * the argument is false, default inference mechanisms will be used.
      */
-    public RangeQueryBinding(Table t, String field, boolean forceOrdinal) {
-        super(t, field);
-        m_type = t.getColumnType(field);
+    public RangeQueryBinding(TupleSet ts, String field, boolean forceOrdinal) {
+        super(ts, field);
+        m_type = DataLib.inferType(ts, field);
         m_ordinal = forceOrdinal;
         m_lstnr = new Listener();
         initPredicate();
@@ -63,13 +63,11 @@ public class RangeQueryBinding extends DynamicQueryBinding {
     }
     
     private void initPredicate() {
-        ColumnMetadata md = m_table.getMetadata(m_field);
-        int minRow = md.getMinimumRow();
-        int maxRow = md.getMaximumRow();
+        // determine minimum and maximum values
+        Object min = DataLib.min(m_tuples, m_field).get(m_field);
+        Object max = DataLib.max(m_tuples, m_field).get(m_field);
         
         // set up predicate
-        Object min = m_table.get(minRow, m_field);
-        Object max = m_table.get(maxRow, m_field);
         Literal left = Literal.getLiteral(min, m_type);
         Literal right = Literal.getLiteral(max, m_type);
         ColumnExpression ce = new ColumnExpression(m_field);
@@ -81,16 +79,15 @@ public class RangeQueryBinding extends DynamicQueryBinding {
         if ( m_model != null )
             m_model.removeChangeListener(m_lstnr);
         
-        ColumnMetadata md = m_table.getMetadata(m_field);
-        
         // set up data / selection model
         ValuedRangeModel model = null;
         if ( TypeLib.isNumericType(m_type) && !m_ordinal ) {
-            Number min = (Number)m_table.get(md.getMinimumRow(), m_field);
-            Number max = (Number)m_table.get(md.getMaximumRow(), m_field);
+            Number min = (Number)DataLib.min(m_tuples, m_field).get(m_field);
+            Number max = (Number)DataLib.max(m_tuples, m_field).get(m_field);
             model = new NumberRangeModel(min, max, min, max);
         } else {
-            model = new ObjectRangeModel(md.getOrdinalArray());
+            model = new ObjectRangeModel(
+                        DataLib.ordinalArray(m_tuples, m_field));
         }
         m_model = model;
         m_model.addChangeListener(m_lstnr);

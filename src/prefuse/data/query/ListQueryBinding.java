@@ -15,6 +15,8 @@ import prefuse.data.expression.Expression;
 import prefuse.data.expression.Literal;
 import prefuse.data.expression.OrPredicate;
 import prefuse.data.expression.Predicate;
+import prefuse.data.tuple.TupleSet;
+import prefuse.util.DataLib;
 import prefuse.util.ui.JToggleGroup;
 
 /**
@@ -33,24 +35,24 @@ public class ListQueryBinding extends DynamicQueryBinding {
     private boolean m_includeAll;
     
     /**
-     * Create a new ListQueryBinding over the given table and data field.
-     * @param t the Table to query
+     * Create a new ListQueryBinding over the given set and data field.
+     * @param ts the TupleSet to query
      * @param field the data field (Table column) to query
      */
-    public ListQueryBinding(Table t, String field) {
-        this(t, field, true);
+    public ListQueryBinding(TupleSet ts, String field) {
+        this(ts, field, true);
     }
     
     /**
-     * Create a new ListQueryBinding over the given table and data field.
-     * @param t the Table to query
+     * Create a new ListQueryBinding over the given set and data field.
+     * @param ts the TupleSet to query
      * @param field the data field (Table column) to query
      * @param includeAllOption indicates if the dynamic queries should
      * include an "All" option for including all data values
      */
-    public ListQueryBinding(Table t, String field, boolean includeAllOption) {
-        super(t, field);
-        m_type = t.getColumnType(field);
+    public ListQueryBinding(TupleSet ts, String field, boolean includeAllOption) {
+        super(ts, field);
+        m_type = DataLib.inferType(ts, field);
         m_lstnr = new Listener();
         m_includeAll = includeAllOption;
         initPredicate();
@@ -69,8 +71,13 @@ public class ListQueryBinding extends DynamicQueryBinding {
             m_model.removeListSelectionListener(m_lstnr);
         
         // set up data / selection model
-        ColumnMetadata md = m_table.getMetadata(m_field);
-        Object[] o = md.getOrdinalArray();
+        Object[] o = null;
+        if ( m_tuples instanceof Table ) {
+            ColumnMetadata md = ((Table)m_tuples).getMetadata(m_field);
+            o = md.getOrdinalArray();
+        } else {
+            o = DataLib.ordinalArray(m_tuples.tuples(), m_field);
+        }
         m_model = new ListModel(o);
         m_model.addListSelectionListener(m_lstnr);
         if ( m_includeAll ) {
