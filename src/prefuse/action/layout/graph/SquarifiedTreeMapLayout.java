@@ -1,6 +1,5 @@
 package prefuse.action.layout.graph;
 
-import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,7 +7,9 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import prefuse.data.Graph;
 import prefuse.data.Schema;
+import prefuse.data.tuple.TupleSet;
 import prefuse.data.util.TreeNodeIterator;
 import prefuse.visual.NodeItem;
 import prefuse.visual.VisualItem;
@@ -109,10 +110,10 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
     private void computeAreas(NodeItem root) {
         int leafCount = 0;
         
-        // ensure data column exists
-        //Graph g = (Graph)m_vis.getGroup(m_group);
-        //TupleSet nodes = g.getNodes();
-        root.getTable().addColumns(AREA_SCHEMA);
+        // ensure area data column exists
+        Graph g = (Graph)m_vis.getGroup(m_group);
+        TupleSet nodes = g.getNodes();
+        nodes.addColumns(AREA_SCHEMA);
         
         // reset all sizes to zero
         Iterator iter = new TreeNodeIterator(root);
@@ -138,8 +139,8 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
         }
         
         // scale sizes by display area factor
-        Dimension d = m_vis.getDisplay(0).getSize();
-        double area = (d.width-1)*(d.height-1);
+        Rectangle2D b = getLayoutBounds();
+        double area = (b.getWidth()-1)*(b.getHeight()-1);
         double scale = area/leafCount;
         iter = new TreeNodeIterator(root);
         while ( iter.hasNext() ) {
@@ -197,7 +198,7 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
         childIter = n.children();
         while ( childIter.hasNext() ) {
             NodeItem c = (NodeItem)childIter.next();
-            c.setSize(c.getDouble(AREA)*t);
+            c.setDouble(AREA, c.getDouble(AREA)*t);
         }
         
         // set bounding rectangle and return
