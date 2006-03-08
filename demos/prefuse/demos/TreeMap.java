@@ -27,10 +27,12 @@ import prefuse.action.assignment.ColorAction;
 import prefuse.action.layout.graph.SquarifiedTreeMapLayout;
 import prefuse.controls.ControlAdapter;
 import prefuse.data.Tree;
+import prefuse.data.expression.Predicate;
+import prefuse.data.expression.parser.ExpressionParser;
 import prefuse.data.io.TreeMLReader;
 import prefuse.data.query.SearchQueryBinding;
-import prefuse.render.DefaultRendererFactory;
 import prefuse.render.AbstractShapeRenderer;
+import prefuse.render.DefaultRendererFactory;
 import prefuse.util.ColorLib;
 import prefuse.util.ColorMap;
 import prefuse.util.FontLib;
@@ -66,6 +68,10 @@ public class TreeMap extends Display {
         
         VisualTree vt = m_vis.addTree(tree, t);
         m_vis.setVisible(treeEdges, null, false);
+        
+        // ensure that only leaf nodes are interactive
+        Predicate noLeaf = (Predicate)ExpressionParser.parse("childcount()>0");
+        m_vis.setInteractive(treeNodes, noLeaf, false);
             
         m_vis.setRendererFactory(
             new DefaultRendererFactory(new TreeMapRenderer(label)));
