@@ -9,6 +9,7 @@ public class All_PrefuseDataExpression_Tests {
         TestSuite suite = new TestSuite("Test for test.prefuse.data.expression");
         //$JUnit-BEGIN$
         suite.addTestSuite(ExpressionTest.class);
+        suite.addTestSuite(PredicateChainTest.class);
         //$JUnit-END$
         return suite;
     }
