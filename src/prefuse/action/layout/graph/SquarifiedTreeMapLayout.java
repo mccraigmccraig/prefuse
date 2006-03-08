@@ -130,10 +130,8 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
                 double sz = n.getSize();
                 n.setDouble(AREA, sz);
                 NodeItem p = (NodeItem)n.getParent();
-                for (; p!=null; p=(NodeItem)p.getParent()) {
+                for (; p!=null; p=(NodeItem)p.getParent())
                     p.setDouble(AREA, sz + p.getDouble(AREA));
-                    p.setInteractive(false);
-                }
                 ++leafCount;
             }
         }
