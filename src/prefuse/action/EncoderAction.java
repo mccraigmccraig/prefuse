@@ -78,7 +78,9 @@ public abstract class EncoderAction extends ItemAction {
     // ------------------------------------------------------------------------
 
     /**
-     * Add a mapping rule to this EncoderAction.
+     * Add a mapping rule to this EncoderAction. This method is protected,
+     * subclasses should crate public add methods of their own to enforce
+     * their own type constraints.
      * @param p the rule Predicate 
      * @param value the value to map to
      */
@@ -96,6 +98,27 @@ public abstract class EncoderAction extends ItemAction {
      */
     protected Object lookup(VisualItem item) {
         return (m_chain == null ? null : m_chain.get(item));
+    }
+    
+    /**
+     * Remove all rule mappings from this encoder.
+     */
+    public void clear() {
+        if ( m_chain != null ) {
+            m_chain.clear();
+        }
+    }
+    
+    /**
+     * Remove rules using the given predicate from this encoder.
+     * This method will not remove rules in which this predicate is used
+     * within a composite of clauses, such as an AND or OR. It only removes
+     * rules using this predicate as the top-level trigger.
+     * @param p the predicate to remove
+     * @return true if a rule was successfully removed, false otherwise
+     */
+    public boolean remove(Predicate p) {
+        return ( m_chain != null ? m_chain.remove(p) : false );
     }
     
     /**

@@ -57,4 +57,46 @@ public class PredicateChain {
         }
     }
     
+    /**
+     * Remove rules using the given predicate from this predicate chain.
+     * This method will not remove rules in which this predicate is used
+     * within a composite of clauses, such as an AND or OR. It only removes
+     * rules using this predicate as the top-level trigger.
+     * @param p the predicate to remove from the chain
+     * @return true if a rule was successfully removed, false otherwise
+     */
+    public boolean remove(Predicate p) {
+        if ( p == null ) return false;
+        
+        IfExpression prev = null;
+        Expression expr = m_head;
+        while ( expr instanceof IfExpression ) {
+            IfExpression ifex = (IfExpression)expr;
+            Predicate text = (Predicate)ifex.getTestPredicate();
+            if ( p.equals(text) ) {
+                Expression elseex = ifex.getElseExpression();
+                ifex.setElseExpression(new ObjectLiteral(null));
+                if ( prev != null ) {
+                    prev.setElseExpression(elseex);
+                    if ( ifex == m_tail )
+                        m_tail = prev;
+                } else {
+                    m_head = elseex;
+                    if ( ifex == m_tail )
+                        m_tail = null;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Remove all rules from the predicate chain.
+     */
+    public void clear() {
+        m_head = new ObjectLiteral(null);
+        m_tail = null;
+    }
+    
 } // end of class PredicateChain
