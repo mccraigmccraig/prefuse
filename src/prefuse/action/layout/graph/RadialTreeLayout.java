@@ -32,6 +32,7 @@ import prefuse.visual.NodeItem;
 public class RadialTreeLayout extends TreeLayout {
     
     public static final int DEFAULT_RADIUS = 50;
+    private static final int MARGIN = 30;
 
     protected int m_maxDepth = 0;
     protected double m_radiusInc;
@@ -151,7 +152,7 @@ public class RadialTreeLayout extends TreeLayout {
     protected void setScale(Rectangle2D bounds) {
         double r = Math.min(bounds.getWidth(),bounds.getHeight())/2.0;
         if ( m_maxDepth > 0 )
-            m_radiusInc = (r-30)/m_maxDepth;
+            m_radiusInc = (r-MARGIN)/m_maxDepth;
     }
 
     /**
