@@ -252,7 +252,7 @@ public class GraphView extends JPanel {
     }
     
     public static JFrame demo() {
-        return demo(null, "label");
+        return demo((String)null, "label");
     }
     
     public static JFrame demo(String datafile, String label) {
@@ -268,6 +268,10 @@ public class GraphView extends JPanel {
                 System.exit(1);
             }
         }
+        return demo(g, "label");
+    }
+    
+    public static JFrame demo(Graph g, String label) {
         final GraphView view = new GraphView(g, label);
         
         // set up menu
