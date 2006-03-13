@@ -160,7 +160,8 @@ public class RadialTreeLayout extends TreeLayout {
      * preserve the angular orientation of the display across transitions.
      */
     private void calcAngularBounds(NodeItem r) {
-        if ( m_prevRoot == null || r == m_prevRoot ) {
+        if ( m_prevRoot == null || !m_prevRoot.isValid() || r == m_prevRoot )
+        {
             m_prevRoot = r;
             return;
         }
