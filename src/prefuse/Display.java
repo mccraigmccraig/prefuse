@@ -1763,7 +1763,7 @@ public class Display extends JComponent {
         }
 
         private void fireItemExited(VisualItem item, MouseEvent e) {
-            item.setHover(false);
+            if ( item.isValid() ) item.setHover(false);
             Object[] lstnrs = m_controls.getArray();
             for (int i = 0; i < lstnrs.length; ++i) {
                 Control ctrl = (Control) lstnrs[i];
