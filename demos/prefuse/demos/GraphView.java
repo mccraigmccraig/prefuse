@@ -107,6 +107,10 @@ public class GraphView extends JPanel {
                     ((VisualItem)add[i]).setFixed(false);
                     ((VisualItem)add[i]).setFixed(true);
                 }
+                if ( ts.getTupleCount() == 0 ) {
+                    ts.addTuple(rem[0]);
+                    ((VisualItem)rem[0]).setFixed(false);
+                }
                 m_vis.run("draw");
             }
         });
@@ -119,18 +123,18 @@ public class GraphView extends JPanel {
         int hops = 30;
         final GraphDistanceFilter filter = new GraphDistanceFilter(graph, hops);
 
-        ActionList draw = new ActionList();
-        draw.add(filter);
-        draw.add(new ColorAction(nodes, VisualItem.FILLCOLOR, ColorLib.rgb(200,200,255)));
-        draw.add(new ColorAction(nodes, VisualItem.STROKECOLOR, 0));
-        draw.add(new ColorAction(nodes, VisualItem.TEXTCOLOR, ColorLib.rgb(0,0,0)));
-        draw.add(new ColorAction(edges, VisualItem.FILLCOLOR, ColorLib.gray(200)));
-        draw.add(new ColorAction(edges, VisualItem.STROKECOLOR, ColorLib.gray(200)));
-        
         ColorAction fill = new ColorAction(nodes, 
                 VisualItem.FILLCOLOR, ColorLib.rgb(200,200,255));
         fill.add(VisualItem.FIXED, ColorLib.rgb(255,100,100));
         fill.add(VisualItem.HIGHLIGHT, ColorLib.rgb(255,200,125));
+        
+        ActionList draw = new ActionList();
+        draw.add(filter);
+        draw.add(fill);
+        draw.add(new ColorAction(nodes, VisualItem.STROKECOLOR, 0));
+        draw.add(new ColorAction(nodes, VisualItem.TEXTCOLOR, ColorLib.rgb(0,0,0)));
+        draw.add(new ColorAction(edges, VisualItem.FILLCOLOR, ColorLib.gray(200)));
+        draw.add(new ColorAction(edges, VisualItem.STROKECOLOR, ColorLib.gray(200)));
         
         ActionList animate = new ActionList(Activity.INFINITY);
         animate.add(new ForceDirectedLayout(graph));
