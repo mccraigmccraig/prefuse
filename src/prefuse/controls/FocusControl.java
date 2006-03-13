@@ -151,6 +151,13 @@ public class FocusControl extends ControlAdapter {
                     ts.addTuple(item);
                 }
                 runActivity(vis);
+                
+            } else if ( e.isControlDown() ) {
+                Visualization vis = item.getVisualization();
+                TupleSet ts = vis.getFocusGroup(group);
+                ts.removeTuple(item);
+                curFocus = null;
+                runActivity(vis);
             }
         }
     }
