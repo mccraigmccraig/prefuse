@@ -192,6 +192,22 @@ public class Table extends AbstractTupleSet implements ColumnListener {
     }
     
     /**
+     * Get the minimum row index currently in use by this Table.
+     * @return the minimum row index
+     */
+    public int getMinimumRow() {
+        return m_rows.getMinimumRow();
+    }
+
+    /**
+     * Get the maximum row index currently in use by this Table.
+     * @return the maximum row index
+     */
+    public int getMaximumRow() {
+        return m_rows.getMaximumRow();
+    }
+    
+    /**
      * Indicates if the value of the given table cell can be changed. 
      * @param row the row number
      * @param col the column number
@@ -333,9 +349,6 @@ public class Table extends AbstractTupleSet implements ColumnListener {
     protected void updateRowCount() {
         int maxrow = m_rows.getMaximumRow() + 1;
         
-        // update tuple manager
-        m_tuples.setMaximumRow(maxrow);
-        
         // update columns
         Iterator cols = getColumns();
         while ( cols.hasNext() ) {
@@ -353,7 +366,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
     public boolean removeRow(int row) {
         if ( m_rows.isValidRow(row) ) {
             // the order of operations here is extremely important
-            // otherwise listeners may end up with corrupted state
+            // otherwise listeners may end up with corrupted state.
             // fire update *BEFORE* clearing values
             // allow listeners (e.g., indices) to perform clean-up
             fireTableEvent(row, row, TableModelEvent.ALL_COLUMNS, 

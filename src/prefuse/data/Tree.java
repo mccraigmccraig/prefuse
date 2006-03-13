@@ -108,8 +108,10 @@ public class Tree extends Graph {
         
         for ( IntIterator rows = nodes.rows(); rows.hasNext(); ) {
             int n = rows.nextInt();
-            if ( getParent(n) < 0 )
+            if ( getParent(n) < 0 ) {
                 m_root = n;
+                break;
+            }
         }
     }
     

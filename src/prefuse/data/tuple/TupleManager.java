@@ -25,7 +25,6 @@ public class TupleManager {
     protected Class        m_tupleType;
     
     private   TableTuple[] m_tuples;
-    private   int          m_size;
     
     /**
      * Create a new TupleManager for the given Table.
@@ -47,7 +46,6 @@ public class TupleManager {
         m_table = t;
         m_graph = g;
         m_tupleType = tupleType;
-        m_size = m_table.getRowCount();
         m_tuples = null;
     }
     
@@ -63,24 +61,15 @@ public class TupleManager {
      * Ensure the tuple array exists.
      */
     private void ensureTupleArray() {
+        int nrows = m_table.getRowCount();
         if ( m_tuples == null ) {
-            m_tuples = new TableTuple[m_size];
-        }
-    }
-    
-    /**
-     * Set the maximum row index this TupleManager should support.
-     * @param nrows the maximum row index this TupleManager is
-     * responsible for.
-     */
-    public void setMaximumRow(int nrows) {
-        if ( m_tuples != null && nrows > m_tuples.length ) {
+            m_tuples = new TableTuple[nrows];
+        } else if ( m_tuples.length < nrows ) {
             int capacity = Math.max((3*m_tuples.length)/2 + 1, nrows);
             TableTuple[] tuples = new TableTuple[capacity];
-            System.arraycopy(m_tuples, 0, tuples, 0, m_size);
+            System.arraycopy(m_tuples, 0, tuples, 0, m_tuples.length);
             m_tuples = tuples;
         }
-        m_size = nrows;
     }
     
     /**
@@ -124,7 +113,7 @@ public class TupleManager {
      * @param row the row index to invalidate
      */
     public void invalidate(int row) {
-        if ( row < 0 || row > m_size || m_tuples == null ) {
+        if ( m_tuples == null || row < 0 || row > m_tuples.length ) {
             return;
         } else if ( m_tuples[row] != null ) {
             m_tuples[row].invalidate();

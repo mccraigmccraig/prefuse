@@ -354,7 +354,7 @@ public class Graph extends CompositeTupleSet {
      * @return the created link table
      */
     protected Table createLinkTable() {
-        return LINKS_SCHEMA.instantiate(getNodeCount());
+        return LINKS_SCHEMA.instantiate(getNodeTable().getMaximumRow()+1);
     }
     
     /**
@@ -369,8 +369,9 @@ public class Graph extends CompositeTupleSet {
         int t = getTargetNode(e);
         if ( s < 0 || t < 0 ) return;
         updateDegrees(e, s, t, incr);
-        if ( incr < 0 )
+        if ( incr < 0 ) {
             m_edgeTuples.invalidate(e);
+        }
     }
     
     /**
@@ -448,9 +449,9 @@ public class Graph extends CompositeTupleSet {
      * @param added indicates if a node was added or removed
      */
     protected void updateNodeData(int r, boolean added) {
-        if ( added )
+        if ( added ) {
             m_links.addRow();
-        else {
+        } else {
             m_nodeTuples.invalidate(r);
             m_links.removeRow(r);
         }
@@ -693,9 +694,6 @@ public class Graph extends CompositeTupleSet {
      * @return the Node instance corresponding to the node id
      */
     public Node getNode(int n) {
-        if ( n < 0 ) {
-            System.err.println("catch");
-        }
         return (Node)m_nodeTuples.getTuple(n);
     }
     
@@ -1316,8 +1314,6 @@ public class Graph extends CompositeTupleSet {
             
             if ( type != EventConstants.UPDATE ) {
                 if ( t == getNodeTable() ) {
-                    // update the node tuple manager
-                    m_nodeTuples.setMaximumRow(getNodeCount());
                     // update the linkage structure table
                     if ( col == EventConstants.ALL_COLUMNS ) {
                         boolean added = type==EventConstants.INSERT;
@@ -1325,8 +1321,6 @@ public class Graph extends CompositeTupleSet {
                             updateNodeData(r, added);
                     }
                 } else {
-                    // update the edge tuple manager
-                    m_edgeTuples.setMaximumRow(getEdgeCount());
                     // update the linkage structure table
                     if ( col == EventConstants.ALL_COLUMNS ) {
                         boolean added = type==EventConstants.INSERT;
