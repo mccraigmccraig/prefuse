@@ -2094,7 +2094,7 @@ public class Display extends JComponent {
         m_editor.setVisible(false);
         if ( m_editItem != null ) {
             String txt = m_editor.getText();
-            m_editItem.set(txt, m_editAttribute);
+            m_editItem.set(m_editAttribute, txt);
             m_editItem = null;
             m_editAttribute = null;
             m_editor.setBackground(null);
