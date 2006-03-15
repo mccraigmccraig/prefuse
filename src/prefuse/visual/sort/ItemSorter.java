@@ -3,7 +3,9 @@ package prefuse.visual.sort;
 import java.util.Comparator;
 
 import prefuse.Visualization;
+import prefuse.visual.AggregateItem;
 import prefuse.visual.DecoratorItem;
+import prefuse.visual.EdgeItem;
 import prefuse.visual.VisualItem;
 
 /**
@@ -16,6 +18,11 @@ import prefuse.visual.VisualItem;
  */
 public class ItemSorter implements Comparator {
 
+    private static final int AGGREGATE = 0;
+    private static final int EDGE      = 1;
+    private static final int ITEM      = 2;
+    private static final int DECORATOR = 3;
+    
     /**
      * <p>Return an ordering score for an item. The default scoring imparts
      * the following order:
@@ -33,22 +40,29 @@ public class ItemSorter implements Comparator {
      * @return the ordering score
      */
     public int score(VisualItem item) {
-        int score = 0;
+        int type = ITEM;
+        if ( item instanceof EdgeItem ) {
+            type = EDGE;
+        } else if ( item instanceof AggregateItem ) {
+            type = AGGREGATE;
+        } else if ( item instanceof DecoratorItem ) {
+            type = DECORATOR;
+        }
+        
+        int score = (1<<(26+type));
         if ( item.isHover() ) {
-            score += (1<<29);
+            score += (1<<25);
         }
         if ( item.isHighlighted() ) {
-            score += (1<<28);
+            score += (1<<24);
         }
         if ( item.isInGroup(Visualization.FOCUS_ITEMS) ) {
-            score += (1<<27);
+            score += (1<<23);
         }
         if ( item.isInGroup(Visualization.SEARCH_ITEMS) ) {
-            score += (1<<26);
+            score += (1<<22);
         }
-        if ( item instanceof DecoratorItem ) {
-            score += (1<<27);
-        }
+
         return score;
     }
     
