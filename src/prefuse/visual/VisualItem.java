@@ -448,7 +448,7 @@ public interface VisualItem extends Tuple {
     public int getFillColor();
     
     /**
-     * Set the current fill color of this item. The stroke color is used to
+     * Set the current fill color of this item. The fill color is used to
      * fill the interior of shapes. Color values as represented as an
      * integer containing the red, green, blue, and alpha (transparency)
      * color channels. A color with a zero alpha component is fully
@@ -472,7 +472,7 @@ public interface VisualItem extends Tuple {
     public int getStartFillColor();
 
     /**
-     * Set the starting fill color of this item. The stroke color is used to
+     * Set the starting fill color of this item. The fill color is used to
      * fill the interior of shapes. Color values as represented as an
      * integer containing the red, green, blue, and alpha (transparency)
      * color channels. A color with a zero alpha component is fully
@@ -496,7 +496,7 @@ public interface VisualItem extends Tuple {
     public int getEndFillColor();
     
     /**
-     * Set the ending fill color of this item. The stroke color is used to
+     * Set the ending fill color of this item. The fill color is used to
      * fill the interior of shapes. Color values as represented as an
      * integer containing the red, green, blue, and alpha (transparency)
      * color channels. A color with a zero alpha component is fully
