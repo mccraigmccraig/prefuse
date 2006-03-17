@@ -73,13 +73,37 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
     /**
      * Creates a new SquarifiedTreeMapLayout with the specified spacing between
      * parent areas and their enclosed children.
-     * @param frame the amount of desired framing space, in pixels, between
+     * @param frame the amount of desired framing space between
      * parent areas and their enclosed children.
      * @param group the data group to layout. Must resolve to a Graph instance.
      */
     public SquarifiedTreeMapLayout(String group, double frame) {
         super(group);
+        setFrameWidth(frame);
+    }
+    
+    /**
+     * Sets the amount of desired framing space between parent rectangles and
+     * their enclosed children. Use a value of 0 to remove frames altogether.
+     * If you adjust the frame value, you must re-run the layout to see the
+     * change reflected. Negative frame values are not allowed and will result
+     * in an IllegalArgumentException.
+     * @param frame the frame width, 0 for no frames
+     */
+    public void setFrameWidth(double frame) {
+        if ( frame < 0 )
+            throw new IllegalArgumentException(
+                    "Frame value must be greater than or equal to 0.");
         m_frame = frame;
+    }
+
+    /**
+     * Gets the amount of desired framing space, in pixels, between
+     * parent rectangles and their enclosed children.
+     * @return the frame width
+     */
+    public double getFrameWidth() {
+        return m_frame;
     }
     
     /**
