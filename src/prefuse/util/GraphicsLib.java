@@ -193,7 +193,7 @@ public class GraphicsLib {
         }
         
         int i0 = 0;
-        // find the starting ref point
+        // find the starting ref point: leftmost point with the minimum y coord
         for ( int i=2; i < len; i += 2 ) {
             if ( pts[i+1] < pts[i0+1] ) {
                 i0 = i;
@@ -206,28 +206,36 @@ public class GraphicsLib {
         for ( int i=0, j=0; i < len; i+=2 ) {
             if ( i == i0 ) continue;
             angles[j] = (float)Math.atan2(pts[i+1]-pts[i0+1], pts[i]-pts[i0]);
-            idx[j] = i;
-            j += 1;
+            idx[j++]  = i;
         }
         ArrayLib.sort(angles,idx,plen);
         
         // toss out duplicated angles
         float angle = angles[0];
-        int ti = 0;
+        int ti = 0, tj = idx[0];
         for ( int i=1; i<plen; i++ ) {
+            int j = idx[i];
             if ( angle == angles[i] ) {
-                double d1 = Math.sqrt(pts[i]*pts[i]   + pts[i+1]*pts[i+1]);
-                double d2 = Math.sqrt(pts[ti]*pts[ti] + pts[ti+1]*pts[ti+1]);
+                // keep whichever angle corresponds to the most distant
+                // point from the reference point
+                double x1 = pts[tj]   - pts[i0];
+                double y1 = pts[tj+1] - pts[i0+1];
+                double x2 = pts[j]    - pts[i0];
+                double y2 = pts[j+1]  - pts[i0+1];
+                double d1 = x1*x1 + y1*y1;
+                double d2 = x2*x2 + y2*y2;
                 if ( d1 >= d2 ) {
                     idx[i] = -1;
                 } else {
                     idx[ti] = -1;
                     angle = angles[i];
                     ti = i;
+                    tj = j;
                 }
             } else {
                 angle = angles[i];
                 ti = i;
+                tj = j;
             }
         }
         
