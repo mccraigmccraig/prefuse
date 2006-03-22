@@ -86,6 +86,26 @@ public class FisheyeTreeFilter extends GroupAction {
     }
     
     /**
+     * Get the graph distance threshold used by this filter. This
+     * is the threshold for high-interest nodes, past which nodes will
+     * not be visible nor expanded.
+     * @return the graph distance threshold
+     */
+    public int getDistance() {
+        return -m_threshold;
+    }
+
+    /**
+     * Set the graph distance threshold used by this filter. This
+     * is the threshold for high-interest nodes, past which nodes will
+     * not be visible nor expanded.
+     * @param distance the graph distance threshold to use
+     */
+    public void setDistance(int distance) {
+        m_threshold = -distance;
+    }
+    
+    /**
      * @see prefuse.action.GroupAction#run(double)
      */
     public void run(double frac) {
