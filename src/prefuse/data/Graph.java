@@ -844,7 +844,7 @@ public class Graph extends CompositeTupleSet {
     
     /**
      * Returns an edge from the source node to the target node. This
-     * method returns the first such node found; in the case of multiple
+     * method returns the first such edge found; in the case of multiple
      * edges there may be more.
      */
     public int getEdge(int source, int target) {
