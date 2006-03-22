@@ -86,7 +86,7 @@ public class AxisRenderer extends AbstractShapeRenderer {
         // get text y-coord
         switch ( m_yalign ) {
         case Constants.CENTER:
-            ty = y1 + (y2-y1)/2 - h;
+            ty = y1 + (y2-y1)/2 - h/2;
             break;
         case Constants.TOP:
             ty = y1-h;
