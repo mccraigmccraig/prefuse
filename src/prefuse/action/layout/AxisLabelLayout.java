@@ -63,10 +63,20 @@ public class AxisLabelLayout extends Layout {
     {
         super(group);
         if ( bounds != null )
-            super.setLayoutBounds(bounds);
+            setLayoutBounds(bounds);
         m_model = values;
         m_axis = axis;
         m_spacing = 25;
+    }
+    
+    /**
+     * Create a new AxisLabelLayout layout.
+     * @param group the data group of the axis lines and labels
+     * @param layout an {@link AxisLayout} instance to model this layout after.
+     * The axis type and range model of the provided instance will be used.
+     */
+    public AxisLabelLayout(String group, AxisLayout layout) {
+        this(group, layout, null, 25);
     }
     
     /**
@@ -92,7 +102,8 @@ public class AxisLabelLayout extends Layout {
             double spacing)
     {
         super(group);
-        super.setLayoutBounds(bounds);
+        if ( bounds != null )
+            setLayoutBounds(bounds);
         m_layout = layout;
         m_model = layout.getRangeModel();
         m_axis = layout.getAxis();
