@@ -106,6 +106,26 @@ public class FisheyeTreeFilter extends GroupAction {
     }
     
     /**
+     * Get the name of the group to use as source nodes for measuring
+     * graph distance. These form the roots from which the graph distance
+     * is measured.
+     * @return the source data group
+     */
+    public String getSources() {
+        return m_sources;
+    }
+    
+    /**
+     * Set the name of the group to use as source nodes for measuring
+     * graph distance. These form the roots from which the graph distance
+     * is measured.
+     * @param sources the source data group
+     */
+    public void setSources(String sources) {
+        m_sources = sources;
+    }
+    
+    /**
      * @see prefuse.action.GroupAction#run(double)
      */
     public void run(double frac) {
