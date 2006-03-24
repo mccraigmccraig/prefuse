@@ -26,7 +26,7 @@ public abstract class UpdateListener
      * @param source a source object, either the Expression, TupleSet,
      * or Component that triggered this update event.
      */
-    protected abstract void update(Object source);
+    public abstract void update(Object source);
     
     /**
      * @see prefuse.data.event.ExpressionListener#expressionChanged(prefuse.data.expression.Expression)

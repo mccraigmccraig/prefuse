@@ -215,7 +215,7 @@ public class Display extends JComponent {
         
         // invalidate the display when the filter changes
         m_predicate.addExpressionListener(new UpdateListener() {
-            protected void update(Object src) { damageReport(); }
+            public void update(Object src) { damageReport(); }
         });
         
         setVisualization(visualization);
