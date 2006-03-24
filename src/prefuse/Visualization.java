@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import prefuse.action.Action;
@@ -192,7 +193,7 @@ public class Visualization {
     public Visualization() {
         m_actions = new ActivityMap();
         m_renderers = new DefaultRendererFactory();
-        m_visual = new HashMap();
+        m_visual = new LinkedHashMap();
         m_source = new HashMap();
         m_focus = new HashMap();
         m_displays = new ArrayList();
