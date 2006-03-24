@@ -66,7 +66,7 @@ public class AxisLabelLayout extends Layout {
             setLayoutBounds(bounds);
         m_model = values;
         m_axis = axis;
-        m_spacing = 25;
+        m_spacing = 50;
     }
     
     /**
@@ -76,7 +76,7 @@ public class AxisLabelLayout extends Layout {
      * The axis type and range model of the provided instance will be used.
      */
     public AxisLabelLayout(String group, AxisLayout layout) {
-        this(group, layout, null, 25);
+        this(group, layout, null, 50);
     }
     
     /**
@@ -87,7 +87,7 @@ public class AxisLabelLayout extends Layout {
      * @param bounds the layout bounds within which to place the axis marks
      */
     public AxisLabelLayout(String group, AxisLayout layout, Rectangle2D bounds) {
-        this(group, layout, bounds, 25);
+        this(group, layout, bounds, 50);
     }
 
     /**
@@ -246,6 +246,7 @@ public class AxisLabelLayout extends Layout {
         double span = m_hi-m_lo;
         double pspan = m_prevhi-m_prevlo;
         double vlo = Math.pow(10, Math.floor(MathLib.safeLog10(m_lo)));
+        if ( vlo == 1 || vlo == 0.1 ) vlo = 0;
         
         // mark previously visible labels
         Iterator iter = labels.tuples();
@@ -413,17 +414,19 @@ public class AxisLabelLayout extends Layout {
         double log10 = Math.log(span)/Math.log(10);
         double step = Math.pow(10, Math.floor(log10));
         
-        double delta = step * scale;
-        if (delta > 1000) {
+        double delta = step * scale / m_spacing;
+        if (delta > 20) {
             step /= 20;
-        } else if (delta > 500) {
+        } else if (delta > 10) {
             step /= 10;
-        } else if (delta > 250) {
+        } else if (delta > 5) {
             step /= 5;
-        } else if (delta > 200) {
+        } else if (delta > 4) {
             step /= 4;
-        } else if (delta > 100) {
+        } else if (delta > 2) {
             step /= 2;
+        } else if (delta < 1) {
+            step *= 2;
         }
         return step;
     }
