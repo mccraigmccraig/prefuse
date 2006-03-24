@@ -73,6 +73,12 @@ public class AxisRenderer extends AbstractShapeRenderer {
         
         // get text x-coord
         switch ( m_xalign ) {
+        case Constants.FAR_RIGHT:
+            tx = x2 + 2;
+            break;
+        case Constants.FAR_LEFT:
+            tx = x1 - w - 2;
+            break;
         case Constants.CENTER:
             tx = x1 + (x2-x1)/2 - w/2;
             break;
@@ -85,15 +91,21 @@ public class AxisRenderer extends AbstractShapeRenderer {
         }
         // get text y-coord
         switch ( m_yalign ) {
+        case Constants.FAR_TOP:
+            ty = y1-h;
+            break;
+        case Constants.FAR_BOTTOM:
+            ty = y2;
+            break;
         case Constants.CENTER:
             ty = y1 + (y2-y1)/2 - h/2;
             break;
         case Constants.TOP:
-            ty = y1-h;
+            ty = y1;
             break;
         case Constants.BOTTOM:
         default:
-            ty = y2; 
+            ty = y2-h; 
         }
         m_box.setFrame(tx,ty,w,h);
         return m_box;
@@ -111,8 +123,10 @@ public class AxisRenderer extends AbstractShapeRenderer {
             float x = (float)m_box.getMinX();
             float y = (float)m_box.getMinY() + m_ascent;
             
-            String str = item.getString(VisualItem.LABEL);
+            // draw label background
+            GraphicsLib.paint(g, item, s, null, RENDER_TYPE_FILL);
             
+            String str = item.getString(VisualItem.LABEL);
             g.setFont(item.getFont());
             g.setColor(ColorLib.getColor(item.getTextColor()));
             g.drawString(str, x, y);
