@@ -31,6 +31,15 @@ public interface Constants {
     /** A top alignment */
     public static final int TOP    = 4;
     
+    /** A left alignment, outside of bounds */
+    public static final int FAR_LEFT = 5;
+    /** A right alignment, outside of bounds */
+    public static final int FAR_RIGHT = 6;
+    /** A bottom alignment, outside of bounds */
+    public static final int FAR_BOTTOM = 7;
+    /** A top alignment, outside of bounds */
+    public static final int FAR_TOP = 8;
+    
     /** A straight-line edge type */
     public static final int EDGE_TYPE_LINE  = 0;
     /** A curved-line edge type */
