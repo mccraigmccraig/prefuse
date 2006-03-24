@@ -51,7 +51,7 @@ public class MathLib {
     public static double safeLog10(double x) {
         boolean neg = (x < 0.0);
         if ( neg ) { x = -x; }
-        //if ( x < 10.0 ) { x += (10.0-x) / 10; }
+        if ( x < 10.0 ) { x += (10.0-x) / 10; }
         x = Math.log(x) / LOG10;
         
         return neg ? -x : x;
