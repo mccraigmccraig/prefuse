@@ -134,7 +134,7 @@ public class Congress extends JPanel {
         vis.setRendererFactory(new RendererFactory() {
             AbstractShapeRenderer sr = new ShapeRenderer();
             Renderer arY = new AxisRenderer(Constants.RIGHT, Constants.TOP);
-            Renderer arX = new AxisRenderer(Constants.CENTER, Constants.BOTTOM);
+            Renderer arX = new AxisRenderer(Constants.CENTER, Constants.FAR_BOTTOM);
             
             public Renderer getRenderer(VisualItem item) {
                 return item.isInGroup("ylab") ? arY :
