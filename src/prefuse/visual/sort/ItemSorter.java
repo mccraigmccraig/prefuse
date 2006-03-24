@@ -18,10 +18,10 @@ import prefuse.visual.VisualItem;
  */
 public class ItemSorter implements Comparator {
 
-    private static final int AGGREGATE = 0;
-    private static final int EDGE      = 1;
-    private static final int ITEM      = 2;
-    private static final int DECORATOR = 3;
+    protected static final int AGGREGATE = 0;
+    protected static final int EDGE      = 1;
+    protected static final int ITEM      = 2;
+    protected static final int DECORATOR = 3;
     
     /**
      * <p>Return an ordering score for an item. The default scoring imparts
