@@ -97,7 +97,7 @@ public class ZoomToFitControl extends ControlAdapter {
             Display display = (Display)e.getComponent();
             Visualization vis = display.getVisualization();
             Rectangle2D bounds = vis.getBounds(m_group);
-            GraphicsLib.expand(bounds, m_margin/display.getScale());
+            GraphicsLib.expand(bounds, m_margin + (int)(1/display.getScale()));
             DisplayLib.fitViewToBounds(display, bounds, m_duration);
         }
     }
@@ -119,6 +119,22 @@ public class ZoomToFitControl extends ControlAdapter {
      */
     public void setZoomOverItem(boolean zoomOverItem) {
         this.m_zoomOverItem = zoomOverItem;
+    }
+    
+    /**
+     * Get the display margin to include within the "zoomed-to-fit" bounds.
+     * @return Display margin currently in use
+     */
+    public int getMargin() {
+        return m_margin;
+    }
+    
+    /**
+     * Set the display margin to include within the "zoomed-to-fit" bounds.
+     * @param margin Display margin to use
+     */
+    public void setMargin(int margin) {
+        this.m_margin = margin;
     }
     
 } // end of class ZoomToFitControl
