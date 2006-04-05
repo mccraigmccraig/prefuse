@@ -16,8 +16,13 @@ import prefuse.util.ui.ValuedRangeModel;
 import prefuse.visual.VisualItem;
 
 /**
- * LAyout Action that assigns positions along a single dimension
- * (either x or y) according to a specified data field.
+ * Layout Action that assigns positions along a single dimension (either x or
+ * y) according to a specified data field. By default, the range of values
+ * along the axis is automatically determined by the minimum and maximum
+ * values of the data field. The range bounds can be manually set using the
+ * {@link #setRangeModel(ValuedRangeModel)} method. Also, the set of items
+ * processed by this layout can be filtered by providing a filtering
+ * predicate (@link #setFilter(Predicate)).
  * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
@@ -80,6 +85,28 @@ public class AxisLayout extends Layout {
     // ------------------------------------------------------------------------
     
     /**
+     * Set the data field used by this axis layout action. The values of the
+     * data field will determine the position of items along the axis. Note
+     * that this method does not affect the other parameters of this action. In
+     * particular, clients that have provided a custom range model for
+     * setting the axis range may need to appropriately update the model
+     * setting for use with the new data field setting.
+     * @param field the name of the data field that determines the layout
+     */
+    public void setField(String field) {
+        m_field = field;
+    }
+    
+    /**
+     * Get the data field used by this axis layout action. The values of the
+     * data field determine the position of items along the axis.
+     * @return the name of the data field that determines the layout
+     */
+    public String getField() {
+        return m_field;
+    }
+    
+    /**
      * Set the range model determing the span of the axis. This model controls
      * the minimum and maximum values of the layout, as provided by the
      * {@link prefuse.util.ui.ValuedRangeModel#getLowValue()} and
@@ -106,10 +133,22 @@ public class AxisLayout extends Layout {
      * Set a predicate filter to limit which items are considered for layout.
      * Only items for which the predicate returns a true value are included
      * in the layout computation. 
-     * @param filter the predicate filter to use
+     * @param filter the predicate filter to use. If null, no filtering
+     * will be performed.
      */
     public void setFilter(Predicate filter) {
         m_filter = filter;
+    }
+    
+    /**
+     * Get the predicate filter to limit which items are considered for layout.
+     * Only items for which the predicate returns a true value are included
+     * in the layout computation. 
+     * @return the predicate filter used by this layout. If null, no filtering
+     * is performed.
+     */
+    public Predicate getFilter() {
+        return m_filter;
     }
     
     // ------------------------------------------------------------------------
