@@ -175,6 +175,14 @@ public class AxisLabelLayout extends Layout {
         m_scale = scale;
     }
     
+    /**
+     * Sets the range model used to layout this axis.
+     * @param model the range model
+     */
+    public void setRangeModel(ValuedRangeModel model) {
+        m_model = model;
+    }
+    
     // ------------------------------------------------------------------------
     
     /**
@@ -245,8 +253,13 @@ public class AxisLabelLayout extends Layout {
         
         double span = m_hi-m_lo;
         double pspan = m_prevhi-m_prevlo;
-        double vlo = Math.pow(10, Math.floor(MathLib.safeLog10(m_lo)));
-        if ( vlo == 1 || vlo == 0.1 ) vlo = 0;
+        double vlo = 0;
+        if ( m_lo >= 0 ) {
+            vlo = Math.pow(10, Math.floor(MathLib.log10(m_lo)));
+        } else {
+            vlo = -Math.pow(10, 1+Math.floor(MathLib.log10(-m_lo)));
+        }
+        //if ( vlo == 10 || vlo == 1 || vlo == 0.1 ) vlo = 0;
         
         // mark previously visible labels
         Iterator iter = labels.tuples();
