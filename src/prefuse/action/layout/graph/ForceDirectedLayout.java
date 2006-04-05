@@ -159,8 +159,8 @@ public class ForceDirectedLayout extends Layout {
      * runs of this layout. When computation times are longer than desired,
      * and node positions are changing dramatically between animated frames,
      * the max step time can be lowered to suppress node movement.
-     * @return the maximum timestep allowed for integrating between two
-     * layout steps to use
+     * @param maxstep the maximum timestep allowed for integrating between two
+     * layout steps
      */
     public void setMaxTimeStep(long maxstep) {
         this.m_maxstep = maxstep;
@@ -334,13 +334,13 @@ public class ForceDirectedLayout extends Layout {
      * Loads the simulator with all relevant force items and springs.
      * @param fsim the force simulator driving this layout
      */
-    protected void initSimulator(ForceSimulator fsim) {
+    protected void initSimulator(ForceSimulator fsim) {     
         // make sure we have force items to work with
         TupleSet ts = m_vis.getGroup(m_nodeGroup);
         if ( ts == null ) return;
         try {
             ts.addColumns(FORCEITEM_SCHEMA);
-        } catch ( IllegalArgumentException iae ) {}
+        } catch ( IllegalArgumentException iae ) { /* ignored */ }
         
         float startX = (referrer == null ? 0f : (float)referrer.getX());
         float startY = (referrer == null ? 0f : (float)referrer.getY());
@@ -421,7 +421,7 @@ public class ForceDirectedLayout extends Layout {
     /**
      * Set the referrer item to use to set x or y coordinates that are
      * initialized to NaN.
-     * @return the referrer item to use.
+     * @param referrer the referrer item to use.
      * @see prefuse.util.PrefuseLib#setX(VisualItem, VisualItem, double)
      * @see prefuse.util.PrefuseLib#setY(VisualItem, VisualItem, double)
      */
