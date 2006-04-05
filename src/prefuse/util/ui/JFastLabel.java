@@ -3,7 +3,9 @@ package prefuse.util.ui;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.RenderingHints;
 
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
@@ -21,6 +23,7 @@ public class JFastLabel extends JComponent {
     private int m_valign = SwingConstants.TOP;
     private int m_halign = SwingConstants.LEFT;
     private int m_fheight = -1;
+    private boolean m_quality = false;
     
     /**
      * Create a new JFastLabel with no text.
@@ -83,6 +86,24 @@ public class JFastLabel extends JComponent {
     }
     
     /**
+     * Get the quality level of this label. High quality results in
+     * anti-aliased rendering.
+     * @return true for high quality, false otherwise
+     */
+    public boolean getHighQuality() {
+        return m_quality;
+    }
+    
+    /**
+     * Set the quality level of this label. High quality results in
+     * anti-aliased rendering.
+     * @param b true for high quality, false otherwise
+     */
+    public void setHighQuality(boolean b) {
+        m_quality = b;
+    }
+    
+    /**
      * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
      */
     public void paintComponent(Graphics g) {
@@ -121,6 +142,11 @@ public class JFastLabel extends JComponent {
             break;
         } default:
             w = ins.left;
+        }
+        if ( m_quality ) {
+            ((Graphics2D)g).setRenderingHint(
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         }
         g.drawString(m_text, w, h); 
     }
