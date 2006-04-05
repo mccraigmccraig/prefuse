@@ -898,7 +898,7 @@ class SubstringFunction extends StringFunction {
         int pos = param(1).getInt(t);
         if ( paramCount() == 3 ) {
             int len = param(2).getInt(t);
-            return src.substring(pos, len);
+            return src.substring(pos, pos+len);
         } else {
             return src.substring(pos);
         }
