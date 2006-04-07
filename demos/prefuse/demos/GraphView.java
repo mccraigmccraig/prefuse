@@ -272,7 +272,7 @@ public class GraphView extends JPanel {
                 System.exit(1);
             }
         }
-        return demo(g, "label");
+        return demo(g, label);
     }
     
     public static JFrame demo(Graph g, String label) {
