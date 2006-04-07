@@ -2,10 +2,13 @@ package prefuse.controls;
 
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
+import java.util.logging.Logger;
 
 import prefuse.Display;
 import prefuse.Visualization;
+import prefuse.data.expression.Predicate;
 import prefuse.data.tuple.TupleSet;
+import prefuse.util.StringLib;
 import prefuse.util.ui.UILib;
 import prefuse.visual.VisualItem;
 
@@ -33,6 +36,7 @@ public class FocusControl extends ControlAdapter {
     protected VisualItem curFocus;
     protected int ccount;
     protected int button = Control.LEFT_MOUSE_BUTTON;
+    protected Predicate filter = null;
     
     /**
      * Creates a new FocusControl that changes the focus to another item
@@ -100,10 +104,55 @@ public class FocusControl extends ControlAdapter {
         this.group = focusGroup;
     }
     
+    // ------------------------------------------------------------------------
+    
+    /**
+     * Set a filter for processing items by this focus control. Only items for
+     * which the predicate returns true (or doesn't throw an exception) will
+     * be considered by this control. A null value indicates that no filtering
+     * should be applied. That is, all items will be considered.
+     * @param p the filtering predicate to apply
+     */
+    public void setFilter(Predicate p) {
+        this.filter = p;
+    }
+    
+    /**
+     * Get the filter for processing items by this focus control. Only items
+     * for which the predicate returns true (or doesn't throw an exception)
+     * are considered by this control. A null value indicates that no
+     * filtering is applied.
+     * @return the filtering predicate
+     */
+    public Predicate getFilter() {
+        return filter;
+    }
+    
+    /**
+     * Perform a filtering check on the input item.
+     * @param item the item to check against the filter
+     * @return true if the item should be considered, false otherwise
+     */
+    protected boolean filterCheck(VisualItem item) {
+        if ( filter == null )
+            return true;
+        
+        try {
+            return filter.getBoolean(item);
+        } catch ( Exception e ) {
+            Logger.getLogger(getClass().getName()).warning(
+                e.getMessage() + "\n" + StringLib.getStackTrace(e));
+            return false;
+        }
+    }
+    
+    // ------------------------------------------------------------------------
+    
     /**
      * @see prefuse.controls.Control#itemEntered(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
      */
     public void itemEntered(VisualItem item, MouseEvent e) {
+        if ( !filterCheck(item) ) return;
         Display d = (Display)e.getSource();
         d.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         if ( ccount == 0 ) {
@@ -119,6 +168,7 @@ public class FocusControl extends ControlAdapter {
      * @see prefuse.controls.Control#itemExited(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
      */
     public void itemExited(VisualItem item, MouseEvent e) {
+        if ( !filterCheck(item) ) return;
         Display d = (Display)e.getSource();
         d.setCursor(Cursor.getDefaultCursor());
         if ( ccount == 0 ) {
@@ -134,6 +184,7 @@ public class FocusControl extends ControlAdapter {
      * @see prefuse.controls.Control#itemClicked(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
      */
     public void itemClicked(VisualItem item, MouseEvent e) {
+        if ( !filterCheck(item) ) return;
         if ( UILib.isButtonPressed(e, button) &&
              e.getClickCount() == ccount )
         {
