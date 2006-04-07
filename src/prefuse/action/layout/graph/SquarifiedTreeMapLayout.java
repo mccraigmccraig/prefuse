@@ -163,7 +163,7 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
         // scale sizes by display area factor
         Rectangle2D b = getLayoutBounds();
         double area = (b.getWidth()-1)*(b.getHeight()-1);
-        double scale = area/leafCount;
+        double scale = area/root.getDouble(AREA);
         iter = new TreeNodeIterator(root);
         while ( iter.hasNext() ) {
             NodeItem n = (NodeItem)iter.next();
@@ -234,7 +234,15 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
         int len;
         
         while ( (len=c.size()) > 0 ) {
-            row.add(c.get(len-1));
+            // add item to the row list, ignore if negative area
+            VisualItem item = (VisualItem) c.get(len-1);
+            double a = item.getDouble(AREA);
+            if (a <= 0.0) {
+                c.remove(len-1);
+                continue;
+            }
+            row.add(item);
+            
             nworst = worst(row, w);
             if ( nworst <= worst ) {
                 c.remove(len-1);
