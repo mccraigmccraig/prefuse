@@ -65,4 +65,10 @@ public class ByteArrayList {
     public InputStream getAsInputStream() {
         return new ByteArrayInputStream(m_bytes,0,m_size);
     }
+    
+    public byte[] toArray() {
+        byte[] b = new byte[m_size];
+        System.arraycopy(m_bytes,0,b,0,m_size);
+        return b;
+    }
 }
