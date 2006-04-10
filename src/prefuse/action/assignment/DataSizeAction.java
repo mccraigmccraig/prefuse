@@ -34,22 +34,35 @@ import prefuse.visual.VisualItem;
  * quantiles that the data should be divided into. 
  * </p>
  * 
+ * <p>
+ * By default, the maximum size value is determined automatically from the
+ * data, faithfully representing the scale differences between data values.
+ * However, this can sometimes result in very large differences. For
+ * example, if the minimum data value is 1.0 and the largest is 200.0, the
+ * largest items will be 200 times larger than the smallest. While
+ * accurate, this may not result in the most readable display. To correct
+ * these cases, use the {@link #setMaximumSize(double)} method to manually
+ * set the range of allowed sizes.  By default, the minimum size value is
+ * 1.0. This too can be changed using the {@link #setMinimumSize(double)}
+ * method.
+ * </p>
+ * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class DataSizeAction extends SizeAction {
     
-    // TODO: get data on just noticeable differences, use to select size
-    // values more intelligently?
+    protected static final double NO_SIZE = Double.NaN;
     
     protected String m_dataField;
     
-    protected double m_baseSize = 1;
+    protected double m_minSize = 1;
     protected double m_sizeRange;
     
     protected int m_scale = Constants.LINEAR_SCALE;
     protected int m_bins = Constants.CONTINUOUS;
     
     protected boolean m_inferBounds = true;
+    protected boolean m_inferRange = true;
     protected boolean m_is2DArea = true;
     protected double[] m_dist;
     
@@ -61,7 +74,7 @@ public class DataSizeAction extends SizeAction {
      * @param field the data field to base size assignments on
      */
     public DataSizeAction(String group, String field) {
-        super(group);
+        super(group, NO_SIZE);
         m_dataField = field;
     }
 
@@ -88,7 +101,7 @@ public class DataSizeAction extends SizeAction {
      * used, the number of bins must be greater than zero. 
      */
     public DataSizeAction(String group, String field, int bins, int scale) {
-        super(group);
+        super(group, NO_SIZE);
         m_dataField = field;
         setScale(scale);
         setBinCount(bins);
@@ -198,8 +211,8 @@ public class DataSizeAction extends SizeAction {
      * Gets the size assigned to the lowest-valued data items, typically 1.0.
      * @return the size for the lowest-valued data items
      */
-    public double getBaseSize() {
-        return m_baseSize;
+    public double getMinimumSize() {
+        return m_minSize;
     }
 
     /**
@@ -207,9 +220,76 @@ public class DataSizeAction extends SizeAction {
      * this value is 1.0.
      * @param size the new size for the lowest-valued data items
      */
-    public void setBaseSize(double size) {
-        m_baseSize = size;
+    public void setMinimumSize(double size) {
+        if ( Double.isInfinite(size) || 
+             Double.isNaN(size)      ||
+             size <= 0 )
+        {
+           throw new IllegalArgumentException("Minimum size value must be a "
+                   + "finite number greater than zero.");
+        }
+        
+        if ( m_inferRange ) {
+            m_sizeRange += m_minSize - size;
+        }
+        m_minSize = size;
     }    
+    
+    /**
+     * Gets the maximum size value that will be assigned by this action. By
+     * default, the maximum size value is determined automatically from the
+     * data, faithfully representing the scale differences between data values.
+     * However, this can sometimes result in very large differences. For
+     * example, if the minimum data value is 1.0 and the largest is 200.0, the
+     * largest items will be 200 times larger than the smallest. While
+     * accurate, this may not result in the most readable display. To correct
+     * these cases, use the {@link #setMaximumSize(double)} method to manually
+     * set the range of allowed sizes.  
+     * @return the current maximum size. For the returned value to accurately
+     * reflect the size range used by this action, either the action must
+     * have already been run (allowing the value to be automatically computed)
+     * or the maximum size must have been explicitly set.
+     */
+    public double getMaximumSize() {
+        return m_minSize + m_sizeRange;
+    }
+    
+    /**
+     * Set the maximum size value that will be assigned by this action. By
+     * default, the maximum size value is determined automatically from the
+     * data, faithfully representing the scale differences between data values.
+     * However, this can sometimes result in very large differences. For
+     * example, if the minimum data value is 1.0 and the largest is 200.0, the
+     * largest items will be 200 times larger than the smallest. While
+     * accurate, this may not result in the most readable display. To correct
+     * these cases, use the {@link #setMaximumSize(double)} method to manually
+     * set the range of allowed sizes. 
+     * @param maxSize the maximum size to use. If this value is less than or
+     * equal to zero, infinite, or not a number (NaN) then the input value
+     * will be ignored and instead automatic inference of the size range
+     * will be performed. 
+     */
+    public void setMaximumSize(double maxSize) {
+        if ( Double.isInfinite(maxSize) || 
+             Double.isNaN(maxSize)      ||
+             maxSize <= 0 )
+        {
+            m_inferRange = true;
+        } else {
+            m_inferRange = false;
+            m_sizeRange = maxSize-m_minSize;
+        }
+    }
+    
+    /**
+     * This operation is not supported by the DataSizeAction type.
+     * Calling this method will result in a thrown exception.
+     * @see prefuse.action.assignment.SizeAction#setDefaultSize(double)
+     * @throws UnsupportedOperationException
+     */
+    public void setDefaultSize(double defaultSize) {
+        throw new UnsupportedOperationException();
+    }
     
     // ------------------------------------------------------------------------
     
@@ -240,7 +320,9 @@ public class DataSizeAction extends SizeAction {
                 m_dist[0]= DataLib.min(ts, m_dataField).getDouble(m_dataField);
                 m_dist[1]= DataLib.max(ts, m_dataField).getDouble(m_dataField);
             }
-            m_sizeRange = m_dist[m_dist.length-1]/m_dist[0] - m_baseSize;
+            if ( m_inferRange ) {
+                m_sizeRange = m_dist[m_dist.length-1]/m_dist[0] - m_minSize;
+            }
         }
     }
     
@@ -256,15 +338,22 @@ public class DataSizeAction extends SizeAction {
      * @see prefuse.action.assignment.SizeAction#getSize(prefuse.visual.VisualItem)
      */
     public double getSize(VisualItem item) {
+        // check for any cascaded rules first
+        double size = super.getSize(item);
+        if ( !Double.isNaN(size) ) {
+            return size;
+        }
+        
+        // otherwise perform data-driven assignment
         double v = item.getDouble(m_dataField);
         double f = MathLib.interp(m_scale, v, m_dist);
         if ( m_bins < 1 ) {
             // continuous scale
-            v = m_baseSize + f * m_sizeRange;
+            v = m_minSize + f * m_sizeRange;
         } else {
             // binned sizes
-            int bin = (int)((f-0.0001)*m_bins);
-            v = m_baseSize + bin*(m_sizeRange/(m_bins-1));
+            int bin = f < 1.0 ? (int)(f*m_bins) : m_bins-1;
+            v = m_minSize + bin*(m_sizeRange/(m_bins-1));
         }
         // return the size value. if this action is configured to return
         // 2-dimensional sizes (ie area rather than length) then the
