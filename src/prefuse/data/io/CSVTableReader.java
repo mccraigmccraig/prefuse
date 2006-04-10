@@ -77,7 +77,7 @@ public class CSVTableReader extends AbstractTextTableReader {
                     else if ( c[i] == ',' )
                     {
                         String s = sbuf.toString().trim();
-                        trl.readValue(lineno, col++, s);
+                        trl.readValue(lineno, ++col, s);
                         sbuf.delete(0, sbuf.length());
                     }
                     else
