@@ -69,7 +69,7 @@ public class ShapeAction extends EncoderAction {
      */
     public ShapeAction(String group, int shape) {
         super(group);
-        setDefaultShape(shape);
+        m_defaultShape = shape;
     }
     
     /**

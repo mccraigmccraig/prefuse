@@ -74,7 +74,7 @@ public class ColorAction extends EncoderAction {
      */
     public ColorAction(String group, String field, int color) {
         this(group, field);
-        setDefaultColor(color);
+        m_defaultColor = color;
     }
     
     /**

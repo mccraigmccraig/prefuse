@@ -57,7 +57,7 @@ public class SizeAction extends EncoderAction {
      */
     public SizeAction(String group, double size) {
         super(group);
-        setDefaultSize(size);
+        m_defaultSize = size;
     }
     
     /**
