@@ -38,10 +38,10 @@ public class ColorMap {
     public int getColor(double val) {
         if ( val < minValue ) {
             return palette[0];
-        } else if ( val > maxValue ) {
+        } else if ( val >= maxValue ) {
             return palette[palette.length-1];
         } else {
-            int idx = (int)((palette.length-1) *
+            int idx = (int)(palette.length *
                             (val-minValue)/(maxValue-minValue));
             return palette[idx];
         }
