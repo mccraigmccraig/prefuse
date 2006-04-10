@@ -33,6 +33,8 @@ import prefuse.visual.VisualItem;
  */
 public class DataShapeAction extends ShapeAction {
     
+    protected static final int NO_SHAPE = Integer.MIN_VALUE;
+    
     protected String m_dataField;
     protected int[]  m_palette;
     
@@ -45,7 +47,7 @@ public class DataShapeAction extends ShapeAction {
      * @param field the data field to base shape assignments on
      */
     public DataShapeAction(String group, String field) {
-        super(group);
+        super(group, NO_SHAPE);
         m_dataField = field;
     }
     
@@ -58,7 +60,7 @@ public class DataShapeAction extends ShapeAction {
      * codes included in the {@link prefuse.Constants} class.
      */
     public DataShapeAction(String group, String field, int[] palette) {
-        super(group);
+        super(group, NO_SHAPE);
         m_dataField = field;
         m_palette = palette;
     }
@@ -81,6 +83,16 @@ public class DataShapeAction extends ShapeAction {
         m_dataField = field;
     }
     
+    /**
+     * This operation is not supported by the DataShapeAction type.
+     * Calling this method will result in a thrown exception.
+     * @see prefuse.action.assignment.ShapeAction#setDefaultShape(int)
+     * @throws UnsupportedOperationException
+     */
+    public void setDefaultShape(int defaultShape) {
+        throw new UnsupportedOperationException();
+    }
+    
     // ------------------------------------------------------------------------
     
     /**
@@ -95,6 +107,13 @@ public class DataShapeAction extends ShapeAction {
      * @see prefuse.action.assignment.ShapeAction#getShape(prefuse.visual.VisualItem)
      */
     public int getShape(VisualItem item) {
+        // check for any cascaded rules first
+        int shape = super.getShape(item);
+        if ( shape != NO_SHAPE ) {
+            return shape;
+        }
+        
+        // otherwise perform data-driven assignment
         Object v = item.get(m_dataField);
         int idx = ((Integer)m_ordinalMap.get(v)).intValue();
 

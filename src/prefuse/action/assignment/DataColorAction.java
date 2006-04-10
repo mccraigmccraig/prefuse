@@ -197,6 +197,16 @@ public class DataColorAction extends ColorAction {
         m_bins = count;
     }
     
+    /**
+     * This operation is not supported by the DataColorAction type.
+     * Calling this method will result in a thrown exception.
+     * @see prefuse.action.assignment.ColorAction#setDefaultColor(int)
+     * @throws UnsupportedOperationException
+     */
+    public void setDefaultColor(int color) {
+        throw new UnsupportedOperationException();
+    }
+    
     // ------------------------------------------------------------------------    
     
     /**
@@ -288,6 +298,20 @@ public class DataColorAction extends ColorAction {
      * @see prefuse.action.assignment.ColorAction#getColor(prefuse.visual.VisualItem)
      */
     public int getColor(VisualItem item) {
+        // check for any cascaded rules first
+        Object o = lookup(item);
+        if ( o != null ) {
+            if ( o instanceof ColorAction ) {
+                return ((ColorAction)o).getColor(item);
+            } else if ( o instanceof Integer ) {
+                return ((Integer)o).intValue();
+            } else {
+                Logger.getLogger(this.getClass().getName())
+                    .warning("Unrecognized Object from predicate chain.");
+            }
+        }
+        
+        // otherwise perform data-driven assignment
         switch ( m_type ) {
         case Constants.NUMERICAL:
             double v = item.getDouble(m_dataField);
