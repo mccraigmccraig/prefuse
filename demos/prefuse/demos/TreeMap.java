@@ -112,7 +112,7 @@ public class TreeMap extends Display {
         
         // animate paint change
         ActionList animatePaint = new ActionList(400);
-        animatePaint.add(new ColorAnimator());
+        animatePaint.add(new ColorAnimator(treeNodes));
         animatePaint.add(new RepaintAction());
         m_vis.putAction("animatePaint", animatePaint);
         
@@ -265,15 +265,15 @@ public class TreeMap extends Display {
         }
         
         public int getColor(VisualItem item) {
-            if ( m_vis.isInGroup(item, Visualization.SEARCH_ITEMS) )
-                return ColorLib.rgb(191,99,130);
-            
             if ( item instanceof NodeItem ) {
                 NodeItem nitem = (NodeItem)item;
                 if ( nitem.getChildCount() > 0 ) {
                     return 0; // no fill for parent nodes
                 } else {
-                    return cmap.getColor(nitem.getDepth());
+                    if ( m_vis.isInGroup(item, Visualization.SEARCH_ITEMS) )
+                        return ColorLib.rgb(191,99,130);
+                    else
+                        return cmap.getColor(nitem.getDepth());
                 }
             } else {
                 return cmap.getColor(0);
