@@ -1,14 +1,16 @@
 package prefuse.demos;
 
 import java.awt.BorderLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JToolBar;
 
 import prefuse.Constants;
 import prefuse.Display;
@@ -17,31 +19,26 @@ import prefuse.action.ActionList;
 import prefuse.action.RepaintAction;
 import prefuse.action.assignment.ColorAction;
 import prefuse.action.assignment.DataShapeAction;
-import prefuse.action.filter.VisibilityFilter;
 import prefuse.action.layout.AxisLayout;
 import prefuse.controls.ToolTipControl;
 import prefuse.data.Table;
-import prefuse.data.expression.AndPredicate;
 import prefuse.data.io.DelimitedTextTableReader;
-import prefuse.data.query.RangeQueryBinding;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.ShapeRenderer;
 import prefuse.util.ColorLib;
-import prefuse.util.UpdateListener;
-import prefuse.util.ui.JRangeSlider;
 import prefuse.visual.VisualItem;
-import prefuse.visual.VisualTable;
 import prefuse.visual.expression.VisiblePredicate;
 
 /**
+ * A simple scatter plot visualization that allows visual encodings to
+ * be changed at runtime.
+ * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class ScatterPlot extends JPanel {
+public class ScatterPlot extends Display {
 
     private static final String group = "data";
     
-    private Visualization m_vis;
-    private Display m_display;
     private ShapeRenderer m_shapeR = new ShapeRenderer(2);
     
     public ScatterPlot(Table t, String xfield, String yfield) {
@@ -49,41 +46,34 @@ public class ScatterPlot extends JPanel {
     }
     
     public ScatterPlot(Table t, String xfield, String yfield, String sfield) {
-        super(new BorderLayout());
+        super(new Visualization());
         
         // --------------------------------------------------------------------
         // STEP 1: setup the visualized data
         
-        m_vis = new Visualization();
-        VisualTable vt = m_vis.addTable(group, t);
+        m_vis.addTable(group, t);
         
         DefaultRendererFactory rf = new DefaultRendererFactory(m_shapeR);
         m_vis.setRendererFactory(rf);
         
         // --------------------------------------------------------------------
         // STEP 2: create actions to process the visual data
-
-        // set up dynamic queries, search set
-        RangeQueryBinding  xaxisQ = new RangeQueryBinding(vt, xfield);
-        RangeQueryBinding  yaxisQ = new RangeQueryBinding(vt, yfield);
-        
-        // construct the filtering predicate
-        AndPredicate filter = new AndPredicate(xaxisQ.getPredicate(),
-                                               yaxisQ.getPredicate());
         
         // set up the actions
         AxisLayout x_axis = new AxisLayout(group, xfield, 
                 Constants.X_AXIS, VisiblePredicate.TRUE);
-        x_axis.setRangeModel(xaxisQ.getModel());
+        m_vis.putAction("x", x_axis);
         
         AxisLayout y_axis = new AxisLayout(group, yfield, 
                 Constants.Y_AXIS, VisiblePredicate.TRUE);
-        y_axis.setRangeModel(yaxisQ.getModel());
+        m_vis.putAction("y", y_axis);
 
         ColorAction color = new ColorAction(group, 
                 VisualItem.STROKECOLOR, ColorLib.rgb(100,100,255));
-
+        m_vis.putAction("color", color);
+        
         DataShapeAction shape = new DataShapeAction(group, sfield);
+        m_vis.putAction("shape", shape);
         
         ActionList draw = new ActionList();
         draw.add(x_axis);
@@ -93,66 +83,23 @@ public class ScatterPlot extends JPanel {
         draw.add(color);
         draw.add(new RepaintAction());
         m_vis.putAction("draw", draw);
-
-        ActionList update = new ActionList();
-        update.add(new VisibilityFilter(group, filter));
-        update.add(x_axis);
-        update.add(y_axis);
-        update.add(new RepaintAction());
-        m_vis.putAction("update", update);
-        
-        UpdateListener lstnr = new UpdateListener() {
-            public void update(Object src) {
-                m_vis.run("update");
-            }
-        };
-        filter.addExpressionListener(lstnr);
         
         // --------------------------------------------------------------------
         // STEP 3: set up a display and ui components to show the visualization
 
-        m_display = new Display(m_vis);
-        m_display.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-        m_display.setSize(700,450);
-        m_display.setHighQuality(true);
+        setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        setSize(700,450);
+        setHighQuality(true);
         
         ToolTipControl ttc = new ToolTipControl(new String[] {xfield,yfield});
-        m_display.addControlListener(ttc);
+        addControlListener(ttc);
         
         
         // --------------------------------------------------------------------        
         // STEP 4: launching the visualization
-        
-        this.addComponentListener(lstnr);
-        
-        JRangeSlider xslider = xaxisQ.createHorizontalRangeSlider();
-        JRangeSlider yslider = yaxisQ.createVerticalRangeSlider();
-        
-        xslider.setThumbColor(null);
-        yslider.setThumbColor(null);
-        
-        MouseAdapter qualityControl = new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
-                m_display.setHighQuality(false);
-            }
-            public void mouseReleased(MouseEvent e) {
-                m_display.setHighQuality(true);
-                m_display.repaint();
-            }
-        };
-        xslider.addMouseListener(qualityControl);
-        yslider.addMouseListener(qualityControl);
-        
+                
         m_vis.run("draw");
-        
-        add(m_display, BorderLayout.CENTER);
-        add(yslider, BorderLayout.EAST);
-        
-        Box xbox = new Box(BoxLayout.X_AXIS);
-        xbox.add(xslider);
-        int corner = yslider.getPreferredSize().width;
-        xbox.add(Box.createHorizontalStrut(corner));
-        add(xbox, BorderLayout.SOUTH);
+
     }
     
     public int getPointSize() {
@@ -162,10 +109,6 @@ public class ScatterPlot extends JPanel {
     public void setPointSize(int size) {
         m_shapeR.setBaseSize(size);
         repaint();
-    }
-    
-    public Display getDisplay() {
-        return m_display;
     }
     
     // ------------------------------------------------------------------------
@@ -181,9 +124,16 @@ public class ScatterPlot extends JPanel {
             yfield = argv[2];
             sfield = ( argv.length > 3 ? argv[3] : null );
         }
+        
+        final ScatterPlot sp = demo(data, xfield, yfield, sfield);
+        JToolBar toolbar = getEncodingToolbar(sp, xfield, yfield, sfield);
+        
+        
+        
         JFrame frame = new JFrame("p r e f u s e  |  s c a t t e r");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setContentPane(demo(data, xfield, yfield, sfield));
+        frame.getContentPane().add(toolbar, BorderLayout.NORTH);
+        frame.getContentPane().add(sp, BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
     }
@@ -205,6 +155,68 @@ public class ScatterPlot extends JPanel {
         ScatterPlot scatter = new ScatterPlot(table, xfield, yfield, sfield);
         scatter.setPointSize(10);
         return scatter;
+    }
+    
+    private static JToolBar getEncodingToolbar(final ScatterPlot sp,
+            final String xfield, final String yfield, final String sfield)
+    {
+        int spacing = 10;
+        
+        // create list of column names
+        Table t = (Table)sp.getVisualization().getSourceData(group);
+        String[] colnames = new String[t.getColumnCount()];
+        for ( int i=0; i<colnames.length; ++i )
+            colnames[i] = t.getColumnName(i);
+        
+        // create toolbar that allows visual mappings to be changed
+        JToolBar toolbar = new JToolBar();
+        toolbar.setLayout(new BoxLayout(toolbar, BoxLayout.X_AXIS));
+        toolbar.add(Box.createHorizontalStrut(spacing));
+        
+        final JComboBox xcb = new JComboBox(colnames);
+        xcb.setSelectedItem(xfield);
+        xcb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Visualization vis = sp.getVisualization();
+                AxisLayout xaxis = (AxisLayout)vis.getAction("x");
+                xaxis.setDataField((String)xcb.getSelectedItem());
+                vis.run("draw");
+            }
+        });
+        toolbar.add(new JLabel("X: "));
+        toolbar.add(xcb);
+        toolbar.add(Box.createHorizontalStrut(2*spacing));
+        
+        final JComboBox ycb = new JComboBox(colnames);
+        ycb.setSelectedItem(yfield);
+        ycb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Visualization vis = sp.getVisualization();
+                AxisLayout yaxis = (AxisLayout)vis.getAction("y");
+                yaxis.setDataField((String)ycb.getSelectedItem());
+                vis.run("draw");
+            }
+        });
+        toolbar.add(new JLabel("Y: "));
+        toolbar.add(ycb);
+        toolbar.add(Box.createHorizontalStrut(2*spacing));
+        
+        final JComboBox scb = new JComboBox(colnames);
+        scb.setSelectedItem(sfield);
+        scb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Visualization vis = sp.getVisualization();
+                DataShapeAction s = (DataShapeAction)vis.getAction("shape");
+                s.setDataField((String)scb.getSelectedItem());
+                vis.run("draw");
+            }
+        });
+        toolbar.add(new JLabel("Shape: "));
+        toolbar.add(scb);
+        toolbar.add(Box.createHorizontalStrut(spacing));
+        toolbar.add(Box.createHorizontalGlue());
+        
+        return toolbar;
     }
     
 } // end of class ScatterPlot
