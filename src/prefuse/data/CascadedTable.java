@@ -451,6 +451,12 @@ public class CascadedTable extends Table {
             switch ( type ) {
             case EventConstants.UPDATE:
             {
+                // do nothing if update on all columns, as this is only
+                // used to indicate a non-measurable update.
+                if ( col == EventConstants.ALL_COLUMNS ) {
+                    break;
+                }
+                
                 // process each update, check if filtered state changes
                 for ( int r=start, cr=-1; r<=end; ++r ) {
                     if ( (cr=rowman.getChildRow(r)) != -1 ) {
