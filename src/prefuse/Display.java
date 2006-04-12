@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -656,12 +657,19 @@ public class Display extends JComponent {
      * Creates a new buffered image to use as an offscreen buffer.
      */
     protected BufferedImage getNewOffscreenBuffer(int width, int height) {
-        try {
-            return (BufferedImage)createImage(width, height);
-        } catch ( Exception e ) {
+        BufferedImage img = null;
+        if ( !GraphicsEnvironment.isHeadless() ) {
+            try {
+                img = (BufferedImage)createImage(width, height);
+            } catch ( Exception e ) {
+                img = null;
+            }
+        }
+        if ( img == null ) {
             return new BufferedImage(width, height,
                                      BufferedImage.TYPE_INT_RGB);
         }
+        return img;
     }
     
     /**
