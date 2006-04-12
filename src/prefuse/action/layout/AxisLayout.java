@@ -93,8 +93,10 @@ public class AxisLayout extends Layout {
      * setting for use with the new data field setting.
      * @param field the name of the data field that determines the layout
      */
-    public void setField(String field) {
+    public void setDataField(String field) {
         m_field = field;
+        if ( !m_modelSet )
+            m_model = null;
     }
     
     /**
@@ -102,7 +104,7 @@ public class AxisLayout extends Layout {
      * data field determine the position of items along the axis.
      * @return the name of the data field that determines the layout
      */
-    public String getField() {
+    public String getDataField() {
         return m_field;
     }
     
