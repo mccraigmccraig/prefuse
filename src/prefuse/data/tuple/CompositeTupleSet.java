@@ -194,8 +194,14 @@ public class CompositeTupleSet extends AbstractTupleSet {
      * @see prefuse.data.tuple.TupleSet#containsTuple(prefuse.data.Tuple)
      */
     public boolean containsTuple(Tuple t) {
-        Table table = t.getTable();
-        return containsSet(table);
+        Iterator it = m_map.entrySet().iterator();
+        while ( it.hasNext() )  {
+            Map.Entry entry = (Map.Entry)it.next();
+            TupleSet ts = (TupleSet)entry.getValue();
+            if ( ts.containsTuple(t) )
+                return true;
+        }
+        return false;
     }
 
     /**
