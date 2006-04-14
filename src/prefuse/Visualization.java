@@ -12,6 +12,7 @@ import prefuse.action.Action;
 import prefuse.activity.Activity;
 import prefuse.activity.ActivityMap;
 import prefuse.data.Graph;
+import prefuse.data.Node;
 import prefuse.data.Schema;
 import prefuse.data.Table;
 import prefuse.data.Tree;
@@ -759,6 +760,33 @@ public class Visualization {
             return t.getTuple(row);
         }
     }
+    
+    /**
+     * Get the VisualItem associated with a source data tuple, if it exists.
+     * @param group the data group from which to lookup the source tuple,
+     * only primary visual groups are valid, focus groups will not work
+     * @param t the source data tuple
+     * @return the associated VisualItem from the given data group, or
+     * null if no such VisualItem exists
+     */
+    public VisualItem getVisualItem(String group, Tuple t) {
+        TupleSet ts = getVisualGroup(group);
+        VisualTable vt;
+        if ( ts instanceof VisualTable ) {
+            vt = (VisualTable)ts;
+        } else if ( ts instanceof Graph ) {
+            Graph g = (Graph)ts;
+            vt = (VisualTable)(t instanceof Node ? g.getNodeTable() 
+                                                 : g.getEdgeTable());
+        } else {
+            return null;
+        }
+        int pr = t.getRow();
+        int cr = vt.getChildRow(pr);
+        return cr<0 ? null : vt.getItem(cr);
+    }
+    
+    // ------------------------------------------------------------------------
     
     /**
      * Get the TupleSet associated with the given data group name. 

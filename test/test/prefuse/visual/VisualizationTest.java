@@ -103,5 +103,14 @@ public class VisualizationTest extends TestCase {
         assertEquals(m_t0, m_vt0.getSourceTuple());
         assertEquals(m_n0, m_vn0.getSourceTuple());
     }
+    
+    /*
+     * Test method for 'prefuse.Visualization.getVisualItem(String,Tuple)'
+     */
+    public void testGetVisualItem() {
+        assertEquals(m_vt0, m_vis.getVisualItem("t", m_t0));
+        assertEquals(m_vn0, m_vis.getVisualItem("g", m_n0));
+        assertEquals(m_vn0, m_vis.getVisualItem("g.nodes", m_n0));
+    }
 
 }
