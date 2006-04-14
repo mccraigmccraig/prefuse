@@ -51,7 +51,7 @@ public class IntParser implements DataParser {
      * @return the parsed int value
      * @throws DataParseException if an error occurs during parsing
      */
-    public int parseInt(String text) throws DataParseException {
+    public static int parseInt(String text) throws DataParseException {
         try {
             return Integer.parseInt(text);
         } catch ( NumberFormatException e ) {

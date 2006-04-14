@@ -54,7 +54,7 @@ public class LongParser implements DataParser {
      * @return the parsed long value
      * @throws DataParseException if an error occurs during parsing
      */
-    public long parseLong(String text) throws DataParseException {
+    public static long parseLong(String text) throws DataParseException {
         try {
             // allow trailing 'L' characters to signify a long
             if ( text.length() > 0 ) {

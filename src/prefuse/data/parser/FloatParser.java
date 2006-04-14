@@ -54,7 +54,7 @@ public class FloatParser implements DataParser {
      * @return the parsed float value
      * @throws DataParseException if an error occurs during parsing
      */
-    public float parseFloat(String text) throws DataParseException {
+    public static float parseFloat(String text) throws DataParseException {
         try {
             return Float.parseFloat(text);
         } catch ( NumberFormatException e ) {

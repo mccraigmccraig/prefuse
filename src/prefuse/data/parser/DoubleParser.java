@@ -57,7 +57,7 @@ public class DoubleParser implements DataParser {
      * @return the parsed double value
      * @throws DataParseException if an error occurs during parsing
      */
-    public double parseDouble(String text) throws DataParseException {
+    public static double parseDouble(String text) throws DataParseException {
         try {
             return Double.parseDouble(text);
         } catch ( NumberFormatException e ) {
