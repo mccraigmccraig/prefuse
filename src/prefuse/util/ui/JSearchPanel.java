@@ -47,6 +47,8 @@ public class JSearchPanel extends JPanel
 
     private String[] m_fields;
     
+    private Color m_cancelColor = ColorLib.getColor(255,75,75);
+    
     private boolean m_includeHitCount = false;
     private boolean m_monitorKeys = false;
     private boolean m_autoIndex = true;
@@ -366,8 +368,18 @@ public class JSearchPanel extends JPanel
         Document d = m_queryF.getDocument();
         d.removeDocumentListener(this);
         m_queryF.setText(query);
-        d.addDocumentListener(this);
+        if ( m_monitorKeys )
+            d.addDocumentListener(this);
         searchUpdate();
+    }
+    
+    /**
+     * Set the fill color of the cancel 'x' button that appears
+     * when the button has the mouse pointer over it. 
+     * @param c the cancel color
+     */
+    public void setCancelColor(Color c) {
+        m_cancelColor = c;
     }
     
     /**
@@ -393,6 +405,18 @@ public class JSearchPanel extends JPanel
         if ( m_searchL != null ) m_searchL.setForeground(fg);
         if ( m_sbox != null && m_showBorder )
             m_sbox.setBorder(BorderFactory.createLineBorder(fg));
+    }
+    
+    /**
+     * @see javax.swing.JComponent#setOpaque(boolean)
+     */
+    public void setOpaque(boolean opaque) {
+        super.setOpaque(opaque);
+        if ( m_queryF  != null ) {
+            m_queryF.setOpaque(opaque);
+        }
+        if ( m_resultL != null ) m_resultL.setOpaque(opaque);
+        if ( m_searchL != null ) m_searchL.setOpaque(opaque);
     }
 
     /**
@@ -474,7 +498,7 @@ public class JSearchPanel extends JPanel
         
         public void paintComponent(Graphics g) {
             if ( hover ) { // draw fill
-                g.setColor(ColorLib.getColor(255,75,75));
+                g.setColor(m_cancelColor);
                 for ( int i=0; i+3 < fill.length; i+=4 ) {
                     g.drawLine(fill[i],fill[i+1],fill[i+2],fill[i+3]);
                 }
