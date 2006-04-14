@@ -1,5 +1,7 @@
 package prefuse.data.column;
 
+import java.util.Date;
+
 import prefuse.data.DataTypeException;
 import prefuse.data.Table;
 import prefuse.data.expression.Expression;
@@ -99,6 +101,15 @@ public class ColumnFactory {
             } else {
                 boolean def = ((Boolean)defaultValue).booleanValue();
                 return new BooleanColumn(nrows, nrows, def);
+            }
+        }
+        else if ( Date.class.isAssignableFrom(type) )
+        {
+            if ( defaultValue == null ) {
+                return new DateColumn(type, nrows);
+            } else {
+                Date d = ((Date)defaultValue);
+                return new DateColumn(type, nrows, nrows, d.getTime());
             }
         }
         else if ( type == byte.class 

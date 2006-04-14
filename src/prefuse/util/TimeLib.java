@@ -1,6 +1,8 @@
 package prefuse.util;
 
+import java.lang.reflect.Constructor;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -183,6 +185,23 @@ public class TimeLib {
         c.clear(Calendar.MILLISECOND);
         c.set(1970, 0, 1, hour, minute, second);
         return c.getTimeInMillis();
+    }
+    
+    /**
+     * Get a new Date instance of the specified subclass and given long value.
+     * @param type the concrete subclass of the Date instance, must be an
+     * instance of subclass of java.util.Date
+     * @param d the date/time value as a long
+     * @return the new Date instance, or null if the class type is not valid
+     */
+    public static Date getDate(Class type, long d) {
+        try {
+            Constructor c = type.getConstructor(new Class[] {long.class});
+            return (Date)c.newInstance(new Object[] {new Long(d)});
+        } catch ( Exception e ) {
+            e.printStackTrace();
+            return null;
+        }
     }
     
     // ------------------------------------------------------------------------
