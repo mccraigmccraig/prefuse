@@ -8,6 +8,8 @@ import java.util.Iterator;
 
 import prefuse.data.Graph;
 import prefuse.data.Table;
+import prefuse.data.expression.Predicate;
+import prefuse.data.util.FilterIterator;
 import prefuse.visual.AggregateItem;
 import prefuse.visual.AggregateTable;
 import prefuse.visual.VisualItem;
@@ -75,6 +77,14 @@ public class TableAggregateItem extends TableVisualItem
      */
     public Iterator items() {
         return ((AggregateTable)m_table).aggregatedTuples(m_row);
+    }
+    
+    /**
+     * @see prefuse.visual.AggregateItem#items()
+     */
+    public Iterator items(Predicate filter) {
+        return new FilterIterator(
+            ((AggregateTable)m_table).aggregatedTuples(m_row), filter);
     }
 
 } // end of class TableAggregateItem

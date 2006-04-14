@@ -6,6 +6,8 @@ package prefuse.visual;
 
 import java.util.Iterator;
 
+import prefuse.data.expression.Predicate;
+
 /**
  * VisualItem that represents an aggregation of one or more other VisualItems.
  * AggregateItems include methods adding and removing items from the aggregate
@@ -52,5 +54,12 @@ public interface AggregateItem extends VisualItem {
      * @return an iterator over the items in this aggregate
      */
     public Iterator items();
+    
+    /**
+     * Get a filtered iterator over all the items contained in this aggregate.
+     * @param filter a Predicate instance indicating the filter criteria
+     * @return an iterator over the items in this aggregate
+     */
+    public Iterator items(Predicate filter);
     
 } // end of interface AggregateItem

@@ -119,5 +119,19 @@ public class VisualAggregateTableTest extends TestCase {
         }
         assertEquals(s, count);
     }
+    
+    /*
+     * Test method for 'prefuse.data.tuple.AggregateTable.getAggregates(Tuple)'
+     */
+    public void testGetAggregates() {
+        for ( int i=0; i<2; ++i ) {
+            Iterator iter = m_agg.aggregatedTuples(0);
+            while ( iter.hasNext() ) {
+                VisualItem t = (VisualItem)iter.next();
+                Iterator aggr = m_agg.getAggregates(t);
+                assertEquals(m_agg.getTuple(0), aggr.next());
+            }
+        }
+    }
 
 }

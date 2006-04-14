@@ -4,6 +4,7 @@
  */
 package prefuse.visual;
 
+import java.util.HashSet;
 import java.util.Iterator;
 
 import prefuse.Visualization;
@@ -172,6 +173,22 @@ public class AggregateTable extends VisualTable {
      */
     public Iterator aggregatedTuples(int row) {
         return new AggregatedIterator(row);
+    }
+    
+    /**
+     * Get an iterator over all AggregateItems that contain the given Tuple.
+     * @param t the input tuple
+     * @return an iterator over all AggregateItems that contain the input Tuple
+     */
+    public Iterator getAggregates(Tuple t) {
+        int hash = getHashCode(t);
+        IntIterator iit = m_aggregated.getIndex(MEMBER_HASH).rows(hash);
+        HashSet set = new HashSet();
+        while ( iit.hasNext() ) {
+            int r = iit.nextInt();
+            set.add(getTuple(m_aggregated.getInt(r, AGGREGATE)));
+        }
+        return set.iterator();
     }
     
     /**
