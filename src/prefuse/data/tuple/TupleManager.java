@@ -113,7 +113,7 @@ public class TupleManager {
      * @param row the row index to invalidate
      */
     public void invalidate(int row) {
-        if ( m_tuples == null || row < 0 || row > m_tuples.length ) {
+        if ( m_tuples == null || row < 0 || row >= m_tuples.length ) {
             return;
         } else if ( m_tuples[row] != null ) {
             m_tuples[row].invalidate();
