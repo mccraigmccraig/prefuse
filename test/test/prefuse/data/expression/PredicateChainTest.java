@@ -95,4 +95,13 @@ public class PredicateChainTest extends TestCase {
         assertFalse(m_chain.remove(p3));
     }
 
+    public void testRemove2() {
+        PredicateChain pc = new PredicateChain();
+        Predicate p1 = (Predicate) ExpressionParser.parse("_fixed");
+        Predicate p2 = (Predicate) ExpressionParser.parse("_highlight");
+        pc.add(p1, new Integer(1));
+        pc.add(p2, new Integer(2));
+        assertTrue(pc.remove(p2));
+    }
+    
 }

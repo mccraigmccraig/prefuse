@@ -72,8 +72,8 @@ public class PredicateChain {
         Expression expr = m_head;
         while ( expr instanceof IfExpression ) {
             IfExpression ifex = (IfExpression)expr;
-            Predicate text = (Predicate)ifex.getTestPredicate();
-            if ( p.equals(text) ) {
+            Predicate test = (Predicate)ifex.getTestPredicate();
+            if ( p.equals(test) ) {
                 Expression elseex = ifex.getElseExpression();
                 ifex.setElseExpression(new ObjectLiteral(null));
                 if ( prev != null ) {
@@ -86,6 +86,9 @@ public class PredicateChain {
                         m_tail = null;
                 }
                 return true;
+            } else {
+                prev = ifex;
+                expr = ifex.getElseExpression();
             }
         }
         return false;
