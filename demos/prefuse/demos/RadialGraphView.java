@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
+import java.util.Iterator;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -304,7 +305,9 @@ public class RadialGraphView extends Display {
             
             Graph g = (Graph)m_vis.getGroup(m_group);
             Node f = null;
-            while ( !g.containsTuple(f=(Node)focus.tuples().next()) ) {
+            Iterator tuples = focus.tuples();
+            while (tuples.hasNext() && !g.containsTuple(f=(Node)tuples.next()))
+            {
                 f = null;
             }
             if ( f == null ) return;
