@@ -1,6 +1,7 @@
 package prefuse.util.collections;
 
 import java.util.Comparator;
+import java.util.Date;
 
 import prefuse.data.DataTypeException;
 
@@ -25,7 +26,7 @@ public class SortedMapFactory {
         {
             return new IntIntTreeMap((LiteralComparator)cmp, !unique);
         } 
-        else if ( type.equals(long.class) )
+        else if ( type.equals(long.class) || type.isAssignableFrom(Date.class) )
         {
             return new LongIntTreeMap((LiteralComparator)cmp, !unique);
         }
