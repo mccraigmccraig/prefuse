@@ -34,7 +34,7 @@ public class DateColumn extends AbstractColumn {
     
     /**
      * Create a new DateColumn.
-     * @param the exact data type (must be an instance or 
+     * @param type the exact data type (must be an instance or 
      * subclass of java.util.Date) 
      * @param nrows the initial size of the column
      */
@@ -44,7 +44,7 @@ public class DateColumn extends AbstractColumn {
     
     /**
      * Create a new DateColumn.
-     * @param the exact data type (must be an instance or 
+     * @param type the exact data type (must be an instance or 
      * subclass of java.util.Date)
      * @param nrows the initial size of the column
      * @param capacity the initial capacity of the column
