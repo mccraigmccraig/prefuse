@@ -240,9 +240,9 @@ public class ForceDirectedLayout extends Layout {
                 // run simulator
                 m_fsim.runSimulator(step);
                 // debugging output
-                if (i % 10 == 0 ) {
-                    System.out.println("iter: "+i);
-                }
+//                if (i % 10 == 0 ) {
+//                    System.out.println("iter: "+i);
+//                }
             }
             updateNodePositions();
         } else {
