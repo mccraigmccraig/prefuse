@@ -115,7 +115,7 @@ public class DateColumn extends AbstractColumn {
      * @see prefuse.data.column.Column#get(int)
      */
     public Object get(int row) {
-        return new Date(getLong(row));
+        return TimeLib.getDate(m_columnType, getLong(row));
     }
 
     /**
