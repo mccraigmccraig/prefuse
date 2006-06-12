@@ -790,7 +790,7 @@ class LPadFunction extends StringFunction {
 //POSITION(substr, str)
 class PositionFunction extends IntFunction {
     public PositionFunction() { super(2); }
-    public String getName() { return "REPEAT"; }
+    public String getName() { return "POSITION"; }
     public int getInt(Tuple t) {
         String substr = param(0).get(t).toString();
         String src = param(1).get(t).toString();
