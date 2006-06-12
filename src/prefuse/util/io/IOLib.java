@@ -158,12 +158,13 @@ public class IOLib {
     
     /**
      * Indicates if the given file ends with a file extension of
-     * ".gz", indicating a GZip file.
+     * ".gz" or ".Z", indicating a GZip file.
      * @param file a String of the filename or URL of the file
-     * @return true if the extension is ".gz", false otherwise
+     * @return true if the extension is ".gz" or ".Z", false otherwise
      */
     public static boolean isGZipFile(String file) {
-        return "gz".equals(getExtension(file));
+    	String ext = getExtension(file);
+        return "gz".equals(ext) || "z".equals(ext);
     }
     
     /**
