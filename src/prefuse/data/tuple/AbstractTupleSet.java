@@ -1,6 +1,7 @@
 package prefuse.data.tuple;
 
 import java.beans.PropertyChangeListener;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -14,6 +15,8 @@ import prefuse.data.event.TupleSetListener;
 import prefuse.data.expression.Expression;
 import prefuse.data.expression.Predicate;
 import prefuse.data.util.FilterIteratorFactory;
+import prefuse.data.util.Sort;
+import prefuse.data.util.SortedTupleIterator;
 import prefuse.util.collections.CopyOnWriteArrayList;
 
 /**
@@ -35,6 +38,19 @@ public abstract class AbstractTupleSet implements TupleSet {
             return FilterIteratorFactory.tuples(this, filter);
         }
     }
+    
+    /**
+     * @see prefuse.data.tuple.TupleSet#tuples(prefuse.data.expression.Predicate, prefuse.data.util.Sort)
+     */
+    public Iterator tuples(Predicate filter, Sort sort) {
+        if ( sort == null ) {
+            return tuples(filter);
+        } else {
+            Comparator c = sort.getComparator(this);
+            return new SortedTupleIterator(tuples(filter),getTupleCount(),c);
+        }
+    }
+    
     
     // -- TupleSet Methods ----------------------------------------------------
     

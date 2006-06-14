@@ -34,7 +34,7 @@ public interface TableTestData {
     public static final Time[]    COLUMN3 
         = { new Time(TimeLib.getTime(CAL,1,12,0)),
             new Time(TimeLib.getTime(CAL,3,14,0)), 
-            new Time(TimeLib.getTime(CAL,14,13,0)),
+            new Time(TimeLib.getTime(CAL,1,12,0)),
             new Time(TimeLib.getTime(CAL,19,12,0)) };
     
     public static final Float[]   COLUMN4 
@@ -57,14 +57,14 @@ public interface TableTestData {
         "id,date,time,float,double,text\n" +
         "1,1/1/2001,1:12 AM,1.1f,12.34,This is some text.\n" +
         "2,6/15/1979,3:14 AM,2.3f,3.3334,13f\n" +
-        "3,3/19/1982,2:13 PM,1e-4f,1.00E+04,12.3\n" +
+        "3,3/19/1982,1:12 AM,1e-4f,1.00E+04,12.3\n" +
         "4,5/13/2053,7:12 PM,1e6f,1.30E-02,\"This is some \"\"quoted\"\", comma'd text\"\n";
     
     public static final String TAB_DELIMITED_DATA =
         "id\tdate\ttime\tfloat\tdouble\ttext\n" +
         "1\t1/1/2001\t1:12 AM\t1.1f\t12.34\tThis is some text.\n" +
         "2\t6/15/1979\t3:14 AM\t2.3f\t3.3334\t13f\n" +
-        "3\t3/19/1982\t2:13 PM\t1e-4f\t1.00E+04\t12.3\n" +
+        "3\t3/19/1982\t1:12 AM\t1e-4f\t1.00E+04\t12.3\n" +
         "4\t5/13/2053\t7:12 PM\t1e6f\t1.30E-02\tThis is some \"quoted\", comma'd text\n";
     
 }

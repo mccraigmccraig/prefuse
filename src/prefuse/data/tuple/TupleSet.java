@@ -8,6 +8,7 @@ import prefuse.data.Tuple;
 import prefuse.data.event.TupleSetListener;
 import prefuse.data.expression.Expression;
 import prefuse.data.expression.Predicate;
+import prefuse.data.util.Sort;
 
 /**
  * A collection of data tuples. This is the top level interface for all
@@ -135,6 +136,17 @@ public interface TupleSet {
      * @return a filtered iterator over this set's tuples
      */
     public Iterator tuples(Predicate filter);
+    
+    /**
+     * Return an iterator over the tuples in this tuple set, filtered by
+     * the given predicate
+     * @param filter predicate to apply to tuples in this set, only tuples
+     * for which the predicate evaluates to true are included in the iteration.
+     * If this value is null, no filtering will be performed.
+     * @param sort the sorting criteria by which to order the returned tuples
+     * @return a filtered, sorted iterator over this set's tuples
+     */
+    public Iterator tuples(Predicate filter, Sort sort);
     
     
     // -- Listeners -----------------------------------------------------------

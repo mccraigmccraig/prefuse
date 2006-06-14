@@ -1,10 +1,16 @@
 package test.prefuse.data;
 
 import java.awt.geom.GeneralPath;
+import java.util.Comparator;
+import java.util.Iterator;
 
 import junit.framework.TestCase;
 import prefuse.data.Table;
+import prefuse.data.Tuple;
 import prefuse.data.column.Column;
+import prefuse.data.util.Sort;
+import prefuse.util.collections.DefaultLiteralComparator;
+import test.prefuse.TestConfig;
 
 public class TableTest extends TestCase implements TableTestData {
 
@@ -260,4 +266,27 @@ public class TableTest extends TestCase implements TableTestData {
         }
     }
 
+    public void testSort() {
+        String h1 = HEADERS[2];
+        String h2 = HEADERS[1];
+        Iterator iter = t.tuples(null, Sort.parse(h1+", "+h2+" desc"));
+        Tuple[] tpls = new Tuple[t.getRowCount()];
+        for ( int i=0; iter.hasNext(); ++i ) {
+            tpls[i] = (Tuple)iter.next();
+            if ( TestConfig.verbose() )
+                System.err.println(tpls[i]);
+        }
+        Comparator cmp = DefaultLiteralComparator.getInstance();
+        for ( int i=0; i<tpls.length-1; ++i ) {
+            Tuple t1 = tpls[i], t2 = tpls[i+1];
+            int c = cmp.compare(t1.get(h1), t2.get(h1));
+            assertTrue(c<=0);
+            if ( c == 0 ) {
+                c = cmp.compare(t1.get(h2), t2.get(h2));
+                assertTrue(c>=0);
+            }
+                
+        }
+    }
+    
 }
