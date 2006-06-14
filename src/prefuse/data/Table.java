@@ -22,6 +22,7 @@ import prefuse.data.tuple.TupleManager;
 import prefuse.data.util.FilterIteratorFactory;
 import prefuse.data.util.Index;
 import prefuse.data.util.RowManager;
+import prefuse.data.util.Sort;
 import prefuse.data.util.TableIterator;
 import prefuse.data.util.TreeIndex;
 import prefuse.util.TypeLib;
@@ -1355,6 +1356,40 @@ public class Table extends AbstractTupleSet implements ColumnListener {
         getColumn(col).setDate(val, row);
     }
 
+    // ------------------------------------------------------------------------
+    // Query Operations
+    
+    /**
+     * Query this table for a filtered, sorted subset of this table. This
+     * operation creates an entirely new table independent of this table.
+     * If a filtered view of this same table is preferred, use the
+     * {@link CascadedTable} class.
+     * @param filter the predicate filter determining which rows to include
+     * in the new table. If this value is null, all rows will be included.
+     * @param sort the sorting criteria determining the order in which
+     * rows are added to the new table. If this value is null, the rows
+     * will not be sorted.
+     * @return a new table meeting the query specification
+     */
+    public Table select(Predicate filter, Sort sort) {
+        Table t = getSchema().instantiate();
+        Iterator tuples = tuples(filter, sort);
+        while ( tuples.hasNext() ) {
+            t.addTuple((Tuple)tuples.next());
+        }
+        return t;
+    }
+    
+    /**
+     * Removes all table rows that meet the input predicate filter.
+     * @param filter a predicate specifying which rows to remove from
+     * the table.
+     */
+    public void remove(Predicate filter) {
+        for ( IntIterator ii = rows(filter); ii.hasNext(); )
+            removeRow(ii.nextInt());
+    }
+    
     // ------------------------------------------------------------------------
     // Iterators
     
