@@ -47,7 +47,6 @@ public class TupleComparator implements Comparator {
         m_cmp = c;
     }
     
-    
     /**
      * Compares two tuples. If either input Object is not a Tuple,
      * a ClassCastException will be thrown.

@@ -13,7 +13,34 @@ import prefuse.data.tuple.TupleSet;
 import prefuse.util.collections.CompositeComparator;
 
 /**
- * Utility class representing sorting criteria
+ * <p>Utility class representing sorting criteria, this can be given as
+ * input to the {@link TupleSet#tuples(Predicate, Sort)} method to
+ * get a sorted iteration of tuples.</p>
+ * 
+ * <p>Sort criteria consists of an ordered list of data field names to
+ * sort by, along with an indication to sort tuples in either ascending
+ * or descending order. These criteria can be passed in to the
+ * constructor or added incrementally using the
+ * {@link #add(String, boolean)} method.</p>
+ * 
+ * <p>Alternatively, one can also specify the sorting criteria using a
+ * single string, which is parsed using the {@link #parse(String)} method.
+ * This string should consist
+ * of a comma-delimited list of field names, which optional "ASC" or
+ * "DESC" modifiers to specify ascending or descending sorts. If no
+ * modifier is given, ascending order is assumed. Field
+ * names which include spaces or other non-standard characters should
+ * be written in brackets ([]), just as is done in 
+ * {@link prefuse.data.expression.parser.ExpressionParser expression
+ * language statements}. For example, the
+ * following string</p>
+ * 
+ * <pre>"Profit DESC, [Product Type]"</pre>   
+ * 
+ * <p>sorts first by the data field "Profit" in descending order,
+ * additionally sorting in ascending order by the data field
+ * "Product Type" for tuples which have identical values in the
+ * "Profit" field.</p>
  * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
@@ -27,20 +54,41 @@ public class Sort {
     private String[]  m_fields;
     private boolean[] m_ascend;
     
+    /**
+     * Creates a new, empty Sort specification.
+     */
     public Sort() {
     	this(new String[0], new boolean[0]);
     }
     
+    /**
+     * Creates a new Sort specification that sorts on the
+     * given fields, all in ascending order.
+     * @param fields the fields to sort on, in order of precedence
+     */
     public Sort(String[] fields) {
     	this(fields, new boolean[fields.length]);
     	Arrays.fill(m_ascend, true);
     }
     
+    /**
+     * Creates a new Sort specification that sorts on the
+     * given fields in the given orders.
+     * @param fields the fields to sort on, in order of precedence
+     * @param ascend for each field, indicates if the field should
+     * be sorted in ascending (true) or descending (false) order
+     */
     public Sort(String[] fields, boolean[] ascend) {
         m_fields = fields;
         m_ascend = ascend;
     }
     
+    /**
+     * Adds a new field to this Sort specification.
+     * @param field the additional field to sort on
+     * @param ascend indicates if the field should
+     * be sorted in ascending (true) or descending (false) order
+     */
     public void add(String field, boolean ascend) {
         String[] f = new String[m_fields.length+1];
         System.arraycopy(m_fields, 0, f, 0, m_fields.length);
@@ -53,18 +101,40 @@ public class Sort {
         m_ascend = b;
     }
     
+    /**
+     * Returns the number of fields in this Sort specification.
+     * @return the number of fields to sort on
+     */
     public int size() {
         return m_fields.length;
     }
     
+    /**
+     * Returns the sort field at the given index.
+     * @param i the index to look up
+     * @return the sort field at the given index
+     */
     public String getField(int i) {
         return m_fields[i];
     }
     
+    /**
+     * Returns the ascending modifier as the given index.
+     * @param i the index to look up
+     * @return true if the field at the given index is to be sorted
+     * in ascending order, false for descending order
+     */
     public boolean isAscending(int i) {
         return m_ascend[i];
     }
     
+    /**
+     * Generates a Comparator to be used for sorting tuples drawn from
+     * the given tuple set.
+     * @param ts the TupleSet whose Tuples are to be sorted
+     * @return a Comparator instance for sorting tuples from the given
+     * set using the sorting criteria given in this specification
+     */
     public Comparator getComparator(TupleSet ts) {
         // get the schema, so we can lookup column value types
         // for Tables, we can get this directly
@@ -111,6 +181,28 @@ public class Sort {
         }
     }
     
+    /**
+     * Parse a comma-delimited String of data fields to sort on, along
+     * with optional ASC or DESC modifiers, to generate a new Sort
+     * specification. This string should consist
+	 * of a comma-delimited list of field names, which optional "ASC" or
+	 * "DESC" modifiers to specify ascending or descending sorts. If no
+	 * modifier is given, ascending order is assumed. Field
+	 * names which include spaces or other non-standard characters should
+	 * be written in brackets ([]), just as is done in 
+	 * {@link prefuse.data.expression.parser.ExpressionParser expression
+	 * language statements}. For example, the
+	 * following string</p>
+	 * 
+	 * <pre>"Profit DESC, [Product Type]"</pre>   
+	 * 
+	 * <p>sorts first by the data field "Profit" in descending order,
+	 * additionally sorting in ascending order by the data field
+	 * "Product Type" for tuples which have identical values in the
+	 * "Profit" field.</p>
+     * @param s the sort specification String
+     * @return a new Sort specification
+     */
     public static Sort parse(String s) {
         Sort sort = new Sort();
         Object[] res = new Object[2];
@@ -141,22 +233,11 @@ public class Sort {
             }
         }
         return sort;
-        
-//        String[] tok = s.trim().split("\\s*,\\s*");
-//        boolean[] ascend = new boolean[tok.length];
-//        for ( int i=0; i<tok.length; ++i ) {
-//            // set default ascend value
-//            ascend[i] = true;
-//            if ( tok[i].endsWith(ASC) || tok[i].endsWith(asc) ) {
-//                tok[i] = tok[i].substring(0, tok[i].length()-ASC.length());
-//            } else if ( tok[i].endsWith(DESC) || tok[i].endsWith(desc) ) {
-//                ascend[i] = false;
-//                tok[i] = tok[i].substring(0, tok[i].length()-DESC.length());
-//            }
-//        }
-//        return new Sort(tok, ascend);
     }
     
+    /**
+     * @see java.lang.Object#toString()
+     */
     public String toString() {
     	StringBuffer sbuf = new StringBuffer();
     	for ( int i=0; i<m_fields.length; ++i ) {
