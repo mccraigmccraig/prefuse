@@ -98,7 +98,11 @@ public class Schema implements Cloneable {
      * @see java.lang.Object#clone()
      */
     public Object clone() {
-        return new Schema(m_names, m_types, m_dflts);
+        Schema s = new Schema(m_size);
+        for ( int i=0; i<m_size; ++i ) {
+            s.addColumn(m_names[i], m_types[i], m_dflts[i]);
+        }
+        return s;
     }
     
     /**
