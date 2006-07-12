@@ -93,8 +93,10 @@ public class ZoomToFitControl extends ControlAdapter {
      * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
      */
     public void mouseClicked(MouseEvent e) {
-        if ( UILib.isButtonPressed(e, m_button) ) {
-            Display display = (Display)e.getComponent();
+    	Display display = (Display)e.getComponent();
+    	if ( !display.isTranformInProgress() && 
+        	  UILib.isButtonPressed(e, m_button) )
+        {
             Visualization vis = display.getVisualization();
             Rectangle2D bounds = vis.getBounds(m_group);
             GraphicsLib.expand(bounds, m_margin + (int)(1/display.getScale()));
