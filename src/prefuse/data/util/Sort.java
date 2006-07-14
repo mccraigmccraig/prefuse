@@ -9,8 +9,10 @@ import java.util.Comparator;
 import prefuse.data.Schema;
 import prefuse.data.Table;
 import prefuse.data.Tuple;
+import prefuse.data.expression.Predicate;
 import prefuse.data.tuple.TupleSet;
 import prefuse.util.collections.CompositeComparator;
+import prefuse.util.collections.NullComparator;
 
 /**
  * <p>Utility class representing sorting criteria, this can be given as
@@ -136,12 +138,18 @@ public class Sort {
      * set using the sorting criteria given in this specification
      */
     public Comparator getComparator(TupleSet ts) {
-        // get the schema, so we can lookup column value types
-        // for Tables, we can get this directly
-        // otherwise, use the schema of the first tuple in the set
-        Schema s = (ts instanceof Table ? ((Table)ts).getSchema()
-                                        : ((Tuple)ts.tuples()).getSchema());
-        
+        // get the schema, so we can lookup column value types        
+        Schema s = null;
+        if ( ts instanceof Table ) {
+            // for Tables, we can get this directly
+        	s = ((Table)ts).getSchema();
+        } else {
+        	// if non-table tuple set is empty, we punt
+        	if ( ts.getTupleCount() == 0 )
+        		return new NullComparator();
+        	// otherwise, use the schema of the first tuple in the set
+            s = ((Tuple)ts.tuples().next()).getSchema();
+        }
         // create the comparator
         CompositeComparator cc = new CompositeComparator(m_fields.length);
         for ( int i=0; i<m_fields.length; ++i ) {
