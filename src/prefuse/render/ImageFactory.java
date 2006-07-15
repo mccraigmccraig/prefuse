@@ -29,23 +29,23 @@ import prefuse.util.io.IOLib;
  */
 public class ImageFactory {
     
-    private int m_imageCacheSize = 3000;
-    private int m_maxImageWidth  = 100;
-    private int m_maxImageHeight = 100;
-    private boolean m_asynch = true;
+    protected int m_imageCacheSize = 3000;
+    protected int m_maxImageWidth  = 100;
+    protected int m_maxImageHeight = 100;
+    protected boolean m_asynch = true;
     
     //a nice LRU cache courtesy of java 1.4
-    private Map imageCache =
+    protected Map imageCache =
         new LinkedHashMap((int) (m_imageCacheSize + 1 / .75F), .75F, true) {
             public boolean removeEldestEntry(Map.Entry eldest) {
                 return size() > m_imageCacheSize;
             }
         };
-    private Map loadMap = new HashMap(50);
+    protected Map loadMap = new HashMap(50);
 
-    private final Component component = new Component() {};
-    private final MediaTracker tracker = new MediaTracker(component);
-    private int nextTrackerID = 0;
+    protected final Component component = new Component() {};
+    protected final MediaTracker tracker = new MediaTracker(component);
+    protected int nextTrackerID = 0;
 
     /**
      * Create a new ImageFactory. Assumes no scaling of loaded images.
@@ -85,6 +85,17 @@ public class ImageFactory {
         m_imageCacheSize = size;
     }
 
+    /**
+     * Indicates if the given string location corresponds to an image
+     * currently stored in this ImageFactory's cache.
+     * @param imageLocation the image location string
+     * @return true if the location is a key for a currently cached image,
+     * false otherwise.
+     */
+    public boolean isInCache(String imageLocation) {
+    	return imageCache.containsKey(imageLocation);
+    }
+    
     /**
      * <p>Get the image associated with the given location string. If the image
      * has already been loaded, it simply will return the image, otherwise it
