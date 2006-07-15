@@ -78,6 +78,35 @@ public class ColorAction extends EncoderAction {
     }
     
     /**
+     * Constructor, sets the data group, filter predicate and color field
+     * for color assignment.
+     * Uses an initial default color value of black [RGB value (0,0,0)].
+     * @param group the data group processed by this Action
+     * @param filter the filter predicate
+     *  {@link prefuse.data.expression.Predicate}
+     * @param field the color field assigned by this Action
+     */
+    public ColorAction(String group, Predicate filter, String field) {
+    	super(group, filter);
+    	setField(field);
+    }
+     
+    /**
+     * Constructor, sets the data group, filter predicate,
+     * color field, and default color value for color assignment.
+     * @param group the data group processed by this Action
+     * @param filter the filter predicate 
+     * 	{@link prefuse.data.expression.Predicate}
+     * @param field the color field assigned by this Action
+     * @param color the default color value assigned by this ColorAction
+     */
+    public ColorAction(String group, Predicate filter, String field, int color)
+    {
+    	this(group, filter, field);
+    	setDefaultColor(color);
+    }    
+    
+    /**
      * Set the color field name that this ColorAction should set. The
      * ColorAction will automatically try to update the start and end
      * values for this field if it is an interpolated field.
