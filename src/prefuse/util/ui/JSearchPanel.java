@@ -374,6 +374,14 @@ public class JSearchPanel extends JPanel
     }
     
     /**
+     * Get the query string in the text field.
+     * @return the current query string
+     */
+    public String getQuery() {
+        return m_queryF.getText();
+    }
+    
+    /**
      * Set the fill color of the cancel 'x' button that appears
      * when the button has the mouse pointer over it. 
      * @param c the cancel color
