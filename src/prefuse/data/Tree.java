@@ -653,6 +653,7 @@ public class Tree extends Graph {
     protected static final Schema TREE_LINKS_SCHEMA = new Schema();
     static {
         TREE_LINKS_SCHEMA.addColumn(CHILDINDEX, int.class, new Integer(-1));
+        TREE_LINKS_SCHEMA.lockSchema();
     }
     
 } // end of class Tree

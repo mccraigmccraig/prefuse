@@ -98,16 +98,14 @@ public class TypeLib {
     }
     
     /**
-     * Given a numeric (int, long, float, or double) class type or associated
-     * wrapper class type, return the primitive class type
+     * Given a numeric (byte, short, int, long, float, or double) class type or
+     * associated wrapper class type, return the primitive class type
      * @param type the type to look up, must be a numerical type, but can be
      * either primitive or a wrapper.
      * @return the primitive class type
      */
     public static Class getPrimitiveType(Class type) {
-        if ( Byte.class.equals(type) || type == byte.class ) {
-            return byte.class;
-        } else if ( Integer.class.equals(type) || type == int.class ) {
+        if ( Integer.class.equals(type) || type == int.class ) {
             return int.class;
         } else if ( Long.class.equals(type) || type == long.class ) {
             return long.class;
@@ -115,6 +113,10 @@ public class TypeLib {
             return float.class;
         } else if ( Double.class.equals(type) || type == double.class ) {
             return double.class;
+        } else if ( Byte.class.equals(type) || type == byte.class ) {
+            return byte.class;
+        } else if ( Short.class.equals(type) || type == short.class ) {
+            return short.class;
         } else {
             throw new IllegalArgumentException(
                 "Input class must be a numeric type");
@@ -146,26 +148,39 @@ public class TypeLib {
             return Character.class;
         } else if ( byte.class == type ) {
             return Byte.class;
+        } else if ( short.class == type ) {
+            return Short.class;
         } else {
             throw new IllegalArgumentException();
         }
     }
     
     /**
+     * Indicates if a given class type is a primitive integer type
+     * (one of byte, short, int, or long).
+     * @param type the type to check
+     * @return true if it is a primitive numeric type, false otherwise
+     */
+    public static boolean isIntegerType(Class type) {
+        return ( type == byte.class || type == short.class ||
+                 type == int.class  || type == long.class);
+    }
+    
+    /**
      * Indicates if a given class type is a primitive numeric one type
-     * (one of int, long, float, or double).
+     * (one of byte, short, int, long, float, or double).
      * @param type the type to check
      * @return true if it is a primitive numeric type, false otherwise
      */
     public static boolean isNumericType(Class type) {
-        return ( type == byte.class   || type == int.class || 
-                 type == long.class   || 
+        return ( type == byte.class   || type == short.class ||
+                 type == int.class    || type == long.class  || 
                  type == double.class || type == float.class );
     }
     
     /**
      * Get a compatible numeric type for two primitive numeric
-     * class types.
+     * class types. Any of (byte, short, int) will resolve to int.
      * @param c1 a numeric primitive class type (int, long, float, or double)
      * @param c2 a numeric primitive class type (int, long, float, or double)
      * @return the compatible numeric type for binary operations involving

@@ -16,6 +16,7 @@ import prefuse.data.tuple.TupleSet;
 import prefuse.data.util.Index;
 import prefuse.data.util.NeighborIterator;
 import prefuse.util.PrefuseConfig;
+import prefuse.util.TypeLib;
 import prefuse.util.collections.CompositeIntIterator;
 import prefuse.util.collections.CompositeIterator;
 import prefuse.util.collections.CopyOnWriteArrayList;
@@ -121,7 +122,8 @@ public class Graph extends CompositeTupleSet {
     protected String m_tkey;
     /** Reference to an index over the node key field */
     protected Index m_nidx;
-    
+    /** Indicates if the key values are of type long */
+    protected boolean m_longKey = false;
     /** Update listener */
     private Listener m_listener;
     /** Listener list */
@@ -249,9 +251,10 @@ public class Graph extends CompositeTupleSet {
             String nodeKey, String sourceKey, String targetKey)
     {
         // sanity check
-        if ( (nodeKey!=null && nodes.getColumnType(nodeKey) != int.class) ||
-             edges.getColumnType(sourceKey) != int.class ||
-             edges.getColumnType(targetKey) != int.class )
+        if ( (nodeKey!=null && 
+              !TypeLib.isIntegerType(nodes.getColumnType(nodeKey)))  ||
+              !TypeLib.isIntegerType(edges.getColumnType(sourceKey)) ||
+              !TypeLib.isIntegerType(edges.getColumnType(targetKey)) )
         {
             throw new IllegalArgumentException(
                 "Incompatible column types for graph keys");
@@ -271,6 +274,8 @@ public class Graph extends CompositeTupleSet {
         
         // set up indices
         if ( nodeKey != null ) {
+            if ( nodes.getColumnType(nodeKey) == long.class )
+                m_longKey = true;
             nodes.index(nodeKey);
             m_nidx = nodes.getIndex(nodeKey);
         }
@@ -490,8 +495,8 @@ public class Graph extends CompositeTupleSet {
      * @param node the node id
      * @return the value of the node key field for the given node
      */
-    public int getKey(int node) {
-        return m_nkey == null ? node : getNodeTable().getInt(node, m_nkey);
+    public long getKey(int node) {
+        return m_nkey == null ? node : getNodeTable().getLong(node, m_nkey);
     }
     
     /**
@@ -500,11 +505,11 @@ public class Graph extends CompositeTupleSet {
      * @param key a node key field value
      * @return the node id (the row number in the node table)
      */
-    public int getNodeIndex(int key) {
+    public int getNodeIndex(long key) {
         if ( m_nidx == null ) {
-            return key;
+            return (int)key;
         } else {
-            int idx = m_nidx.get(key);
+            int idx = m_longKey ? m_nidx.get(key) : m_nidx.get((int)key);
             return idx<0 ? -1 : idx;
         }
     }
@@ -538,15 +543,19 @@ public class Graph extends CompositeTupleSet {
      */
     public int addEdge(int s, int t) {
         // get keys for the nodes
-        int key1 = getKey(s);
-        int key2 = getKey(t);
+        long key1 = getKey(s);
+        long key2 = getKey(t);
         
         // add edge row, set source/target fields
         Table edges = getEdgeTable();
         int r = edges.addRow();
-        edges.setInt(r, m_skey, key1);
-        edges.setInt(r, m_tkey, key2);
-        //updateDegrees(r, s, t, 1);
+        if ( m_longKey ) {
+            edges.setLong(r, m_skey, key1);
+            edges.setLong(r, m_tkey, key2);
+        } else {
+            edges.setInt(r, m_skey, (int)key1);
+            edges.setInt(r, m_tkey, (int)key2);
+        }
         return r;
     }
     
@@ -625,12 +634,6 @@ public class Graph extends CompositeTupleSet {
      */
     protected void clearEdges() {
         getEdgeTable().clear();
-        // TODO this can be removed after removeEdge fix is implemented
-//        for ( IntIterator rows = m_links.rows(); rows.hasNext(); ) {
-//            int row = rows.nextInt();
-//            m_links.setInt(row, OUTDEGREE, 0);
-//            m_links.setInt(row, INDEGREE, 0);
-//        }
     }
     
     // ------------------------------------------------------------------------
@@ -704,7 +707,7 @@ public class Graph extends CompositeTupleSet {
      * @param key a node key field value
      * @return the requested Node instance
      */
-    public Node getNodeFromKey(int key) {
+    public Node getNodeFromKey(long key) {
         int n = getNodeIndex(key);
         return (n<0 ? null : getNode(n) );
     }
@@ -881,7 +884,7 @@ public class Graph extends CompositeTupleSet {
      * @return the source node id (node table row number)
      */
     public int getSourceNode(int edge) {
-        return getNodeIndex(getEdgeTable().getInt(edge, m_skey));
+        return getNodeIndex(getEdgeTable().getLong(edge, m_skey));
     }
     
     /**
@@ -901,7 +904,7 @@ public class Graph extends CompositeTupleSet {
      * @return the target node id (node table row number)
      */
     public int getTargetNode(int edge) {
-        return getNodeIndex(getEdgeTable().getInt(edge, m_tkey));
+        return getNodeIndex(getEdgeTable().getLong(edge, m_tkey));
     }
     
     /**
@@ -1335,6 +1338,10 @@ public class Graph extends CompositeTupleSet {
         }
 
         public void columnChanged(Column src, int idx, int prev) {
+            columnChanged(src, idx, (long)prev);
+        }
+
+        public void columnChanged(Column src, int idx, long prev) {
             if ( src==m_scol || src==m_tcol ) {
                 boolean isSrc = src==m_scol;
                 int e = m_edges.getTableRow(idx, isSrc?m_sidx:m_tidx);
@@ -1351,12 +1358,8 @@ public class Graph extends CompositeTupleSet {
                 throw new IllegalStateException();
             }
         }
-
+        
         public void columnChanged(Column src, int type, int start, int end) {
-            // should never be called
-            throw new IllegalStateException();
-        }
-        public void columnChanged(Column src, int idx, long prev) {
             // should never be called
             throw new IllegalStateException();
         }
@@ -1398,6 +1401,7 @@ public class Graph extends CompositeTupleSet {
         LINKS_SCHEMA.addColumn(OUTDEGREE, int.class, defaultValue);
         LINKS_SCHEMA.addColumn(INLINKS,   int[].class);
         LINKS_SCHEMA.addColumn(OUTLINKS,  int[].class);
+        LINKS_SCHEMA.lockSchema();
     }
     
 } // end of class Graph
