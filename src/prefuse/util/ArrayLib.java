@@ -147,7 +147,7 @@ public abstract class ArrayLib {
     }
     
     // ------------------------------------------------------------------------
-    // Max / Min
+    // Max / Min / Sum
     
     /**
      * Find the maximum value in an array.
@@ -175,6 +175,19 @@ public abstract class ArrayLib {
                 min = a[i];
         }
         return min;
+    }
+    
+    /**
+     * Compute the sum of the values in an array.
+     * @param a the array
+     * @return the sum of the values in the array
+     */
+    public static final double sum(double[] a) {
+        double sum = 0;
+        for ( int i=0; i<a.length; ++i ) {
+            sum += a[i];
+        }
+        return sum;
     }
     
     //// -----------------------------------------------
