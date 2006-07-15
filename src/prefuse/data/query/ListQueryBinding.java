@@ -89,6 +89,16 @@ public class ListQueryBinding extends DynamicQueryBinding {
     // ------------------------------------------------------------------------    
     
     /**
+     * Returns a list model for creating custom dynamic query widgets.
+     * This list model acts both as a data model and a selection model,
+     * and so must be registered as both with any custom widgets.
+     * @return the dynamic query list model
+     */
+    public ListModel getListModel() {
+        return m_model;
+    }
+    
+    /**
      * Creates a new group of check boxes for interacting with the query.
      * @return a {@link prefuse.util.ui.JToggleGroup} of check boxes bound to
      * this dynamic query.
