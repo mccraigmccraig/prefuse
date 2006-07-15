@@ -123,16 +123,11 @@ public class CascadedTable extends Table {
         m_parent = parent;
         m_pnames = new ArrayList();
         m_rows = new CascadedRowManager(this);
-        m_rowFilter = rowFilter==null ? BooleanLiteral.TRUE : rowFilter;
-        m_colFilter = colFilter==null ? new AcceptAllColumnProjection() : colFilter;
-        filterColumns();
-        filterRows();
-        
         m_listener = new Listener();
+        
+        setColumnProjection(colFilter);
+        setRowFilter(rowFilter);
         m_parent.addTableListener(m_listener);
-        if ( m_rowFilter != BooleanLiteral.TRUE )
-            m_rowFilter.addExpressionListener(m_listener);
-        m_colFilter.addProjectionListener(m_listener);
     }
     
     // -- non-cascading version -----------------------------------------------
@@ -238,6 +233,55 @@ public class CascadedTable extends Table {
             if ( rowman.getChildRow(prow) == -1 )
                 addCascadedRow(prow);
         }
+    }
+    
+    /**
+     * Get the ColumnProjection determining which columns of the
+     * parent table are included in this one.
+     * @return the ColumnProjection of this CascadedTable
+     */
+    public ColumnProjection getColumnProjection() {
+    	return m_colFilter;
+    }
+    
+    /**
+     * Sets the ColumnProjection determining which columns of the
+     * parent table are included in this one.
+     * @param colFilter a ColumnProjection determining which columns of the
+     * parent table to include in this one.
+     */
+    public void setColumnProjection(ColumnProjection colFilter) {
+        if ( m_colFilter != null ) {
+        	m_colFilter.removeProjectionListener(m_listener);
+        }
+        m_colFilter = colFilter==null ? new AcceptAllColumnProjection() : colFilter;
+        m_colFilter.addProjectionListener(m_listener);
+        filterColumns();
+    }
+    
+    /**
+     * Gets ths Predicate determining which rows of the parent
+     * table are included in this one.
+     * @return the row filtering Predicate of this CascadedTable
+     */
+    public Predicate getRowFilter() {
+    	return m_rowFilter;
+    }
+    
+    /**
+     * Sets the Predicate determining which rows of the parent
+     * table are included in this one.
+     * @param rowFilter a Predicate determining which rows of the parent
+     * table to include in this one.
+     */
+    public void setRowFilter(Predicate rowFilter) {
+    	if ( m_rowFilter != null ) {
+    		m_rowFilter.removeExpressionListener(m_listener);
+    	}
+        m_rowFilter = rowFilter==null ? BooleanLiteral.TRUE : rowFilter;
+        if ( m_rowFilter != BooleanLiteral.TRUE )
+            m_rowFilter.addExpressionListener(m_listener);
+        filterRows();
     }
     
     // ------------------------------------------------------------------------
