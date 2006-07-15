@@ -7,7 +7,8 @@ import prefuse.data.tuple.TupleSet;
 import prefuse.visual.VisualItem;
 
 /**
- * Layout action that uniformly positions visual items along a circle.
+ * Layout action that positions visual items along a circle. By default,
+ * items are sorted in the order in which they iterated over.
  * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
