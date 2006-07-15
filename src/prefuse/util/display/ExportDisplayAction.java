@@ -35,6 +35,9 @@ public class ExportDisplayAction extends AbstractAction {
      */
     public ExportDisplayAction(Display display) {
         this.display = display;
+    }
+    
+    private void init() {
         scaler  = new ScaleSelector();
         chooser = new JFileChooser();
         chooser.setDialogType(JFileChooser.SAVE_DIALOG);
@@ -60,6 +63,10 @@ public class ExportDisplayAction extends AbstractAction {
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed(ActionEvent evt) {
+        // lazy initialization
+        if ( chooser == null )
+            init();
+        
         // open image save dialog
         File f = null;
         scaler.setImage(display.getOffscreenBuffer());
