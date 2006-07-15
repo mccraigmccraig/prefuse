@@ -22,7 +22,7 @@ public class SortedMapFactory {
             throw new IncompatibleComparatorException();
         }
         
-        if ( type.equals(int.class) )
+        if ( type.equals(int.class) || type.equals(byte.class) )
         {
             return new IntIntTreeMap((LiteralComparator)cmp, !unique);
         } 
