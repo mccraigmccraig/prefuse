@@ -34,6 +34,7 @@ public class AxisLabelLayout extends Layout {
     
     private NumberFormat m_nf = NumberFormat.getInstance();
     private int m_axis;
+    private boolean m_asc = true;
     private int m_scale = Constants.LINEAR_SCALE;
     
     private double m_spacing; // desired spacing between axis labels
@@ -176,6 +177,27 @@ public class AxisLabelLayout extends Layout {
     }
     
     /**
+     * Indicates if the axis values should be presented in ascending order
+     * along the axis.
+     * @return true if data values increase as pixel coordinates increase,
+     * false if data values decrease as pixel coordinates increase.
+     */
+    public boolean isAscending() {
+        return m_asc;
+    }
+    
+    /**
+     * Sets if the axis values should be presented in ascending order
+     * along the axis.
+     * @param asc true if data values should increase as pixel coordinates
+     * increase, false if data values should decrease as pixel coordinates
+     * increase.
+     */
+    public void setAscending(boolean asc) {
+        m_asc = asc;
+    }
+    
+    /**
      * Sets the range model used to layout this axis.
      * @param model the range model
      */
@@ -272,9 +294,10 @@ public class AxisLabelLayout extends Layout {
         }
 
         Index index = labels.index(VALUE);
-        double step = getLinearStep(span, breadth/span);
+        double step = getLinearStep(span, span==0 ? 0 : breadth/span);
         if ( step == 0 ) step = 1;
         int r;
+
         for ( double x, v=vlo; v<=m_hi; v+=step ) {
             x = ((v-m_lo)/span)*breadth;
             if ( x < -0.5 ) {
@@ -508,14 +531,14 @@ public class AxisLabelLayout extends Layout {
     protected void set(VisualItem item, double xOrY, Rectangle2D b) {
         switch ( m_axis ) {
         case Constants.X_AXIS:
-            xOrY += b.getMinX();
+            xOrY = m_asc ? xOrY + b.getMinX() : b.getMaxX() - xOrY;
             PrefuseLib.updateDouble(item, VisualItem.X,  xOrY);
             PrefuseLib.updateDouble(item, VisualItem.Y,  b.getMinY());
             PrefuseLib.updateDouble(item, VisualItem.X2, xOrY);
             PrefuseLib.updateDouble(item, VisualItem.Y2, b.getMaxY());
             break;
         case Constants.Y_AXIS:
-            xOrY = b.getMaxY() - xOrY - 1;
+            xOrY = m_asc ? b.getMaxY() - xOrY - 1 : xOrY + b.getMinY();
             PrefuseLib.updateDouble(item, VisualItem.X,  b.getMinX());
             PrefuseLib.updateDouble(item, VisualItem.Y,  xOrY);
             PrefuseLib.updateDouble(item, VisualItem.X2, b.getMaxX());
