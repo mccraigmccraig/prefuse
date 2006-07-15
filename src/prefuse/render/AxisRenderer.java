@@ -49,6 +49,27 @@ public class AxisRenderer extends AbstractShapeRenderer {
     }
     
     /**
+     * Set the horizontal alignment of axis labels.
+     * @param xalign the horizontal alignment for the axis label. One of
+     * {@link prefuse.Constants#LEFT}, {@link prefuse.Constants#RIGHT},
+     * or {@link prefuse.Constants#CENTER}.
+     */
+    public void setHorizontalAlignment(int xalign) {
+        m_xalign = xalign;
+    }
+    
+    /**
+     * Set the vertical alignment of axis labels.
+     * @param yalign the vertical alignment for the axis label. One of
+     * {@link prefuse.Constants#TOP}, {@link prefuse.Constants#BOTTOM},
+     * or {@link prefuse.Constants#CENTER}.
+     * @param yalign
+     */
+    public void setVerticalAlignment(int yalign) {
+        m_yalign = yalign;
+    }
+    
+    /**
      * @see prefuse.render.AbstractShapeRenderer#getRawShape(prefuse.visual.VisualItem)
      */
     protected Shape getRawShape(VisualItem item) {
