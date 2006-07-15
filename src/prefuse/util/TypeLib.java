@@ -105,7 +105,9 @@ public class TypeLib {
      * @return the primitive class type
      */
     public static Class getPrimitiveType(Class type) {
-        if ( Integer.class.equals(type) || type == int.class ) {
+        if ( Byte.class.equals(type) || type == byte.class ) {
+            return byte.class;
+        } else if ( Integer.class.equals(type) || type == int.class ) {
             return int.class;
         } else if ( Long.class.equals(type) || type == long.class ) {
             return long.class;
@@ -156,7 +158,8 @@ public class TypeLib {
      * @return true if it is a primitive numeric type, false otherwise
      */
     public static boolean isNumericType(Class type) {
-        return ( type == int.class || type == long.class || 
+        return ( type == byte.class   || type == int.class || 
+                 type == long.class   || 
                  type == double.class || type == float.class );
     }
     
