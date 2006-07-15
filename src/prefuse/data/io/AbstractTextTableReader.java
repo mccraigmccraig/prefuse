@@ -150,7 +150,7 @@ public abstract class AbstractTextTableReader extends AbstractTableReader {
                 // collections. If this proves to be a problem down the road,
                 // we can add more nuance later.
                 DataParser dp = di.getParser(dim[1]);
-                table.setValueAt(dim[0], dim[1], dp.parse(value));
+                table.set(dim[0], dim[1], dp.parse(value));
             }
         };
         

@@ -52,7 +52,7 @@ public class DelimitedTextTableReaderTest extends TestCase implements TableTestD
         if (verbose) System.out.println();
         for (int r = 0; r < t.getRowCount(); ++r) {
             for (int c = 0; c < t.getColumnCount(); ++c) {
-                Object o = t.getValueAt(r, c);
+                Object o = t.get(r, c);
                 if (verbose) System.out.print(o + "\t");
                 assertEquals(TABLE[c][r], o);
             }

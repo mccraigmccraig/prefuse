@@ -233,7 +233,7 @@ public class TableTest extends TestCase implements TableTestData {
         
         for ( int i=0; i<cols.length; ++i ) {
             try {
-                t.getValueAt(0,cols[i]);
+                t.get(0,cols[i]);
                 fail("Allowed illegal access");
             } catch ( Exception success ) {
             }
@@ -259,7 +259,7 @@ public class TableTest extends TestCase implements TableTestData {
         
         for ( int i=0; i<cols.length; ++i ) {
             try {
-                t.setValueAt(0,cols[i],TABLE[i][0]);
+                t.set(0,cols[i],TABLE[i][0]);
                 fail("Allowed illegal access");
             } catch ( Exception success ) {
             }

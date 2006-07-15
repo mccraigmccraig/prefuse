@@ -140,7 +140,7 @@ public interface Tuple {
      * @see #canGet(String, Class)
      * @see #getColumnType(int)
      */
-    public Object getValueAt(int col);
+    public Object get(int col);
     
     /**
      * Set the value of at the given column number.
@@ -152,7 +152,7 @@ public interface Tuple {
      * @see #canSet(String, Class)
      * @see #getColumnType(String)
      */
-    public void setValueAt(int col, Object value);
+    public void set(int col, Object value);
     
     /**
      * Get the default value for the given data field.
@@ -207,6 +207,21 @@ public interface Tuple {
      */
     public void setInt(String field, int val);
     
+    /**
+     * Get the data value at the given field as an <code>int</code>.
+     * @param col the column number of the data field to retrieve
+     * @see #canGetInt(String)
+     */
+    public int getInt(int col);
+    
+    /**
+     * Set the data value of the given field with an <code>int</code>.
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetInt(String)
+     */
+    public void setInt(int col, int val);
+    
     // --------------------------------------------------------------
     
     /**
@@ -242,6 +257,21 @@ public interface Tuple {
      * @see #canSetLong(String)
      */
     public void setLong(String field, long val);
+    
+    /**
+     * Get the data value at the given field as a <code>long</code>.
+     * @param col the column number of the data field to retrieve
+     * @see #canGetLong(String)
+     */
+    public long getLong(int col);
+    
+    /**
+     * Set the data value of the given field with a <code>long</code>.
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetLong(String)
+     */
+    public void setLong(int col, long val);
 
     // --------------------------------------------------------------
     
@@ -279,6 +309,21 @@ public interface Tuple {
      */
     public void setFloat(String field, float val);
     
+    /**
+     * Get the data value at the given field as a <code>float</code>.
+     * @param col the column number of the data field to retrieve
+     * @see #canGetFloat(String)
+     */
+    public float getFloat(int col);
+    
+    /**
+     * Set the data value of the given field with a <code>float</code>.
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetFloat(String)
+     */
+    public void setFloat(int col, float val);
+    
     // --------------------------------------------------------------
     
     /**
@@ -314,6 +359,21 @@ public interface Tuple {
      * @see #canSetDouble(String)
      */
     public void setDouble(String field, double val);
+    
+    /**
+     * Get the data value at the given field as a <code>double</code>.
+     * @param col the column number of the data field to retrieve
+     * @see #canGetDouble(String)
+     */
+    public double getDouble(int col);
+    
+    /**
+     * Set the data value of the given field with a <code>double</code>.
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetDouble(String)
+     */
+    public void setDouble(int col, double val);
     
     // --------------------------------------------------------------
     
@@ -351,6 +411,21 @@ public interface Tuple {
      */
     public void setBoolean(String field, boolean val);
     
+    /**
+     * Get the data value at the given field as a <code>boolean</code>.
+     * @param col the column number of the data field to retrieve
+     * @see #canGetBoolean(String)
+     */
+    public boolean getBoolean(int col);
+    
+    /**
+     * Set the data value of the given field with a <code>boolean</code>.
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetBoolean(String)
+     */
+    public void setBoolean(int col, boolean val);
+    
     // --------------------------------------------------------------
     
     /**
@@ -387,6 +462,21 @@ public interface Tuple {
      */
     public void setString(String field, String val);
     
+    /**
+     * Get the data value at the given field as a <code>String</code>.
+     * @param col the column number of the data field to retrieve
+     * @see #canGetString(String)
+     */
+    public String getString(int col);
+    
+    /**
+     * Set the data value of the given field with a <code>String</code>.
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetString(String)
+     */
+    public void setString(int col, String val);
+    
     // --------------------------------------------------------------
     
     /**
@@ -422,5 +512,20 @@ public interface Tuple {
      * @see #canSetDate(String)
      */
     public void setDate(String field, Date val);
+    
+    /**
+     * Get the data value at the given field as a <code>Date</code>.
+     * @param col the column number of the data field to retrieve
+     * @see #canGetDate(String)
+     */
+    public Date getDate(int col);
+    
+    /**
+     * Set the data value of the given field with a <code>Date</code>.
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetDate(String)
+     */
+    public void setDate(int col, Date val);
     
 } // end of interface Tuple

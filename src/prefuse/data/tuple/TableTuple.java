@@ -151,19 +151,19 @@ public class TableTuple implements Tuple {
     }
     
     /**
-     * @see prefuse.data.Tuple#getValueAt(int)
+     * @see prefuse.data.Tuple#get(int)
      */
-    public final Object getValueAt(int idx) {
+    public final Object get(int idx) {
         validityCheck();
-        return m_table.getValueAt(m_row, idx);
+        return m_table.get(m_row, idx);
     }
 
     /**
-     * @see prefuse.data.Tuple#setValueAt(int, java.lang.Object)
+     * @see prefuse.data.Tuple#set(int, java.lang.Object)
      */
-    public final void setValueAt(int idx, Object value) {
+    public final void set(int idx, Object value) {
         validityCheck();
-        m_table.setValueAt(m_row, idx, value);
+        m_table.set(m_row, idx, value);
     }
     
     /**
@@ -215,6 +215,22 @@ public class TableTuple implements Tuple {
         m_table.setInt(m_row, field, val);
     }
     
+    /**
+     * @see prefuse.data.Tuple#getInt(int)
+     */
+    public final int getInt(int col) {
+        validityCheck();
+        return m_table.getInt(m_row, col);
+    }
+    
+    /**
+     * @see prefuse.data.Tuple#setInt(int, int)
+     */
+    public final void setInt(int col, int val) {
+        validityCheck();
+        m_table.setInt(m_row, col, val);
+    }
+    
     // --------------------------------------------------------------
     
     /**
@@ -245,6 +261,22 @@ public class TableTuple implements Tuple {
     public final void setLong(String field, long val) {
         validityCheck();
         m_table.setLong(m_row, field, val);
+    }
+    
+    /**
+     * @see prefuse.data.Tuple#getLong(int)
+     */
+    public final long getLong(int col) {
+        validityCheck();
+        return m_table.getLong(m_row, col);
+    }
+    
+    /**
+     * @see prefuse.data.Tuple#setLong(int, long)
+     */
+    public final void setLong(int col, long val) {
+        validityCheck();
+        m_table.setLong(m_row, col, val);
     }
 
     // --------------------------------------------------------------
@@ -279,6 +311,22 @@ public class TableTuple implements Tuple {
         m_table.setFloat(m_row, field, val);
     }
     
+    /**
+     * @see prefuse.data.Tuple#getFloat(int)
+     */
+    public final float getFloat(int col) {
+        validityCheck();
+        return m_table.getFloat(m_row, col);
+    }
+    
+    /**
+     * @see prefuse.data.Tuple#setFloat(int, float)
+     */
+    public final void setFloat(int col, float val) {
+        validityCheck();
+        m_table.setFloat(m_row, col, val);
+    }
+    
     // --------------------------------------------------------------
     
     /**
@@ -309,6 +357,22 @@ public class TableTuple implements Tuple {
     public final void setDouble(String field, double val) {
         validityCheck();
         m_table.setDouble(m_row, field, val);
+    }
+    
+    /**
+     * @see prefuse.data.Tuple#getDouble(int)
+     */
+    public final double getDouble(int col) {
+        validityCheck();
+        return m_table.getDouble(m_row, col);
+    }
+    
+    /**
+     * @see prefuse.data.Tuple#setDouble(int, double)
+     */
+    public final void setDouble(int col, double val) {
+        validityCheck();
+        m_table.setDouble(m_row, col, val);
     }
     
     // --------------------------------------------------------------
@@ -343,6 +407,22 @@ public class TableTuple implements Tuple {
         m_table.setBoolean(m_row, field, val);
     }
     
+    /**
+     * @see prefuse.data.Tuple#getBoolean(int)
+     */
+    public final boolean getBoolean(int col) {
+        validityCheck();
+        return m_table.getBoolean(m_row, col);
+    }
+    
+    /**
+     * @see prefuse.data.Tuple#setBoolean(java.lang.String, boolean)
+     */
+    public final void setBoolean(int col, boolean val) {
+        validityCheck();
+        m_table.setBoolean(m_row, col, val);
+    }
+    
     // --------------------------------------------------------------
     
     /**
@@ -373,6 +453,22 @@ public class TableTuple implements Tuple {
     public final void setString(String field, String val) {
         validityCheck();
         m_table.setString(m_row, field, val);
+    }
+    
+    /**
+     * @see prefuse.data.Tuple#getString(int)
+     */
+    public final String getString(int col) {
+        validityCheck();
+        return m_table.getString(m_row, col);
+    }
+    
+    /**
+     * @see prefuse.data.Tuple#setString(int, java.lang.String)
+     */
+    public final void setString(int col, String val) {
+        validityCheck();
+        m_table.setString(m_row, col, val);
     }
     
     // --------------------------------------------------------------
@@ -407,6 +503,22 @@ public class TableTuple implements Tuple {
         m_table.setDate(m_row, field, val);
     }
     
+    /**
+     * @see prefuse.data.Tuple#getDate(int)
+     */
+    public final Date getDate(int col) {
+        validityCheck();
+        return m_table.getDate(m_row, col);
+    }
+    
+    /**
+     * @see prefuse.data.Tuple#setDate(java.lang.String, java.util.Date)
+     */
+    public final void setDate(int col, Date val) {
+        validityCheck();
+        m_table.setDate(m_row, col, val);
+    }
+    
     // ------------------------------------------------------------------------
     
     /**
@@ -418,7 +530,7 @@ public class TableTuple implements Tuple {
         for ( int i=0; i<getColumnCount(); ++i ) {
             if ( i > 0 ) sb.append(',');
             try {
-                sb.append(getValueAt(i).toString());
+                sb.append(get(i).toString());
             } catch ( Exception e ) {
                 sb.append("?");
             }

@@ -782,7 +782,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
                 int r = addRow();
                 for ( int i=0; i<s.getColumnCount(); ++i ) {
                     String field = s.getColumnName(i);
-                    this.set(r, field, t.getValueAt(i));
+                    this.set(r, field, t.get(i));
                 }
                 return getTuple(r);
             } else {
@@ -930,7 +930,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      * @see #canGet(String, Class)
      * @see #getColumnType(int)
      */
-    public Object getValueAt(int row, int col) {
+    public Object get(int row, int col) {
         row = getColumnRow(row, col);
         return getColumn(col).get(row);
     }
@@ -946,7 +946,7 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      * @see #canSet(String, Class)
      * @see #getColumnType(String)
      */
-    public void setValueAt(int row, int col, Object val) {
+    public void set(int row, int col, Object val) {
         row = getColumnRow(row, col);
         getColumn(col).set(val, row);
         
@@ -1032,6 +1032,31 @@ public class Table extends AbstractTupleSet implements ColumnListener {
         getColumn(col).setInt(val, row);
     }
     
+    /**
+     * Get the data value at the given row and field as an
+     * <code>int</code>.
+     * @param row the table row to retrieve
+     * @param col the column number of the data field to retrieve
+     * @see #canGetInt(String)
+     */
+    public final int getInt(int row, int col) {
+        row = getColumnRow(row, col);
+        return getColumn(col).getInt(row);
+    }
+    
+    /**
+     * Set the data value of the given row and field as an
+     * <code>int</code>.
+     * @param row the table row to set
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetInt(String)
+     */
+    public final void setInt(int row, int col, int val) {
+        row = getColumnRow(row, col);
+        getColumn(col).setInt(val, row);
+    }
+    
     // --------------------------------------------------------------
     
     /**
@@ -1086,6 +1111,31 @@ public class Table extends AbstractTupleSet implements ColumnListener {
         getColumn(col).setLong(val, row);
     }
 
+    /**
+     * Get the data value at the given row and field as an
+     * <code>long</code>.
+     * @param row the table row to retrieve
+     * @param col the column number of the data field to retrieve
+     * @see #canGetLong(String)
+     */
+    public final long getLong(int row, int col)  {
+        row = getColumnRow(row, col);
+        return getColumn(col).getLong(row);
+    }
+    
+    /**
+     * Set the data value of the given row and field as an
+     * <code>long</code>.
+     * @param row the table row to set
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetLong(String)
+     */
+    public final void setLong(int row, int col, long val) {
+        row = getColumnRow(row, col);
+        getColumn(col).setLong(val, row);
+    }
+    
     // --------------------------------------------------------------
     
     /**
@@ -1136,6 +1186,31 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final void setFloat(int row, String field, float val) {
         int col = getColumnNumber(field);
+        row = getColumnRow(row, col);
+        getColumn(col).setFloat(val, row);   
+    }
+    
+    /**
+     * Get the data value at the given row and field as a
+     * <code>float</code>.
+     * @param row the table row to retrieve
+     * @param col the column number of the data field to get
+     * @see #canGetFloat(String)
+     */
+    public final float getFloat(int row, int col) {
+        row = getColumnRow(row, col);
+        return getColumn(col).getFloat(row);
+    }
+    
+    /**
+     * Set the data value of the given row and field as a
+     * <code>float</code>.
+     * @param row the table row to set
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetFloat(String)
+     */
+    public final void setFloat(int row, int col, float val) {
         row = getColumnRow(row, col);
         getColumn(col).setFloat(val, row);   
     }
@@ -1194,6 +1269,31 @@ public class Table extends AbstractTupleSet implements ColumnListener {
         getColumn(col).setDouble(val, row);
     }
     
+    /**
+     * Get the data value at the given row and field as a
+     * <code>double</code>.
+     * @param row the table row to retrieve
+     * @param col the column number of the data field to get
+     * @see #canGetDouble(String)
+     */
+    public final double getDouble(int row, int col) {
+        row = getColumnRow(row, col);
+        return getColumn(col).getDouble(row);
+    }
+    
+    /**
+     * Set the data value of the given row and field as a
+     * <code>double</code>.
+     * @param row the table row to set
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetDouble(String)
+     */
+    public final void setDouble(int row, int col, double val) {
+        row = getColumnRow(row, col);
+        getColumn(col).setDouble(val, row);
+    }
+
     // --------------------------------------------------------------
     
     /**
@@ -1244,6 +1344,31 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final void setBoolean(int row, String field, boolean val) {
         int col = getColumnNumber(field);
+        row = getColumnRow(row, col);
+        getColumn(col).setBoolean(val, row);
+    }
+    
+    /**
+     * Get the data value at the given row and field as a
+     * <code>boolean</code>.
+     * @param row the table row to retrieve
+     * @param col the column number of the data field to get
+     * @see #canGetBoolean(String)
+     */
+    public final boolean getBoolean(int row, int col) {
+        row = getColumnRow(row, col);
+        return getColumn(col).getBoolean(row);
+    }
+    
+    /**
+     * Set the data value of the given row and field as a
+     * <code>boolean</code>.
+     * @param row the table row to set
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetBoolean(String)
+     */
+    public final void setBoolean(int row, int col, boolean val) {
         row = getColumnRow(row, col);
         getColumn(col).setBoolean(val, row);
     }
@@ -1302,6 +1427,31 @@ public class Table extends AbstractTupleSet implements ColumnListener {
         getColumn(col).setString(val, row);
     }
     
+    /**
+     * Get the data value at the given row and field as a
+     * <code>String</code>.
+     * @param row the table row to retrieve
+     * @param col the column number of the data field to retrieve
+     * @see #canGetString(String)
+     */
+    public final String getString(int row, int col) {
+        row = getColumnRow(row, col);
+        return getColumn(col).getString(row);
+    }
+    
+    /**
+     * Set the data value of the given row and field as a
+     * <code>String</code>.
+     * @param row the table row to set
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetString(String)
+     */
+    public final void setString(int row, int col, String val) {
+        row = getColumnRow(row, col);
+        getColumn(col).setString(val, row);
+    }
+    
     // --------------------------------------------------------------
     
     /**
@@ -1352,6 +1502,31 @@ public class Table extends AbstractTupleSet implements ColumnListener {
      */
     public final void setDate(int row, String field, Date val) {
         int col = getColumnNumber(field);
+        row = getColumnRow(row, col);
+        getColumn(col).setDate(val, row);
+    }
+    
+    /**
+     * Get the data value at the given row and field as a
+     * <code>Date</code>.
+     * @param row the table row to retrieve
+     * @param col the column number of the data field to retrieve
+     * @see #canGetDate(String)
+     */
+    public final Date getDate(int row, int col) {
+        row = getColumnRow(row, col);
+        return getColumn(col).getDate(row);
+    }
+    
+    /**
+     * Set the data value of the given row and field as a
+     * <code>Date</code>.
+     * @param row the table row to set
+     * @param col the column number of the data field to set
+     * @param val the value to set
+     * @see #canSetDate(String)
+     */
+    public final void setDate(int row, int col, Date val) {
         row = getColumnRow(row, col);
         getColumn(col).setDate(val, row);
     }

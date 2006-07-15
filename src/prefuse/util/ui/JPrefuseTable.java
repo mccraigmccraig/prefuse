@@ -121,7 +121,7 @@ public class JPrefuseTable extends JTable {
          * @see javax.swing.table.TableModel#getValueAt(int, int)
          */
         public Object getValueAt(int rowIndex, int columnIndex) {
-            Object o = m_table.getValueAt(getRow(rowIndex), columnIndex);
+            Object o = m_table.get(getRow(rowIndex), columnIndex);
             if ( o != null && o.getClass().isArray() ) {
                 return StringLib.getArrayString(o);
             } else {
@@ -132,7 +132,7 @@ public class JPrefuseTable extends JTable {
          * @see javax.swing.table.TableModel#setValueAt(java.lang.Object, int, int)
          */
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-            m_table.setValueAt(getRow(rowIndex), columnIndex, aValue);
+            m_table.set(getRow(rowIndex), columnIndex, aValue);
         }
         /**
          * @see javax.swing.table.TableModel#getColumnName(int)
