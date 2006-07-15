@@ -1,5 +1,6 @@
 package prefuse.action.assignment;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -52,6 +53,7 @@ public class DataColorAction extends ColorAction {
     private double[] m_dist;
     private int      m_bins = Constants.CONTINUOUS;
     private Map      m_omap;
+    private Object[] m_olist;
     private ColorMap m_cmap = new ColorMap(null,0,1);
     private int[]    m_palette;
     
@@ -207,6 +209,26 @@ public class DataColorAction extends ColorAction {
         throw new UnsupportedOperationException();
     }
     
+    /**
+     * Manually sets the ordered list of values to use for color assignment.
+     * Normally, this ordering is computed using the methods of the
+     * {@link prefuse.util.DataLib} class. This method allows you to set your
+     * own custom ordering. This ordering corresponds to the ordering of
+     * colors in this action's color palette. If the provided array of values
+     * is missing a value contained within the data, an exception will result
+     * during execution of this action.
+     * @param values the ordered list of values. If this array is missing a
+     * value contained within data processed by this action, an exception
+     * will be thrown when this action is run.
+     */
+    public void setOrdinalMap(Object[] values) {
+        m_olist = values;
+        m_omap = new HashMap();
+        for ( int i=0; i<values.length; ++i ) {
+            m_omap.put(values[i], new Integer(i));
+        }
+    }
+    
     // ------------------------------------------------------------------------    
     
     /**
@@ -275,7 +297,8 @@ public class DataColorAction extends ColorAction {
                 return dist;
             }
         } else {
-            m_omap = DataLib.ordinalMap(ts, m_dataField);
+            if ( m_olist == null ) 
+                m_omap = DataLib.ordinalMap(ts, m_dataField);
             return new double[] { 0, m_omap.size()-1 };
         }
     }
