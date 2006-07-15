@@ -30,6 +30,8 @@ import prefuse.util.collections.IntObjectHashMap;
  */
 public class ColorLib {
 
+    public static final char HEX_PREFIX = '#';
+    
     private static final IntObjectHashMap colorMap = new IntObjectHashMap();
     private static int misses = 0;
     private static int lookups = 0;
@@ -80,8 +82,8 @@ public class ColorLib {
      * @return the integer color code for the input String
      */
     public static int hex(String hex) {
-        if ( hex.charAt(0) == '#' )
-            hex = hex.substring(1,hex.length());
+        if ( hex.charAt(0) == HEX_PREFIX )
+            hex = hex.substring(1);
         return setAlpha(Integer.parseInt(hex, 16), 255);
     }
     
@@ -365,7 +367,36 @@ public class ColorLib {
                     Math.min(255, (int)(b/scale)),
                     alpha(c));
     }
+    
+    /**
+     * Get a desaturated shade of an input color.
+     * @param c a color code
+     * @return a desaturated color code
+     */
+    public static int desaturate(int c) {
+        int a = c & 0xff000000;
+        float r = ((c & 0xff0000) >> 16);
+        float g = ((c & 0x00ff00) >> 8);
+        float b = (c & 0x0000ff);
 
+        r *= 0.2125f; // red band weight
+        g *= 0.7154f; // green band weight
+        b *= 0.0721f; // blue band weight
+
+        int gray = Math.min(((int)(r+g+b)),0xff) & 0xff;
+        return a | (gray << 16) | (gray << 8) | gray;
+    }
+    
+    /**
+     * Set the saturation of an input color.
+     * @param c a color code
+     * @param saturation the new sautration value
+     * @return a saturated color code
+     */
+    public static int saturate(int c, float saturation) {
+        float[] hsb = Color.RGBtoHSB(red(c), green(c), blue(c), null);
+        return ColorLib.hsb(hsb[0], saturation, hsb[2]);
+    }
     
     // ------------------------------------------------------------------------
     // Color Palettes
@@ -374,7 +405,7 @@ public class ColorLib {
      * Default palette of category hues.
      */
     public static final float[] CATEGORY_HUES = {
-        0f, 1f/12f, 1f/6f, 1f/3f, 1f/2f, 2f/3f, 3f/4f, 5f/6f, 11f/12f
+        0f, 1f/12f, 1f/6f, 1f/3f, 1f/2f, 7f/12f, 2f/3f, /*3f/4f,*/ 5f/6f, 11f/12f
     };
     
     /**
