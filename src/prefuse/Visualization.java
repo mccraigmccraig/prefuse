@@ -246,6 +246,22 @@ public class Visualization {
         }
     }
     
+    protected void checkGroupExists(String group) {
+    	if ( m_visual.containsKey(group) || m_focus.containsKey(group) ) {
+    		throw new IllegalArgumentException(
+    				"Group name \'"+group+"\' already in use");
+    	}
+    }
+    
+    protected void addDataGroup(String group, VisualTupleSet ts, TupleSet src) {
+    	checkGroupExists(group);
+    	m_visual.put(group, ts);
+    	if ( src != null )
+    		m_source.put(group, src);
+    }
+    
+    // -- Tables --------------------------------------------------------------
+    
     /**
      * Add an empty VisualTable to this visualization, using the given data
      * group name. This adds a group of VisualItems that do not have a
@@ -256,8 +272,8 @@ public class Visualization {
      * @return the added VisualTable
      */
     public synchronized VisualTable addTable(String group) {
-        VisualTable vt = new VisualTable(this, group);
-        m_visual.put(group, vt);
+    	VisualTable vt = new VisualTable(this, group);
+    	addDataGroup(group, vt, null);
         return vt;
     }
     
@@ -272,8 +288,8 @@ public class Visualization {
      * @return the added VisualTable
      */
     public synchronized VisualTable addTable(String group, Schema schema) {
-        VisualTable vt = new VisualTable(this, group, schema);
-        m_visual.put(group, vt);
+    	VisualTable vt = new VisualTable(this, group, schema);
+        addDataGroup(group, vt, null);
         return vt;
     }
     
@@ -302,9 +318,8 @@ public class Visualization {
     public synchronized VisualTable addTable(
             String group, Table table, Predicate filter)
     {
-        VisualTable vt = new VisualTable(table, this, group, filter);
-        m_visual.put(group, vt);
-        m_source.put(group, table);
+    	VisualTable vt = new VisualTable(table, this, group, filter);
+    	addDataGroup(group, vt, table);
         return vt;
     }
 
@@ -338,12 +353,28 @@ public class Visualization {
             String group, Table table, Predicate filter, Schema schema)
     {
         VisualTable vt = new VisualTable(table, this, group, filter, schema);
-        m_visual.put(group, vt);
-        m_source.put(group, table);
+        addDataGroup(group, vt, table);
         return vt;
     }
     
-    // ------------------------------------------------------------------------
+    /**
+     * Add a VisualTable to this visualization, using the table's
+     * pre-set group name. An exception will be thrown if the group
+     * name is already in use. This method allows you to insert custom
+     * implementations of VisualTable into a Visualization. It is intended
+     * for advanced users and should <b>NOT</b> be used if you do not know
+     * what you are doing. In almost all cases, one of the other add methods
+     * is preferred.
+     * @param table the pre-built VisualTable to add
+     * @return the added VisualTable
+     */
+    public synchronized VisualTable addTable(VisualTable table) {
+    	addDataGroup(table.getGroup(), table, table.getParentTable());
+    	table.setVisualization(this);
+    	return table;
+    }
+    
+    // -- Graphs and Trees ----------------------------------------------------
     
     /**
      * Adds a graph to this visualization, using the given data group
@@ -394,6 +425,7 @@ public class Visualization {
     public synchronized VisualGraph addGraph(String group, Graph graph,
             Predicate filter, Schema nodeSchema, Schema edgeSchema)
     {
+    	checkGroupExists(group); // check before adding sub-tables
         String ngroup = PrefuseLib.getGroupName(group, Graph.NODES); 
         String egroup = PrefuseLib.getGroupName(group, Graph.EDGES);
 
@@ -406,9 +438,8 @@ public class Visualization {
                 graph.getEdgeSourceField(), graph.getEdgeTargetField());
         vg.setVisualization(this);
         vg.setGroup(group);
-        
-        m_visual.put(group, vg);
-        m_source.put(group, graph);
+     
+        addDataGroup(group, vg, graph);
         
         TupleManager ntm = new TupleManager(nt, vg, TableNodeItem.class);
         TupleManager etm = new TupleManager(et, vg, TableEdgeItem.class);
@@ -468,6 +499,7 @@ public class Visualization {
     public synchronized VisualTree addTree(String group, Tree tree,
             Predicate filter, Schema nodeSchema, Schema edgeSchema)
     {
+    	checkGroupExists(group); // check before adding sub-tables
         String ngroup = PrefuseLib.getGroupName(group, Graph.NODES); 
         String egroup = PrefuseLib.getGroupName(group, Graph.EDGES);
         
@@ -480,8 +512,7 @@ public class Visualization {
         vt.setVisualization(this);
         vt.setGroup(group);
         
-        m_visual.put(group, vt);
-        m_source.put(group, tree);
+        addDataGroup(group, vt, tree);
         
         TupleManager ntm = new TupleManager(nt, vt, TableNodeItem.class);
         TupleManager etm = new TupleManager(et, vt, TableEdgeItem.class);
@@ -491,6 +522,8 @@ public class Visualization {
         
         return vt;
     }
+    
+    // -- Aggregates ----------------------------------------------------------
     
     /**
      * Add a group of aggregates to this visualization. Aggregates are
@@ -515,9 +548,11 @@ public class Visualization {
                                                      Schema schema)
     {
         AggregateTable vat = new AggregateTable(this, group, schema);
-        m_visual.put(group, vat);
+        addDataGroup(group, vat, null);
         return vat;
     }
+    
+    // -- Derived Tables and Decorators ---------------------------------------
     
     /**
      * Add a derived table, a VisualTable that is cascaded from an
@@ -539,8 +574,8 @@ public class Visualization {
     {
         VisualTable src = (VisualTable)getGroup(source);
         VisualTable vt = new VisualTable(src, this, group, filter, override);
-        
-        m_visual.put(group, vt);
+     
+        addDataGroup(group, vt, getSourceData(source));
         return vt;
     }
     
@@ -625,6 +660,8 @@ public class Visualization {
         t.setTupleManager(new TupleManager(t, null, TableDecoratorItem.class));
         return t;
     }
+    
+    // -- Data Removal --------------------------------------------------------
     
     /**
      * Removes a data group from this Visualization. If the group is a focus
@@ -824,6 +861,7 @@ public class Visualization {
      * @param group the name of the focus group to add
      */
     public void addFocusGroup(String group) {
+    	checkGroupExists(group);
         m_focus.put(group, new DefaultTupleSet());
     }
 
@@ -833,7 +871,8 @@ public class Visualization {
      * @param tset the TupleSet for the focus group
      */
     public void addFocusGroup(String group, TupleSet tset) {
-        m_focus.put(group, tset);
+        checkGroupExists(group);
+    	m_focus.put(group, tset);
     }
     
     // ------------------------------------------------------------------------

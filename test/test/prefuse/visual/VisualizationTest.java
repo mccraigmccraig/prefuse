@@ -43,6 +43,38 @@ public class VisualizationTest extends TestCase {
         ts.addTuple(m_vn0);
     }
     
+    public void testRepeatGroup() {
+    	Table t = new Table();
+    	Graph g = new Graph();
+    	try {
+    		m_vis.add("t", t);
+    		fail("Should not allow duplicate groups");
+    	} catch ( Exception e ) {
+    	}
+    	try {
+    		m_vis.addFocusGroup(Visualization.FOCUS_ITEMS, t);
+    		fail("Should not allow duplicate groups");
+    	} catch ( Exception e ) {
+    	}
+    	try {
+    		m_vis.add("g", g);
+    		fail("Should not allow duplicate groups");
+    	} catch ( Exception e ) {
+    	}
+    	m_vis.removeGroup("t");
+    	try {
+    		m_vis.add("t", t);
+    	} catch ( Exception e ) {
+    		fail("Should be able to re-use group name after removal");
+    	}
+    	m_vis.removeGroup("g");
+    	try {
+    		m_vis.add("g", t);
+    	} catch ( Exception e ) {
+    		fail("Should be able to re-use group name after removal");
+    	}
+    }
+    
     /*
      * Test method for 'prefuse.Visualization.removeGroup(String)'
      */
