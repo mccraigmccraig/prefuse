@@ -77,14 +77,25 @@ public class ColorLib {
      * numbers representing RGB color values in the range 0-255. A single
      * '#' character may be included at the beginning of the String, but
      * is not required. For example '#000000' is black, 'FFFFFF' is white,
-     * '0000FF' is blue, and '#FFFF00' is orange.
+     * '0000FF' is blue, and '#FFFF00' is orange. Color values may also
+     * include transparency (alpha) values, ranging from 00 (fully transparent)
+     * to FF (fully opaque). If included, alpha values should come first in
+     * the string. For example, "#770000FF" is a translucent blue.
      * @param hex the color code value as a hexadecimal String
      * @return the integer color code for the input String
      */
     public static int hex(String hex) {
         if ( hex.charAt(0) == HEX_PREFIX )
             hex = hex.substring(1);
-        return setAlpha(Integer.parseInt(hex, 16), 255);
+        
+        if ( hex.length() > 6 ) {
+			// break up number, as Integer will puke on a large unsigned int
+			int rgb = Integer.parseInt(hex.substring(2), 16);
+			int alpha = Integer.parseInt(hex.substring(0,2), 16);
+			return ColorLib.setAlpha(rgb, alpha);
+		} else {
+			return setAlpha(Integer.parseInt(hex, 16), 255);
+		}
     }
     
     /**
