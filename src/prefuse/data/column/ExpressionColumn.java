@@ -333,7 +333,7 @@ public class ExpressionColumn extends AbstractColumn {
     
         public void expressionChanged(Expression expr) {
             // mark everything as changed
-            columnChanged(0, m_cache.getRowCount());
+            columnChanged(0, m_cache.getRowCount()-1);
             // re-initialize our setup
             init();
         }
