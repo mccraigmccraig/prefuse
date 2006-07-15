@@ -41,7 +41,7 @@ public class BalloonTreeLayout extends TreeLayout {
      */
     public BalloonTreeLayout(String group, int minRadius) {
         super(group);
-        m_minRadius = 2;
+        m_minRadius = minRadius;
     }
 
     /**
