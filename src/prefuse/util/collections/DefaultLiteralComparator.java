@@ -23,6 +23,13 @@ public class DefaultLiteralComparator implements LiteralComparator {
     }
     
     /**
+     * @see prefuse.util.collections.LiteralComparator#compare(byte, byte)
+     */
+    public int compare(byte x1, byte x2) {
+        return ( x1 < x2 ? -1 : x1 > x2 ? 1 : 0 );
+    }
+    
+    /**
      * @see prefuse.util.collections.LiteralComparator#compare(int, int)
      */
     public int compare(int x1, int x2) {
