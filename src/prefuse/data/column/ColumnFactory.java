@@ -58,12 +58,21 @@ public class ColumnFactory {
     public static final Column getColumn(Class type, int nrows, int nnz,
                                          Object defaultValue)
     {
+        if ( type == byte.class )
+        {
+            if ( defaultValue == null ) {
+                return new ByteColumn(nrows);
+            } else {
+                byte def = ((Number)defaultValue).byteValue();
+                return new ByteColumn(nrows, nrows, def);
+            }
+        }
         if ( type == int.class )
         {
             if ( defaultValue == null ) {
                 return new IntColumn(nrows);
             } else {
-                int def = ((Integer)defaultValue).intValue();
+                int def = ((Number)defaultValue).intValue();
                 return new IntColumn(nrows, nrows, def);
             }
         }
@@ -72,7 +81,7 @@ public class ColumnFactory {
             if ( defaultValue == null ) {
                 return new LongColumn(nrows);
             } else {
-                long def = ((Long)defaultValue).longValue();
+                long def = ((Number)defaultValue).longValue();
                 return new LongColumn(nrows, nrows, def);
             }
         }
@@ -81,7 +90,7 @@ public class ColumnFactory {
             if ( defaultValue == null ) {
                 return new FloatColumn(nrows);
             } else {
-                float def = ((Float)defaultValue).floatValue();
+                float def = ((Number)defaultValue).floatValue();
                 return new FloatColumn(nrows, nrows, def);
             }
         }
@@ -90,7 +99,7 @@ public class ColumnFactory {
             if ( defaultValue == null ) {
                 return new DoubleColumn(nrows);
             } else {
-                double def = ((Double)defaultValue).doubleValue();
+                double def = ((Number)defaultValue).doubleValue();
                 return new DoubleColumn(nrows, nrows, def);
             }
         }

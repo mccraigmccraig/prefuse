@@ -59,7 +59,7 @@ public class ArithmeticExpression extends BinaryExpression {
      */
     public Object get(Tuple t) {
         Class type = getType(t.getSchema());
-        if ( int.class == type ) {
+        if ( int.class == type || byte.class == type ) {
             return new Integer(getInt(t));
         } else if ( long.class == type ) {
             return new Long(getInt(t));

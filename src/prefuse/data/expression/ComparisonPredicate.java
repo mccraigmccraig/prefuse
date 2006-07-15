@@ -86,7 +86,7 @@ public class ComparisonPredicate extends BinaryExpression implements Predicate {
         int c = 0;
         if ( TypeLib.isNumericType(lType) && TypeLib.isNumericType(rType) ) {
             Class type = TypeLib.getNumericType(lType, rType);
-            if ( type == int.class ) {
+            if ( type == int.class || type == byte.class ) {
                 int x = m_left.getInt(t);
                 int y = m_right.getInt(t);
                 c = ((LiteralComparator)m_cmp).compare(x,y);

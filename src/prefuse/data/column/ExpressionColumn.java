@@ -201,7 +201,7 @@ public class ExpressionColumn extends AbstractColumn {
     }
 
     private void computeNumber(int row) {
-        if ( m_columnType == int.class ) {
+        if ( m_columnType == int.class || m_columnType == byte.class ) {
             m_cache.setInt(m_expr.getInt(m_table.getTuple(row)), row);
         } else if ( m_columnType == long.class ) {
             m_cache.setLong(m_expr.getLong(m_table.getTuple(row)), row);
