@@ -22,6 +22,7 @@ public class ParserFactory implements Cloneable {
             new DoubleParser(),
             new FloatParser(),
             new BooleanParser(),
+            new ColorIntParser(),
             new DateParser(),
             new TimeParser(),
             new DateTimeParser(),
