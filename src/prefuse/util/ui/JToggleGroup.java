@@ -1,6 +1,8 @@
 package prefuse.util.ui;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -90,7 +92,8 @@ public class JToggleGroup extends JPanel {
         m_lstnr = new Listener();
         m_sel.addListSelectionListener(m_lstnr);
         
-        initUI();
+        if ( m_data.getSize() > 0 )
+            initUI();
         setFocusable(false);
     }
     
@@ -251,6 +254,36 @@ public class JToggleGroup extends JPanel {
     }
     
     /**
+     * Set the background color of this toggle group.
+     * @see java.awt.Component#setBackground(java.awt.Color)
+     */
+    public void setBackground(Color background) {
+        for ( int i=0; i<getComponentCount(); ++i ) {
+            getComponent(i).setBackground(background);
+        }
+    }
+    
+    /**
+     * Set the foreground color of this toggle group.
+     * @see java.awt.Component#setBackground(java.awt.Color)
+     */
+    public void setForeground(Color foreground) {
+        for ( int i=0; i<getComponentCount(); ++i ) {
+            getComponent(i).setForeground(foreground);
+        }
+    }
+    
+    /**
+     * Set the font used by this toggle group.
+     * @see java.awt.Component#setFont(java.awt.Font)
+     */
+    public void setFont(Font font) {
+        for ( int i=0; i<getComponentCount(); ++i ) {
+            getComponent(i).setFont(font);
+        }
+    }
+    
+    /**
      * Sets if the various toggle buttons can receive the keyboard focus.
      * @param b true to set toggle buttons keyboard accessible, false to
      * set them unaccessible.
@@ -276,6 +309,7 @@ public class JToggleGroup extends JPanel {
                 int idx = m_sel.getMinSelectionIndex();
                 boolean sel = (idx >= 0);
                 JToggleButton tb = null;
+                
                 for ( int i=0, j=0; i<getComponentCount(); ++i ) {
                     Component c = getComponent(i);
                     if ( c instanceof JToggleButton ) {
