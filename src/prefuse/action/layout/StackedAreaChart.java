@@ -81,7 +81,7 @@ public class StackedAreaChart extends Layout {
 
     /**
      * Set the data columns used to compute the stacked layout
-     * @param columns the various data fields, in sorted order, that
+     * @param cols the various data fields, in sorted order, that
      * should be referenced for each consecutive point of a stack layer
      */
     public void setColumns(String[] cols) {

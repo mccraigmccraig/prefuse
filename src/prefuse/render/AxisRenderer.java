@@ -63,7 +63,6 @@ public class AxisRenderer extends AbstractShapeRenderer {
      * @param yalign the vertical alignment for the axis label. One of
      * {@link prefuse.Constants#TOP}, {@link prefuse.Constants#BOTTOM},
      * or {@link prefuse.Constants#CENTER}.
-     * @param yalign
      */
     public void setVerticalAlignment(int yalign) {
         m_yalign = yalign;
