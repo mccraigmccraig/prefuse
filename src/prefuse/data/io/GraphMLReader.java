@@ -135,26 +135,36 @@ public class GraphMLReader extends AbstractGraphReader  implements GraphReader {
             m_esch.addColumn(TRGID, String.class);
         }
         
-        public void endDocument() {
+        public void endDocument() throws SAXException {
             // time to actually set up the edges
             IntIterator rows = m_edges.rows();
-            while ( rows.hasNext() ) {
+            while (rows.hasNext()) {
                 int r = rows.nextInt();
-                
+
                 String src = m_edges.getString(r, SRCID);
-                int s = ((Integer)m_nodeMap.get(src)).intValue();
+                if (!m_nodeMap.containsKey(src)) {
+                    throw new SAXException(
+                        "Tried to create edge with source node id=" + src
+                        + " which does not exist.");
+                }
+                int s = ((Integer) m_nodeMap.get(src)).intValue();
                 m_edges.setInt(r, SRC, s);
-                
+
                 String trg = m_edges.getString(r, TRGID);
-                int t = ((Integer)m_nodeMap.get(trg)).intValue();
+                if (!m_nodeMap.containsKey(trg)) {
+                    throw new SAXException(
+                        "Tried to create edge with target node id=" + trg
+                        + " which does not exist.");
+                }
+                int t = ((Integer) m_nodeMap.get(trg)).intValue();
                 m_edges.setInt(r, TRG, t);
             }
             m_edges.removeColumn(SRCID);
             m_edges.removeColumn(TRGID);
-            
+
             // now create the graph
             m_graph = new Graph(m_nodes, m_edges, m_directed);
-            if ( m_graphid != null )
+            if (m_graphid != null)
                 m_graph.putClientProperty(ID, m_graphid);
         }
         
