@@ -5,9 +5,10 @@
   <!-- =================================================================== -->
   <target name="init">
     <tstamp>
-   	  <format property="year" pattern="yyyy" locale="en"/>
+    	<format property="year" pattern="yyyy" locale="en"/>
     </tstamp>
   	
+  	<property file="build.properties"/>
     <property name="Name" value="prefuse"/>
     <property name="name" value="prefuse"/>
     <property name="version" value="beta"/>
@@ -155,6 +156,9 @@
     <jar jarfile="${build.dir}/${name}.jar"
          basedir="${build.prefuse.dest}"
          includes="**"/>
+  	<jar jarfile="${build.dir}/${name}.src.jar"
+  		 basedir="${build.prefuse.src}"
+  		 includes="**"/>
   </target>
 	
   <!-- =================================================================== -->
