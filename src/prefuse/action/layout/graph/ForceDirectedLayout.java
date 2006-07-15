@@ -286,8 +286,8 @@ public class ForceDirectedLayout extends Layout {
                 fitem.velocity[1] = 0.0f;
                 
                 if ( Double.isNaN(item.getX()) ) {
-                    super.setX(item, referrer, 0.0);
-                    super.setY(item, referrer, 0.0);
+                    setX(item, referrer, 0.0);
+                    setY(item, referrer, 0.0);
                 }
                 continue;
             }
@@ -306,8 +306,8 @@ public class ForceDirectedLayout extends Layout {
             }
             
             // set the actual position
-            super.setX(item, referrer, x);
-            super.setY(item, referrer, y);
+            setX(item, referrer, x);
+            setY(item, referrer, y);
         }
     }
     
