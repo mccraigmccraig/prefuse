@@ -317,7 +317,7 @@ import prefuse.util.StringLib;
  *     Returns a "negative safe" logarithm base 10 of <code>x</code>, equivalent to
  *     <code>SIGN(x) * LOG10(ABS(x))</code>
  *   </li>
- *   <li><strong><code>POW(x)</code></strong><br/>
+ *   <li><strong><code>SAFESQRT(x)</code></strong><br/>
  *     Returns a "negative safe" square root of <code>x</code>, equivalent to
  *     <code>SIGN(x) * SQRT(ABS(x))</code>
  *   </li>
@@ -376,7 +376,7 @@ import prefuse.util.StringLib;
  *     replaced by <code>replace</code>
  *   </li>
  *   <li><strong><code>RIGHT(str, len)</code></strong><br/>
- *     Returns the <code>len</code> rightmost characters of string<code>str</code>
+ *     Returns the <code>len</code> rightmost characters of string <code>str</code>
  *   </li>
  *   <li><strong><code>RPAD(x)</code></strong><br/>
  *     Pad the right side of string <code>str</code> with copies of string <code>pad</code>,
