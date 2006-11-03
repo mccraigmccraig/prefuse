@@ -1100,6 +1100,30 @@ public class Visualization {
     }
     
     /**
+     * Remove a data processing Action registered with this visualization.
+     * If the removed action is currently running, it will be canceled.
+     * The visualization reference held by the removed Action will be set to
+     * null.<br/>
+     * <strong>NOTE:</strong> Errors may occur if the removed Action is 
+     * included in an "always run after" relation with another registered
+     * Action that has not been removed from this visualization. It is the
+     * currently the responsibility of clients to avoid this situation. 
+     * @param name the name of the Action
+     * @return the removed Action, or null if no action was found
+     */
+    public Action removeAction(String name) {
+        // TODO: create registry of always run after relations to automatically
+        // resolve action references?
+        Action a = getAction(name);
+        if ( a != null ) {
+            a.cancel();
+            m_actions.remove(name);
+            a.setVisualization(null);
+        }
+        return a;
+    }
+    
+    /**
      * Schedule the Action with the given name to run immediately. The running
      * of all Actions is managed by the
      * {@link prefuse.activity.ActivityManager}, which runs in a dedicated
