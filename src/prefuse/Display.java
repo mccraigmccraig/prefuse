@@ -862,15 +862,18 @@ public class Display extends JComponent {
 
             } else {
                 // set the background region to clear
-                m_rclip.setFrame(0, 0, getWidth(), getHeight());
+                m_rclip.setFrame(m_screen.getMinX(),  m_screen.getMinY(),
+                                 m_screen.getWidth(), m_screen.getHeight());
+                
                 // set the item clip to the current screen
                 m_clip.setClip(m_screen);
+                
                 // set the transform, rendering keys, etc
                 prepareGraphics(g2D);
             }
 
             // now clear the region
-            clearRegion(g2D, m_rclip);
+            clearRegion(g2D, m_rclip);            
             
             // -- render ----------------------------
             // the actual rendering  loop
