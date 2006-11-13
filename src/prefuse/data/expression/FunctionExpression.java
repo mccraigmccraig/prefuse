@@ -680,7 +680,9 @@ class ConcatFunction extends StringFunction {
     public Object get(Tuple t) {
         StringBuffer sbuf = getBuffer();
         for ( int i=0; i<paramCount(); ++i ) {
-            sbuf.append(param(i).get(t).toString());
+            Object o = param(i).get(t);
+            if ( o != null )
+                sbuf.append(o.toString());
         }
         return sbuf.toString();
     }
