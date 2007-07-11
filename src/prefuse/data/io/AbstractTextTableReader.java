@@ -73,7 +73,7 @@ public abstract class AbstractTextTableReader extends AbstractTableReader {
         }
         
         final TypeInferencer di = new TypeInferencer(m_pfactory);
-        final ArrayList headers = new ArrayList();
+        final ArrayList headers = getColumnNames();
         final int[] dim = new int[] { 0, 0 };
         
         TableReadListener scanner = new TableReadListener() {
@@ -117,7 +117,7 @@ public abstract class AbstractTextTableReader extends AbstractTableReader {
         // create the table columns
         for ( int i=0; i < ncols; ++i ) {
             String header;
-            if ( m_hasHeader ) {
+            if ( m_hasHeader || i < headers.size() ) {
                 header = (String)headers.get(i);
             } else {
                 header = getDefaultHeader(i);
@@ -172,6 +172,15 @@ public abstract class AbstractTextTableReader extends AbstractTableReader {
         }
         
         return table;
+    }
+    
+    /**
+     * Subclasses can override this to provide column names through
+     * a custom mechanism.
+     * @return an ArrayList of String instances indicating the column names
+     */
+    protected ArrayList getColumnNames() {
+    	return new ArrayList();
     }
     
     /**
