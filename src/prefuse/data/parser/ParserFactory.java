@@ -33,7 +33,7 @@ public class ParserFactory implements Cloneable {
             new StringParser()
         };
     
-    private static final ParserFactory DEFAULT_FACTORY =
+    private static ParserFactory DEFAULT_FACTORY =
         new ParserFactory(DEFAULT_PARSERS);
     
     private DataParser[] m_parsers;
@@ -43,9 +43,19 @@ public class ParserFactory implements Cloneable {
      * Returns the default parser factory. The default factory tests for the
      * following data types (in the provided order of precedence):
      *   int, long, double, float, boolean, Date, Time, DateTime, String.
+     * @return the default parser factory.
      */
     public static ParserFactory getDefaultFactory() {
         return DEFAULT_FACTORY;
+    }
+    
+    /**
+     * Sets the default parser factory. This factory will be used by default
+     * by all readers to parse data values.
+     * @param factory the new default parser factory.
+     */
+    public static void setDefaultFactory(ParserFactory factory) {
+    	DEFAULT_FACTORY = factory;
     }
     
     /**
