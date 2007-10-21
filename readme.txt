@@ -1,5 +1,5 @@
 prefuse README
-beta release - initial release february 2006, current release 2006.07.15
+beta release - initial release february 2006, current release 2007.10.20
 
 --INTRO--
 
