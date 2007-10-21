@@ -915,7 +915,7 @@ public class Visualization {
      * @param group the visual data group to invalidate
      */
     public void invalidate(String group) {
-        Iterator items = items(ValidatedPredicate.TRUE);
+        Iterator items = items(group, ValidatedPredicate.TRUE);
         while ( items.hasNext() ) {
             VisualItem item = (VisualItem)items.next();
             item.setValidated(false);

@@ -937,7 +937,7 @@ Expression Literal() :
 { Token t; }
 {
     t=<INT> { return new NumericLiteral(Integer.parseInt(t.image)); }
-|   t=<LONG> { return new NumericLiteral(Long.parseLong(t.image)); }
+|   t=<LONG> { return new NumericLiteral(Long.parseLong(t.image.substring(0,t.image.length()-1))); }
 |   t=<FLOAT> { return new NumericLiteral(Float.parseFloat(t.image)); }
 |   t=<DOUBLE> { return new NumericLiteral(Double.parseDouble(t.image)); }
 |   t=<STRING> {

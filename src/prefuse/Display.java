@@ -225,6 +225,16 @@ public class Display extends JComponent {
     }
     
     /**
+     * Resets the display by clearing the offscreen buffer and flushing the
+     * internal rendering queue. This method can help reclaim memory when a
+     * Display is not visible.
+     */
+    public void reset() {
+    	m_offscreen = null;
+    	m_queue.clean();
+    }
+    
+    /**
      * Registers default keystroke commands on the Display. The default
      * commands are
      * <ul><li><b>ctrl D</b> - Toggle debug info display</li>

@@ -438,6 +438,7 @@ public class Tree extends Graph {
             return -1;
         
         int depth = 0;
+        if ( node!=m_root && getParent(node) < 0 ) return -1;
         for ( int i=node; i!=m_root && i>=0; ++depth, i=getParent(i) );
         return depth;
     }

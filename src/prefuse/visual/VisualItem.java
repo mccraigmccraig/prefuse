@@ -886,7 +886,7 @@ public interface VisualItem extends Tuple {
     /** The end polygon data field.
      * Not included in the VisualItem schema by default */
     public static final String ENDPOLYGON
-        = PrefuseLib.getStartField(POLYGON);
+        = PrefuseLib.getEndField(POLYGON);
     
     /** The x2 data field.
      * Not included in the VisualItem schema by default */

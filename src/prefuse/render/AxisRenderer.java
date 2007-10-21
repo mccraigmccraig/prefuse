@@ -3,6 +3,7 @@ package prefuse.render;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -16,6 +17,7 @@ import prefuse.visual.VisualItem;
  * Renderer for drawing an axis tick mark and label.
  * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
+ * @author jgood
  */
 public class AxisRenderer extends AbstractShapeRenderer {
 
@@ -134,24 +136,30 @@ public class AxisRenderer extends AbstractShapeRenderer {
     /**
      * @see prefuse.render.Renderer#render(java.awt.Graphics2D, prefuse.visual.VisualItem)
      */
-    public void render(Graphics2D g, VisualItem item) {
-        Shape s = getShape(item);
-        GraphicsLib.paint(g, item, m_line, getStroke(item), getRenderType(item));
-        
-        // check if we have a text label, if so, render it
-        if ( s == m_box ) {
-            float x = (float)m_box.getMinX();
-            float y = (float)m_box.getMinY() + m_ascent;
-            
-            // draw label background
-            GraphicsLib.paint(g, item, s, null, RENDER_TYPE_FILL);
-            
-            String str = item.getString(VisualItem.LABEL);
-            g.setFont(item.getFont());
-            g.setColor(ColorLib.getColor(item.getTextColor()));
-            g.drawString(str, x, y);
-        }
-    }
+    public void render(Graphics2D g, VisualItem item) { 
+    	Shape s = getShape(item); 
+    	GraphicsLib.paint(g, item, m_line, getStroke(item), getRenderType(item)); 
+    	 
+    	// check if we have a text label, if so, render it 
+    	if ( item.canGetString(VisualItem.LABEL) ) { 
+	    	float x = (float)m_box.getMinX(); 
+	    	float y = (float)m_box.getMinY() + m_ascent; 
+	    	 
+	    	// draw label background 
+	    	GraphicsLib.paint(g, item, s, null, RENDER_TYPE_FILL); 
+	    	 
+	    	String str = item.getString(VisualItem.LABEL); 
+	    	AffineTransform origTransform = g.getTransform();
+	    	AffineTransform transform = this.getTransform(item);
+	    	if ( transform != null ) g.setTransform(transform);
+	    		
+	    	g.setFont(item.getFont()); 
+	    	g.setColor(ColorLib.getColor(item.getTextColor())); 
+	    	g.drawString(str, x, y);
+	    		
+	    	if ( transform != null ) g.setTransform(origTransform); 
+    	}
+	}
 
     /**
      * @see prefuse.render.Renderer#locatePoint(java.awt.geom.Point2D, prefuse.visual.VisualItem)

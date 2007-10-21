@@ -45,6 +45,20 @@ public class RenderingQueue {
     }
     
     /**
+     * Clears the rendering queue and resizes internal arrays to a small size.
+     * This should help reclaim used memory.
+     */
+    public void clean() {
+    	clear();
+    	ritems = new VisualItem[DEFAULT_SIZE];
+    	rscores = new int[DEFAULT_SIZE];
+    	pitems = new VisualItem[DEFAULT_SIZE];
+    	pscores = new int[DEFAULT_SIZE];
+    	items_buf = null;
+    	scores_buf = null;
+    }
+    
+    /**
      * Add an item to the rendering queue.
      * @param item the item to add
      */

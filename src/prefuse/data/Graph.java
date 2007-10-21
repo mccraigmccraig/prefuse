@@ -1244,6 +1244,13 @@ public class Graph extends CompositeTupleSet {
     }
     
     /**
+     * Removes all listeners on this graph
+     */
+    public void removeAllGraphModelListeners() {
+    	m_listeners.clear();
+    }
+    
+    /**
      * Fire a graph change event
      * @param t the backing table where the change occurred (either a
      * node table or an edge table)

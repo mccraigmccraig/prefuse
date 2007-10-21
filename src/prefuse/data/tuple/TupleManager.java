@@ -60,8 +60,8 @@ public class TupleManager {
     /**
      * Ensure the tuple array exists.
      */
-    private void ensureTupleArray() {
-        int nrows = m_table.getRowCount();
+    private void ensureTupleArray(int row) {
+        int nrows = Math.max(m_table.getRowCount(), row+1);
         if ( m_tuples == null ) {
             m_tuples = new TableTuple[nrows];
         } else if ( m_tuples.length < nrows ) {
@@ -79,7 +79,7 @@ public class TupleManager {
      */
     public Tuple getTuple(int row) {
         if ( m_table.isValidRow(row) ) {
-            ensureTupleArray();
+            ensureTupleArray(row);
             if ( m_tuples[row] == null ) {
                 return (m_tuples[row] = newTuple(row));
             } else {

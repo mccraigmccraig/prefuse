@@ -67,6 +67,25 @@ public class ImageFactory {
     }
 
     /**
+     * Indicates if this ImageFactory loads images asynchronously (true by
+     * default)
+     * @return true for asynchronous (background) loading, false for
+     *  synchronous (blocking) loading
+     */
+    public boolean isAsynchronous() {
+    	return m_asynch;
+    }
+    
+    /**
+     * Sets if this ImageFactory loads images asynchronously.
+     * @param b true for asynchronous (background) loading, false for
+     *  synchronous (blocking) loading
+     */
+    public void setAsynchronous(boolean b) {
+    	m_asynch = b;
+    }
+    
+    /**
      * Sets the maximum image dimensions of loaded images, images larger than
      * these limits will be scaled to fit within bounds.
      * @param width the maximum width of input images (-1 means no limit)

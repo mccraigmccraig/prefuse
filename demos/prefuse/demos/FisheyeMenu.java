@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import prefuse.Constants;
 import prefuse.Display;
@@ -216,8 +217,17 @@ public class FisheyeMenu extends Display {
             }
             
             // set the display size to fit text
-            d.setSize((int)Math.round(2*m_scale*w + ins.left + ins.right),
-                      (int)Math.round(h + ins.bottom));
+            setSize(d, (int)Math.round(2*m_scale*w + ins.left + ins.right),
+                       (int)Math.round(h + ins.bottom));
+        }
+        
+        private void setSize(final Display d, final int width, final int height)
+        {
+        	SwingUtilities.invokeLater(new Runnable() {
+        		public void run() {
+        			d.setSize(width, height);
+        		}
+        	});
         }
     } // end of inner class VerticalLineLayout
     

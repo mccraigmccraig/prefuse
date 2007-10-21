@@ -152,16 +152,12 @@ public class ActivityManager extends Thread {
     }
     
     /**
-     * Removes an Activity from this manager, called by an
-     * Activity when it finishes or is cancelled. Application 
-     * code should not call this method! Instead, use 
-     * Activity.cancel() to stop a sheduled or running Activity.
-     * @param a
-     * @return true if the activity was found and removed, false
-     *  if the activity is not scheduled with this manager.
+     * Cancels an Activity and removes it from this manager, called by
+     * an Activity when the activity needs to be cancelled. 
+     * @param a The activity to cancel.
      */
-    static void removeActivity(Activity a) {
-        getInstance()._removeActivity(a);
+    static void cancelActivity(Activity a){
+    	getInstance()._cancelActivity(a);
     }
     
     /**
@@ -191,6 +187,7 @@ public class ActivityManager extends Thread {
      */
     private void _schedule(Activity a, long startTime) {
         if ( a.isScheduled() ) {
+        	try { notifyAll(); } catch ( Exception e ) {}
             return; // already scheduled, do nothing
         }
         a.setStartTime(startTime);
@@ -239,6 +236,47 @@ public class ActivityManager extends Thread {
      */
     private void _alwaysScheduleAfter(Activity before, Activity after) {
         before.addActivityListener(new ScheduleAfterActivity(after,false));
+    }
+    
+    /**
+     * Cancels an action, called by an Activity when it is cancelled. 
+     * Application code should not call this method! Instead, use 
+     * Activity.cancel() to stop a sheduled or running Activity.
+     * @param a The Activity to cancel
+     */
+    private void _cancelActivity(Activity a){
+    	/*
+    	 * Prefuse Bug ID #1708926
+         * The fix ("Contribution") has not been tested and/or validated for release as or in products,
+         * combinations with products or other commercial use.
+         * Any use of the Contribution is entirely made at the user's own responsibility and the user can
+         * not rely on any features, functionalities or performances Alcatel-Lucent has attributed to the Contribution.
+         * THE CONTRIBUTION BY ALCATEL-LUCENT (...) IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND,
+         * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+         * FITNESS FOR A PARTICULAR PURPOSE, COMPLIANCE, NON-INTERFERENCE  AND/OR INTERWORKING WITH THE SOFTWARE
+         * TO WHICH THE CONTRIBUTION HAS BEEN MADE, TITLE AND NON-INFRINGEMENT.
+         * IN NO EVENT SHALL ALCATEL-LUCENT (...) BE LIABLE FOR ANY DAMAGES OR OTHER LIABLITY,
+         * WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE CONTRIBUTION
+         * OR THE USE OR OTHER DEALINGS IN THE CONTRIBUTION,
+         * WHETHER TOGETHER WITH THE SOFTWARE TO WHICH THE CONTRIBUTION RELATES OR ON A STAND ALONE BASIS.
+    	 */
+        boolean fire = false;
+        //removeActivity synchronizes on this, we need to lock this
+        //before we lock the activity to avoid deadlock
+        synchronized ( this ) {
+        	synchronized(a)
+        	{
+        		if ( a.isScheduled() ) {
+        			// attempt to remove this activity, if the remove fails,
+        			// this activity is not currently scheduled with the manager
+        			_removeActivity(a);
+        			fire = true;
+        		}
+        		a.setRunning(false);
+        	}
+        }
+        if ( fire )
+            a.fireActivityCancelled();
     }
     
     /**

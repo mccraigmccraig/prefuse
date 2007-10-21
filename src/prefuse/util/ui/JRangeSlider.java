@@ -30,6 +30,7 @@ import javax.swing.event.ChangeListener;
  * @author Jon Meyer
  * @author Lance Good
  * @author jeffrey heer
+ * @author Colin Combe
  */
 public class JRangeSlider extends JComponent 
     implements MouseListener, MouseMotionListener, KeyListener
@@ -86,7 +87,7 @@ public class JRangeSlider extends JComponent
      * @param orientation - construct a horizontal or vertical slider?
      */
     public JRangeSlider(int minimum, int maximum, int lowValue, int highValue, int orientation) {
-        this(new DefaultBoundedRangeModel(lowValue,highValue,minimum,maximum),
+        this(new DefaultBoundedRangeModel(lowValue, highValue - lowValue, minimum, maximum),
                 orientation,LEFTRIGHT_TOPBOTTOM);
     }
 
@@ -101,7 +102,7 @@ public class JRangeSlider extends JComponent
      * @param direction - Is the slider left-to-right/top-to-bottom or right-to-left/bottom-to-top
      */
     public JRangeSlider(int minimum, int maximum, int lowValue, int highValue, int orientation, int direction) {
-        this(new DefaultBoundedRangeModel(lowValue, highValue, minimum, maximum), 
+        this(new DefaultBoundedRangeModel(lowValue, highValue - lowValue, minimum, maximum), 
                 orientation, direction);
     }
     
@@ -684,28 +685,30 @@ public class JRangeSlider extends JComponent
                 if (low < minimum) {
                     low = minimum;
                 }
-                if (low > maximum) {
-                    low = maximum;
+                if (low > maximum - minExtent) {
+                    low = maximum - minExtent;
                 }
                 if (low > highValue-minExtent) {
-                    low = highValue-minExtent;
+                    setRange(low, low + minExtent);
                 }
-                setLowValue(low);
+                else
+                    setLowValue(low);
                 break;
 
             case PICK_RIGHT_OR_BOTTOM:
                 int high = toLocal(value-pickOffsetHigh);
                 
-                if (high < minimum) {
-                    high = minimum;
+                if (high < minimum + minExtent) {
+                    high = minimum + minExtent;
                 }
                 if (high > maximum) {
                     high = maximum;
                 }
                 if (high < lowValue+minExtent) {
-                    high = lowValue+minExtent;
+                    setRange(high - minExtent, high);
                 }
-                setHighValue(high);
+                else
+                    setHighValue(high);
                 break;
 
             case PICK_THUMB:

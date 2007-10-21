@@ -1848,6 +1848,13 @@ public class Table extends AbstractTupleSet implements ColumnListener {
     }
     
     /**
+     * Removes all table listeners from this table.
+     */
+    public void removeAllTableListeners() {
+    	m_listeners.clear();
+    }
+    
+    /**
      * Fire a table event to notify listeners.
      * @param row0 the starting row of the modified range
      * @param row1 the ending row (inclusive) of the modified range

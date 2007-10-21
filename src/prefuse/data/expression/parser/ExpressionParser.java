@@ -1035,7 +1035,7 @@ public class ExpressionParser implements ExpressionParserConstants {
       break;
     case LONG:
       t = jj_consume_token(LONG);
-               {if (true) return new NumericLiteral(Long.parseLong(t.image));}
+               {if (true) return new NumericLiteral(Long.parseLong(t.image.substring(0,t.image.length()-1)));}
       break;
     case FLOAT:
       t = jj_consume_token(FLOAT);

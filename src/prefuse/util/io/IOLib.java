@@ -101,9 +101,10 @@ public class IOLib {
             
             if ( includeFileSystem && url == null ) {
                 // if still not found, check the file system
-                if ( (new File(location)).exists() ) {
+            	File f = new File(location);
+            	if ( f.exists() ) {
                     try {
-                        url = new URL("file:///"+location);
+                    	url = f.toURI().toURL();
                     } catch ( Exception e ) {}
                 }
             }

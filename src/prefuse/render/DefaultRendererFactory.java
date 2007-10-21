@@ -32,7 +32,7 @@ import prefuse.visual.VisualItem;
  * <pre>
  *   DefaultRendererFactory rf = new DefaultRendererFactory();
  *   rf.setDefaultEdgeRenderer(new EdgeRenderer(Constants.EDGE_TYPE_CURVE);
- *   rf.addRenderer("INGROUP('data')", new LabelRenderer("label");
+ *   rf.add("INGROUP('data')", new LabelRenderer("label");
  * </pre>
  * 
  * @author <a href="http://jheer.org">jeffrey heer</a>

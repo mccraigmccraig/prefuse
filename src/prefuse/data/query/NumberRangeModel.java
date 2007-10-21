@@ -89,19 +89,31 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
         }
         else if ( m_type == long.class )
         {
-            int v = 10000 * (int)( (m_lo.longValue()-m_min.longValue()) / 
-                               (m_max.longValue()-m_min.longValue()) );
-            int e = 10000 * (int)( (m_hi.longValue()-m_min.longValue()) /
-                               (m_max.longValue()-m_min.longValue()) ) - v;
-            setRange(v, e, 0, 10000);
+        	long range = m_max.longValue() - m_min.longValue();
+        	if (range == 0) {
+        		setRange(0, 0, 0, 0);
+        	} else {
+        		long lo = m_lo.longValue() - m_min.longValue();
+        		long hi = m_hi.longValue() - m_min.longValue();
+        	
+        		int v = 10000 * (int)( lo / range );
+        		int e = 10000 * (int)( hi / range ) - v;
+        		setRange(v, e, 0, 10000);
+        	}
         }
         else
         {
-            int v = 10000 * (int)( (m_lo.doubleValue()-m_min.doubleValue()) / 
-                               (m_max.doubleValue()-m_min.doubleValue()) );
-            int e = 10000 * (int)( (m_hi.doubleValue()-m_min.doubleValue()) /
-                               (m_max.doubleValue()-m_min.doubleValue()) ) - v;
-            setRange(v, e, 0, 10000);
+        	double range = m_max.doubleValue() - m_min.doubleValue();
+        	if (range == 0) {
+        		setRange(0, 0, 0, 0);
+        	} else {
+        		double lo = m_lo.doubleValue() - m_min.doubleValue();
+        		double hi = m_hi.doubleValue() - m_min.doubleValue();
+
+        		int v = 10000 * (int)( lo / range );
+        		int e = 10000 * (int)( hi / range ) - v;
+        		setRange(v, e, 0, 10000);
+        	}
         }
     }
     
