@@ -101,7 +101,9 @@ public class TreeMLWriter extends AbstractGraphWriter {
                 for ( int i=0; i<ns.getColumnCount(); ++i ) {
                     vals[0] = ns.getColumnName(i);
                     vals[1] = n.getString(vals[0]);
-                    xml.tag(Tokens.ATTR, attr, vals, 2);
+                    if (vals[1] != null) {
+                    	xml.tag(Tokens.ATTR, attr, vals, 2);
+                    }
                 }
             }
             n = nextNode(n, xml);

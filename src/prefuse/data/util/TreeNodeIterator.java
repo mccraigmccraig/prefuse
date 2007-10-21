@@ -4,6 +4,7 @@
  */
 package prefuse.data.util;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import prefuse.data.Node;
@@ -15,49 +16,71 @@ import prefuse.data.Node;
  */
 public class TreeNodeIterator implements Iterator {
 
-    private Node m_node;
-    private Node m_root;
+    private ArrayList m_stack;
+    private boolean m_preorder = true;
     
     /**
      * Create a new TreeNodeIterator over the given subtree.
      * @param root the root of the subtree to traverse
      */
     public TreeNodeIterator(Node root) {
-        m_root = root;
-        m_node = root;
+    	this(root, true);
+    }
+    
+    /**
+     * Create a new TreeNodeIterator over the given subtree.
+     * @param root the root of the subtree to traverse
+     * @param preorder true to use a pre-order traversal, false
+     *  for a post-order traversal
+     */
+    public TreeNodeIterator(Node root, boolean preorder) {
+    	m_preorder = preorder;
+    	m_stack = new ArrayList();
+    	m_stack.add(root);
+    	
+    	if (!preorder) {
+    		for (Node n = root.getChild(0); n!=null; n=n.getChild(0))
+    			m_stack.add(n);
+    	}
+        
     }
     
     /**
      * @see java.util.Iterator#hasNext()
      */
     public boolean hasNext() {
-        return m_node != null;
+        return !m_stack.isEmpty();
     }
 
     /**
      * @see java.util.Iterator#next()
      */
     public Object next() {
-        Node n, c;
-        if ( (c=m_node.getChild(0)) != null ) {
-            // do nothing
-        } else if ( m_node!=m_root && (c=m_node.getNextSibling()) != null ) {
-            // do nothing
-        } else {
-            c = m_node.getParent();
-            while ( c!=m_root && c != null ) {
-                if ( (n=c.getNextSibling()) != null ) {
-                    c = n;
-                    break;
-                }
-                c = c.getParent();
-            }
-            if ( c == m_root )
-                c = null;
-        }
-        n = m_node;
-        m_node = c;
-        return n;
+    	Node c, x = null;
+    	if (m_preorder) {
+    		x = (Node)m_stack.get(m_stack.size()-1);
+	    	if ( (c=x.getChild(0)) != null ) {
+	    		m_stack.add(c);
+	    	} else if ( (c=x.getNextSibling()) != null ) {
+	    		m_stack.set(m_stack.size()-1, c);
+	    	} else {
+	    		m_stack.remove(m_stack.size()-1);
+	    		while (!m_stack.isEmpty()) {
+		    		c = (Node)m_stack.remove(m_stack.size()-1);
+		    		if ( (c=c.getNextSibling()) != null ) {
+		    			m_stack.add(c); break;
+		    		}
+	    		}
+	    	}
+    	} else {
+    		x = (Node)m_stack.remove(m_stack.size()-1);
+    		if ( (c=x.getNextSibling()) != null ) {
+    			for (; c != null; c=c.getChild(0)) {
+    				m_stack.add(c);
+    			}
+    		}
+    	}
+    	return x;
     }
 
     /**

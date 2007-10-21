@@ -1045,9 +1045,16 @@ public class Display extends JComponent {
      * @param dy the amount to pan along the y-dimension, in pixel units
      */
     public synchronized void pan(double dx, double dy) {
-        double panx = dx / m_transform.getScaleX();
-        double pany = dy / m_transform.getScaleY();
-        panAbs(panx,pany);
+        m_tmpPoint.setLocation(dx, dy);
+        m_itransform.transform(m_tmpPoint, m_tmpPoint);
+        double panx = m_tmpPoint.getX();
+        double pany = m_tmpPoint.getY();
+        m_tmpPoint.setLocation(0, 0);
+        m_itransform.transform(m_tmpPoint, m_tmpPoint);
+        panx -= m_tmpPoint.getX();
+        pany -= m_tmpPoint.getY();
+        panAbs(panx, pany);
+
     }
     
     /**

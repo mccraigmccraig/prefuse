@@ -79,7 +79,8 @@ public class GraphView extends JPanel {
     private Visualization m_vis;
     
     public GraphView(Graph g, String label) {
-        
+    	super(new BorderLayout());
+    	
         // create a new, empty visualization for our data
         m_vis = new Visualization();
         

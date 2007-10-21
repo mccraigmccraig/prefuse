@@ -147,17 +147,22 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
         }
         
         // set raw sizes, compute leaf count
-        iter = new TreeNodeIterator(root);
+        iter = new TreeNodeIterator(root, false);
         while ( iter.hasNext() ) {
             NodeItem n = (NodeItem)iter.next();
+            double area = 0;
             if ( n.getChildCount() == 0 ) {
-                double sz = n.getSize();
-                n.setDouble(AREA, sz);
-                NodeItem p = (NodeItem)n.getParent();
-                for (; p!=null; p=(NodeItem)p.getParent())
-                    p.setDouble(AREA, sz + p.getDouble(AREA));
-                ++leafCount;
+            	area = n.getSize();
+            	++leafCount;
+            } else if ( n.isExpanded() ) {
+            	NodeItem c = (NodeItem)n.getFirstChild();
+            	for (; c!=null; c = (NodeItem)c.getNextSibling()) {
+            		area += c.getDouble(AREA);
+            		++leafCount;
+            	}
             }
+            n.setDouble(AREA, area);
+            
         }
         
         // scale sizes by display area factor
@@ -190,7 +195,7 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
         childIter = p.children();
         while ( childIter.hasNext() ) {
             NodeItem c = (NodeItem)childIter.next();
-            if ( c.getChildCount() > 0 ) {
+            if ( c.getChildCount() > 0 && c.getDouble(AREA) > 0 ) {
                 updateArea(c,r);
                 layout(c, r);
             }
