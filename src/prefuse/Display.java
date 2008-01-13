@@ -451,7 +451,7 @@ public class Display extends JComponent {
      * Set the ItemSorter that determines the rendering order of the
      * VisualItems. Items are drawn in ascending order of the scores provided
      * by the ItemSorter.
-     * @return the {@link prefuse.visual.sort.ItemSorter} to use
+     * @param cmp the {@link prefuse.visual.sort.ItemSorter} to use
      */
     public synchronized void setItemSorter(ItemSorter cmp) {
         damageReport();

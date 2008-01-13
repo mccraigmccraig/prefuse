@@ -73,7 +73,7 @@ public interface Force {
      * strictly enforced, but is used by interface components that allow force
      * parameters to be varied.
      * @param i the parameter index
-     * @return the suggested maximum value to use
+     * @param val the suggested maximum value to use
      */
     public void setMaxValue(int i, float val);
     

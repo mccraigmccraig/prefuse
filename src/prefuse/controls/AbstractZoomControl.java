@@ -74,7 +74,7 @@ public class AbstractZoomControl extends ControlAdapter {
     
     /**
      * Sets the maximum scale value allowed by this zoom control
-     * @return the maximum scale value 
+     * @param maxScale the maximum scale value 
      */
     public void setMaxScale(double maxScale) {
         this.m_maxScale = maxScale;
@@ -90,7 +90,7 @@ public class AbstractZoomControl extends ControlAdapter {
     
     /**
      * Sets the minimum scale value allowed by this zoom control
-     * @return the minimum scale value 
+     * @param minScale the minimum scale value 
      */
     public void setMinScale(double minScale) {
         this.m_minScale = minScale;

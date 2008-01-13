@@ -114,7 +114,7 @@ public class VisualGraph extends Graph implements VisualTupleSet {
     
     /**
      * Set the visualization data group name for this graph
-     * @return the data group name to use
+     * @param group the data group name to use
      */
     public void setGroup(String group) {
         m_group = group;

@@ -207,7 +207,7 @@ public class JToggleGroup extends JPanel {
     
     /**
      * Set the ListModel backing this component.
-     * @return the list model to use
+     * @param model the list model to use
      */
     public void setModel(ListModel model) {
         m_data = model;

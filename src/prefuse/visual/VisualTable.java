@@ -190,7 +190,7 @@ public class VisualTable extends CascadedTable implements VisualTupleSet {
     
     /**
      * Set the visualization data group name for this table
-     * @return the data group name to use
+     * @param group the data group name to use
      */
     public void setGroup(String group) {
         m_group = group;

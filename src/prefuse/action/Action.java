@@ -137,7 +137,7 @@ public abstract class Action extends Activity {
     
     /**
      * Set the Visualization processed by this Action.
-     * @return the {@link prefuse.Visualization} to process.
+     * @param vis the {@link prefuse.Visualization} to process.
      */
     public void setVisualization(Visualization vis) {
         m_vis = vis;

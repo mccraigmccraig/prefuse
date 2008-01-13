@@ -75,7 +75,7 @@ public class CollapsedSubtreeLayout extends Layout {
      * {@link prefuse.Constants#ORIENT_RIGHT_LEFT},
      * {@link prefuse.Constants#ORIENT_TOP_BOTTOM}, and
      * {@link prefuse.Constants#ORIENT_BOTTOM_TOP}.
-     * @return the layout orientation to use
+     * @param orientation the layout orientation to use
      */
     public void setOrientation(int orientation) {
         if ( orientation < 0 || orientation >= Constants.ORIENTATION_COUNT )
