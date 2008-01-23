@@ -40,25 +40,25 @@ public class JSearchPanel extends JPanel
     private Object m_lock;
     private SearchTupleSet m_searcher;
 
-    private JTextField m_queryF  = new JTextField(15);
-    private JLabel     m_resultL = new JLabel("          ");
-    private JLabel     m_searchL = new JLabel("search >> ");
-    private Box        m_sbox    = new Box(BoxLayout.X_AXIS);
+    private final JTextField m_queryF  = new JTextField(15);
+    private final JLabel     m_resultL = new JLabel("          ");
+    private final JLabel     m_searchL = new JLabel("search >> ");
+    private final Box        m_sbox    = new Box(BoxLayout.X_AXIS);
 
-    private String[] m_fields;
-    
+    private final String[] m_fields;
+
     private Color m_cancelColor = ColorLib.getColor(255,75,75);
-    
+
     private boolean m_includeHitCount = false;
     private boolean m_monitorKeys = false;
     private boolean m_autoIndex = true;
-    
+
     private boolean m_showBorder = true;
     private boolean m_showCancel = true;
 
     // ------------------------------------------------------------------------
     // Free form constructors
-    
+
     /**
      * Create a new JSearchPanel.
      * @param search the search tuple set conducting the searches
@@ -67,7 +67,7 @@ public class JSearchPanel extends JPanel
     public JSearchPanel(SearchTupleSet search, String field) {
         this(search, field, false);
     }
-    
+
     /**
      * Create a new JSearchPanel.
      * @param search the search tuple set conducting the searches
@@ -76,12 +76,12 @@ public class JSearchPanel extends JPanel
      * in a new search being issued (true) or if searches should only be
      * initiated by hitting the enter key (false)
      */
-    public JSearchPanel(SearchTupleSet search, String field, 
+    public JSearchPanel(SearchTupleSet search, String field,
             boolean monitorKeystrokes)
     {
         this(null, search, new String[] {field}, false, monitorKeystrokes);
     }
-    
+
     /**
      * Create a new JSearchPanel.
      * @param source the source set of tuples that should be searched over
@@ -91,7 +91,7 @@ public class JSearchPanel extends JPanel
      * in a new search being issued (true) or if searches should only be
      * initiated by hitting the enter key (false)
      */
-    public JSearchPanel(TupleSet source, SearchTupleSet search, 
+    public JSearchPanel(TupleSet source, SearchTupleSet search,
             String[] fields, boolean autoIndex, boolean monitorKeystrokes)
     {
         m_lock = new Object();
@@ -99,14 +99,14 @@ public class JSearchPanel extends JPanel
         m_autoIndex = autoIndex;
         m_monitorKeys = monitorKeystrokes;
 
-        m_searcher = ( search != null ? search : new PrefixSearchTupleSet() );
-        
+        m_searcher = search != null ? search : new PrefixSearchTupleSet();
+
         init(source);
     }
-    
+
     // ------------------------------------------------------------------------
     // Visualization-based constructors
-    
+
     /**
      * Create a new JSearchPanel. The default search tuple set for the
      * visualization will be used.
@@ -116,7 +116,7 @@ public class JSearchPanel extends JPanel
     public JSearchPanel(Visualization vis, String field) {
         this(vis, Visualization.ALL_ITEMS, field, true);
     }
-    
+
     /**
      * Create a new JSearchPanel. The default search tuple set for the
      * visualization will be used.
@@ -127,7 +127,7 @@ public class JSearchPanel extends JPanel
     public JSearchPanel(Visualization vis, String group, String field) {
         this(vis, group, field, true);
     }
-    
+
     /**
      * Create a new JSearchPanel. The default search tuple set for the
      * visualization will be used.
@@ -138,13 +138,13 @@ public class JSearchPanel extends JPanel
      * indexed and unindexed as their membership in the source group
      * changes.
      */
-    public JSearchPanel(Visualization vis, String group, String field, 
+    public JSearchPanel(Visualization vis, String group, String field,
             boolean autoIndex)
     {
-        this(vis, group, Visualization.SEARCH_ITEMS, 
+        this(vis, group, Visualization.SEARCH_ITEMS,
                 new String[] {field}, autoIndex, false);
     }
-    
+
     /**
      * Create a new JSearchPanel. The default search tuple set for the
      * visualization will be used.
@@ -158,13 +158,13 @@ public class JSearchPanel extends JPanel
      * in a new search being issued (true) or if searches should only be
      * initiated by hitting the enter key (false)
      */
-    public JSearchPanel(Visualization vis, String group, String field, 
+    public JSearchPanel(Visualization vis, String group, String field,
             boolean autoIndex, boolean monitorKeystrokes)
     {
-        this(vis, group, Visualization.SEARCH_ITEMS, 
+        this(vis, group, Visualization.SEARCH_ITEMS,
                 new String[] {field}, autoIndex, true);
     }
-    
+
     /**
      * Create a new JSearchPanel.
      * @param vis the Visualization to search over
@@ -179,13 +179,13 @@ public class JSearchPanel extends JPanel
      * in a new search being issued (true) or if searches should only be
      * initiated by hitting the enter key (false)
      */
-    public JSearchPanel(Visualization vis, String group, String searchGroup, 
+    public JSearchPanel(Visualization vis, String group, String searchGroup,
             String field, boolean autoIndex, boolean monitorKeystrokes)
     {
         this(vis, group, searchGroup, new String[] {field}, autoIndex,
                 monitorKeystrokes);
     }
-    
+
     /**
      * Create a new JSearchPanel.
      * @param vis the Visualization to search over
@@ -200,7 +200,7 @@ public class JSearchPanel extends JPanel
      * in a new search being issued (true) or if searches should only be
      * initiated by hitting the enter key (false)
      */
-    public JSearchPanel(Visualization vis, String group, String searchGroup, 
+    public JSearchPanel(Visualization vis, String group, String searchGroup,
             String[] fields, boolean autoIndex, boolean monitorKeystrokes)
     {
         m_lock = vis;
@@ -208,7 +208,7 @@ public class JSearchPanel extends JPanel
         m_autoIndex = autoIndex;
         m_monitorKeys = monitorKeystrokes;
 
-        TupleSet search = vis.getGroup(searchGroup);
+        TupleSet<?> search = vis.getGroup(searchGroup);
 
         if ( search != null ) {
             if ( search instanceof SearchTupleSet ) {
@@ -221,54 +221,58 @@ public class JSearchPanel extends JPanel
             m_searcher = new PrefixSearchTupleSet();
             vis.addFocusGroup(searchGroup, m_searcher);
         }
-        
+
         init(vis.getGroup(group));
     }
 
     // ------------------------------------------------------------------------
     // Initialization
-    
-    private void init(TupleSet source) {
+
+    private void init(TupleSet<?> source) {
         if ( m_autoIndex && source != null ) {
             // index everything already there
-            for ( int i=0; i < m_fields.length; i++ )
-                m_searcher.index(source.tuples(), m_fields[i]);
-            
+            for (String element : m_fields) {
+				m_searcher.index(source.tuples(), element);
+			}
+
             // add a listener to dynamically build search index
             source.addTupleSetListener(new TupleSetListener() {
-                public void tupleSetChanged(TupleSet tset, 
-                        Tuple[] add, Tuple[] rem)
+                public void tupleSetChanged(TupleSet<?> tset,
+                        Tuple<?>[] add, Tuple<?>[] rem)
                 {
                     if ( add != null ) {
                         for ( int i=0; i<add.length; ++i ) {
-                            for ( int j=0; j<m_fields.length; j++ )
-                                m_searcher.index(add[i], m_fields[j]);
+                            for (String element : m_fields) {
+								m_searcher.index(add[i], element);
+							}
                         }
                     }
                     if ( rem != null && m_searcher.isUnindexSupported() ) {
                         for ( int i=0; i<rem.length; ++i )  {
-                            for ( int j=0; j<m_fields.length; j++ )
-                                m_searcher.unindex(rem[i], m_fields[j]);
+                            for (String element : m_fields) {
+								m_searcher.unindex(rem[i], element);
+							}
                         }
                     }
                 }
             });
         }
-        
+
         m_queryF.addActionListener(this);
-        if ( m_monitorKeys )
-            m_queryF.getDocument().addDocumentListener(this);
+        if ( m_monitorKeys ) {
+			m_queryF.getDocument().addDocumentListener(this);
+		}
         m_queryF.setMaximumSize(new Dimension(400, 100));
         m_queryF.setPreferredSize(new Dimension(200, 20));
         m_queryF.setBorder(null);
         setBackground(Color.WHITE);
         initUI();
     }
-    
+
     private void initUI() {
         this.removeAll();
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        
+
         m_sbox.removeAll();
         m_sbox.add(Box.createHorizontalStrut(3));
         m_sbox.add(m_queryF);
@@ -277,13 +281,14 @@ public class JSearchPanel extends JPanel
             m_sbox.add(new CancelButton());
             m_sbox.add(Box.createHorizontalStrut(3));
         }
-        if ( m_showBorder )
-            m_sbox.setBorder(BorderFactory.createLineBorder(getForeground()));
-        else
-            m_sbox.setBorder(null);
+        if ( m_showBorder ) {
+			m_sbox.setBorder(BorderFactory.createLineBorder(getForeground()));
+		} else {
+			m_sbox.setBorder(null);
+		}
         m_sbox.setMaximumSize(new Dimension(400, 100));
         m_sbox.setPreferredSize(new Dimension(171, 20));
-        
+
         Box b = new Box(BoxLayout.X_AXIS);
         if ( m_includeHitCount ) {
             b.add(m_resultL);
@@ -293,19 +298,20 @@ public class JSearchPanel extends JPanel
         b.add(m_searchL);
         b.add(Box.createHorizontalStrut(3));
         b.add(m_sbox);
-        
+
         this.add(b);
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Request the keyboard focus for this component.
      */
-    public void requestFocus() {
+    @Override
+	public void requestFocus() {
         this.m_queryF.requestFocus();
     }
-    
+
     /**
      * Set the lock, an object to synchronize on while issuing queries.
      * @param lock the synchronization lock
@@ -313,7 +319,7 @@ public class JSearchPanel extends JPanel
     public void setLock(Object lock) {
         m_lock = lock;
     }
-    
+
     /**
      * Indicates if the component should show the number of search results.
      * @param b true to show the result count, false to hide it
@@ -323,7 +329,7 @@ public class JSearchPanel extends JPanel
         initUI();
         validate();
     }
-    
+
     /**
      * Indicates if the component should show a border around the text field.
      * @param b true to show the text field border, false to hide it
@@ -333,7 +339,7 @@ public class JSearchPanel extends JPanel
         initUI();
         validate();
     }
-    
+
     /**
      * Indicates if the component should show the cancel query button.
      * @param b true to show the cancel query button, false to hide it
@@ -343,7 +349,7 @@ public class JSearchPanel extends JPanel
         initUI();
         validate();
     }
-    
+
     /**
      * Update the search results based on the current query.
      */
@@ -351,15 +357,15 @@ public class JSearchPanel extends JPanel
         String query = m_queryF.getText();
         synchronized ( m_lock ) {
             m_searcher.search(query);
-            if ( m_searcher.getQuery().length() == 0 )
-                m_resultL.setText(null);
-            else {
+            if ( m_searcher.getQuery().length() == 0 ) {
+				m_resultL.setText(null);
+			} else {
                 int r = m_searcher.getTupleCount();
                 m_resultL.setText(r + " match" + (r==1?"":"es"));
             }
         }
     }
-    
+
     /**
      * Set the query string in the text field.
      * @param query the query string to use
@@ -368,11 +374,12 @@ public class JSearchPanel extends JPanel
         Document d = m_queryF.getDocument();
         d.removeDocumentListener(this);
         m_queryF.setText(query);
-        if ( m_monitorKeys )
-            d.addDocumentListener(this);
+        if ( m_monitorKeys ) {
+			d.addDocumentListener(this);
+		}
         searchUpdate();
     }
-    
+
     /**
      * Get the query string in the text field.
      * @return the current query string
@@ -380,63 +387,88 @@ public class JSearchPanel extends JPanel
     public String getQuery() {
         return m_queryF.getText();
     }
-    
+
     /**
      * Set the fill color of the cancel 'x' button that appears
-     * when the button has the mouse pointer over it. 
+     * when the button has the mouse pointer over it.
      * @param c the cancel color
      */
     public void setCancelColor(Color c) {
         m_cancelColor = c;
     }
-    
+
     /**
      * @see java.awt.Component#setBackground(java.awt.Color)
      */
-    public void setBackground(Color bg) {
+    @Override
+	public void setBackground(Color bg) {
         super.setBackground(bg);
-        if ( m_queryF  != null ) m_queryF.setBackground(bg);
-        if ( m_resultL != null ) m_resultL.setBackground(bg);
-        if ( m_searchL != null ) m_searchL.setBackground(bg);
+        if ( m_queryF  != null ) {
+			m_queryF.setBackground(bg);
+		}
+        if ( m_resultL != null ) {
+			m_resultL.setBackground(bg);
+		}
+        if ( m_searchL != null ) {
+			m_searchL.setBackground(bg);
+		}
     }
-    
+
     /**
      * @see java.awt.Component#setForeground(java.awt.Color)
      */
-    public void setForeground(Color fg) {
+    @Override
+	public void setForeground(Color fg) {
         super.setForeground(fg);
         if ( m_queryF  != null ) {
             m_queryF.setForeground(fg);
             m_queryF.setCaretColor(fg);
         }
-        if ( m_resultL != null ) m_resultL.setForeground(fg);
-        if ( m_searchL != null ) m_searchL.setForeground(fg);
-        if ( m_sbox != null && m_showBorder )
-            m_sbox.setBorder(BorderFactory.createLineBorder(fg));
+        if ( m_resultL != null ) {
+			m_resultL.setForeground(fg);
+		}
+        if ( m_searchL != null ) {
+			m_searchL.setForeground(fg);
+		}
+        if ( m_sbox != null && m_showBorder ) {
+			m_sbox.setBorder(BorderFactory.createLineBorder(fg));
+		}
     }
-    
+
     /**
      * @see javax.swing.JComponent#setOpaque(boolean)
      */
-    public void setOpaque(boolean opaque) {
+    @Override
+	public void setOpaque(boolean opaque) {
         super.setOpaque(opaque);
         if ( m_queryF  != null ) {
             m_queryF.setOpaque(opaque);
         }
-        if ( m_resultL != null ) m_resultL.setOpaque(opaque);
-        if ( m_searchL != null ) m_searchL.setOpaque(opaque);
+        if ( m_resultL != null ) {
+			m_resultL.setOpaque(opaque);
+		}
+        if ( m_searchL != null ) {
+			m_searchL.setOpaque(opaque);
+		}
     }
 
     /**
      * @see java.awt.Component#setFont(java.awt.Font)
      */
-    public void setFont(Font f) {
+    @Override
+	public void setFont(Font f) {
         super.setFont(f);;
-        if ( m_queryF  != null ) m_queryF.setFont(f);
-        if ( m_resultL != null ) m_resultL.setFont(f);
-        if ( m_searchL != null ) m_searchL.setFont(f);
+        if ( m_queryF  != null ) {
+			m_queryF.setFont(f);
+		}
+        if ( m_resultL != null ) {
+			m_resultL.setFont(f);
+		}
+        if ( m_searchL != null ) {
+			m_searchL.setFont(f);
+		}
     }
-    
+
     /**
      * Set the label text used on this component.
      * @param text the label text, use null to show no label
@@ -444,8 +476,8 @@ public class JSearchPanel extends JPanel
     public void setLabelText(String text) {
         m_searchL.setText(text);
     }
-    
-    
+
+
     /**
      * @see javax.swing.event.DocumentListener#changedUpdate(javax.swing.event.DocumentEvent)
      */
@@ -482,29 +514,30 @@ public class JSearchPanel extends JPanel
     public class CancelButton extends JComponent implements MouseListener {
 
         private boolean hover = false;
-        private int[] outline = new int[] {
+        private final int[] outline = new int[] {
             0,0, 2,0, 4,2, 5,2, 7,0, 9,0, 9,2, 7,4, 7,5, 9,7, 9,9,
             7,9, 5,7, 4,7, 2,9, 0,9, 0,7, 2,5, 2,4, 0,2, 0,0
         };
-        private int[] fill = new int[] {
+        private final int[] fill = new int[] {
             1,1,8,8, 1,2,7,8, 2,1,8,7, 7,1,1,7, 8,2,2,8, 1,8,8,1
         };
-        
+
         public CancelButton() {
             // set button size
             Dimension d = new Dimension(10,10);
             this.setPreferredSize(d);
             this.setMinimumSize(d);
             this.setMaximumSize(d);
-            
+
             // prevent the widget from getting the keyboard focus
             this.setFocusable(false);
-            
+
             // add callbacks
             this.addMouseListener(this);
         }
-        
-        public void paintComponent(Graphics g) {
+
+        @Override
+		public void paintComponent(Graphics g) {
             if ( hover ) { // draw fill
                 g.setColor(m_cancelColor);
                 for ( int i=0; i+3 < fill.length; i+=4 ) {
@@ -537,7 +570,7 @@ public class JSearchPanel extends JPanel
             hover = false;
             repaint();
         }
-        
+
     } // end of class CancelButton
 
 } // end of class JSearchPanel

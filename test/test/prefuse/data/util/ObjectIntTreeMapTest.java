@@ -10,24 +10,26 @@ import prefuse.util.collections.LiteralIterator;
 import prefuse.util.collections.ObjectIntTreeMap;
 
 public class ObjectIntTreeMapTest extends TestCase {
-    
+
     ObjectIntTreeMap map = new ObjectIntTreeMap(true);
     int[] keys = { 1, 2, 5, 3, 4, 5, 10 };
     int[] sort;
-    
+
     public ObjectIntTreeMapTest() {
-        sort = (int[])keys.clone();
+        sort = keys.clone();
         Arrays.sort(sort);
     }
-    
-    protected void setUp() throws Exception {
+
+    @Override
+	protected void setUp() throws Exception {
         super.setUp();
         for ( int i=0; i<keys.length; ++i ) {
             map.put(new Integer(keys[i]),keys[i]);
         }
     }
 
-    protected void tearDown() throws Exception {
+    @Override
+	protected void tearDown() throws Exception {
         super.tearDown();
         map.clear();
     }
@@ -113,20 +115,24 @@ public class ObjectIntTreeMapTest extends TestCase {
      */
     public void testSubMap() {
         int k1, i1, i2, i, k, len = sort.length-1;
-        for ( i=0, k=sort[0]; k==sort[0]; ++i, k=sort[i] );
+        for ( i=0, k=sort[0]; k==sort[0]; ++i, k=sort[i] ) {
+			;
+		}
         k1 = k; i1 = i;
-        for ( i=len, k=sort[len]; i>=0 && k==sort[len]; --i, k=sort[i] );
+        for ( i=len, k=sort[len]; i>=0 && k==sort[len]; --i, k=sort[i] ) {
+			;
+		}
         i2 = i;
-        
+
         Object loKey = new Integer(k1);
         Object hiKey = new Integer(sort[len]);
-        
+
         Iterator iter = map.keyRangeIterator(loKey, true, hiKey, false);
         for ( i=i1; iter.hasNext() && i <= i2; ++i ) {
             assertEquals(((Integer)iter.next()).intValue(), sort[i]);
         }
         assertTrue(!iter.hasNext() && i == i2+1);
-        
+
         IntIterator liter = map.valueRangeIterator(loKey, true, hiKey, false);
         for ( i=i1; liter.hasNext() && i <= i2; ++i ) {
             assertEquals(liter.nextInt(), sort[i]);

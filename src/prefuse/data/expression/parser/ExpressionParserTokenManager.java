@@ -27,6 +27,14 @@ static private final int jjStopAtPos(int pos, int kind)
    jjmatchedPos = pos;
    return pos + 1;
 }
+static private final int jjStartNfaWithStates_0(int pos, int kind, int state)
+{
+   jjmatchedKind = kind;
+   jjmatchedPos = pos;
+   try { curChar = input_stream.readChar(); }
+   catch(java.io.IOException e) { return pos + 1; }
+   return jjMoveNfa_0(state, pos + 1);
+}
 static private final int jjMoveStringLiteralDfa0_0()
 {
    switch(curChar)
@@ -61,7 +69,7 @@ static private final int jjMoveStringLiteralDfa0_0()
 }
 static private final int jjMoveStringLiteralDfa1_0(long active0)
 {
-   try { curChar = JavaCharStream.readChar(); }
+   try { curChar = input_stream.readChar(); }
    catch(java.io.IOException e) {
       jjStopStringLiteralDfa_0(0, active0);
       return 1;
@@ -104,6 +112,11 @@ static private final void jjCheckNAddStates(int start, int end)
       jjCheckNAdd(jjnextStates[start]);
    } while (start++ != end);
 }
+static private final void jjCheckNAddStates(int start)
+{
+   jjCheckNAdd(jjnextStates[start]);
+   jjCheckNAdd(jjnextStates[start + 1]);
+}
 static final long[] jjbitVec0 = {
    0xfffffffffffffffeL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL
 };
@@ -142,7 +155,7 @@ static private final int jjMoveNfa_0(int startState, int curPos)
       if (curChar < 64)
       {
          long l = 1L << curChar;
-         do
+         MatchLoop: do
          {
             switch(jjstateSet[--i])
             {
@@ -485,7 +498,7 @@ static private final int jjMoveNfa_0(int startState, int curPos)
       else if (curChar < 128)
       {
          long l = 1L << (curChar & 077);
-         do
+         MatchLoop: do
          {
             switch(jjstateSet[--i])
             {
@@ -899,7 +912,7 @@ static private final int jjMoveNfa_0(int startState, int curPos)
          long l1 = 1L << (hiByte & 077);
          int i2 = (curChar & 0xff) >> 6;
          long l2 = 1L << (curChar & 077);
-         do
+         MatchLoop: do
          {
             switch(jjstateSet[--i])
             {
@@ -936,16 +949,16 @@ static private final int jjMoveNfa_0(int startState, int curPos)
       ++curPos;
       if ((i = jjnewStateCnt) == (startsAt = 141 - (jjnewStateCnt = startsAt)))
          return curPos;
-      try { curChar = JavaCharStream.readChar(); }
+      try { curChar = input_stream.readChar(); }
       catch(java.io.IOException e) { return curPos; }
    }
 }
 static final int[] jjnextStates = {
-   114, 115, 120, 121, 124, 125, 130, 131, 104, 105, 108, 109, 112, 53, 54, 56, 
-   44, 45, 47, 100, 101, 102, 135, 137, 138, 140, 102, 44, 45, 49, 47, 53, 
-   54, 58, 56, 62, 63, 108, 109, 112, 126, 127, 112, 96, 98, 90, 92, 83, 
-   86, 76, 79, 46, 48, 50, 55, 57, 59, 106, 107, 110, 111, 118, 119, 122, 
-   123, 128, 129, 132, 133, 
+   114, 115, 120, 121, 124, 125, 130, 131, 104, 105, 108, 109, 112, 53, 54, 56,
+   44, 45, 47, 100, 101, 102, 135, 137, 138, 140, 102, 44, 45, 49, 47, 53,
+   54, 58, 56, 62, 63, 108, 109, 112, 126, 127, 112, 96, 98, 90, 92, 83,
+   86, 76, 79, 46, 48, 50, 55, 57, 59, 106, 107, 110, 111, 118, 119, 122,
+   123, 128, 129, 132, 133,
 };
 private static final boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, long l2)
 {
@@ -953,7 +966,7 @@ private static final boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, lo
    {
       case 0:
          return ((jjbitVec2[i2] & l2) != 0L);
-      default : 
+      default :
          if ((jjbitVec0[i1] & l1) != 0L)
             return true;
          return false;
@@ -973,38 +986,36 @@ private static final boolean jjCanMove_1(int hiByte, int i1, int i2, long l1, lo
          return ((jjbitVec7[i2] & l2) != 0L);
       case 61:
          return ((jjbitVec8[i2] & l2) != 0L);
-      default : 
+      default :
          if ((jjbitVec3[i1] & l1) != 0L)
             return true;
          return false;
    }
 }
 public static final String[] jjstrLiteralImages = {
-"", null, null, null, null, null, null, null, null, null, null, null, null, 
-null, null, null, null, null, null, null, null, null, null, null, null, null, null, 
-null, null, "\50", "\51", null, "\76", "\74", "\74\75", "\76\75", null, "\53", 
+"", null, null, null, null, null, null, null, null, null, null, null, null,
+null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+null, null, "\50", "\51", null, "\76", "\74", "\74\75", "\76\75", null, "\53",
 "\55", "\52", "\57", "\136", "\45", "\54", };
 public static final String[] lexStateNames = {
-   "DEFAULT", 
+   "DEFAULT",
 };
 static final long[] jjtoToken = {
-   0xfffe771ffc1L, 
+   0xfffe771ffc1L,
 };
 static final long[] jjtoSkip = {
-   0x3eL, 
+   0x3eL,
 };
 static protected JavaCharStream input_stream;
 static private final int[] jjrounds = new int[141];
 static private final int[] jjstateSet = new int[282];
 static protected char curChar;
-public ExpressionParserTokenManager(JavaCharStream stream)
-{
+public ExpressionParserTokenManager(JavaCharStream stream){
    if (input_stream != null)
       throw new TokenMgrError("ERROR: Second call to constructor of static lexer. You must use ReInit() to initialize the static variables.", TokenMgrError.STATIC_LEXER_ERROR);
    input_stream = stream;
 }
-public ExpressionParserTokenManager(JavaCharStream stream, int lexState)
-{
+public ExpressionParserTokenManager(JavaCharStream stream, int lexState){
    this(stream);
    SwitchTo(lexState);
 }
@@ -1040,11 +1051,11 @@ static protected Token jjFillToken()
    Token t = Token.newToken(jjmatchedKind);
    t.kind = jjmatchedKind;
    String im = jjstrLiteralImages[jjmatchedKind];
-   t.image = (im == null) ? JavaCharStream.GetImage() : im;
-   t.beginLine = JavaCharStream.getBeginLine();
-   t.beginColumn = JavaCharStream.getBeginColumn();
-   t.endLine = JavaCharStream.getEndLine();
-   t.endColumn = JavaCharStream.getEndColumn();
+   t.image = (im == null) ? input_stream.GetImage() : im;
+   t.beginLine = input_stream.getBeginLine();
+   t.beginColumn = input_stream.getBeginColumn();
+   t.endLine = input_stream.getEndLine();
+   t.endColumn = input_stream.getEndColumn();
    return t;
 }
 
@@ -1055,28 +1066,28 @@ static int jjround;
 static int jjmatchedPos;
 static int jjmatchedKind;
 
-public static Token getNextToken() 
+public static Token getNextToken()
 {
   Token matchedToken;
   int curPos = 0;
 
   EOFLoop :
   for (;;)
-  {   
-   try   
-   {     
-      curChar = JavaCharStream.BeginToken();
-   }     
+  {
+   try
+   {
+      curChar = input_stream.BeginToken();
+   }
    catch(java.io.IOException e)
-   {        
+   {
       jjmatchedKind = 0;
       matchedToken = jjFillToken();
       return matchedToken;
    }
 
-   try { JavaCharStream.backup(0);
+   try { input_stream.backup(0);
       while (curChar <= 32 && (0x100003600L & (1L << curChar)) != 0L)
-         curChar = JavaCharStream.BeginToken();
+         curChar = input_stream.BeginToken();
    }
    catch (java.io.IOException e1) { continue EOFLoop; }
    jjmatchedKind = 0x7fffffff;
@@ -1085,7 +1096,7 @@ public static Token getNextToken()
    if (jjmatchedKind != 0x7fffffff)
    {
       if (jjmatchedPos + 1 < curPos)
-         JavaCharStream.backup(curPos - jjmatchedPos - 1);
+         input_stream.backup(curPos - jjmatchedPos - 1);
       if ((jjtoToken[jjmatchedKind >> 6] & (1L << (jjmatchedKind & 077))) != 0L)
       {
          matchedToken = jjFillToken();
@@ -1096,14 +1107,14 @@ public static Token getNextToken()
          continue EOFLoop;
       }
    }
-   int error_line = JavaCharStream.getEndLine();
-   int error_column = JavaCharStream.getEndColumn();
+   int error_line = input_stream.getEndLine();
+   int error_column = input_stream.getEndColumn();
    String error_after = null;
    boolean EOFSeen = false;
-   try { JavaCharStream.readChar(); JavaCharStream.backup(1); }
+   try { input_stream.readChar(); input_stream.backup(1); }
    catch (java.io.IOException e1) {
       EOFSeen = true;
-      error_after = curPos <= 1 ? "" : JavaCharStream.GetImage();
+      error_after = curPos <= 1 ? "" : input_stream.GetImage();
       if (curChar == '\n' || curChar == '\r') {
          error_line++;
          error_column = 0;
@@ -1112,8 +1123,8 @@ public static Token getNextToken()
          error_column++;
    }
    if (!EOFSeen) {
-      JavaCharStream.backup(1);
-      error_after = curPos <= 1 ? "" : JavaCharStream.GetImage();
+      input_stream.backup(1);
+      error_after = curPos <= 1 ? "" : input_stream.GetImage();
    }
    throw new TokenMgrError(EOFSeen, curLexState, error_line, error_column, error_after, curChar, TokenMgrError.LEXICAL_ERROR);
   }

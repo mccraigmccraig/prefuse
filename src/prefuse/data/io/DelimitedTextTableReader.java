@@ -15,13 +15,13 @@ import prefuse.data.parser.ParserFactory;
  * (\t) or pipe (|) to demarcate different data columns. This class
  * allows you to select any regular expression as the column
  * delimiter.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class DelimitedTextTableReader extends AbstractTextTableReader {
 
-    private String m_delim;
-   
+    private final String m_delim;
+
     /**
      * Create a new DelimitedTextTableReader for reading tab-delimited files
      * using a default parser factory.
@@ -29,7 +29,7 @@ public class DelimitedTextTableReader extends AbstractTextTableReader {
     public DelimitedTextTableReader() {
         this("\t");
     }
-    
+
     /**
      * Create a new DelimitedTextTableReader for reading tab-delimited files.
      * @param parserFactory the ParserFactory to use for parsing text strings
@@ -38,7 +38,7 @@ public class DelimitedTextTableReader extends AbstractTextTableReader {
     public DelimitedTextTableReader(ParserFactory parserFactory) {
         this("\t", parserFactory);
     }
-    
+
     /**
      * Create a new DelimitedTextTableReader using a default parser factory.
      * @param delimiterRegex a regular expression string indicating the
@@ -47,7 +47,7 @@ public class DelimitedTextTableReader extends AbstractTextTableReader {
     public DelimitedTextTableReader(String delimiterRegex) {
         m_delim = delimiterRegex;
     }
-    
+
     /**
      * Create a new DelimitedTextTableReader.
      * @param delimiterRegex a regular expression string indicating the
@@ -59,23 +59,24 @@ public class DelimitedTextTableReader extends AbstractTextTableReader {
         super(pf);
         m_delim = delimiterRegex;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * @see prefuse.data.io.AbstractTextTableReader#read(java.io.InputStream, prefuse.data.io.TableReadListener)
      */
-    protected void read(InputStream is, TableReadListener trl)
+    @Override
+	protected void read(InputStream is, TableReadListener trl)
             throws IOException, DataParseException
     {
         String line;
         int lineno   = 0;
-        
+
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         while ( (line=br.readLine()) != null ) {
             // increment the line number
             ++lineno;
-            
+
             // split on tab character
             String[] cols = line.split(m_delim);
             for ( int i=0; i<cols.length; ++i ) {

@@ -7,7 +7,7 @@ import prefuse.action.Action;
  * high quality rendering of still images. At the beginning of an animation,
  * high quality rendering (if enabled) is disabled, and at the end the original
  * setting is restored.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class QualityControlAnimator extends Action {
@@ -15,8 +15,11 @@ public class QualityControlAnimator extends Action {
     /**
      * @see prefuse.action.Action#run(double)
      */
-    public void run(double frac) {
-        if ( m_vis == null ) return;
+    @Override
+	public void run(double frac) {
+        if ( m_vis == null ) {
+			return;
+		}
         if ( frac == 0.0 || frac == 1.0 ) {
             boolean quality = frac >= 1.0;
             for ( int i=0; i<m_vis.getDisplayCount(); ++i ) {
@@ -25,7 +28,7 @@ public class QualityControlAnimator extends Action {
             qualityValue(quality);
         }
     }
-    
+
     /**
      * Callback procedure that subclasses can override to execute
      * custom quality control measures.

@@ -12,7 +12,7 @@ import prefuse.util.collections.LiteralComparator;
  * Predicate implementation that computes a comparison operation. Supported
  * operations are equals, not equals, less than, greater than, less than or
  * equal to, and greater than or equal to.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class ComparisonPredicate extends BinaryExpression implements Predicate {
@@ -29,16 +29,16 @@ public class ComparisonPredicate extends BinaryExpression implements Predicate {
     public static final int LTEQ = 4;
     /** Indicates a greater-than-or-equals comparison. */
     public static final int GTEQ = 5;
-    
-    private Comparator m_cmp;
-    
+
+    private final Comparator<Object> m_cmp;
+
     /**
      * Create a new ComparisonPredicate. Uses a default comparator instance.
      * @param operation the comparison operation to compute
      * @param left the left sub-expression
      * @param right the right sub-expression
      */
-    public ComparisonPredicate(int operation, 
+    public ComparisonPredicate(int operation,
             Expression left, Expression right)
     {
         this(operation, left, right, DefaultLiteralComparator.getInstance());
@@ -51,41 +51,42 @@ public class ComparisonPredicate extends BinaryExpression implements Predicate {
      * @param right the right sub-expression
      * @param cmp the comparator to use to compare values
      */
-    public ComparisonPredicate(int operation, 
-            Expression left, Expression right, Comparator cmp)
+    public ComparisonPredicate(int operation,
+            Expression left, Expression right, Comparator<Object> cmp)
     {
         super(operation, LT, GTEQ, left, right);
         this.m_cmp = cmp;
     }
-    
-    
+
+
     /**
      * Get the comparator used to compare instances.
      * @return the comparator instance
      */
-    public Comparator getComparator() {
+    public Comparator<Object> getComparator() {
         return m_cmp;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * @see prefuse.data.expression.Expression#getType(prefuse.data.Schema)
      */
-    public Class getType(Schema s) {
+    public Class<?> getType(Schema s) {
         return boolean.class;
     }
-    
+
     /**
      * @see prefuse.data.expression.Expression#getBoolean(prefuse.data.Tuple)
      */
-    public boolean getBoolean(Tuple t) {
-        Class lType = m_left.getType(t.getSchema());
-        Class rType = m_right.getType(t.getSchema());
-        
+    @Override
+	public boolean getBoolean(Tuple<?> t) {
+        Class<?> lType = m_left.getType(t.getSchema());
+        Class<?> rType = m_right.getType(t.getSchema());
+
         int c = 0;
         if ( TypeLib.isNumericType(lType) && TypeLib.isNumericType(rType) ) {
-            Class type = TypeLib.getNumericType(lType, rType);
+            Class<?> type = TypeLib.getNumericType(lType, rType);
             if ( type == int.class || type == byte.class ) {
                 int x = m_left.getInt(t);
                 int y = m_right.getInt(t);
@@ -108,20 +109,20 @@ public class ComparisonPredicate extends BinaryExpression implements Predicate {
         } else {
             c = m_cmp.compare(m_left.get(t), m_right.get(t));
         }
-       
+
         switch ( m_op ) {
         case LT:
-            return ( c == -1 );
+            return c == -1;
         case GT:
-            return ( c == 1 );
+            return c == 1;
         case EQ:
-            return ( c == 0 );
+            return c == 0;
         case NEQ:
-            return ( c != 0 );
+            return c != 0;
         case LTEQ:
-            return ( c <= 0 );
+            return c <= 0;
         case GTEQ:
-            return ( c >= 0 );
+            return c >= 0;
         default:
             throw new IllegalStateException("Unknown operation.");
         }
@@ -130,14 +131,16 @@ public class ComparisonPredicate extends BinaryExpression implements Predicate {
     /**
      * @see prefuse.data.expression.Expression#get(prefuse.data.Tuple)
      */
-    public Object get(Tuple t) {
-        return ( getBoolean(t) ? Boolean.TRUE : Boolean.FALSE );
+    @Override
+	public Object get(Tuple<?> t) {
+        return getBoolean(t) ? Boolean.TRUE : Boolean.FALSE;
     }
-    
+
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString() {
+    @Override
+	public String toString() {
         String op = "?";
         switch ( m_op ) {
         case LT:
@@ -161,5 +164,5 @@ public class ComparisonPredicate extends BinaryExpression implements Predicate {
         }
         return m_left.toString()+' '+op+' '+m_right.toString();
     }
-    
+
 } // end of class BinaryPredicate

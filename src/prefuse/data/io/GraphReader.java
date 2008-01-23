@@ -9,9 +9,9 @@ import java.net.URL;
 import prefuse.data.Graph;
 
 /**
- * nterface for classes that read in Graph or Tree data from a particular
+ * Interface for classes that read in Graph or Tree data from a particular
  * file format.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public interface GraphReader {
@@ -27,16 +27,16 @@ public interface GraphReader {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public Graph readGraph(String location) throws DataIOException;
-    
+    public Graph<?,?,?> readGraph(String location) throws DataIOException;
+
     /**
      * Read in a graph from the given URL.
      * @param url the url to read the graph from
      * @return the loaded Graph
      * @throws IOException
      */
-    public Graph readGraph(URL url) throws DataIOException;
-    
+    public Graph<?,?,?> readGraph(URL url) throws DataIOException;
+
     /**
      * Read in a graph from the given File.
      * @param f the file to read the graph from
@@ -44,14 +44,14 @@ public interface GraphReader {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public Graph readGraph(File f) throws DataIOException;
-    
+    public Graph<?,?,?> readGraph(File f) throws DataIOException;
+
     /**
      * Read in a graph from the given InputStream.
      * @param is the InputStream to read the graph from
      * @return the loaded Graph
      * @throws IOException
      */
-    public Graph readGraph(InputStream is) throws DataIOException;
+    public Graph<?,?,?> readGraph(InputStream is) throws DataIOException;
 
 } // end of interface GraphReader

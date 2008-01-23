@@ -1,5 +1,7 @@
 package prefuse.util.ui;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -8,7 +10,6 @@ import prefuse.data.Table;
 import prefuse.data.event.EventConstants;
 import prefuse.data.event.TableListener;
 import prefuse.util.StringLib;
-import prefuse.util.collections.CopyOnWriteArrayList;
 import prefuse.util.collections.IntIterator;
 
 /**
@@ -16,19 +17,19 @@ import prefuse.util.collections.IntIterator;
  * Table instance and a JTable component.
  */
 public class PrefuseTableModel implements TableModel, TableListener {
-    
-    private CopyOnWriteArrayList m_listeners = new CopyOnWriteArrayList();
+
+    private CopyOnWriteArrayList<TableModelListener> m_listeners = new CopyOnWriteArrayList<TableModelListener>();
     private int[] m_rowmap;
-    private Table m_table;
-    
+    private Table<?> m_table;
+
     /**
      * Creates a new PrefuseTableModel
      * @param table the underlying prefuse table
      */
-    public PrefuseTableModel(Table table) {
+    public PrefuseTableModel(Table<?> table) {
     	m_table = table;
     }
-    
+
     /**
      * Initialize mapping between prefuse table rows and the rows reported
      * by this model.
@@ -40,7 +41,7 @@ public class PrefuseTableModel implements TableModel, TableListener {
             m_rowmap[i] = rows.nextInt();
         }
     }
-    
+
     /**
      * Get the prefuse table row for a row index into this table model.
      * @param rowIndex the row index in this table model
@@ -51,9 +52,9 @@ public class PrefuseTableModel implements TableModel, TableListener {
             initRowMap();
         return m_rowmap[rowIndex];
     }
-    
+
     // --------------------------------------------------------------------
-    
+
     /**
      * @see javax.swing.table.TableModel#getColumnCount()
      */
@@ -75,7 +76,7 @@ public class PrefuseTableModel implements TableModel, TableListener {
     /**
      * @see javax.swing.table.TableModel#getColumnClass(int)
      */
-    public Class getColumnClass(int columnIndex) {
+    public Class<?> getColumnClass(int columnIndex) {
         return m_table.getColumnType(columnIndex);
     }
     /**
@@ -101,9 +102,9 @@ public class PrefuseTableModel implements TableModel, TableListener {
     public String getColumnName(int columnIndex) {
         return m_table.getColumnName(columnIndex);
     }
-    
+
     // --------------------------------------------------------------------
-    
+
     /**
      * @see javax.swing.table.TableModel#addTableModelListener(javax.swing.event.TableModelListener)
      */
@@ -120,19 +121,13 @@ public class PrefuseTableModel implements TableModel, TableListener {
     /**
      * @see prefuse.data.event.TableListener#tableChanged(prefuse.data.Table, int, int, int, int)
      */
-    public void tableChanged(Table t, int start, int end, int col, int type) {
+    public void tableChanged(Table<?> t, int start, int end, int col, int type) {
         if ( type == EventConstants.INSERT || type == EventConstants.DELETE )
             m_rowmap = null; // invalidate row map
-        
-        Object[] lstnrs = m_listeners.getArray();
-        if ( lstnrs.length == 0 )
-            return;
-        
-        TableModelEvent evt 
-            = new TableModelEvent(this, start, end, col, type);
-        for ( int i=0; i<lstnrs.length; ++i ) {
-            ((TableModelListener)lstnrs[i]).tableChanged(evt);
+        TableModelEvent evt = new TableModelEvent(this, start, end, col, type);
+        for(TableModelListener l : m_listeners) {
+            l.tableChanged(evt);
         }
     }
-    
+
 } // end of class PrefuseTableModel

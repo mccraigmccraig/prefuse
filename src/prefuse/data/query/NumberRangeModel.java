@@ -8,17 +8,17 @@ import prefuse.util.ui.ValuedRangeModel;
 /**
  * Range model for numerical data. Designed to support range-based dynamic
  * queries.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class NumberRangeModel extends DefaultBoundedRangeModel
     implements ValuedRangeModel
 {
-    protected Class m_type;
+    protected Class<?> m_type;
     protected Number m_min, m_max, m_lo, m_hi;
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Create a new NumberRangeModel for the given range.
      * @param lo the low value of the selected range
@@ -27,10 +27,10 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
      * @param max the maximum value allowed for ranges
      */
     public NumberRangeModel(int lo, int hi, int min, int max) {
-        this(new Integer(lo), new Integer(hi), 
+        this(new Integer(lo), new Integer(hi),
              new Integer(min),  new Integer(hi));
     }
-    
+
     /**
      * Create a new NumberRangeModel for the given range.
      * @param lo the low value of the selected range
@@ -41,7 +41,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
     public NumberRangeModel(long lo, long hi, long min, long max) {
         this(new Long(lo), new Long(hi), new Long(min), new Long(max));
     }
-    
+
     /**
      * Create a new NumberRangeModel for the given range.
      * @param lo the low value of the selected range
@@ -52,7 +52,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
     public NumberRangeModel(float lo, float hi, float min, float max) {
         this(new Float(lo), new Float(hi), new Float(min), new Float(max));
     }
-    
+
     /**
      * Create a new NumberRangeModel for the given range.
      * @param lo the low value of the selected range
@@ -63,7 +63,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
     public NumberRangeModel(double lo, double hi, double min, double max) {
         this(new Double(lo), new Double(hi), new Double(min), new Double(max));
     }
-    
+
     /**
      * Create a new NumberRangeModel for the given range.
      * @param lo the low value of the selected range
@@ -77,7 +77,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
     }
 
     // ------------------------------------------------------------------------
-    
+
     /**
      * Update the range settings based on current values.
      */
@@ -95,7 +95,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
         	} else {
         		long lo = m_lo.longValue() - m_min.longValue();
         		long hi = m_hi.longValue() - m_min.longValue();
-        	
+
         		int v = 10000 * (int)( lo / range );
         		int e = 10000 * (int)( hi / range ) - v;
         		setRange(v, e, 0, 10000);
@@ -116,14 +116,14 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
         	}
         }
     }
-    
+
     /**
      * Set the range settings in the pixel-space coordinates.
      */
     protected void setRange(int val, int ext, int min, int max) {
         super.setRangeProperties(val, ext, min, max, false);
     }
-    
+
     /**
      * @see javax.swing.BoundedRangeModel#setRangeProperties(int, int, int, int, boolean)
      */
@@ -137,7 +137,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
         m_hi = null;
         super.setRangeProperties(val, extent, min, max, adj);
     }
-    
+
     /**
      * Set the range model's backing values.
      * @param lo the low value of the selected range
@@ -149,7 +149,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
         m_lo = lo; m_hi = hi; m_min = min; m_max = max;
         updateRange();
     }
-    
+
     /**
      * Set the range model's backing values.
      * @param lo the low value of the selected range
@@ -162,7 +162,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
         m_min = new Double(min); m_max = new Double(max);
         updateRange();
     }
-    
+
     /**
      * Set the range model's backing values.
      * @param lo the low value of the selected range
@@ -175,7 +175,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
         m_min = new Integer(min); m_max = new Integer(max);
         updateRange();
     }
-    
+
     /**
      * Set the range model's backing values.
      * @param lo the low value of the selected range
@@ -188,7 +188,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
         m_min = new Long(min); m_max = new Long(max);
         updateRange();
     }
-    
+
     /**
      * @see prefuse.util.ui.ValuedRangeModel#getMinValue()
      */
@@ -203,7 +203,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
     public void setMinValue(Number n) {
         setValueRange((Number)getLowValue(), (Number)getHighValue(), n, m_max);
     }
-    
+
     /**
      * @see prefuse.util.ui.ValuedRangeModel#getMaxValue()
      */
@@ -218,7 +218,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
     public void setMaxValue(Number n) {
         setValueRange((Number)getLowValue(), (Number)getHighValue(), m_min, n);
     }
-    
+
     /**
      * @see prefuse.util.ui.ValuedRangeModel#getLowValue()
      */
@@ -235,7 +235,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
     public void setLowValue(Number n) {
         setValueRange(n, (Number)getHighValue(), m_min, m_max);
     }
-    
+
     /**
      * @see prefuse.util.ui.ValuedRangeModel#getHighValue()
      */
@@ -244,7 +244,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
             m_hi = (Number)value(getValue()+getExtent());
         return m_hi;
     }
-    
+
     /**
      * Set the highest selected range value.
      * @param n the high value of the selected range.
@@ -252,7 +252,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
     public void setHighValue(Number n) {
         setValueRange((Number)getLowValue(), n, m_min, m_max);
     }
-    
+
     protected Object value(int val) {
         int min = getMinimum();
         int max = getMaximum();
@@ -260,7 +260,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
             double f = (val-min)/(double)(max-min);
             double m = m_min.doubleValue();
             double v = m + f*(m_max.doubleValue()-m);
-            return (m_type==float.class ? (Number)new Float((float)v) 
+            return (m_type==float.class ? (Number)new Float((float)v)
                                         : new Double(v));
         } else if ( m_type == long.class ) {
             long m = m_min.longValue();
@@ -270,7 +270,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
             return new Integer(val);
         }
     }
-    
+
     /**
      * Not supported, throws an exception.
      * @throws UnsupportedOperationException
@@ -279,7 +279,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
     public void setMinimum(int min) {
         throw new UnsupportedOperationException();
     }
-    
+
     /**
      * Not supported, throws an exception.
      * @throws UnsupportedOperationException
@@ -288,7 +288,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
     public void setMaximum(int max) {
         throw new UnsupportedOperationException();
     }
-    
+
     /**
      * @see javax.swing.BoundedRangeModel#setValue(int)
      */
@@ -296,7 +296,7 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
         m_lo = null;
         super.setValue(val);
     }
-    
+
     /**
      * @see javax.swing.BoundedRangeModel#setExtent(int)
      */
@@ -304,5 +304,5 @@ public class NumberRangeModel extends DefaultBoundedRangeModel
         m_hi = null;
         super.setExtent(extent);
     }
-    
+
 } // end of class NumberRangeModel

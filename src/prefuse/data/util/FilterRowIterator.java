@@ -10,29 +10,29 @@ import prefuse.util.collections.IntIterator;
  * Iterator over table rows that filters the output by a given predicate. For
  * each table row, the corresponding tuple is checked against the predicate.
  * Only rows whose tuples pass the filter are included in this iteration.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class FilterRowIterator extends IntIterator {
-    
-    private Predicate predicate;
+
+    private final Predicate predicate;
     private IntIterator rows;
-    private Table t;
+    private final Table<?> t;
     private int next;
-    
+
     /**
      * Create a new FilterRowIterator.
      * @param rows an iterator over table rows
      * @param t the whos rows are being iterated over
      * @param p the filter predicate to use
      */
-    public FilterRowIterator(IntIterator rows, Table t, Predicate p) {
+    public FilterRowIterator(IntIterator rows, Table<?> t, Predicate p) {
         this.predicate = p;
         this.rows = rows;
         this.t = t;
         next = advance();
     }
-    
+
     private int advance() {
         while ( rows.hasNext() ) {
             int r = rows.nextInt();
@@ -48,7 +48,8 @@ public class FilterRowIterator extends IntIterator {
     /**
      * @see prefuse.util.collections.LiteralIterator#nextInt()
      */
-    public int nextInt() {
+    @Override
+	public int nextInt() {
         if ( !hasNext() ) {
             throw new NoSuchElementException("No more elements");
         }
@@ -56,14 +57,14 @@ public class FilterRowIterator extends IntIterator {
         next = advance();
         return retval;
     }
-    
+
     /**
      * @see java.util.Iterator#hasNext()
      */
     public boolean hasNext() {
-        return ( rows != null );
+        return rows != null;
     }
-    
+
     /**
      * Not supported.
      * @see java.util.Iterator#remove()
@@ -71,5 +72,5 @@ public class FilterRowIterator extends IntIterator {
     public void remove() {
         throw new UnsupportedOperationException();
     }
-    
+
 } // end of class FilterRowIterator

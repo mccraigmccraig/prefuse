@@ -7,7 +7,7 @@ import prefuse.util.TypeLib;
 /**
  * Expression supporting basic arithmetic: add, subtract, multiply,
  * divide, exponentiate (pow), and modulo (%).
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class ArithmeticExpression extends BinaryExpression {
@@ -25,29 +25,29 @@ public class ArithmeticExpression extends BinaryExpression {
     /** Indicates a modulo operation. */
     public static final int MOD = 5;
 
-    private Class m_type;    
-    
+    private Class<?> m_type;
+
     /**
      * Create a new ArithmeticExpression.
      * @param operation the operation to perform
      * @param left the left sub-expression
      * @param right the right sub-expression
      */
-    public ArithmeticExpression(int operation, 
+    public ArithmeticExpression(int operation,
             Expression left, Expression right)
     {
         super(operation, ADD, MOD, left, right);
         m_type = null;
     }
-    
+
     /**
      * @see prefuse.data.expression.Expression#getType(prefuse.data.Schema)
      */
-    public Class getType(Schema s) {
+    public Class<?> getType(Schema s) {
         if ( m_type == null ) {
-            Class lType = m_left.getType(s);
-            Class rType = m_right.getType(s);
-        
+            Class<?> lType = m_left.getType(s);
+            Class<?> rType = m_right.getType(s);
+
             // determine this class's type
             m_type = TypeLib.getNumericType(lType, rType);
         }
@@ -57,8 +57,9 @@ public class ArithmeticExpression extends BinaryExpression {
     /**
      * @see prefuse.data.expression.Expression#get(prefuse.data.Tuple)
      */
-    public Object get(Tuple t) {
-        Class type = getType(t.getSchema());
+    @Override
+	public Object get(Tuple<?> t) {
+        Class<?> type = getType(t.getSchema());
         if ( int.class == type || byte.class == type ) {
             return new Integer(getInt(t));
         } else if ( long.class == type ) {
@@ -70,16 +71,17 @@ public class ArithmeticExpression extends BinaryExpression {
         } else {
             throw new IllegalStateException();
         }
-        
+
     }
 
     /**
      * @see prefuse.data.expression.Expression#getInt(prefuse.data.Tuple)
      */
-    public int getInt(Tuple t) {
+    @Override
+	public int getInt(Tuple<?> t) {
         int x = m_left.getInt(t);
         int y = m_right.getInt(t);
-        
+
         // compute return value
         switch ( m_op ) {
         case ADD:
@@ -101,10 +103,11 @@ public class ArithmeticExpression extends BinaryExpression {
     /**
      * @see prefuse.data.expression.Expression#getLong(prefuse.data.Tuple)
      */
-    public long getLong(Tuple t) {
+    @Override
+	public long getLong(Tuple<?> t) {
         long x = m_left.getLong(t);
         long y = m_right.getLong(t);
-        
+
         // compute return value
         switch ( m_op ) {
         case ADD:
@@ -126,10 +129,11 @@ public class ArithmeticExpression extends BinaryExpression {
     /**
      * @see prefuse.data.expression.Expression#getFloat(prefuse.data.Tuple)
      */
-    public float getFloat(Tuple t) {
+    @Override
+	public float getFloat(Tuple<?> t) {
         float x = m_left.getFloat(t);
         float y = m_right.getFloat(t);
-        
+
         // compute return value
         switch ( m_op ) {
         case ADD:
@@ -151,10 +155,11 @@ public class ArithmeticExpression extends BinaryExpression {
     /**
      * @see prefuse.data.expression.Expression#getDouble(prefuse.data.Tuple)
      */
-    public double getDouble(Tuple t) {
+    @Override
+	public double getDouble(Tuple<?> t) {
         double x = m_left.getDouble(t);
         double y = m_right.getDouble(t);
-        
+
         // compute return value
         switch ( m_op ) {
         case ADD:
@@ -176,7 +181,8 @@ public class ArithmeticExpression extends BinaryExpression {
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString() {
+    @Override
+	public String toString() {
         char op = '?';
         switch ( m_op ) {
         case ADD:
@@ -200,5 +206,5 @@ public class ArithmeticExpression extends BinaryExpression {
         }
         return '('+m_left.toString()+' '+op+' '+m_right.toString()+')';
     }
-    
+
 } // end of class ArithmeticExpression

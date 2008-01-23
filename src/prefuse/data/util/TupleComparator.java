@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package prefuse.data.util;
 
@@ -11,17 +11,17 @@ import prefuse.util.collections.LiteralComparator;
 
 /**
  * Comparator that compares Tuples based on the value of a single field.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class TupleComparator implements Comparator {
+public class TupleComparator <T extends Tuple> implements Comparator<T> {
 
     private String m_field;
     private int m_col;
-    private Comparator m_cmp;
+    private Comparator<Object> m_cmp;
     private Class m_type;
     private int m_rev;
-    
+
     /**
      * Creates a new TupleComparator.
      * @param field the data field to compare
@@ -31,7 +31,7 @@ public class TupleComparator implements Comparator {
     public TupleComparator(String field, Class type, boolean ascend) {
         this(field, type, ascend, DefaultLiteralComparator.getInstance());
     }
-    
+
     /**
      * Creates a new TupleComparator.
      * @param field the data field to compare
@@ -41,8 +41,8 @@ public class TupleComparator implements Comparator {
      * this should be an instance of LiteralComparator, otherwise
      * subequent errors will occur.
      */
-    public TupleComparator(String field, Class type, 
-                           boolean ascend, Comparator c)
+    public TupleComparator(String field, Class type,
+                           boolean ascend, Comparator<Object> c)
     {
         m_field = field;
         m_col = -1;
@@ -50,7 +50,7 @@ public class TupleComparator implements Comparator {
         m_rev = ascend ? 1 : -1;
         m_cmp = c;
     }
-    
+
     /**
      * Creates a new TupleComparator.
      * @param col the column number of the data field to compare
@@ -60,7 +60,7 @@ public class TupleComparator implements Comparator {
     public TupleComparator(int col, Class type, boolean ascend) {
         this(col, type, ascend, DefaultLiteralComparator.getInstance());
     }
-    
+
     /**
      * Creates a new TupleComparator.
      * @param col the column number of the data field to compare
@@ -74,16 +74,15 @@ public class TupleComparator implements Comparator {
         m_rev = ascend ? 1 : -1;
         m_cmp = c;
     }
-    
+
     /**
      * Compares two tuples. If either input Object is not a Tuple,
      * a ClassCastException will be thrown.
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(Object o1, Object o2) {
-        Tuple t1 = (Tuple)o1, t2 = (Tuple)o2;
+    public int compare(Tuple t1, Tuple t2) {
         int c = 0;
-        
+
         if ( m_col == -1 ) {
             if ( m_type == int.class || m_type == byte.class ) {
                 c = ((LiteralComparator)m_cmp).compare(

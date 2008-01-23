@@ -21,22 +21,22 @@ public abstract class Layout extends GroupAction {
     /** The explicitly set anchor point at which the layout can
      *  be centered or rooted. May be null. */
     protected Point2D     m_anchor = null;
-    
+
     protected boolean     m_margin = false;
     protected Insets      m_insets = new Insets(0,0,0,0);
     protected double[]    m_bpts   = new double[4];
     protected Rectangle2D m_tmpb   = new Rectangle2D.Double();
     protected Point2D     m_tmpa   = new Point2D.Double();
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Create a new Layout.
      */
     public Layout() {
         super();
     }
-    
+
     /**
      * Create a new Layout.
      * @param group the data group to layout.
@@ -48,9 +48,9 @@ public abstract class Layout extends GroupAction {
     public Layout(String group, long duration) {
         super(group, duration);
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Set the margins the layout should observe within its layout bounds.
      * @param top the top margin, in pixels
@@ -65,7 +65,7 @@ public abstract class Layout extends GroupAction {
         m_insets.right = right;
         m_margin = true;
     }
-    
+
     /**
      * Returns the bounds in which the layout should be computed. If the
      * bounds have been explicitly set, that value is used. Otherwise,
@@ -75,14 +75,15 @@ public abstract class Layout extends GroupAction {
      * @return the layout bounds within which to constain the layout.
      */
     public Rectangle2D getLayoutBounds() {
-        if ( m_bounds != null )
-            return m_bounds;
-        
+        if ( m_bounds != null ) {
+			return m_bounds;
+		}
+
         if ( m_vis != null && m_vis.getDisplayCount() > 0 )
         {
             Display d = m_vis.getDisplay(0);
             Insets i = m_margin ? m_insets : d.getInsets(m_insets);
-            m_bpts[0] = i.left; 
+            m_bpts[0] = i.left;
             m_bpts[1] = i.top;
             m_bpts[2] = d.getWidth()-i.right;
             m_bpts[3] = d.getHeight()-i.bottom;
@@ -95,7 +96,7 @@ public abstract class Layout extends GroupAction {
             return null;
         }
     }
-    
+
     /**
      * Explicitly set the layout bounds. A reference to the input rectangle
      * instance is maintained, not a copy, and so any subsequent changes to
@@ -106,7 +107,7 @@ public abstract class Layout extends GroupAction {
     public void setLayoutBounds(Rectangle2D b) {
         m_bounds = b;
     }
-     
+
     /**
      * Return the layout anchor at which to center or root the layout. How this
      * point is used (if it is used at all) is dependent on the particular
@@ -116,9 +117,10 @@ public abstract class Layout extends GroupAction {
      * @return the layout anchor point.
      */
     public Point2D getLayoutAnchor() {
-        if ( m_anchor != null )
-            return m_anchor;
-        
+        if ( m_anchor != null ) {
+			return m_anchor;
+		}
+
         m_tmpa.setLocation(0,0);
         if ( m_vis != null ) {
             Display d = m_vis.getDisplay(0);
@@ -127,7 +129,7 @@ public abstract class Layout extends GroupAction {
         }
         return m_tmpa;
     }
-    
+
     /**
      * Explicitly set the layout anchor point. The provided object will be
      * used directly (rather than copying its values), so subsequent
@@ -137,7 +139,7 @@ public abstract class Layout extends GroupAction {
     public void setLayoutAnchor(Point2D a) {
         m_anchor = a;
     }
-    
+
     /**
      * Convenience method for setting an x-coordinate. The start value of the
      * x-coordinate will be set to the current value, and the current and end
@@ -146,15 +148,15 @@ public abstract class Layout extends GroupAction {
      * item (if non null) will be used to set the start coordinate.
      * @param item the item to set
      * @param referrer the referrer item to use for the start location if
-     * the current valu eis not a number (NaN)
+     * the current value is not a number (NaN)
      * @param x the x-coordinate value to set. This will be set for both
      * the current and end values.
      * @see prefuse.util.PrefuseLib#setX(VisualItem, VisualItem, double)
      */
-    public void setX(VisualItem item, VisualItem referrer, double x) {
+    public void setX(VisualItem<?> item, VisualItem<?> referrer, double x) {
         PrefuseLib.setX(item, referrer, x);
     }
-    
+
     /**
      * Convenience method for setting an y-coordinate. The start value of the
      * y-coordinate will be set to the current value, and the current and end
@@ -163,12 +165,12 @@ public abstract class Layout extends GroupAction {
      * item (if non null) will be used to set the start coordinate.
      * @param item the item to set
      * @param referrer the referrer item to use for the start location if
-     * the current valu eis not a number (NaN)
+     * the current value is not a number (NaN)
      * @param y the y-coordinate value to set. This will be set for both
      * the current and end values.
      * @see prefuse.util.PrefuseLib#setY(VisualItem, VisualItem, double)
      */
-    public void setY(VisualItem item, VisualItem referrer, double y) {
+    public void setY(VisualItem<?> item, VisualItem<?> referrer, double y) {
         PrefuseLib.setY(item, referrer, y);
     }
 

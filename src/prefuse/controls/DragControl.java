@@ -23,21 +23,21 @@ import prefuse.visual.VisualItem;
  */
 public class DragControl extends ControlAdapter implements TableListener {
 
-    private VisualItem activeItem;
+    private VisualItem<?> activeItem;
     protected String action;
     protected Point2D down = new Point2D.Double();
     protected Point2D temp = new Point2D.Double();
     protected boolean dragged, wasFixed, resetItem;
     private boolean fixOnMouseOver = true;
     protected boolean repaint = true;
-    
+
     /**
      * Creates a new drag control that issues repaint requests as an item
      * is dragged.
      */
     public DragControl() {
     }
-    
+
     /**
      * Creates a new drag control that optionally issues repaint requests
      * as an item is dragged.
@@ -49,7 +49,7 @@ public class DragControl extends ControlAdapter implements TableListener {
     public DragControl(boolean repaint) {
         this.repaint = repaint;
     }
-    
+
     /**
      * Creates a new drag control that optionally issues repaint requests
      * as an item is dragged.
@@ -64,7 +64,7 @@ public class DragControl extends ControlAdapter implements TableListener {
         this.repaint = repaint;
         this.fixOnMouseOver = fixOnMouseOver;
     }
-    
+
     /**
      * Creates a new drag control that invokes an action upon drag events.
      * @param action the action to run when drag events occur.
@@ -73,7 +73,7 @@ public class DragControl extends ControlAdapter implements TableListener {
         this.repaint = false;
         this.action = action;
     }
-    
+
     /**
      * Creates a new drag control that invokes an action upon drag events.
      * @param action the action to run when drag events occur
@@ -85,7 +85,7 @@ public class DragControl extends ControlAdapter implements TableListener {
         this.fixOnMouseOver = fixOnMouseOver;
         this.action = action;
     }
-    
+
     /**
      * Determines whether or not an item should have it's position fixed
      * when the mouse moves over it.
@@ -95,11 +95,12 @@ public class DragControl extends ControlAdapter implements TableListener {
     public void setFixPositionOnMouseOver(boolean s) {
         fixOnMouseOver = s;
     }
-    
+
     /**
      * @see prefuse.controls.Control#itemEntered(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
      */
-    public void itemEntered(VisualItem item, MouseEvent e) {
+    @Override
+	public void itemEntered(VisualItem<?> item, MouseEvent e) {
         Display d = (Display)e.getSource();
         d.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         activeItem = item;
@@ -110,25 +111,31 @@ public class DragControl extends ControlAdapter implements TableListener {
             item.getTable().addTableListener(this);
         }
     }
-    
+
     /**
      * @see prefuse.controls.Control#itemExited(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
      */
-    public void itemExited(VisualItem item, MouseEvent e) {
+    @Override
+	public void itemExited(VisualItem<?> item, MouseEvent e) {
         if ( activeItem == item ) {
             activeItem = null;
             item.getTable().removeTableListener(this);
-            if ( resetItem ) item.setFixed(wasFixed);
+            if ( resetItem ) {
+				item.setFixed(wasFixed);
+			}
         }
         Display d = (Display)e.getSource();
         d.setCursor(Cursor.getDefaultCursor());
     } //
-    
+
     /**
      * @see prefuse.controls.Control#itemPressed(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
      */
-    public void itemPressed(VisualItem item, MouseEvent e) {
-        if (!SwingUtilities.isLeftMouseButton(e)) return;
+    @Override
+	public void itemPressed(VisualItem<?> item, MouseEvent e) {
+        if (!SwingUtilities.isLeftMouseButton(e)) {
+			return;
+		}
         if ( !fixOnMouseOver ) {
             wasFixed = item.isFixed();
             resetItem = true;
@@ -139,25 +146,33 @@ public class DragControl extends ControlAdapter implements TableListener {
         Display d = (Display)e.getComponent();
         d.getAbsoluteCoordinate(e.getPoint(), down);
     }
-    
+
     /**
      * @see prefuse.controls.Control#itemReleased(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
      */
-    public void itemReleased(VisualItem item, MouseEvent e) {
-        if (!SwingUtilities.isLeftMouseButton(e)) return;
+    @Override
+	public void itemReleased(VisualItem<?> item, MouseEvent e) {
+        if (!SwingUtilities.isLeftMouseButton(e)) {
+			return;
+		}
         if ( dragged ) {
             activeItem = null;
             item.getTable().removeTableListener(this);
-            if ( resetItem ) item.setFixed(wasFixed);
+            if ( resetItem ) {
+				item.setFixed(wasFixed);
+			}
             dragged = false;
-        }            
+        }
     }
-    
+
     /**
      * @see prefuse.controls.Control#itemDragged(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
      */
-    public void itemDragged(VisualItem item, MouseEvent e) {
-        if (!SwingUtilities.isLeftMouseButton(e)) return;
+    @Override
+	public void itemDragged(VisualItem<?> item, MouseEvent e) {
+        if (!SwingUtilities.isLeftMouseButton(e)) {
+			return;
+		}
         dragged = true;
         Display d = (Display)e.getComponent();
         d.getAbsoluteCoordinate(e.getPoint(), temp);
@@ -169,25 +184,29 @@ public class DragControl extends ControlAdapter implements TableListener {
         item.setStartX(x);  item.setStartY(y);
         item.setX(x+dx);    item.setY(y+dy);
         item.setEndX(x+dx); item.setEndY(y+dy);
-        
-        if ( repaint )
-            item.getVisualization().repaint();
-        
+
+        if ( repaint ) {
+			item.getVisualization().repaint();
+		}
+
         down.setLocation(temp);
-        if ( action != null )
-            d.getVisualization().run(action);
+        if ( action != null ) {
+			d.getVisualization().run(action);
+		}
     }
 
     /**
      * @see prefuse.data.event.TableListener#tableChanged(prefuse.data.Table, int, int, int, int)
      */
-    public void tableChanged(Table t, int start, int end, int col, int type) {
-        if ( activeItem == null || type != EventConstants.UPDATE 
-                || col != t.getColumnNumber(VisualItem.FIXED) )
-            return;
+    public void tableChanged(Table<?> t, int start, int end, int col, int type) {
+        if ( activeItem == null || type != EventConstants.UPDATE
+                || col != t.getColumnNumber(VisualItem.FIXED) ) {
+			return;
+		}
         int row = activeItem.getRow();
-        if ( row >= start && row <= end )
-            resetItem = false;
+        if ( row >= start && row <= end ) {
+			resetItem = false;
+		}
     }
 
 } // end of class DragControl

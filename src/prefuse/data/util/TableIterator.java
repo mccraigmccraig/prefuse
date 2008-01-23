@@ -9,15 +9,15 @@ import prefuse.util.collections.IntIterator;
 /**
  * An iterator over table rows, providing convenience methods for accessing and
  * manipulating table data.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class TableIterator extends IntIterator {
 
-    private Table       m_table;
-    private IntIterator m_rows;
+    private final Table<?>       m_table;
+    private final IntIterator m_rows;
     private int         m_modCount;
-    
+
     protected int m_cur = -1;
 
     /**
@@ -25,7 +25,7 @@ public class TableIterator extends IntIterator {
      * @param table the Table to iterate over
      * @param rows the iteration over individual table rows
      */
-    public TableIterator(Table table, IntIterator rows) {
+    public TableIterator(Table<?> table, IntIterator rows) {
         m_table = table;
         m_rows = rows;
         m_modCount = table.getModificationCount();
@@ -33,14 +33,16 @@ public class TableIterator extends IntIterator {
 
     // ------------------------------------------------------------------------
     // Iterator Methods
-    
+
     /**
      * Returns the next table row.
      * @see prefuse.util.collections.LiteralIterator#nextInt()
      */
-    public int nextInt() {
-        if ( m_modCount != m_table.getModificationCount() )
-            throw new ConcurrentModificationException();
+    @Override
+	public int nextInt() {
+        if ( m_modCount != m_table.getModificationCount() ) {
+			throw new ConcurrentModificationException();
+		}
         m_cur = m_rows.nextInt();
         return m_cur;
     }
@@ -57,10 +59,11 @@ public class TableIterator extends IntIterator {
      * @see java.util.Iterator#remove()
      */
     public void remove() {
-        if ( m_table.removeRow(m_cur) )
-            modify();
+        if ( m_table.removeRow(m_cur) ) {
+			modify();
+		}
     }
-    
+
     /**
      * Tracks table modifications.
      */
@@ -68,10 +71,10 @@ public class TableIterator extends IntIterator {
         ++m_modCount;
         m_cur = -1;
     }
-    
+
     // ------------------------------------------------------------------------
     // Data Access Methods
-    
+
     /**
      * Check if the <code>get</code> method for the given data field returns
      * values that are compatible with a given target type.
@@ -83,10 +86,10 @@ public class TableIterator extends IntIterator {
      * the {@link #get(String)} can be cast to the given type.
      * @see #get(String)
      */
-    public final boolean canGet(String field, Class type) {
+    public final boolean canGet(String field, Class<?> type) {
         return m_table.canGet(field, type);
     }
-    
+
     /**
      * Check if the <code>set</code> method for the given data field can
      * accept values of a given target type.
@@ -98,10 +101,10 @@ public class TableIterator extends IntIterator {
      * can be used as parameters of the {@link #set(String, Object)} method.
      * @see #set(String, Object)
      */
-    public final boolean canSet(String field, Class type) {
+    public final boolean canSet(String field, Class<?> type) {
         return m_table.canSet(field, type);
     }
-    
+
     /**
      * Get the data value at the given field as an Object.
      * @param field the data field to retrieve
@@ -113,7 +116,7 @@ public class TableIterator extends IntIterator {
     public final Object get(String field) {
         return m_table.get(m_cur, field);
     }
-    
+
     /**
      * Set the value of a given data field.
      * @param field the data field to set
@@ -128,10 +131,10 @@ public class TableIterator extends IntIterator {
         ++m_modCount;
         m_table.set(m_cur, field, val);
     }
-    
+
     // ------------------------------------------------------------------------
     // Convenience Data Access Methods
-    
+
     /**
      * Check if the given data field can return primitive <code>int</code>
      * values.
@@ -143,7 +146,7 @@ public class TableIterator extends IntIterator {
     public final boolean canGetInt(String field) {
         return m_table.canGetInt(field);
     }
-    
+
     /**
      * Check if the <code>setInt</code> method can safely be used for the
      * given data field.
@@ -154,7 +157,7 @@ public class TableIterator extends IntIterator {
     public final boolean canSetInt(String field) {
         return m_table.canSetInt(field);
     }
-    
+
     /**
      * Get the data value at the given field as an <code>int</code>.
      * @param field the data field to retrieve
@@ -163,7 +166,7 @@ public class TableIterator extends IntIterator {
     public final int getInt(String field) {
         return m_table.getInt(m_cur, field);
     }
-    
+
     /**
      * Set the data value of the given field with an <code>int</code>.
      * @param field the data field to set
@@ -174,9 +177,9 @@ public class TableIterator extends IntIterator {
         ++m_modCount;
         m_table.setInt(m_cur, field, val);
     }
-    
+
     // --------------------------------------------------------------
-    
+
     /**
      * Check if the given data field can return primitive <code>long</code>
      * values.
@@ -188,7 +191,7 @@ public class TableIterator extends IntIterator {
     public final boolean canGetLong(String field) {
         return m_table.canGetLong(field);
     }
-    
+
     /**
      * Check if the <code>setLong</code> method can safely be used for the
      * given data field.
@@ -199,7 +202,7 @@ public class TableIterator extends IntIterator {
     public final boolean canSetLong(String field) {
         return m_table.canSetLong(field);
     }
-    
+
     /**
      * Get the data value at the given field as a <code>long</code>.
      * @param field the data field to retrieve
@@ -208,7 +211,7 @@ public class TableIterator extends IntIterator {
     public final long getLong(String field) {
         return m_table.getLong(m_cur, field);
     }
-    
+
     /**
      * Set the data value of the given field with a <code>long</code>.
      * @param field the data field to set
@@ -221,7 +224,7 @@ public class TableIterator extends IntIterator {
     }
 
     // --------------------------------------------------------------
-    
+
     /**
      * Check if the given data field can return primitive <code>float</code>
      * values.
@@ -233,7 +236,7 @@ public class TableIterator extends IntIterator {
     public final boolean canGetFloat(String field) {
         return m_table.canGetFloat(field);
     }
-    
+
     /**
      * Check if the <code>setFloat</code> method can safely be used for the
      * given data field.
@@ -244,7 +247,7 @@ public class TableIterator extends IntIterator {
     public final boolean canSetFloat(String field) {
         return m_table.canSetFloat(field);
     }
-    
+
     /**
      * Get the data value at the given field as a <code>float</code>.
      * @param field the data field to retrieve
@@ -253,7 +256,7 @@ public class TableIterator extends IntIterator {
     public final float getFloat(String field) {
         return m_table.getFloat(m_cur, field);
     }
-    
+
     /**
      * Set the data value of the given field with a <code>float</code>.
      * @param field the data field to set
@@ -264,9 +267,9 @@ public class TableIterator extends IntIterator {
         ++m_modCount;
         m_table.setFloat(m_cur, field, val);
     }
-    
+
     // --------------------------------------------------------------
-    
+
     /**
      * Check if the given data field can return primitive <code>double</code>
      * values.
@@ -278,7 +281,7 @@ public class TableIterator extends IntIterator {
     public final boolean canGetDouble(String field) {
         return m_table.canGetDouble(field);
     }
-    
+
     /**
      * Check if the <code>setDouble</code> method can safely be used for the
      * given data field.
@@ -289,7 +292,7 @@ public class TableIterator extends IntIterator {
     public final boolean canSetDouble(String field) {
         return m_table.canSetDouble(field);
     }
-    
+
     /**
      * Get the data value at the given field as a <code>double</code>.
      * @param field the data field to retrieve
@@ -298,7 +301,7 @@ public class TableIterator extends IntIterator {
     public final double getDouble(String field) {
         return m_table.getDouble(m_cur, field);
     }
-    
+
     /**
      * Set the data value of the given field with a <code>double</code>.
      * @param field the data field to set
@@ -309,9 +312,9 @@ public class TableIterator extends IntIterator {
         ++m_modCount;
         m_table.setDouble(m_cur, field, val);
     }
-    
+
     // --------------------------------------------------------------
-    
+
     /**
      * Check if the given data field can return primitive <code>boolean</code>
      * values.
@@ -323,7 +326,7 @@ public class TableIterator extends IntIterator {
     public final boolean canGetBoolean(String field) {
         return m_table.canGetBoolean(field);
     }
-    
+
     /**
      * Check if the <code>setBoolean</code> method can safely be used for the
      * given data field.
@@ -334,7 +337,7 @@ public class TableIterator extends IntIterator {
     public final boolean canSetBoolean(String field) {
         return m_table.canSetBoolean(field);
     }
-    
+
     /**
      * Get the data value at the given field as a <code>boolean</code>.
      * @param field the data field to retrieve
@@ -343,7 +346,7 @@ public class TableIterator extends IntIterator {
     public final boolean getBoolean(String field) {
         return m_table.getBoolean(m_cur, field);
     }
-    
+
     /**
      * Set the data value of the given field with a <code>boolean</code>.
      * @param field the data field to set
@@ -354,9 +357,9 @@ public class TableIterator extends IntIterator {
         ++m_modCount;
         m_table.setBoolean(m_cur, field, val);
     }
-    
+
     // --------------------------------------------------------------
-    
+
     /**
      * Check if the given data field can return <code>String</code>
      * values.
@@ -368,7 +371,7 @@ public class TableIterator extends IntIterator {
     public final boolean canGetString(String field) {
         return m_table.canGetString(field);
     }
-    
+
     /**
      * Check if the <code>setString</code> method can safely be used for the
      * given data field.
@@ -379,7 +382,7 @@ public class TableIterator extends IntIterator {
     public final boolean canSetString(String field) {
         return m_table.canSetString(field);
     }
-    
+
     /**
      * Get the data value at the given field as a <code>String</code>.
      * @param field the data field to retrieve
@@ -388,7 +391,7 @@ public class TableIterator extends IntIterator {
     public final String getString(String field) {
         return m_table.getString(m_cur, field);
     }
-    
+
     /**
      * Set the data value of the given field with a <code>String</code>.
      * @param field the data field to set
@@ -399,9 +402,9 @@ public class TableIterator extends IntIterator {
         ++m_modCount;
         m_table.setString(m_cur, field, val);
     }
-    
+
     // --------------------------------------------------------------
-    
+
     /**
      * Check if the given data field can return <code>Date</code>
      * values.
@@ -413,7 +416,7 @@ public class TableIterator extends IntIterator {
     public final boolean canGetDate(String field) {
         return m_table.canGetDate(field);
     }
-    
+
     /**
      * Check if the <code>setDate</code> method can safely be used for the
      * given data field.
@@ -424,7 +427,7 @@ public class TableIterator extends IntIterator {
     public final boolean canSetDate(String field) {
         return m_table.canSetDate(field);
     }
-    
+
     /**
      * Get the data value at the given field as a <code>Date</code>.
      * @param field the data field to retrieve
@@ -433,7 +436,7 @@ public class TableIterator extends IntIterator {
     public final Date getDate(String field) {
         return m_table.getDate(m_cur, field);
     }
-    
+
     /**
      * Set the data value of the given field with a <code>Date</code>.
      * @param field the data field to set
@@ -444,5 +447,5 @@ public class TableIterator extends IntIterator {
         ++m_modCount;
         m_table.setDate(m_cur, field, val);
     }
-    
+
 } // end of class TableIterator

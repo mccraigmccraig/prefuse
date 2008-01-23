@@ -5,7 +5,7 @@ import prefuse.visual.VisualItem;
 
 /**
  * Animator that linearly interpolates the size of a VisualItems.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class SizeAnimator extends ItemAction {
@@ -16,7 +16,7 @@ public class SizeAnimator extends ItemAction {
     public SizeAnimator() {
         super();
     }
-    
+
     /**
      * Create a new SizeAnimator that processes the specified group.
      * @param group the data group to process.
@@ -28,9 +28,10 @@ public class SizeAnimator extends ItemAction {
     /**
      * @see prefuse.action.ItemAction#process(prefuse.visual.VisualItem, double)
      */
-    public void process(VisualItem item, double frac) {
+    @Override
+	public void process(VisualItem<?> item, double frac) {
         double ss = item.getStartSize();
-        item.setSize(ss + frac*(item.getEndSize() - ss));       
+        item.setSize(ss + frac*(item.getEndSize() - ss));
     }
 
 } // end of class SizeAnimator

@@ -4,14 +4,14 @@ import prefuse.Visualization;
 
 /**
  * An Action that can be parameterized to process a particular group of items.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public abstract class GroupAction extends Action {
 
     /** A reference to the group to be processed by this Action */
     protected String m_group;
-    
+
     /**
      * Create a new GroupAction that processes all groups.
      * @see prefuse.Visualization#ALL_ITEMS
@@ -28,7 +28,7 @@ public abstract class GroupAction extends Action {
     public GroupAction(Visualization vis) {
         this(vis, Visualization.ALL_ITEMS);
     }
-    
+
     /**
      * Create a new GroupAction that processes all groups.
      * @param vis the {@link prefuse.Visualization} to process
@@ -38,7 +38,7 @@ public abstract class GroupAction extends Action {
     public GroupAction(Visualization vis, long duration) {
         this(vis, Visualization.ALL_ITEMS, duration);
     }
-    
+
     /**
      * Create a new GroupAction that processes all groups.
      * @param vis the {@link prefuse.Visualization} to process
@@ -49,7 +49,7 @@ public abstract class GroupAction extends Action {
     public GroupAction(Visualization vis, long duration, long stepTime) {
         this(vis, Visualization.ALL_ITEMS, duration, stepTime);
     }
-    
+
     /**
      * Create a new GroupAction that processes the specified group.
      * @param group the name of the group to process
@@ -57,7 +57,7 @@ public abstract class GroupAction extends Action {
     public GroupAction(String group) {
         this(null, group);
     }
-    
+
     /**
      * Create a new GroupAction that processes the specified group.
      * @param group the name of the group to process
@@ -66,7 +66,7 @@ public abstract class GroupAction extends Action {
     public GroupAction(String group, long duration) {
         this(null, group, duration);
     }
-    
+
     /**
      * Create a new GroupAction that processes the specified group.
      * @param group the name of the group to process
@@ -76,7 +76,7 @@ public abstract class GroupAction extends Action {
     public GroupAction(String group, long duration, long stepTime) {
         this(null, group, duration, stepTime);
     }
-    
+
     /**
      * Create a new GroupAction that processes the specified group.
      * @param vis the {@link prefuse.Visualization} to process
@@ -86,7 +86,7 @@ public abstract class GroupAction extends Action {
         super(vis);
         m_group = group;
     }
-    
+
     /**
      * Create a new GroupAction that processes the specified group.
      * @param vis the {@link prefuse.Visualization} to process
@@ -97,7 +97,7 @@ public abstract class GroupAction extends Action {
         super(vis, duration);
         m_group = group;
     }
-    
+
     /**
      * Create a new GroupAction that processes the specified group.
      * @param vis the {@link prefuse.Visualization} to process
@@ -113,7 +113,7 @@ public abstract class GroupAction extends Action {
     }
 
     // ------------------------------------------------------------------------
-    
+
     /**
      * Get the name of the group to be processed by this Action.
      * @return the name of the group to process
@@ -129,12 +129,13 @@ public abstract class GroupAction extends Action {
     public void setGroup(String group) {
         m_group = group;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * @see prefuse.action.Action#run(double)
      */
-    public abstract void run(double frac);
+    @Override
+	public abstract void run(double frac);
 
 } // end of class GroupAction

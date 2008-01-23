@@ -3,26 +3,26 @@ package prefuse.util.collections;
 /**
  * Not of interest for users; only for implementors of hashtables. Used to keep
  * hash table capacities prime numbers.
- * 
+ *
  * <p>
  * Choosing prime numbers as hash table capacities is a good idea to keep them
  * working fast, particularly under hash table expansions.
  * </p>
- * 
+ *
  * <p>
  * However, JDK 1.2, JGL 3.1 and many other toolkits do nothing to keep
  * capacities prime. This class provides efficient means to choose prime
  * capacities.
  * </p>
- * 
+ *
  * <p>
  * Choosing a prime is <tt>O(log 300)</tt> (binary search in a list of 300
  * int's). Memory requirements: 1 KB static memory.
  * </p>
- * 
+ *
  * This class has been adapted from the corresponding class in the COLT
  * library for scientfic computing.
- * 
+ *
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
  */
@@ -39,24 +39,24 @@ public class PrimeFinder extends Object {
      * numbers. A chunk starts with a prime P1. The next element is a prime P2.
      * P2 is the smallest prime for which holds: P2 >= 2*P1. The next element is
      * P3, for which the same holds with respect to P2, and so on.
-     * 
+     *
      * Chunks are chosen such that for any desired capacity >= 1000 the list
      * includes a prime number <= desired capacity * 1.11 (11%). For any desired
      * capacity >= 200 the list includes a prime number <= desired capacity *
      * 1.16 (16%). For any desired capacity >= 16 the list includes a prime
      * number <= desired capacity * 1.21 (21%).
-     * 
+     *
      * Therefore, primes can be retrieved which are quite close to any desired
      * capacity, which in turn avoids wasting memory. For example, the list
      * includes 1039,1117,1201,1277,1361,1439,1523,1597,1759,1907,2081. So if
      * you need a prime >= 1040, you will find a prime <= 1040*1.11=1154.
-     * 
+     *
      * Chunks are chosen such that they are optimized for a hashtable
      * growthfactor of 2.0; If your hashtable has such a growthfactor then,
      * after initially "rounding to a prime" upon hashtable construction, it
      * will later expand to prime capacities such that there exist no better
      * primes.
-     * 
+     *
      * In total these are about 32*10=320 numbers -> 1 KB of static memory
      * needed. If you are stingy, then delete every second or fourth chunk.
      */
@@ -117,18 +117,18 @@ public class PrimeFinder extends Object {
         379, 761, 1523, 3049, 6101, 12203, 24407, 48817, 97649, 195311,
         390647, 781301, 1562611, 3125257, 6250537, 12501169, 25002389,
         50004791, 100009607, 200019221, 400038451, 800076929, 1600153859
-        
+
         /*
          * // some more chunks for the low range [3..1000] //chunk #11
          * 13,29,59,127,257,521,1049,2099,4201,8419,16843,33703,67409,134837,269683,
          * 539389,1078787,2157587,4315183,8630387,17260781,34521589,69043189,138086407,
          * 276172823,552345671,1104691373,
-         * 
+         *
          * //chunk #12 19,41,83,167,337,677,
          * //1361,2729,5471,10949,21911,43853,87719,175447,350899,
          * //701819,1403641,2807303,5614657,11229331,22458671,44917381,89834777,179669557,
          * //359339171,718678369,1437356741,
-         * 
+         *
          * //chunk #13 53,107,223,449,907,1823,3659,7321,14653,29311,58631,117269,
          * 234539,469099,938207,1876417,3752839,7505681,15011389,30022781,
          * 60045577,120091177,240182359,480364727,960729461,1921458943
@@ -152,7 +152,7 @@ public class PrimeFinder extends Object {
      * Returns a prime number which is <code>&gt;= desiredCapacity</code> and
      * very close to <code>desiredCapacity</code> (within 11% if
      * <code>desiredCapacity &gt;= 1000</code>).
-     * 
+     *
      * @param desiredCapacity
      *            the capacity desired by the user.
      * @return the capacity which should be used for a hashtable.

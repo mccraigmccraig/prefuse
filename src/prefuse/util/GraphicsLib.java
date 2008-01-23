@@ -14,25 +14,31 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
 
+import prefuse.Alignment;
 import prefuse.render.AbstractShapeRenderer;
+import prefuse.render.AbstractShapeRenderer.RenderType;
 import prefuse.visual.VisualItem;
 
 /**
  * Library of useful computer graphics routines such as geometry routines
  * for computing the intersection of different shapes and rendering methods
  * for computing bounds and performing optimized drawing.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class GraphicsLib {
 
-    /** Indicates no intersection between shapes */
-    public static final int NO_INTERSECTION = 0;
-    /** Indicates intersection between shapes */
-    public static final int COINCIDENT      = -1;
-    /** Indicates two lines are parallel */
-    public static final int PARALLEL        = -2;
-    
+	public static enum IntersectionType {
+		/** Indicates intersection between shapes */
+		INTERSECTION,
+	    /** Indicates no intersection between shapes */
+		NO_INTERSECTION,
+	    /** Indicates coincidence between shapes */
+		COINCIDENT,
+	    /** Indicates two lines are parallel */
+		PARALLEL
+	}
+
     /**
      * Compute the intersection of two line segments.
      * @param a the first line segment
@@ -41,14 +47,14 @@ public class GraphicsLib {
      * @return the intersection code. One of {@link #NO_INTERSECTION},
      * {@link #COINCIDENT}, or {@link #PARALLEL}.
      */
-    public static int intersectLineLine(Line2D a, Line2D b, Point2D intersect) {
+    public static IntersectionType intersectLineLine(Line2D a, Line2D b, Point2D intersect) {
         double a1x = a.getX1(), a1y = a.getY1();
         double a2x = a.getX2(), a2y = a.getY2();
         double b1x = b.getX1(), b1y = b.getY1();
         double b2x = b.getX2(), b2y = b.getY2();
         return intersectLineLine(a1x,a1y,a2x,a2y,b1x,b1y,b2x,b2y,intersect);
     }
-    
+
     /**
      * Compute the intersection of two line segments.
      * @param a1x the x-coordinate of the first endpoint of the first line
@@ -63,8 +69,8 @@ public class GraphicsLib {
      * @return the intersection code. One of {@link #NO_INTERSECTION},
      * {@link #COINCIDENT}, or {@link #PARALLEL}.
      */
-    public static int intersectLineLine(double a1x, double a1y, double a2x,
-        double a2y, double b1x, double b1y, double b2x, double b2y, 
+    public static IntersectionType intersectLineLine(double a1x, double a1y, double a2x,
+        double a2y, double b1x, double b1y, double b2x, double b2y,
         Point2D intersect)
     {
         double ua_t = (b2x-b1x)*(a1y-b1y)-(b2y-b1y)*(a1x-b1x);
@@ -77,12 +83,12 @@ public class GraphicsLib {
 
             if ( 0 <= ua && ua <= 1 && 0 <= ub && ub <= 1 ) {
                 intersect.setLocation(a1x+ua*(a2x-a1x), a1y+ua*(a2y-a1y));
-                return 1;
+                return IntersectionType.INTERSECTION;
             } else {
-                return NO_INTERSECTION;
+                return IntersectionType.NO_INTERSECTION;
             }
         } else {
-            return ( ua_t == 0 || ub_t == 0 ? COINCIDENT : PARALLEL );
+            return ua_t == 0 || ub_t == 0 ? IntersectionType.COINCIDENT : IntersectionType.PARALLEL;
         }
     }
 
@@ -92,7 +98,7 @@ public class GraphicsLib {
      * @param a2 the second endpoint of the line
      * @param r the rectangle
      * @param pts a length 2 or greater array of points in which to store
-     * the results 
+     * the results
      * @return the intersection code. One of {@link #NO_INTERSECTION},
      * {@link #COINCIDENT}, or {@link #PARALLEL}.
      */
@@ -101,17 +107,33 @@ public class GraphicsLib {
         double a2x = a2.getX(), a2y = a2.getY();
         double mxx = r.getMaxX(), mxy = r.getMaxY();
         double mnx = r.getMinX(), mny = r.getMinY();
-        
-        if ( pts[0] == null ) pts[0] = new Point2D.Double();
-        if ( pts[1] == null ) pts[1] = new Point2D.Double();
-        
+
+        if ( pts[0] == null ) {
+			pts[0] = new Point2D.Double();
+		}
+        if ( pts[1] == null ) {
+			pts[1] = new Point2D.Double();
+		}
+
         int i = 0;
-        if ( intersectLineLine(mnx,mny,mxx,mny,a1x,a1y,a2x,a2y,pts[i]) > 0 ) i++;
-        if ( intersectLineLine(mxx,mny,mxx,mxy,a1x,a1y,a2x,a2y,pts[i]) > 0 ) i++;
-        if ( i == 2 ) return i;
-        if ( intersectLineLine(mxx,mxy,mnx,mxy,a1x,a1y,a2x,a2y,pts[i]) > 0 ) i++;
-        if ( i == 2 ) return i;
-        if ( intersectLineLine(mnx,mxy,mnx,mny,a1x,a1y,a2x,a2y,pts[i]) > 0 ) i++;
+        if ( intersectLineLine(mnx,mny,mxx,mny,a1x,a1y,a2x,a2y,pts[i]) == IntersectionType.INTERSECTION ) {
+			i++;
+		}
+        if ( intersectLineLine(mxx,mny,mxx,mxy,a1x,a1y,a2x,a2y,pts[i]) == IntersectionType.INTERSECTION ) {
+			i++;
+		}
+        if ( i == 2 ) {
+			return i;
+		}
+        if ( intersectLineLine(mxx,mxy,mnx,mxy,a1x,a1y,a2x,a2y,pts[i]) == IntersectionType.INTERSECTION ) {
+			i++;
+		}
+        if ( i == 2 ) {
+			return i;
+		}
+        if ( intersectLineLine(mnx,mxy,mnx,mny,a1x,a1y,a2x,a2y,pts[i]) == IntersectionType.INTERSECTION ) {
+			i++;
+		}
         return i;
     }
 
@@ -120,7 +142,7 @@ public class GraphicsLib {
      * @param l the line
      * @param r the rectangle
      * @param pts a length 2 or greater array of points in which to store
-     * the results 
+     * the results
      * @return the intersection code. One of {@link #NO_INTERSECTION},
      * {@link #COINCIDENT}, or {@link #PARALLEL}.
      */
@@ -129,28 +151,44 @@ public class GraphicsLib {
         double a2x = l.getX2(), a2y = l.getY2();
         double mxx = r.getMaxX(), mxy = r.getMaxY();
         double mnx = r.getMinX(), mny = r.getMinY();
-        
-        if ( pts[0] == null ) pts[0] = new Point2D.Double();
-        if ( pts[1] == null ) pts[1] = new Point2D.Double();
-        
+
+        if ( pts[0] == null ) {
+			pts[0] = new Point2D.Double();
+		}
+        if ( pts[1] == null ) {
+			pts[1] = new Point2D.Double();
+		}
+
         int i = 0;
-        if ( intersectLineLine(mnx,mny,mxx,mny,a1x,a1y,a2x,a2y,pts[i]) > 0 ) i++;
-        if ( intersectLineLine(mxx,mny,mxx,mxy,a1x,a1y,a2x,a2y,pts[i]) > 0 ) i++;
-        if ( i == 2 ) return i;
-        if ( intersectLineLine(mxx,mxy,mnx,mxy,a1x,a1y,a2x,a2y,pts[i]) > 0 ) i++;
-        if ( i == 2 ) return i;
-        if ( intersectLineLine(mnx,mxy,mnx,mny,a1x,a1y,a2x,a2y,pts[i]) > 0 ) i++;
+        if ( intersectLineLine(mnx,mny,mxx,mny,a1x,a1y,a2x,a2y,pts[i]) == IntersectionType.INTERSECTION ) {
+			i++;
+		}
+        if ( intersectLineLine(mxx,mny,mxx,mxy,a1x,a1y,a2x,a2y,pts[i]) == IntersectionType.INTERSECTION ) {
+			i++;
+		}
+        if ( i == 2 ) {
+			return i;
+		}
+        if ( intersectLineLine(mxx,mxy,mnx,mxy,a1x,a1y,a2x,a2y,pts[i]) == IntersectionType.INTERSECTION ) {
+			i++;
+		}
+        if ( i == 2 ) {
+			return i;
+		}
+        if ( intersectLineLine(mnx,mxy,mnx,mny,a1x,a1y,a2x,a2y,pts[i]) == IntersectionType.INTERSECTION ) {
+			i++;
+		}
         return i;
     }
-    
+
     /**
      * Computes the 2D convex hull of a set of points using Graham's
      * scanning algorithm. The algorithm has been implemented as described
      * in Cormen, Leiserson, and Rivest's Introduction to Algorithms.
-     * 
+     *
      * The running time of this algorithm is O(n log n), where n is
      * the number of input points.
-     * 
+     *
      * @param pts the input points in [x0,y0,x1,y1,...] order
      * @param len the length of the pts array to consider (2 * #points)
      * @return the convex hull of the input points
@@ -166,19 +204,19 @@ public class GraphicsLib {
         int[] stack  = new int[len/2];
         return convexHull(pts, len, angles, idx, stack);
     }
-    
+
     /**
      * Computes the 2D convex hull of a set of points using Graham's
      * scanning algorithm. The algorithm has been implemented as described
      * in Cormen, Leiserson, and Rivest's Introduction to Algorithms.
-     * 
+     *
      * The running time of this algorithm is O(n log n), where n is
      * the number of input points.
-     * 
+     *
      * @param pts
      * @return the convex hull of the input points
      */
-    public static double[] convexHull(double[] pts, int len, 
+    public static double[] convexHull(double[] pts, int len,
             float[] angles, int[] idx, int[] stack)
     {
         // check arguments
@@ -191,25 +229,27 @@ public class GraphicsLib {
             throw new IllegalArgumentException(
                     "Pre-allocated data structure too small");
         }
-        
+
         int i0 = 0;
         // find the starting ref point: leftmost point with the minimum y coord
         for ( int i=2; i < len; i += 2 ) {
             if ( pts[i+1] < pts[i0+1] ) {
                 i0 = i;
             } else if ( pts[i+1] == pts[i0+1] ) {
-                i0 = (pts[i] < pts[i0] ? i : i0);
+                i0 = pts[i] < pts[i0] ? i : i0;
             }
         }
-        
+
         // calculate polar angles from ref point and sort
         for ( int i=0, j=0; i < len; i+=2 ) {
-            if ( i == i0 ) continue;
+            if ( i == i0 ) {
+				continue;
+			}
             angles[j] = (float)Math.atan2(pts[i+1]-pts[i0+1], pts[i]-pts[i0]);
             idx[j++]  = i;
         }
         ArrayLib.sort(angles,idx,plen);
-        
+
         // toss out duplicated angles
         float angle = angles[0];
         int ti = 0, tj = idx[0];
@@ -238,7 +278,7 @@ public class GraphicsLib {
                 tj = j;
             }
         }
-        
+
         // initialize our stack
         int sp = 0;
         stack[sp++] = i0;
@@ -249,10 +289,12 @@ public class GraphicsLib {
                 k++;
             }
         }
-        
+
         // do graham's scan
         for ( ; j < plen; j++ ) {
-            if ( idx[j] == -1 ) continue; // skip tossed out points
+            if ( idx[j] == -1 ) {
+				continue; // skip tossed out points
+			}
             while ( isNonLeft(i0, stack[sp-2], stack[sp-1], idx[j], pts) ) {
                 sp--;
             }
@@ -265,7 +307,7 @@ public class GraphicsLib {
             hull[2*i]   = pts[stack[i]];
             hull[2*i+1] = pts[stack[i]+1];
         }
-        
+
         return hull;
     }
 
@@ -281,18 +323,18 @@ public class GraphicsLib {
         l5 = Math.sqrt(Math.pow(pts[i1+1]-pts[i0+1],2) + Math.pow(pts[i1]-pts[i0],2));
         l6 = Math.sqrt(Math.pow(pts[i2+1]-pts[i0+1],2) + Math.pow(pts[i2]-pts[i0],2));
 
-        angle1 = Math.acos( ( (l2*l2)+(l6*l6)-(l4*l4) ) / (2*l2*l6) );
-        angle2 = Math.acos( ( (l6*l6)+(l1*l1)-(l5*l5) ) / (2*l6*l1) );
+        angle1 = Math.acos( ( l2*l2+l6*l6-l4*l4 ) / (2*l2*l6) );
+        angle2 = Math.acos( ( l6*l6+l1*l1-l5*l5 ) / (2*l6*l1) );
 
-        angle = (Math.PI - angle1) - angle2;
+        angle = Math.PI - angle1 - angle2;
 
         if (angle <= 0.0) {
-            return(true);
+            return true;
         } else {
-            return(false);
+            return false;
         }
     }
-    
+
     /**
      * Computes the mean, or centroid, of a set of points
      * @param pts the points array, in x1, y1, x2, y2, ... arrangement.
@@ -309,10 +351,10 @@ public class GraphicsLib {
         c[1] /= len/2;
         return c;
     }
-    
+
     /**
      * Expand a polygon by adding the given distance along the line from
-     * the centroid of the polyong.
+     * the centroid of the polygon.
      * @param pts the polygon to expand, a set of points in a float array
      * @param len the length of the range of the array to consider
      * @param amt the amount by which to expand the polygon, each point
@@ -329,7 +371,7 @@ public class GraphicsLib {
             pts[i+1] += amt*vy/norm;
         }
     }
-    
+
     /**
      * Compute a cardinal spline, a series of cubic Bezier splines smoothly
      * connecting a set of points. Cardinal splines maintain C(1)
@@ -348,7 +390,7 @@ public class GraphicsLib {
         path.moveTo(pts[0], pts[1]);
         return cardinalSpline(path, pts, slack, closed, 0f, 0f);
     }
-    
+
     /**
      * Compute a cardinal spline, a series of cubic Bezier splines smoothly
      * connecting a set of points. Cardinal splines maintain C(1)
@@ -371,7 +413,7 @@ public class GraphicsLib {
         path.moveTo(pts[start], pts[start+1]);
         return cardinalSpline(path, pts, start, npoints, slack, closed, 0f, 0f);
     }
-    
+
     /**
      * Compute a cardinal spline, a series of cubic Bezier splines smoothly
      * connecting a set of points. Cardinal splines maintain C(1)
@@ -388,15 +430,18 @@ public class GraphicsLib {
      * @return the cardinal spline as a Java2D {@link java.awt.geom.GeneralPath}
      * instance.
      */
-    public static GeneralPath cardinalSpline(GeneralPath p, 
+    public static GeneralPath cardinalSpline(GeneralPath p,
             float pts[], float slack, boolean closed, float tx, float ty)
     {
         int npoints = 0;
-        for ( ; npoints<pts.length; ++npoints )
-            if ( Float.isNaN(pts[npoints]) ) break;
+        for ( ; npoints<pts.length; ++npoints ) {
+			if ( Float.isNaN(pts[npoints]) ) {
+				break;
+			}
+		}
         return cardinalSpline(p, pts, 0, npoints/2, slack, closed, tx, ty);
     }
-    
+
     /**
      * Compute a cardinal spline, a series of cubic Bezier splines smoothly
      * connecting a set of points. Cardinal splines maintain C(1)
@@ -415,21 +460,21 @@ public class GraphicsLib {
      * @return the cardinal spline as a Java2D {@link java.awt.geom.GeneralPath}
      * instance.
      */
-    public static GeneralPath cardinalSpline(GeneralPath p, 
+    public static GeneralPath cardinalSpline(GeneralPath p,
             float pts[], int start, int npoints,
             float slack, boolean closed, float tx, float ty)
     {
         // compute the size of the path
         int len = 2*npoints;
         int end = start+len;
-        
+
         if ( len < 6 ) {
             throw new IllegalArgumentException(
                     "To create spline requires at least 3 points");
         }
-        
+
         float dx1, dy1, dx2, dy2;
-        
+
         // compute first control point
         if ( closed ) {
             dx2 = pts[start+2]-pts[end-2];
@@ -438,7 +483,7 @@ public class GraphicsLib {
             dx2 = pts[start+4]-pts[start];
             dy2 = pts[start+5]-pts[start+1];
         }
-        
+
         // repeatedly compute next control point and append curve
         int i;
         for ( i=start+2; i<end-2; i+=2 ) {
@@ -449,7 +494,7 @@ public class GraphicsLib {
                       tx+pts[i]  -slack*dx2, ty+pts[i+1]-slack*dy2,
                       tx+pts[i],             ty+pts[i+1]);
         }
-        
+
         // compute last control point
         if ( closed ) {
             dx1 = dx2; dy1 = dy2;
@@ -458,7 +503,7 @@ public class GraphicsLib {
             p.curveTo(tx+pts[i-2]+slack*dx1, ty+pts[i-1]+slack*dy1,
                       tx+pts[i]  -slack*dx2, ty+pts[i+1]-slack*dy2,
                       tx+pts[i],             ty+pts[i+1]);
-            
+
             dx1 = dx2; dy1 = dy2;
             dx2 = pts[start+2]-pts[end-2];
             dy2 = pts[start+3]-pts[end-1];
@@ -473,7 +518,7 @@ public class GraphicsLib {
         }
         return p;
     }
-    
+
     /**
      * Computes a set of curves using the cardinal spline approach, but
      * using straight lines for completely horizontal or vertical segments.
@@ -491,15 +536,18 @@ public class GraphicsLib {
      * @return the stack spline as a Java2D {@link java.awt.geom.GeneralPath}
      * instance.
      */
-    public static GeneralPath stackSpline(GeneralPath p, float[] pts, 
+    public static GeneralPath stackSpline(GeneralPath p, float[] pts,
             float epsilon, float slack, boolean closed, float tx, float ty)
     {
         int npoints = 0;
-        for ( ; npoints<pts.length; ++npoints )
-            if ( Float.isNaN(pts[npoints]) ) break;
+        for ( ; npoints<pts.length; ++npoints ) {
+			if ( Float.isNaN(pts[npoints]) ) {
+				break;
+			}
+		}
         return stackSpline(p,pts,0,npoints/2,epsilon,slack,closed,tx,ty);
     }
-    
+
     /**
      * Computes a set of curves using the cardinal spline approach, but
      * using straight lines for completely horizontal or vertical segments.
@@ -519,19 +567,19 @@ public class GraphicsLib {
      * @return the stack spline as a Java2D {@link java.awt.geom.GeneralPath}
      * instance.
      */
-    public static GeneralPath stackSpline(GeneralPath p, 
+    public static GeneralPath stackSpline(GeneralPath p,
             float pts[], int start, int npoints, float epsilon,
             float slack, boolean closed, float tx, float ty)
     {
         // compute the size of the path
         int len = 2*npoints;
         int end = start+len;
-        
+
         if ( len < 6 ) {
             throw new IllegalArgumentException(
                     "To create spline requires at least 3 points");
         }
-        
+
         float dx1, dy1, dx2, dy2;
         // compute first control point
         if ( closed ) {
@@ -541,13 +589,13 @@ public class GraphicsLib {
             dx2 = pts[start+4]-pts[start];
             dy2 = pts[start+5]-pts[start+1];
         }
-        
+
         // repeatedly compute next control point and append curve
         int i;
         for ( i=start+2; i<end-2; i+=2 ) {
             dx1 = dx2; dy1 = dy2;
             dx2 = pts[i+2]-pts[i-2];
-            dy2 = pts[i+3]-pts[i-1];            
+            dy2 = pts[i+3]-pts[i-1];
             if ( Math.abs(pts[i]  -pts[i-2]) < epsilon ||
                  Math.abs(pts[i+1]-pts[i-1]) < epsilon )
             {
@@ -558,7 +606,7 @@ public class GraphicsLib {
                           tx+pts[i],             ty+pts[i+1]);
             }
         }
-        
+
         // compute last control point
         dx1 = dx2; dy1 = dy2;
         dx2 = pts[start]-pts[i-2];
@@ -572,9 +620,9 @@ public class GraphicsLib {
                       tx+pts[i]  -slack*dx2, ty+pts[i+1]-slack*dy2,
                       tx+pts[i],             ty+pts[i+1]);
         }
-        
+
         // close the curve if requested
-        if ( closed ) {    
+        if ( closed ) {
             if ( Math.abs(pts[end-2]-pts[0]) < epsilon ||
                  Math.abs(pts[end-1]-pts[1]) < epsilon )
             {
@@ -591,7 +639,7 @@ public class GraphicsLib {
         }
         return p;
     }
-    
+
     /**
      * Expand a rectangle by the given amount.
      * @param r the rectangle to expand
@@ -601,9 +649,9 @@ public class GraphicsLib {
         r.setRect(r.getX()-amount, r.getY()-amount,
                   r.getWidth()+2*amount, r.getHeight()+2*amount);
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Sets a VisualItem's bounds based on its shape and stroke type. This
      * method is optimized to avoid calling .getBounds2D where it can, thus
@@ -614,11 +662,31 @@ public class GraphicsLib {
      * and may affect the final bounds. A null value indicates the
      * default (line width = 1) stroke is used.
      */
-    public static void setBounds(VisualItem item,
+    public static void setBounds(VisualItem<?> item,
                                  Shape shape, BasicStroke stroke)
     {
+    	// TODO: can this be made more efficient - like by avoiding construction of bounds object?
+    	Rectangle2D bounds = new Rectangle2D.Double();
+    	calculateBounds(item, shape, stroke, bounds);
+        item.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
+    }
+
+    /**
+     * Calculates a VisualItem's bounds based on its shape and stroke type. This
+     * method is optimized to avoid calling .getBounds2D where it can, thus
+     * avoiding object initialization and reducing object churn.
+     * @param item the VisualItem whose bounds are to be set
+     * @param shape a Shape from which to determine the item bounds
+     * @param stroke the stroke type that will be used for drawing the object,
+     * and may affect the final bounds. A null value indicates the
+     * default (line width = 1) stroke is used.
+     * @param bounds the rectangle to populate with the bounds
+     */
+    public static void calculateBounds(VisualItem<?> item,
+                                 Shape shape, BasicStroke stroke, Rectangle2D bounds)
+    {
         double x, y, w, h, lw, lw2;
-        
+
         if ( shape instanceof RectangularShape ) {
             // this covers rectangle, rounded rectangle, ellipse, and arcs
             RectangularShape r = (RectangularShape)shape;
@@ -651,20 +719,22 @@ public class GraphicsLib {
             // this covers any other arbitrary shapes, but
             // takes a small object allocation / garbage collection hit
             Rectangle2D r = shape.getBounds2D();
-            x = r.getX();
-            y = r.getY();
+            x = r.getMinX();
+            y = r.getMinY();
             w = r.getWidth();
             h = r.getHeight();
         }
-        
-        // adjust boundary for stoke length as necessary
+
+        // adjust boundary for stroke length as necessary
         if ( stroke != null && (lw=stroke.getLineWidth()) > 1 ) {
             lw2 = lw/2.0;
             x -= lw2; y -= lw2; w += lw; h += lw;
         }
-        item.setBounds(x, y, w, h);
+
+        bounds.setRect(x, y, w, h);
     }
-    
+
+
     /**
      * Render a shape associated with a VisualItem into a graphics context. This
      * method uses the {@link java.awt.Graphics} interface methods when it can,
@@ -679,36 +749,35 @@ public class GraphicsLib {
      * @param shape the shape to render
      * @param stroke the stroke type to use for drawing the object.
      * @param type the rendering type indicating if the shape should be drawn,
-     * filled, or both. One of
-     * {@link prefuse.render.AbstractShapeRenderer#RENDER_TYPE_DRAW},
-     * {@link prefuse.render.AbstractShapeRenderer#RENDER_TYPE_FILL},
-     * {@link prefuse.render.AbstractShapeRenderer#RENDER_TYPE_DRAW_AND_FILL}, or
-     * {@link prefuse.render.AbstractShapeRenderer#RENDER_TYPE_NONE}.
+     * filled, or both.
      */
-    public static void paint(Graphics2D g, VisualItem item,
-                             Shape shape, BasicStroke stroke, int type)
+    public static void paint(Graphics2D g, VisualItem<?> item,
+                             Shape shape, BasicStroke stroke, RenderType type)
     {
         // if render type is NONE, then there is nothing to do
-        if ( type == AbstractShapeRenderer.RENDER_TYPE_NONE )
-            return;
-        
+        if ( type == AbstractShapeRenderer.RenderType.NONE ) {
+			return;
+		}
+
         // set up colors
         Color strokeColor = ColorLib.getColor(item.getStrokeColor());
         Color fillColor = ColorLib.getColor(item.getFillColor());
-        boolean sdraw = (type == AbstractShapeRenderer.RENDER_TYPE_DRAW ||
-                         type == AbstractShapeRenderer.RENDER_TYPE_DRAW_AND_FILL) &&
+        boolean sdraw = (type == AbstractShapeRenderer.RenderType.DRAW ||
+                         type == AbstractShapeRenderer.RenderType.DRAW_AND_FILL) &&
                         strokeColor.getAlpha() != 0;
-        boolean fdraw = (type == AbstractShapeRenderer.RENDER_TYPE_FILL ||
-                         type == AbstractShapeRenderer.RENDER_TYPE_DRAW_AND_FILL) &&
+        boolean fdraw = (type == AbstractShapeRenderer.RenderType.FILL ||
+                         type == AbstractShapeRenderer.RenderType.DRAW_AND_FILL) &&
                         fillColor.getAlpha() != 0;
-        if ( !(sdraw || fdraw) ) return;
-        
+        if ( !(sdraw || fdraw) ) {
+			return;
+		}
+
         Stroke origStroke = null;
         if ( sdraw ) {
             origStroke = g.getStroke();
             g.setStroke(stroke);
         }
-        
+
         int x, y, w, h, aw, ah;
         double xx, yy, ww, hh;
 
@@ -726,14 +795,14 @@ public class GraphicsLib {
         else if ( shape instanceof RectangularShape )
         {
             RectangularShape r = (RectangularShape)shape;
-            xx = r.getX(); ww = r.getWidth(); 
+            xx = r.getX(); ww = r.getWidth();
             yy = r.getY(); hh = r.getHeight();
-            
+
             x = (int)xx;
             y = (int)yy;
             w = (int)(ww+xx-x);
             h = (int)(hh+yy-y);
-            
+
             if ( shape instanceof Rectangle2D ) {
                 if (fdraw) {
                     g.setPaint(fillColor);
@@ -786,5 +855,24 @@ public class GraphicsLib {
             g.setStroke(origStroke);
         }
     }
-    
+
+	/**
+	 * Helper method, which calculates the top-left co-ordinate of a rectangle
+	 * given the rectangle's alignment.
+	 */
+	public static void getAlignedPoint(Point2D p, Rectangle2D r, Alignment xAlign, Alignment yAlign) {
+	    double x = r.getX(), y = r.getY(), w = r.getWidth(), h = r.getHeight();
+	    if ( xAlign == Alignment.CENTER ) {
+	        x = x+w/2;
+	    } else if ( xAlign == Alignment.RIGHT ) {
+	        x = x+w;
+	    }
+	    if ( yAlign == Alignment.CENTER ) {
+	        y = y+h/2;
+	    } else if ( yAlign == Alignment.BOTTOM ) {
+	        y = y+h;
+	    }
+	    p.setLocation(x,y);
+	}
+
 } // end of class GraphicsLib

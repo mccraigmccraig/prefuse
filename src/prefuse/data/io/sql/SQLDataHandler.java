@@ -8,7 +8,7 @@ import prefuse.data.Table;
 /**
  * Interface for taking a value in a SQL ResultSet and translating it into
  * a Java data value for use in a prefuse Table.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public interface SQLDataHandler {
@@ -25,9 +25,9 @@ public interface SQLDataHandler {
      * to access the correct data field of the Table.
      * @throws SQLException if an error occurs accessing the ResultSet
      */
-    public void process(Table t, int trow, ResultSet rset, int rcol)
+    public void process(Table<?> t, int trow, ResultSet rset, int rcol)
         throws SQLException;
-    
+
     /**
      * Return the Java data type for the given data field name and
      * its sql data type.
@@ -36,6 +36,6 @@ public interface SQLDataHandler {
      * in the {@link java.sql.Types} class.
      * @return the Java Class data type
      */
-    public Class getDataType(String columnName, int sqlType);
-    
+    public Class<?> getDataType(String columnName, int sqlType);
+
 } // end of interface SQLDataValueHandler

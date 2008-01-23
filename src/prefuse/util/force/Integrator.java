@@ -10,5 +10,5 @@ package prefuse.util.force;
 public interface Integrator {
 
     public void integrate(ForceSimulator sim, long timestep);
-    
+
 } // end of interface Integrator

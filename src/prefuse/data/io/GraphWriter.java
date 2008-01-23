@@ -11,7 +11,7 @@ import prefuse.data.Graph;
 
 /**
  * Interface for classes that write Graph data to a particular file format.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public interface GraphWriter {
@@ -22,22 +22,22 @@ public interface GraphWriter {
      * @param filename the file to write the graph to
      * @throws DataWriteException
      */
-    public void writeGraph(Graph graph, String filename) throws DataIOException;
-    
+    public void writeGraph(Graph<?,?,?> graph, String filename) throws DataIOException;
+
     /**
      * Write a graph to the given File.
      * @param graph the Graph to write
      * @param f the file to write the graph to
      * @throws DataWriteException
      */
-    public void writeGraph(Graph graph, File f) throws DataIOException;
-    
+    public void writeGraph(Graph<?,?,?> graph, File f) throws DataIOException;
+
     /**
      * Write a graph from the given OutputStream.
      * @param graph the Graph to write
      * @param os the OutputStream to write the graph to
      * @throws DataWriteException
      */
-    public void writeGraph(Graph graph, OutputStream os) throws DataIOException;
-    
+    public void writeGraph(Graph<?,?,?> graph, OutputStream os) throws DataIOException;
+
 } // end of interface GraphWriter

@@ -4,7 +4,7 @@ import prefuse.data.column.Column;
 
 /**
  * ColumnProjection that simply includes all columns.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class AcceptAllColumnProjection extends AbstractColumnProjection {

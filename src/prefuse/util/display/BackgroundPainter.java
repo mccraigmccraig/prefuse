@@ -22,17 +22,17 @@ import prefuse.util.io.IOLib;
  * {@link prefuse.Display#setBackgroundImage(Image, boolean, boolean)} and
  * {@link prefuse.Display#setBackgroundImage(String, boolean, boolean)}
  * methods.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class BackgroundPainter implements PaintListener {
 
     private static final double THRESH = 0.01;
-    
-    private Image m_img;
-    private boolean m_fixed;
-    private boolean m_tiled;
-    
+
+    private final Image m_img;
+    private final boolean m_fixed;
+    private final boolean m_tiled;
+
     private AffineTransform m_identity;
     private Clip m_clip;
 
@@ -52,9 +52,9 @@ public class BackgroundPainter implements PaintListener {
     {
         this(Toolkit.getDefaultToolkit()
                 .getImage(IOLib.urlFromString(imageLocation)),
-             fixed, tile);        
+             fixed, tile);
     }
-    
+
     /**
      * Create a new BackgroundPainter.
      * @param image the background Image
@@ -66,7 +66,7 @@ public class BackgroundPainter implements PaintListener {
      */
     public BackgroundPainter(Image image, boolean fixed, boolean tile) {
         m_img = image;
-        
+
         // make sure the image is completely loaded
         MediaTracker mt = new MediaTracker(new Container());
         mt.addImage(m_img, 0);
@@ -74,11 +74,11 @@ public class BackgroundPainter implements PaintListener {
             mt.waitForID(0);
         } catch ( Exception e ) { e.printStackTrace(); }
         mt.removeImage(m_img, 0);
-        
+
         m_fixed = fixed;
         m_tiled = tile;
     }
-    
+
     /**
      * Paint the background.
      * @see prefuse.util.display.PaintListener#prePaint(prefuse.Display, java.awt.Graphics2D)
@@ -86,31 +86,36 @@ public class BackgroundPainter implements PaintListener {
     public void prePaint(Display d, Graphics2D g) {
         AffineTransform at = g.getTransform();
         boolean translate = isTranslation(at);
-        
+
         if ( m_fixed || translate )
         {
             // if the background is fixed, we can unset the transform.
             // if we have no scaling component, we draw the image directly
             //  rather than run it through the transform.
             //  this avoids rendering artifacts on Java 1.5 on Win32.
-            
+
             int tx = m_fixed ? 0 : (int)at.getTranslateX();
             int ty = m_fixed ? 0 : (int)at.getTranslateY();
-            
+
             g.setTransform(getIdentity());
             if ( m_tiled ) {
                 // if tiled, compute visible background region and draw tiles
                 int w = d.getWidth(),  iw = m_img.getWidth(null);
                 int h = d.getHeight(), ih = m_img.getHeight(null);
-                
+
                 int sx = m_fixed ? 0 : tx%iw;
                 int sy = m_fixed ? 0 : ty%ih;
-                if ( sx > 0 ) sx -= iw;
-                if ( sy > 0 ) sy -= ih;
-                
+                if ( sx > 0 ) {
+					sx -= iw;
+				}
+                if ( sy > 0 ) {
+					sy -= ih;
+				}
+
                 for ( int x=sx; x<w-sx; x+=iw ) {
-                    for ( int y=sy; y<h-sy; y+=ih )
-                        g.drawImage(m_img, x, y, null);
+                    for ( int y=sy; y<h-sy; y+=ih ) {
+						g.drawImage(m_img, x, y, null);
+					}
                 }
             } else {
                 // if not tiled, simply draw the image at the translated origin
@@ -124,12 +129,12 @@ public class BackgroundPainter implements PaintListener {
             if ( m_tiled ) {
                 int iw = m_img.getWidth(null);
                 int ih = m_img.getHeight(null);
-                
+
                 // get the screen region and map it into item-space
                 Clip c = getClip();
                 c.setClip(0, 0, d.getWidth(), d.getHeight());
                 c.transform(d.getInverseTransform());
-                
+
                 // get the bounding region for image tiles
                 int w = (int)Math.ceil(c.getWidth());
                 int h = (int)Math.ceil(c.getHeight());
@@ -139,18 +144,19 @@ public class BackgroundPainter implements PaintListener {
                 int dh = ty%ih + ih;
                 tx -= dw; w += dw;
                 ty -= dh; h += dh;
-                
+
                 // draw the image tiles
                 for ( int x=tx; x<tx+w; x+=iw ) {
-                    for ( int y=ty; y<ty+h; y+=ih )
-                        g.drawImage(m_img, x, y, null);
+                    for ( int y=ty; y<ty+h; y+=ih ) {
+						g.drawImage(m_img, x, y, null);
+					}
                 }
             } else {
                 // if not tiled, simply draw the image
                 g.drawImage(m_img, 0, 0, null);
             }
         }
-        
+
     }
 
     /**
@@ -158,18 +164,19 @@ public class BackgroundPainter implements PaintListener {
      * (within thresholds -- see {@link #THRESH}.
      */
     private static boolean isTranslation(AffineTransform at) {
-        return ( Math.abs(at.getScaleX()-1.0) < THRESH &&
+        return Math.abs(at.getScaleX()-1.0) < THRESH &&
                  Math.abs(at.getScaleY()-1.0) < THRESH &&
                  Math.abs(at.getShearX())     < THRESH &&
-                 Math.abs(at.getShearY())     < THRESH );
+                 Math.abs(at.getShearY())     < THRESH;
     }
 
     /**
      * Get an identity transform (creating it if necessary)
      */
     private AffineTransform getIdentity() {
-        if ( m_identity == null )
-            m_identity = new AffineTransform();
+        if ( m_identity == null ) {
+			m_identity = new AffineTransform();
+		}
         return m_identity;
     }
 
@@ -177,11 +184,12 @@ public class BackgroundPainter implements PaintListener {
      * Get a clip instance (creating it if necessary)
      */
     private Clip getClip() {
-        if ( m_clip == null )
-            m_clip = new Clip();
+        if ( m_clip == null ) {
+			m_clip = new Clip();
+		}
         return m_clip;
     }
-    
+
     /**
      * Does nothing.
      * @see prefuse.util.display.PaintListener#postPaint(prefuse.Display, java.awt.Graphics2D)

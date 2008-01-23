@@ -13,7 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
@@ -22,9 +22,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- * <p>Implements a Swing-based Range slider, which allows the user to enter a 
+ * <p>Implements a Swing-based Range slider, which allows the user to enter a
  * range (minimum and maximum) value.</p>
- * 
+ *
  * @author Ben Bederson
  * @author Jesse Grosjean
  * @author Jon Meyer
@@ -32,30 +32,35 @@ import javax.swing.event.ChangeListener;
  * @author jeffrey heer
  * @author Colin Combe
  */
-public class JRangeSlider extends JComponent 
+public class JRangeSlider extends JComponent
     implements MouseListener, MouseMotionListener, KeyListener
-{   
+{
     /*
      * NOTE: This is a modified version of the original class distributed by
      * Ben Bederson, Jesse Grosjean, and Jon Meyer as part of an HCIL Tech
-     * Report.  It is modified to allow both vertical and horitonal modes.
+     * Report.  It is modified to allow both vertical and horizontal modes.
      * It also fixes a bug with offset on the buttons. Also fixed a bug with
      * rendering using (x,y) instead of (0,0) as origin.  Also modified to
      * render arrows as a series of lines rather than as a GeneralPath.
      * Also modified to fix rounding errors on toLocal and toScreen.
-     * 
+     *
      * With inclusion in prefuse, this class has been further modified to use a
-     * bounded range model, support keyboard commands and more extensize
+     * bounded range model, support keyboard commands and more extensive
      * parameterization of rendering/appearance options. Furthermore, a stub
      * method has been introduced to allow subclasses to perform custom
      * rendering within the slider through.
      */
-    
-    final public static int VERTICAL = 0;
-    final public static int HORIZONTAL = 1;
-    final public static int LEFTRIGHT_TOPBOTTOM = 0;
-    final public static int RIGHTLEFT_BOTTOMTOP = 1;
-    
+
+	public static enum Orientation {
+		VERTICAL,
+		HORIZONTAL
+	}
+
+	public static enum Direction {
+		LEFTRIGHT_TOPBOTTOM,
+		RIGHTLEFT_BOTTOMTOP
+	}
+
     final public static int PREFERRED_BREADTH = 16;
     final public static int PREFERRED_LENGTH = 300;
     final protected static int ARROW_SZ = 16;
@@ -63,22 +68,22 @@ public class JRangeSlider extends JComponent
     final protected static int ARROW_HEIGHT = 4;
 
     protected BoundedRangeModel model;
-    protected int orientation;
-    protected int direction;
+    protected Orientation orientation;
+    protected Direction direction;
     protected boolean empty;
     protected int increment = 1;
     protected int minExtent = 0; // min extent, in pixels
-    
-    protected ArrayList listeners = new ArrayList();
+
+    protected List<ChangeListener> listeners = new ArrayList<ChangeListener>();
     protected ChangeEvent changeEvent = null;
     protected ChangeListener lstnr;
- 
+
     protected Color thumbColor = new Color(150,180,220);
-    
+
     // ------------------------------------------------------------------------
 
-    /** 
-     * Create a new range slider. 
+    /**
+     * Create a new range slider.
      *
      * @param minimum - the minimum value of the range.
      * @param maximum - the maximum value of the range.
@@ -86,13 +91,13 @@ public class JRangeSlider extends JComponent
      * @param highValue - the current high value shown by the range slider's bar.
      * @param orientation - construct a horizontal or vertical slider?
      */
-    public JRangeSlider(int minimum, int maximum, int lowValue, int highValue, int orientation) {
+    public JRangeSlider(int minimum, int maximum, int lowValue, int highValue, Orientation orientation) {
         this(new DefaultBoundedRangeModel(lowValue, highValue - lowValue, minimum, maximum),
-                orientation,LEFTRIGHT_TOPBOTTOM);
+                orientation, Direction.LEFTRIGHT_TOPBOTTOM);
     }
 
-    /** 
-     * Create a new range slider. 
+    /**
+     * Create a new range slider.
      *
      * @param minimum - the minimum value of the range.
      * @param maximum - the maximum value of the range.
@@ -101,34 +106,34 @@ public class JRangeSlider extends JComponent
      * @param orientation - construct a horizontal or vertical slider?
      * @param direction - Is the slider left-to-right/top-to-bottom or right-to-left/bottom-to-top
      */
-    public JRangeSlider(int minimum, int maximum, int lowValue, int highValue, int orientation, int direction) {
-        this(new DefaultBoundedRangeModel(lowValue, highValue - lowValue, minimum, maximum), 
+    public JRangeSlider(int minimum, int maximum, int lowValue, int highValue, Orientation orientation, Direction direction) {
+        this(new DefaultBoundedRangeModel(lowValue, highValue - lowValue, minimum, maximum),
                 orientation, direction);
     }
-    
-    /** 
-     * Create a new range slider. 
+
+    /**
+     * Create a new range slider.
      *
      * @param model - a BoundedRangeModel specifying the slider's range
      * @param orientation - construct a horizontal or vertical slider?
      * @param direction - Is the slider left-to-right/top-to-bottom or right-to-left/bottom-to-top
      */
-    public JRangeSlider(BoundedRangeModel model, int orientation, int direction) {
+    public JRangeSlider(BoundedRangeModel model, Orientation orientation, Direction direction) {
         super.setFocusable(true);
         this.model = model;
-        this.orientation = orientation;     
+        this.orientation = orientation;
         this.direction = direction;
-        
+
         setForeground(Color.LIGHT_GRAY);
-        
+
         this.lstnr = createListener();
         model.addChangeListener(lstnr);
-        
+
         addMouseListener(this);
         addMouseMotionListener(this);
         addKeyListener(this);
     }
-    
+
     /**
      * Create a listener to relay change events from the bounded range model.
      * @return a ChangeListener to relay events from the range model
@@ -136,7 +141,7 @@ public class JRangeSlider extends JComponent
     protected ChangeListener createListener() {
         return new RangeSliderChangeListener();
     }
-    
+
     /**
      * Listener that fires a change event when it receives  change event from
      * the slider list model.
@@ -146,16 +151,16 @@ public class JRangeSlider extends JComponent
             fireChangeEvent();
         }
     }
-    
-    /** 
+
+    /**
      * Returns the current "low" value shown by the range slider's bar. The low
-     * value meets the constraint minimum <= lowValue <= highValue <= maximum. 
+     * value meets the constraint minimum <= lowValue <= highValue <= maximum.
      */
     public int getLowValue() {
         return model.getValue();
     }
 
-    /** 
+    /**
      * Sets the low value shown by this range slider. This causes the range slider to be
      * repainted and a ChangeEvent to be fired.
      * @param lowValue the low value to use
@@ -167,15 +172,15 @@ public class JRangeSlider extends JComponent
         model.setValue(lowValue);
     }
 
-    /** 
+    /**
      * Returns the current "high" value shown by the range slider's bar. The high
-     * value meets the constraint minimum <= lowValue <= highValue <= maximum. 
+     * value meets the constraint minimum <= lowValue <= highValue <= maximum.
      */
     public int getHighValue() {
         return model.getValue()+model.getExtent();
     }
 
-    /** 
+    /**
      * Sets the high value shown by this range slider. This causes the range slider to be
      * repainted and a ChangeEvent to be fired.
      * @param highValue the high value to use
@@ -183,7 +188,7 @@ public class JRangeSlider extends JComponent
     public void setHighValue(int highValue) {
         model.setExtent(highValue-model.getValue());
     }
-    
+
     /**
      * Set the slider range span.
      * @param lowValue the low value of the slider range
@@ -235,7 +240,7 @@ public class JRangeSlider extends JComponent
     public void setMinExtent(int minExtent) {
         this.minExtent = minExtent;
     }
-    
+
     /**
      * Sets whether this slider is empty.
      * @param empty true if set to empty, false otherwise
@@ -253,7 +258,7 @@ public class JRangeSlider extends JComponent
     public Color getThumbColor() {
         return thumbColor;
     }
-    
+
     /**
      * Set the slider thumb color. This is the part of the slider between
      * the range resize buttons.
@@ -262,7 +267,7 @@ public class JRangeSlider extends JComponent
     public void setThumbColor(Color thumbColor) {
         this.thumbColor = thumbColor;
     }
-    
+
     /**
      * Get the BoundedRangeModel backing this slider.
      * @return the slider's range model
@@ -270,7 +275,7 @@ public class JRangeSlider extends JComponent
     public BoundedRangeModel getModel() {
         return model;
     }
-    
+
     /**
      * Set the BoundedRangeModel backing this slider.
      * @param brm the slider range model to use
@@ -281,8 +286,8 @@ public class JRangeSlider extends JComponent
         model.addChangeListener(lstnr);
         repaint();
     }
-    
-    /** 
+
+    /**
      * Registers a listener for ChangeEvents.
      * @param cl the ChangeListener to add
      */
@@ -291,14 +296,14 @@ public class JRangeSlider extends JComponent
             listeners.add(cl);
     }
 
-    /** 
+    /**
      * Removes a listener for ChangeEvents.
      * @param cl the ChangeListener to remove
      */
     public void removeChangeListener(ChangeListener cl) {
         listeners.remove(cl);
     }
-    
+
     /**
      * Fire a change event to all listeners.
      */
@@ -306,16 +311,16 @@ public class JRangeSlider extends JComponent
         repaint();
         if ( changeEvent == null )
             changeEvent = new ChangeEvent(this);
-        Iterator iter = listeners.iterator();
-        while ( iter.hasNext() )
-            ((ChangeListener)iter.next()).stateChanged(changeEvent);
+        for(ChangeListener listener : listeners) {
+        	listener.stateChanged(changeEvent);
+        }
     }
 
     /**
      * @see java.awt.Component#getPreferredSize()
      */
     public Dimension getPreferredSize() {
-        if (orientation == VERTICAL) {
+        if (orientation == Orientation.VERTICAL) {
             return new Dimension(PREFERRED_BREADTH, PREFERRED_LENGTH);
         }
         else {
@@ -336,11 +341,11 @@ public class JRangeSlider extends JComponent
         // does nothing in this class
         // subclasses can override to perform custom painting
     }
-    
+
     /**
      * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
      */
-    public void paintComponent(Graphics g) {        
+    public void paintComponent(Graphics g) {
         Rectangle bounds = getBounds();
         int width = (int)bounds.getWidth() - 1;
         int height = (int)bounds.getHeight() - 1;
@@ -350,13 +355,13 @@ public class JRangeSlider extends JComponent
 
         // Paint the full slider if the slider is marked as empty
         if (empty) {
-            if (direction == LEFTRIGHT_TOPBOTTOM) {
+            if (direction == Direction.LEFTRIGHT_TOPBOTTOM) {
                 min = ARROW_SZ;
-                max = (orientation == VERTICAL) ? height-ARROW_SZ : width-ARROW_SZ;
+                max = (orientation == Orientation.VERTICAL) ? height-ARROW_SZ : width-ARROW_SZ;
             }
             else {
-                min = (orientation == VERTICAL) ? height-ARROW_SZ : width-ARROW_SZ;
-                max = ARROW_SZ;                 
+                min = (orientation == Orientation.VERTICAL) ? height-ARROW_SZ : width-ARROW_SZ;
+                max = ARROW_SZ;
             }
         }
 
@@ -367,26 +372,26 @@ public class JRangeSlider extends JComponent
         g2.drawRect(0, 0, width, height);
 
         customPaint(g2, width, height);
-        
+
         // Draw arrow and thumb backgrounds
         g2.setStroke(new BasicStroke(1));
-        if (orientation == VERTICAL) {  
-            if (direction == LEFTRIGHT_TOPBOTTOM) {
+        if (orientation == Orientation.VERTICAL) {
+            if (direction == Direction.LEFTRIGHT_TOPBOTTOM) {
                 g2.setColor(getForeground());
                 g2.fillRect(0, min - ARROW_SZ, width, ARROW_SZ-1);
                 paint3DRectLighting(g2,0,min-ARROW_SZ,width,ARROW_SZ-1);
-            
+
                 if ( thumbColor != null ) {
                     g2.setColor(thumbColor);
                     g2.fillRect(0, min, width, max - min-1);
                     paint3DRectLighting(g2,0,min,width,max-min-1);
                 }
-                
+
                 g2.setColor(getForeground());
                 g2.fillRect(0, max, width, ARROW_SZ-1);
                 paint3DRectLighting(g2,0,max,width,ARROW_SZ-1);
-            
-                // Draw arrows          
+
+                // Draw arrows
                 g2.setColor(Color.black);
                 paintArrow(g2, (width-ARROW_WIDTH) / 2.0, min - ARROW_SZ + (ARROW_SZ-ARROW_HEIGHT) / 2.0, ARROW_WIDTH, ARROW_HEIGHT, true);
                 paintArrow(g2, (width-ARROW_WIDTH) / 2.0, max + (ARROW_SZ-ARROW_HEIGHT) / 2.0, ARROW_WIDTH, ARROW_HEIGHT, false);
@@ -395,29 +400,29 @@ public class JRangeSlider extends JComponent
                 g2.setColor(getForeground());
                 g2.fillRect(0, min, width, ARROW_SZ-1);
                 paint3DRectLighting(g2,0,min,width,ARROW_SZ-1);
-            
+
                 if ( thumbColor != null ) {
                     g2.setColor(thumbColor);
                     g2.fillRect(0, max, width, min-max-1);
                     paint3DRectLighting(g2,0,max,width,min-max-1);
                 }
-            
+
                 g2.setColor(getForeground());
                 g2.fillRect(0, max-ARROW_SZ, width, ARROW_SZ-1);
                 paint3DRectLighting(g2,0,max-ARROW_SZ,width,ARROW_SZ-1);
-            
-                // Draw arrows          
+
+                // Draw arrows
                 g2.setColor(Color.black);
                 paintArrow(g2, (width-ARROW_WIDTH) / 2.0, min + (ARROW_SZ-ARROW_HEIGHT) / 2.0, ARROW_WIDTH, ARROW_HEIGHT, false);
-                paintArrow(g2, (width-ARROW_WIDTH) / 2.0, max - ARROW_SZ + (ARROW_SZ-ARROW_HEIGHT) / 2.0, ARROW_WIDTH, ARROW_HEIGHT, true);             
+                paintArrow(g2, (width-ARROW_WIDTH) / 2.0, max - ARROW_SZ + (ARROW_SZ-ARROW_HEIGHT) / 2.0, ARROW_WIDTH, ARROW_HEIGHT, true);
             }
         }
         else {
-            if (direction == LEFTRIGHT_TOPBOTTOM) {
+            if (direction == Direction.LEFTRIGHT_TOPBOTTOM) {
                 g2.setColor(getForeground());
                 g2.fillRect(min - ARROW_SZ, 0, ARROW_SZ-1, height);
                 paint3DRectLighting(g2,min-ARROW_SZ,0,ARROW_SZ-1,height);
-            
+
                 if ( thumbColor != null ) {
                     g2.setColor(thumbColor);
                     g2.fillRect(min, 0, max - min - 1, height);
@@ -427,8 +432,8 @@ public class JRangeSlider extends JComponent
                 g2.setColor(getForeground());
                 g2.fillRect(max, 0, ARROW_SZ-1, height);
                 paint3DRectLighting(g2,max,0,ARROW_SZ-1,height);
-            
-                // Draw arrows          
+
+                // Draw arrows
                 g2.setColor(Color.black);
                 paintArrow(g2, min - ARROW_SZ + (ARROW_SZ-ARROW_HEIGHT) / 2.0, (height-ARROW_WIDTH) / 2.0, ARROW_HEIGHT, ARROW_WIDTH, true);
                 paintArrow(g2, max + (ARROW_SZ-ARROW_HEIGHT) / 2.0, (height-ARROW_WIDTH) / 2.0, ARROW_HEIGHT, ARROW_WIDTH, false);
@@ -437,41 +442,41 @@ public class JRangeSlider extends JComponent
                 g2.setColor(getForeground());
                 g2.fillRect(min, 0, ARROW_SZ - 1, height);
                 paint3DRectLighting(g2,min,0,ARROW_SZ-1,height);
-                
+
                 if ( thumbColor != null ) {
                     g2.setColor(thumbColor);
                     g2.fillRect(max, 0, min - max - 1, height);
-                    paint3DRectLighting(g2,max,0,min-max-1,height); 
+                    paint3DRectLighting(g2,max,0,min-max-1,height);
                 }
-                
+
                 g2.setColor(getForeground());
                 g2.fillRect(max-ARROW_SZ, 0, ARROW_SZ-1, height);
-                paint3DRectLighting(g2,max-ARROW_SZ,0,ARROW_SZ-1,height); 
-            
-                // Draw arrows          
+                paint3DRectLighting(g2,max-ARROW_SZ,0,ARROW_SZ-1,height);
+
+                // Draw arrows
                 g2.setColor(Color.black);
                 paintArrow(g2, min + (ARROW_SZ-ARROW_HEIGHT) / 2.0, (height-ARROW_WIDTH) / 2.0, ARROW_HEIGHT, ARROW_WIDTH, true);
-                paintArrow(g2, max - ARROW_SZ + (ARROW_SZ-ARROW_HEIGHT) / 2.0, (height-ARROW_WIDTH) / 2.0, ARROW_HEIGHT, ARROW_WIDTH, false);                   
+                paintArrow(g2, max - ARROW_SZ + (ARROW_SZ-ARROW_HEIGHT) / 2.0, (height-ARROW_WIDTH) / 2.0, ARROW_HEIGHT, ARROW_WIDTH, false);
             }
-        }               
+        }
     }
 
     /**
      * This draws an arrow as a series of lines within the specified box.
-     * The last boolean specifies whether the point should be at the 
-     * right/bottom or left/top. 
+     * The last boolean specifies whether the point should be at the
+     * right/bottom or left/top.
      */
     protected void paintArrow(Graphics2D g2, double x, double y, int w, int h,
                               boolean topDown)
     {
         int intX = (int)(x+0.5);
         int intY = (int)(y+0.5);
-        
-        if (orientation == VERTICAL) {
+
+        if (orientation == Orientation.VERTICAL) {
             if (w % 2 == 0) {
                 w = w - 1;
             }
-            
+
             if (topDown) {
                 for(int i=0; i<(w/2+1); i++) {
                     g2.drawLine(intX+i,intY+i,intX+w-i-1,intY+i);
@@ -480,14 +485,14 @@ public class JRangeSlider extends JComponent
             else {
                 for(int i=0; i<(w/2+1); i++) {
                     g2.drawLine(intX+w/2-i,intY+i,intX+w-w/2+i-1,intY+i);
-                }               
+                }
             }
         }
         else {
             if (h % 2 == 0) {
                 h = h - 1;
             }
-                        
+
             if (topDown) {
                 for(int i=0; i<(h/2+1); i++) {
                     g2.drawLine(intX+i,intY+i,intX+i,intY+h-i-1);
@@ -496,11 +501,11 @@ public class JRangeSlider extends JComponent
             else {
                 for(int i=0; i<(h/2+1); i++) {
                     g2.drawLine(intX+i,intY+h/2-i,intX+i,intY+h-h/2+i-1);
-                }               
-            }           
+                }
+            }
         }
     }
-    
+
     /**
      * Adds Windows2K type 3D lighting effects
      */
@@ -515,7 +520,7 @@ public class JRangeSlider extends JComponent
         g2.drawLine(x+width-1,y+1,x+width-1,y+height-1);
         g2.setColor(Color.darkGray);
         g2.drawLine(x,y+height,x+width,y+height);
-        g2.drawLine(x+width,y,x+width,y+height);        
+        g2.drawLine(x+width,y,x+width,y+height);
     }
 
     /**
@@ -525,18 +530,18 @@ public class JRangeSlider extends JComponent
         Dimension sz = getSize();
         int min = getMinimum();
         double scale;
-        if (orientation == VERTICAL) {
-            scale = (sz.height - (2 * ARROW_SZ)) / (double) (getMaximum() - min);           
+        if (orientation == Orientation.VERTICAL) {
+            scale = (sz.height - (2 * ARROW_SZ)) / (double) (getMaximum() - min);
         }
         else {
             scale = (sz.width - (2 * ARROW_SZ)) / (double) (getMaximum() - min);
         }
 
-        if (direction == LEFTRIGHT_TOPBOTTOM) {
-            return (int) (((xOrY - ARROW_SZ) / scale) + min + 0.5);         
+        if (direction == Direction.LEFTRIGHT_TOPBOTTOM) {
+            return (int) (((xOrY - ARROW_SZ) / scale) + min + 0.5);
         }
         else {
-            if (orientation == VERTICAL) {
+            if (orientation == Orientation.VERTICAL) {
                 return (int) ((sz.height - xOrY - ARROW_SZ) / scale + min + 0.5);
             }
             else {
@@ -552,8 +557,8 @@ public class JRangeSlider extends JComponent
         Dimension sz = getSize();
         int min = getMinimum();
         double scale;
-        if (orientation == VERTICAL) {
-            scale = (sz.height - (2 * ARROW_SZ)) / (double) (getMaximum() - min);           
+        if (orientation == Orientation.VERTICAL) {
+            scale = (sz.height - (2 * ARROW_SZ)) / (double) (getMaximum() - min);
         }
         else {
             scale = (sz.width - (2 * ARROW_SZ)) / (double) (getMaximum() - min);
@@ -561,11 +566,11 @@ public class JRangeSlider extends JComponent
 
         // If the direction is left/right_top/bottom then we subtract the min and multiply times scale
         // Otherwise, we have to invert the number by subtracting the value from the height
-        if (direction == LEFTRIGHT_TOPBOTTOM) {
+        if (direction == Direction.LEFTRIGHT_TOPBOTTOM) {
             return (int)(ARROW_SZ + ((xOrY - min) * scale) + 0.5);
         }
         else {
-            if (orientation == VERTICAL) {
+            if (orientation == Orientation.VERTICAL) {
                 return (int)(sz.height-(xOrY - min) * scale - ARROW_SZ + 0.5);
             }
             else {
@@ -581,8 +586,8 @@ public class JRangeSlider extends JComponent
         Dimension sz = getSize();
         int min = getMinimum();
         double scale;
-        if (orientation == VERTICAL) {
-            scale = (sz.height - (2 * ARROW_SZ)) / (double) (getMaximum()+1 - min);         
+        if (orientation == Orientation.VERTICAL) {
+            scale = (sz.height - (2 * ARROW_SZ)) / (double) (getMaximum()+1 - min);
         }
         else {
             scale = (sz.width - (2 * ARROW_SZ)) / (double) (getMaximum()+1 - min);
@@ -590,11 +595,11 @@ public class JRangeSlider extends JComponent
 
         // If the direction is left/right_top/bottom then we subtract the min and multiply times scale
         // Otherwise, we have to invert the number by subtracting the value from the height
-        if (direction == LEFTRIGHT_TOPBOTTOM) {
+        if (direction == Direction.LEFTRIGHT_TOPBOTTOM) {
             return ARROW_SZ + ((xOrY - min) * scale);
         }
         else {
-            if (orientation == VERTICAL) {
+            if (orientation == Orientation.VERTICAL) {
                 return sz.height-(xOrY - min) * scale - ARROW_SZ;
             }
             else {
@@ -603,7 +608,7 @@ public class JRangeSlider extends JComponent
         }
     }
 
-    
+
     // ------------------------------------------------------------------------
     // Event Handling
 
@@ -620,8 +625,8 @@ public class JRangeSlider extends JComponent
         int min = toScreen(getLowValue());
         int max = toScreen(getHighValue());
         int pick = PICK_NONE;
-        
-        if (direction == LEFTRIGHT_TOPBOTTOM) {
+
+        if (direction == Direction.LEFTRIGHT_TOPBOTTOM) {
             if ((xOrY > (min - ARROW_SZ)) && (xOrY < min)) {
                 pick = PICK_LEFT_OR_TOP;
             } else if ((xOrY >= min) && (xOrY <= max)) {
@@ -637,9 +642,9 @@ public class JRangeSlider extends JComponent
                 pick = PICK_THUMB;
             } else if ((xOrY > (max - ARROW_SZ) && (xOrY < max))) {
                 pick = PICK_RIGHT_OR_BOTTOM;
-            }           
+            }
         }
-        
+
         return pick;
     }
 
@@ -650,8 +655,8 @@ public class JRangeSlider extends JComponent
     /**
      * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
      */
-    public void mousePressed(MouseEvent e) {        
-        if (orientation == VERTICAL) {
+    public void mousePressed(MouseEvent e) {
+        if (orientation == Orientation.VERTICAL) {
             pick = pickHandle(e.getY());
             pickOffsetLow = e.getY() - toScreen(getLowValue());
             pickOffsetHigh = e.getY() - toScreen(getHighValue());
@@ -661,7 +666,7 @@ public class JRangeSlider extends JComponent
             pick = pickHandle(e.getX());
             pickOffsetLow = e.getX() - toScreen(getLowValue());
             pickOffsetHigh = e.getX() - toScreen(getHighValue());
-            mouse = e.getX();           
+            mouse = e.getX();
         }
         repaint();
     }
@@ -671,17 +676,17 @@ public class JRangeSlider extends JComponent
      */
     public void mouseDragged(MouseEvent e) {
         requestFocus();
-        int value = (orientation == VERTICAL) ? e.getY() : e.getX();
-        
+        int value = (orientation == Orientation.VERTICAL) ? e.getY() : e.getX();
+
         int minimum = getMinimum();
         int maximum = getMaximum();
         int lowValue = getLowValue();
         int highValue = getHighValue();
-        
+
         switch (pick) {
             case PICK_LEFT_OR_TOP:
                 int low = toLocal(value-pickOffsetLow);
-            
+
                 if (low < minimum) {
                     low = minimum;
                 }
@@ -697,7 +702,7 @@ public class JRangeSlider extends JComponent
 
             case PICK_RIGHT_OR_BOTTOM:
                 int high = toLocal(value-pickOffsetHigh);
-                
+
                 if (high < minimum + minExtent) {
                     high = minimum + minExtent;
                 }
@@ -738,7 +743,7 @@ public class JRangeSlider extends JComponent
      * @see java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
      */
     public void mouseMoved(MouseEvent e) {
-        if (orientation == VERTICAL) {
+        if (orientation == Orientation.VERTICAL) {
             switch (pickHandle(e.getY())) {
                 case PICK_LEFT_OR_TOP:
                     setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -768,7 +773,7 @@ public class JRangeSlider extends JComponent
                 case PICK_NONE :
                     setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                     break;
-            }           
+            }
         }
     }
 
@@ -790,32 +795,32 @@ public class JRangeSlider extends JComponent
 
     private void grow(int increment) {
         model.setRangeProperties(model.getValue()-increment,
-            model.getExtent()+2*increment, 
+            model.getExtent()+2*increment,
             model.getMinimum(), model.getMaximum(), false);
     }
-    
+
     /**
      * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
      */
     public void keyPressed(KeyEvent e) {
         int kc = e.getKeyCode();
-        boolean v = (orientation == VERTICAL);
+        boolean v = (orientation == Orientation.VERTICAL);
         boolean d = (kc == KeyEvent.VK_DOWN);
         boolean u = (kc == KeyEvent.VK_UP);
         boolean l = (kc == KeyEvent.VK_LEFT);
         boolean r = (kc == KeyEvent.VK_RIGHT);
-        
+
         int minimum = getMinimum();
         int maximum = getMaximum();
         int lowValue = getLowValue();
         int highValue = getHighValue();
-        
+
         if ( v&&r || !v&&u ) {
             if ( lowValue-increment >= minimum &&
                  highValue+increment <= maximum ) {
                 grow(increment);
             }
-        } else if ( v&&l || !v&&d ) { 
+        } else if ( v&&l || !v&&d ) {
             if ( highValue-lowValue >= 2*increment ) {
                 grow(-1*increment);
             }
@@ -829,7 +834,7 @@ public class JRangeSlider extends JComponent
             }
         }
     }
-    
+
     /**
      * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
      */
@@ -840,5 +845,5 @@ public class JRangeSlider extends JComponent
      */
     public void keyTyped(KeyEvent e) {
     }
-    
+
 } // end of class JRangeSlider

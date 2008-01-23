@@ -40,5 +40,5 @@ public class DataIOException extends Exception {
     public DataIOException(Throwable cause) {
         super(cause);
     }
-    
+
 } // end of class DataIOException

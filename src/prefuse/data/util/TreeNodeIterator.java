@@ -6,47 +6,52 @@ package prefuse.data.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import prefuse.data.Node;
 
 /**
  * A depth-first iterator over the subtree rooted at given node.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class TreeNodeIterator implements Iterator {
+public class TreeNodeIterator <N extends Node<?,?>> implements Iterator<N> {
 
-    private ArrayList m_stack;
-    private Node m_root;
+    private ArrayList<N> m_stack;
+    private N m_root;
     private boolean m_preorder = true;
-    
+
     /**
      * Create a new TreeNodeIterator over the given subtree.
      * @param root the root of the subtree to traverse
      */
-    public TreeNodeIterator(Node root) {
+    public TreeNodeIterator(N root) {
     	this(root, true);
     }
-    
+
     /**
      * Create a new TreeNodeIterator over the given subtree.
      * @param root the root of the subtree to traverse
      * @param preorder true to use a pre-order traversal, false
      *  for a post-order traversal
      */
-    public TreeNodeIterator(Node root, boolean preorder) {
+    public TreeNodeIterator(N root, boolean preorder) {
     	m_preorder = preorder;
     	m_root = root;
-    	m_stack = new ArrayList();
+    	m_stack = new ArrayList<N>();
     	m_stack.add(root);
-    	
+
     	if (!preorder) {
-    		for (Node n = root.getChild(0); n!=null; n=n.getChild(0))
+    		List<N> children = (List<N>) root.children();
+    		while(!children.isEmpty()) {
+    			N n = children.get(0);
     			m_stack.add(n);
+    			children = (List<N>) n.children();
+    		}
     	}
-        
+
     }
-    
+
     /**
      * @see java.util.Iterator#hasNext()
      */
@@ -57,31 +62,37 @@ public class TreeNodeIterator implements Iterator {
     /**
      * @see java.util.Iterator#next()
      */
-    public Object next() {
-    	Node c, x = null;
+    public N next() {
+    	N c, x = null;
     	if (m_preorder) {
-    		x = (Node)m_stack.get(m_stack.size()-1);
-	    	if ( (c=x.getChild(0)) != null ) {
+    		x = m_stack.get(m_stack.size()-1);
+    		List<N> xChildren = (List<N>) x.children();
+	    	if ( !xChildren.isEmpty()) {
+	    		c = xChildren.get(0);
 	    		m_stack.add(c);
-	    	} else if ( (c=x.getNextSibling()) != null ) {
+	    	} else if ( (c=(N) x.getNextSibling()) != null ) {
 	    		m_stack.set(m_stack.size()-1, c);
 	    	} else {
 	    		m_stack.remove(m_stack.size()-1);
 	    		while (!m_stack.isEmpty()) {
-		    		c = (Node)m_stack.remove(m_stack.size()-1);
+		    		c = m_stack.remove(m_stack.size()-1);
 		    		if ( c == m_root ) {
 		    			break;
-		    		} else if ( (c=c.getNextSibling()) != null ) {
+		    		} else if ( (c=(N) c.getNextSibling()) != null ) {
 		    			m_stack.add(c); break;
 		    		}
 	    		}
 	    	}
     	} else {
-    		x = (Node)m_stack.remove(m_stack.size()-1);
-    		if ( x != m_root && (c=x.getNextSibling()) != null ) {
-    			for (; c != null; c=c.getChild(0)) {
+    		x = m_stack.remove(m_stack.size()-1);
+    		if ( x != m_root && (c=(N) x.getNextSibling()) != null ) {
+				m_stack.add(c);
+        		List<N> cChildren = (List<N>) c.children();
+        		while(!cChildren.isEmpty()) {
+        			c = cChildren.get(0);
     				m_stack.add(c);
-    			}
+            		cChildren = (List<N>) c.children();
+        		}
     		}
     	}
     	return x;

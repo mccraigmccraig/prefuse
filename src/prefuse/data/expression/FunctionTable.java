@@ -1,6 +1,7 @@
 package prefuse.data.expression;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import prefuse.visual.expression.GroupSizeFunction;
 import prefuse.visual.expression.HoverPredicate;
@@ -13,18 +14,18 @@ import prefuse.visual.expression.VisiblePredicate;
 /**
  * Function table that allows lookup of registered FunctionExpressions
  * by their function name.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class FunctionTable {
-    
+
     private FunctionTable() {
         // prevent instantiation
     }
-    
-    private static HashMap s_functionTable;
+
+    private static Map<String,Class<?>> s_functionTable;
     static {
-        s_functionTable = new HashMap();
+        s_functionTable = new HashMap<String,Class<?>>();
         // tuple functions
         addFunction("ROW", RowFunction.class);
         addFunction("ISNODE", IsNodeFunction.class);
@@ -34,7 +35,7 @@ public class FunctionTable {
         addFunction("OUTDEGREE", OutDegreeFunction.class);
         addFunction("CHILDCOUNT", ChildCountFunction.class);
         addFunction("TREEDEPTH", TreeDepthFunction.class);
-        
+
         // numeric functions
         addFunction("ABS", AbsFunction.class);
         addFunction("ACOS", AcosFunction.class);
@@ -66,10 +67,10 @@ public class FunctionTable {
         addFunction("SQRT", SqrtFunction.class);
         addFunction("SUM", SumFunction.class);
         addFunction("TAN", TanFunction.class);
-        
+
         addFunction("SAFELOG10", SafeLog10Function.class);
         addFunction("SAFESQRT", SafeSqrtFunction.class);
-        
+
         // string functions
         addFunction("CAP", CapFunction.class);
         addFunction("CONCAT", ConcatFunction.class);
@@ -92,7 +93,7 @@ public class FunctionTable {
         addFunction("SUBSTRING", SubstringFunction.class);
         addFunction("UPPER", UpperFunction.class);
         addFunction("UCASE", UpperFunction.class);
-        
+
         // color functions
         addFunction("RGB", RGBFunction.class);
         addFunction("RGBA", RGBAFunction.class);
@@ -101,7 +102,7 @@ public class FunctionTable {
         addFunction("HSB", HSBFunction.class);
         addFunction("HSBA", HSBAFunction.class);
         addFunction("COLORINTERP", ColorInterpFunction.class);
-        
+
         // visualization functions
         addFunction("GROUPSIZE", GroupSizeFunction.class);
         addFunction("HOVER", HoverPredicate.class);
@@ -111,7 +112,7 @@ public class FunctionTable {
         addFunction("VISIBLE", VisiblePredicate.class);
         addFunction("VALIDATED", ValidatedPredicate.class);
     }
-    
+
     /**
      * Indicates if a function of the given name is included in the function
      * table.
@@ -121,7 +122,7 @@ public class FunctionTable {
     public static boolean hasFunction(String name) {
         return s_functionTable.containsKey(name);
     }
-    
+
     /**
      * Add a function to the function table. It will then become available
      * for use with compiled statements of the prefuse expression language.
@@ -129,7 +130,7 @@ public class FunctionTable {
      * be registered in the table, i.e. there is no function overloading.
      * @param type the Class instance of the function itself
      */
-    public static void addFunction(String name, Class type) {
+    public static void addFunction(String name, Class<?> type) {
         if ( !Function.class.isAssignableFrom(type) ) {
             throw new IllegalArgumentException(
                 "Type argument must be a subclass of FunctionExpression.");
@@ -140,20 +141,21 @@ public class FunctionTable {
         }
         String lo = name.toLowerCase();
         String hi = name.toUpperCase();
-        if ( !name.equals(lo) && !name.equals(hi) )
-            throw new IllegalArgumentException(
+        if ( !name.equals(lo) && !name.equals(hi) ) {
+			throw new IllegalArgumentException(
                 "Name can't have mixed case, try \""+hi+"\" instead.");
+		}
         s_functionTable.put(lo, type);
         s_functionTable.put(hi, type);
     }
-    
+
     /**
      * Get a new Function instance for the function with the given name.
      * @param name the name of the function to create
      * @return the instantiated Function
      */
     public static Function createFunction(String name) {
-        Class type = (Class)s_functionTable.get(name);
+        Class<?> type = s_functionTable.get(name);
         if ( type == null ) {
             throw new IllegalArgumentException(
                     "Unrecognized function name");

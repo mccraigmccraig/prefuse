@@ -8,21 +8,21 @@ package prefuse.data.parser;
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public interface DataParser {
-    
+
     /**
      * Get the data type for the values parsed by this parser.
      * @return the parsed data type for this parser as a Java Class instance
      */
-    public Class getType();
-    
-    
+    public Class<?> getType();
+
+
     /**
      * Get a String representation for the given value.
      * @param value the object value to format
      * @return a formatted String representing the input value
      */
     public String format(Object value);
-    
+
     /**
      * Indicates if the given text string can be successfully parsed by
      * this parser.
@@ -31,7 +31,7 @@ public interface DataParser {
      * parser's data type, false otherwise
      */
     public boolean canParse(String text);
-    
+
     /**
      * Parse the given text string to a data value.
      * @param text the text string to parse
@@ -39,6 +39,6 @@ public interface DataParser {
      * Class returned by the {@link #getType()} method
      * @throws DataParseException if an error occurs during parsing
      */
-    public Object parse(String text) throws DataParseException; 
-   
+    public Object parse(String text) throws DataParseException;
+
 } // end of interface DataParser

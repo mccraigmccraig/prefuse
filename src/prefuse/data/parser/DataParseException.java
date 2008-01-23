@@ -2,7 +2,7 @@ package prefuse.data.parser;
 
 /**
  * Exception indicating an error occurred during parsing of data values.
- *  
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class DataParseException extends Exception {
@@ -13,7 +13,7 @@ public class DataParseException extends Exception {
     public DataParseException() {
         super();
     }
-    
+
     /**
      * Create a new DataParseException.
      * @param message a descriptive error message
@@ -40,5 +40,5 @@ public class DataParseException extends Exception {
     public DataParseException(Throwable cause) {
         super(cause);
     }
-    
+
 } // end of class DataParseException

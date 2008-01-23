@@ -2,12 +2,10 @@ package prefuse.util;
 
 import java.util.Arrays;
 
-import prefuse.Constants;
-
 /**
  * Library of mathematical constants and methods not included in the
  * {@link java.lang.Math} class.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class MathLib {
@@ -18,11 +16,11 @@ public class MathLib {
     public static final double LOG10 = Math.log(10);
     /** The natural logarithm of 2 */
     public static final double LOG2 = Math.log(2);
-    
+
     private MathLib() {
         // prevent instantiation
     }
-    
+
     /**
      * The base 2 logarithm of the input value
      * @param x the input value
@@ -40,7 +38,7 @@ public class MathLib {
     public static double log10(double x) {
         return Math.log(x)/LOG10;
     }
-    
+
     /**
      * The "safe" base 10 logarithm of the input value, handling
      * negative values by simply making them positive and then
@@ -49,14 +47,14 @@ public class MathLib {
      * @return the "negative-safe" base 10 logarithm
      */
     public static double safeLog10(double x) {
-        boolean neg = (x < 0.0);
+        boolean neg = x < 0.0;
         if ( neg ) { x = -x; }
         if ( x < 10.0 ) { x += (10.0-x) / 10; }
         x = Math.log(x) / LOG10;
-        
+
         return neg ? -x : x;
     }
-    
+
     /**
      * The "safe" square root of the input value, handling
      * negative values by simply making them positive and then
@@ -65,20 +63,16 @@ public class MathLib {
      * @return the "negative-safe" square root
      */
     public static double safeSqrt(double x) {
-        return ( x<0 ? -Math.sqrt(-x) : Math.sqrt(x) );
+        return x<0 ? -Math.sqrt(-x) : Math.sqrt(x);
     }
-    
+
     /**
      * Interpolates a value within a range using a specified scale,
      * returning the fractional position of the value within that scale.
-     * @param scale The scale on which to perform the interpolation, one of
-     * {@link prefuse.Constants#LINEAR_SCALE},
-     * {@link prefuse.Constants#LOG_SCALE},
-     * {@link prefuse.Constants#SQRT_SCALE}, or
-     * {@link prefuse.Constants#QUANTILE_SCALE}.
+     * @param scale The scale on which to perform the interpolation
      * @param val the interpolation value, a fraction between 0 and 1.0.
      * @param dist a double array describing the distribution of the data.
-     * For the {@link prefuse.Constants#QUANTILE_SCALE} option, this should
+     * For the {@link Scale#QUANTILE} option, this should
      * be a collection of quantile boundaries, as determined by the
      * {@link #quantiles(int, double[])} method. For any other scale type,
      * the first value of the array must contain the minimum value of the
@@ -88,20 +82,20 @@ public class MathLib {
      * @return the fractional position of the value within the scale,
      * a double between 0 and 1.
      */
-    public static double interp(int scale, double val, double dist[]) {
+    public static double interp(Scale scale, double val, double dist[]) {
         switch ( scale ) {
-        case Constants.LINEAR_SCALE:
+        case LINEAR:
             return linearInterp(val, dist[0], dist[dist.length-1]);
-        case Constants.LOG_SCALE:
+        case LOG:
             return logInterp(val, dist[0], dist[dist.length-1]);
-        case Constants.SQRT_SCALE:
+        case SQRT:
             return sqrtInterp(val, dist[0], dist[dist.length-1]);
-        case Constants.QUANTILE_SCALE:
+        case QUANTILE:
             return quantile(val, dist);
         }
         throw new IllegalArgumentException("Unrecognized scale value: "+scale);
     }
-    
+
     /**
      * Interpolates a value between a given minimum and maximum value using
      * a linear scale.
@@ -111,12 +105,13 @@ public class MathLib {
      * @return the resulting interpolated value
      */
     public static double linearInterp(double val, double min, double max) {
-        double denominator = (max-min);
-        if ( denominator == 0 )
-            return 0;
+        double denominator = max-min;
+        if ( denominator == 0 ) {
+			return 0;
+		}
         return (val-min)/denominator;
     }
-    
+
     /**
      * Interpolates a value between a given minimum and maximum value using
      * a base-10 logarithmic scale.
@@ -127,12 +122,13 @@ public class MathLib {
      */
     public static double logInterp(double val, double min, double max) {
         double logMin = safeLog10(min);
-        double denominator = (safeLog10(max)-logMin);
-        if ( denominator == 0 )
-            return 0;
-        return (safeLog10(val)-logMin) / denominator; 
+        double denominator = safeLog10(max)-logMin;
+        if ( denominator == 0 ) {
+			return 0;
+		}
+        return (safeLog10(val)-logMin) / denominator;
     }
-    
+
     /**
      * Interpolates a value between a given minimum and maximum value using
      * a square root scale.
@@ -143,12 +139,13 @@ public class MathLib {
      */
     public static double sqrtInterp(double val, double min, double max) {
         double sqrtMin = safeSqrt(min);
-        double denominator = (safeSqrt(max)-sqrtMin);
-        if ( denominator == 0 )
-            return 0;
+        double denominator = safeSqrt(max)-sqrtMin;
+        if ( denominator == 0 ) {
+			return 0;
+		}
         return (safeSqrt(val)-sqrtMin) / denominator;
     }
-    
+
     /**
      * Compute the n-quantile boundaries for a set of values. The result is
      * an n+1 size array holding the minimum value in the first entry and
@@ -161,15 +158,15 @@ public class MathLib {
      * the quantile boundary values, in that order
      */
     public static double[] quantiles(int n, double[] values) {
-        values = (double[])values.clone();
+        values = values.clone();
         Arrays.sort(values);
         double[] qtls = new double[n+1];
         for ( int i=0; i<=n; ++i ) {
-            qtls[i] = values[((values.length-1)*i)/n];
+            qtls[i] = values[(values.length-1)*i/n];
         }
         return qtls;
     }
-    
+
     /**
      * Get the quantile measure, as a value between 0 and 1, for a given
      * value and set of quantile boundaries. For example, if the input value
@@ -196,7 +193,7 @@ public class MathLib {
             }
             i = x1 + (x2 - x1) / 2;
         }
-        return ((double)i)/(quantiles.length-1);
+        return (double)i/(quantiles.length-1);
     }
-    
+
 } // end of class MathLib

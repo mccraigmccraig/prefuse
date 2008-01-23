@@ -14,7 +14,7 @@ public class ThereAndBackPacer implements Pacer {
      * @see prefuse.activity.Pacer#pace(double)
      */
     public double pace(double f) {
-        return 2*(f <= 0.5 ? f : (1-f));
+        return 2*(f <= 0.5 ? f : 1-f);
     }
 
 } // end of class ThereAndBackPacer

@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import prefuse.data.parser.DataParseException;
 import prefuse.data.parser.ParserFactory;
 
@@ -13,11 +12,11 @@ import prefuse.data.parser.ParserFactory;
  * each row of a table on a line, separating each data column by a line.
  * Typically the first line of the file is a header row indicating the
  * names of each data column.
- * 
+ *
  * For a more in-depth description of the CSV format, please see this
  * <a href="http://www.creativyst.com/Doc/Articles/CSV/CSV01.htm">
  *  CSV reference web page</a>.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class CSVTableReader extends AbstractTextTableReader {
@@ -28,7 +27,7 @@ public class CSVTableReader extends AbstractTextTableReader {
     public CSVTableReader() {
         super();
     }
-    
+
     /**
      * Create a new CSVTableReader.
      * @param parserFactory the ParserFactory to use for parsing text strings
@@ -37,30 +36,31 @@ public class CSVTableReader extends AbstractTextTableReader {
     public CSVTableReader(ParserFactory parserFactory) {
         super(parserFactory);
     }
-    
+
     /**
      * @see prefuse.data.io.AbstractTextTableReader#read(java.io.InputStream, prefuse.data.io.TableReadListener)
      */
-    public void read(InputStream is, TableReadListener trl)
+    @Override
+	public void read(InputStream is, TableReadListener trl)
         throws IOException, DataParseException
     {
         String line;
         StringBuffer sbuf = new StringBuffer();
-        
+
         boolean inRecord = false;
         int inQuote  = 0;
         int lineno   = 0;
         int col      = 0;
-        
+
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         while ( (line=br.readLine()) != null ) {
             // increment the line number
             ++lineno;
-            
+
             // extract the character array for quicker processing
             char[] c = line.toCharArray();
             int last = c.length-1;
-            
+
             // iterate through current line
             for ( int i=0; i<=last; ++i ) {
                 if ( !inRecord ) {
@@ -110,7 +110,7 @@ public class CSVTableReader extends AbstractTextTableReader {
                         else if ( c[i] != ',' && inQuote == 2 )
                         {
                             throw new IllegalStateException(
-                                "Invalid data format. " + 
+                                "Invalid data format. " +
                                 "Error at line " + lineno + ", col " + i);
                         }
                         else if ( c[i] != ',' )
@@ -140,5 +140,5 @@ public class CSVTableReader extends AbstractTextTableReader {
             }
         }
     }
-    
+
 } // end of class CSVTableReader

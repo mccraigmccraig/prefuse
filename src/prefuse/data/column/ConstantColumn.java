@@ -5,7 +5,7 @@ import prefuse.data.event.ColumnListener;
 
 /**
  * Column implementation holding a single, constant value for all rows.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class ConstantColumn extends AbstractColumn {
@@ -17,10 +17,10 @@ public class ConstantColumn extends AbstractColumn {
      * @param type the data type of this column
      * @param defaultValue the default value used for all rows
      */
-    public ConstantColumn(Class type, Object defaultValue) {
+    public ConstantColumn(Class<?> type, Object defaultValue) {
         super(type, defaultValue);
     }
-    
+
     /**
      * @see prefuse.data.column.Column#getRowCount()
      */
@@ -58,15 +58,17 @@ public class ConstantColumn extends AbstractColumn {
      * Returns false.
      * @see prefuse.data.column.Column#canSet(java.lang.Class)
      */
-    public boolean canSet(Class type) {
+    @Override
+	public boolean canSet(Class<?> type) {
         return false;
-    }    
-    
+    }
+
     /**
      * Does nothing.
      * @see prefuse.data.column.Column#addColumnListener(prefuse.data.event.ColumnListener)
      */
-    public void addColumnListener(ColumnListener listener) {
+    @Override
+	public void addColumnListener(ColumnListener listener) {
         return; // column can't change, so nothing to listen to
     }
 
@@ -74,8 +76,9 @@ public class ConstantColumn extends AbstractColumn {
      * Does nothing.
      * @see prefuse.data.column.Column#removeColumnListener(prefuse.data.event.ColumnListener)
      */
-    public void removeColumnListener(ColumnListener listener) {
+    @Override
+	public void removeColumnListener(ColumnListener listener) {
         return; // column can't change, so nothing to listen to
     }
-    
+
 } // end of class Constant Column

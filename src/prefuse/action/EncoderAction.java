@@ -16,20 +16,20 @@ import prefuse.visual.VisualItem;
  * ItemAction instance that can also maintain a collection of rule mappings
  * that can be used by subclasses to create particular rule-mappings for
  * encoding data values.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public abstract class EncoderAction extends ItemAction {
 
     private PredicateChain m_chain = null;
-    
+
     /**
      * Create a new EncoderAction that processes all data groups.
      */
     public EncoderAction() {
         super();
     }
-    
+
     /**
      * Create a new EncoderAction that processes all groups.
      * @param vis the {@link prefuse.Visualization} to process
@@ -38,7 +38,7 @@ public abstract class EncoderAction extends ItemAction {
     public EncoderAction(Visualization vis) {
         super(vis);
     }
-    
+
     /**
      * Create a new EncoderAction that processes the specified group.
      * @param group the name of the group to process
@@ -46,7 +46,7 @@ public abstract class EncoderAction extends ItemAction {
     public EncoderAction(String group) {
         super(group);
     }
-    
+
     /**
      * Create a new EncoderAction that processes the specified group.
      * @param group the name of the group to process
@@ -55,7 +55,7 @@ public abstract class EncoderAction extends ItemAction {
     public EncoderAction(String group, Predicate filter) {
         super(group, filter);
     }
-    
+
     /**
      * Create a new EncoderAction that processes the specified group.
      * @param vis the {@link prefuse.Visualization} to process
@@ -64,7 +64,7 @@ public abstract class EncoderAction extends ItemAction {
     public EncoderAction(Visualization vis, String group) {
         super(vis, group);
     }
-    
+
     /**
      * Create a new EncoderAction that processes the specified group.
      * @param vis the {@link prefuse.Visualization} to process
@@ -74,32 +74,35 @@ public abstract class EncoderAction extends ItemAction {
     public EncoderAction(Visualization vis, String group, Predicate filter) {
         super(vis, group, filter);
     }
-    
+
     // ------------------------------------------------------------------------
 
     /**
      * Add a mapping rule to this EncoderAction. This method is protected,
      * subclasses should crate public add methods of their own to enforce
      * their own type constraints.
-     * @param p the rule Predicate 
+     * @param p the rule Predicate
      * @param value the value to map to
      */
     protected void add(Predicate p, Object value) {
-        if ( m_chain == null ) m_chain = new PredicateChain();
-        if ( value instanceof Action )
-            ((Action)value).setVisualization(m_vis);
+        if ( m_chain == null ) {
+			m_chain = new PredicateChain();
+		}
+        if ( value instanceof Action ) {
+			((Action)value).setVisualization(m_vis);
+		}
         m_chain.add(p, value);
     }
-    
+
     /**
      * Lookup the value mapped to by the given item.
      * @param item the item to lookup
      * @return the result of the rule lookup
      */
-    protected Object lookup(VisualItem item) {
-        return (m_chain == null ? null : m_chain.get(item));
+    protected Object lookup(VisualItem<?> item) {
+        return m_chain == null ? null : m_chain.get(item);
     }
-    
+
     /**
      * Remove all rule mappings from this encoder.
      */
@@ -108,7 +111,7 @@ public abstract class EncoderAction extends ItemAction {
             m_chain.clear();
         }
     }
-    
+
     /**
      * Remove rules using the given predicate from this encoder.
      * This method will not remove rules in which this predicate is used
@@ -118,35 +121,40 @@ public abstract class EncoderAction extends ItemAction {
      * @return true if a rule was successfully removed, false otherwise
      */
     public boolean remove(Predicate p) {
-        return ( m_chain != null ? m_chain.remove(p) : false );
+        return m_chain != null ? m_chain.remove(p) : false;
     }
-    
+
     /**
      * @see prefuse.action.Action#setVisualization(prefuse.Visualization)
      */
-    public void setVisualization(Visualization vis) {
+    @Override
+	public void setVisualization(Visualization vis) {
         super.setVisualization(vis);
-        if ( m_chain != null )
-            m_chain.getExpression().visit(new SetVisualizationVisitor());
+        if ( m_chain != null ) {
+			m_chain.getExpression().visit(new SetVisualizationVisitor());
+		}
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * @see prefuse.action.Action#run(double)
      */
-    public void run(double frac) {
+    @Override
+	public void run(double frac) {
         setup();
-        if ( m_chain != null )
-            m_chain.getExpression().visit(SetupVisitor.getInstance());
-        
+        if ( m_chain != null ) {
+			m_chain.getExpression().visit(SetupVisitor.getInstance());
+		}
+
         super.run(frac);
-        
-        if ( m_chain != null )
-            m_chain.getExpression().visit(FinishVisitor.getInstance());
+
+        if ( m_chain != null ) {
+			m_chain.getExpression().visit(FinishVisitor.getInstance());
+		}
         finish();
     }
-    
+
     /**
      * Perform any necessary setup before this encoder can be used. By default
      * does nothing. Subclasses can override this method to perform custom
@@ -155,7 +163,7 @@ public abstract class EncoderAction extends ItemAction {
     protected void setup() {
         // do nothing be default
     }
-    
+
     /**
      * Perform any necessary clean-up after this encoder can be used. By
      * default does nothing. Subclasses can override this method to perform
@@ -164,9 +172,9 @@ public abstract class EncoderAction extends ItemAction {
     protected void finish() {
         // do nothing be default
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Abstract class for processing the Actions stored in the predicate chain.
      */
@@ -174,25 +182,27 @@ public abstract class EncoderAction extends ItemAction {
         public void visitExpression(Expression expr) {
             if ( expr instanceof ObjectLiteral ) {
                 Object val = expr.get(null);
-                if ( val instanceof Action )
-                    visitAction(((Action)val));
+                if ( val instanceof Action ) {
+					visitAction(((Action)val));
+				}
             }
         }
         public abstract void visitAction(Action a);
         public void down() { /* do nothing */ }
         public void up()   { /* do nothing */ }
     }
-    
+
     /**
      * Sets the visualization status for any Actions contained within the
      * predicate chain.
      */
     private class SetVisualizationVisitor extends ActionVisitor {
-        public void visitAction(Action a) {
+        @Override
+		public void visitAction(Action a) {
             a.setVisualization(m_vis);
         }
     }
-    
+
     /**
      * Calls the "setup" method for any delegate actions contained within
      * the rule-mappings for this encoder.
@@ -200,16 +210,19 @@ public abstract class EncoderAction extends ItemAction {
     private static class SetupVisitor extends ActionVisitor {
         private static SetupVisitor s_instance;
         public static SetupVisitor getInstance() {
-            if ( s_instance == null )
-                s_instance = new SetupVisitor();
+            if ( s_instance == null ) {
+				s_instance = new SetupVisitor();
+			}
             return s_instance;
         }
-        public void visitAction(Action a) {
-            if ( a instanceof EncoderAction )
-                ((EncoderAction)a).setup();
+        @Override
+		public void visitAction(Action a) {
+            if ( a instanceof EncoderAction ) {
+				((EncoderAction)a).setup();
+			}
         }
     }
-    
+
     /**
      * Calls the "setup" method for any delegate actions contained within
      * the rule-mappings for this encoder.
@@ -217,14 +230,17 @@ public abstract class EncoderAction extends ItemAction {
     private static class FinishVisitor extends ActionVisitor {
         private static FinishVisitor s_instance;
         public static FinishVisitor getInstance() {
-            if ( s_instance == null )
-                s_instance = new FinishVisitor();
+            if ( s_instance == null ) {
+				s_instance = new FinishVisitor();
+			}
             return s_instance;
         }
-        public void visitAction(Action a) {
-            if ( a instanceof EncoderAction )
-                ((EncoderAction)a).setup();
+        @Override
+		public void visitAction(Action a) {
+            if ( a instanceof EncoderAction ) {
+				((EncoderAction)a).setup();
+			}
         }
     }
-    
+
 } // end of class EncoderAction

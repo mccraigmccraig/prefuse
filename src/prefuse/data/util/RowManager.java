@@ -10,38 +10,38 @@ import prefuse.util.collections.IntIterator;
  * Manages the set of valid rows for a Table instance, maintains an index of
  * the available and occupied rows. RowManager instances are used internally
  * by Table instances.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class RowManager {
 
-    protected Table m_table;
+    protected Table<?> m_table;
     private IntIntSortedMap m_openrows;
     private int m_firstid = 0;
     private int m_curid = -1;
-    
+
     // ------------------------------------------------------------------------
     // Constructor
-    
+
     /**
      * Create a new RowManager for the given Table.
      * @param table the Table to manage
      */
-    public RowManager(Table table) {
+    public RowManager(Table<?> table) {
         m_table = table;
     }
-    
+
     /**
      * Get the table managed by this RowManager.
      * @return the managed table
      */
-    public Table getTable() {
+    public Table<?> getTable() {
         return m_table;
     }
-    
+
     // ------------------------------------------------------------------------
     // Row Information Methods
-    
+
     /**
      * Get the lowest-numbered occupied table row.
      * @return the minimum row
@@ -57,16 +57,16 @@ public class RowManager {
     public int getMaximumRow() {
         return m_curid;
     }
-    
+
     /**
      * Get the total number of occupied rows
      * @return the number of rows being used by the table
      */
     public int getRowCount() {
-        return 1 + m_curid - m_firstid 
+        return 1 + m_curid - m_firstid
             - (m_openrows==null ? 0 : m_openrows.size());
     }
-    
+
     /**
      * Indicates if a given row value is a valid, occupied row of the table.
      * @param row the row index to check
@@ -74,13 +74,13 @@ public class RowManager {
      * it is an illegal value or is currently free
      */
     public boolean isValidRow(int row) {
-        return ( row >= m_firstid && row <=m_curid && 
-                (m_openrows == null || !m_openrows.containsKey(row)) );
+        return row >= m_firstid && row <=m_curid &&
+                (m_openrows == null || !m_openrows.containsKey(row));
     }
-    
+
     // ------------------------------------------------------------------------
     // Row Update Methods
-    
+
     /**
      * Clear the row manager status, marking all rows as available.
      */
@@ -89,7 +89,7 @@ public class RowManager {
         m_firstid = 0;
         m_curid = -1;
     }
-    
+
     /**
      * Add a new row to management. The lowest valued available row
      * will be used.
@@ -98,14 +98,14 @@ public class RowManager {
     public int addRow() {
         int r;
         if ( m_openrows == null || m_openrows.isEmpty() ) {
-            r = ( m_firstid == 0 ? ++m_curid : --m_firstid );
+            r = m_firstid == 0 ? ++m_curid : --m_firstid;
         } else {
             int key = m_openrows.firstKey();
             r = m_openrows.remove(key);
         }
         return r;
     }
-    
+
     /**
      * Release a row and mark it as free.
      * @param row the row index of the released row
@@ -122,16 +122,17 @@ public class RowManager {
         } else if ( row == m_firstid ) {
             ++m_firstid;
         } else {
-            if ( m_openrows == null )
-                m_openrows = new IntIntTreeMap(false);
+            if ( m_openrows == null ) {
+				m_openrows = new IntIntTreeMap(false);
+			}
             m_openrows.put(row, row);
         }
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Column Mapping
-    
+
     /**
      * Given Table row and column indices, return the corresponding row in
      * the underlying data column. This is of use for CascadedTable instances,
@@ -146,7 +147,7 @@ public class RowManager {
     public int getColumnRow(int row, int col) {
         return this.isValidRow(row) ? row : -1;
     }
-    
+
     /**
      * Given a column row index and a table column index, return the
      * table row corresponding to the column value. This is of use for
@@ -183,7 +184,7 @@ public class RowManager {
     public IntIterator columnRows(int col, boolean reverse) {
         return new ColumnRowIterator(rows(reverse), col);
     }
-    
+
     /**
      * Return an iterator over column row indices.
      * @param rows an iterator over table row indices
@@ -194,10 +195,10 @@ public class RowManager {
     public IntIterator columnRows(IntIterator rows, int col) {
         return new ColumnRowIterator(rows, col);
     }
-    
+
     // ------------------------------------------------------------------------
     // Iterators
-        
+
     /**
      * Get an iterator over the table rows.
      * @return an iterator over the table rows
@@ -205,7 +206,7 @@ public class RowManager {
     public IntIterator rows() {
         return new RowIterator(false);
     }
-    
+
     /**
      * Get an iterator over the table rows.
      * @param reverse indicates the direction to iterate over, true
@@ -215,7 +216,7 @@ public class RowManager {
     public IntIterator rows(boolean reverse) {
         return new RowIterator(reverse);
     }
-    
+
     /**
      * Iterator over the occupied rows of this RowManager.
      */
@@ -228,9 +229,10 @@ public class RowManager {
             next = advance(reverse ? m_curid : m_firstid);
         }
         public boolean hasNext() {
-            return ( reverse ? next >= 0 : next <= m_curid );
+            return reverse ? next >= 0 : next <= m_curid;
         }
-        public int nextInt() {
+        @Override
+		public int nextInt() {
             // advance the iterator
             last = next;
             next = advance(reverse ? --next : ++next);
@@ -240,24 +242,29 @@ public class RowManager {
             m_table.removeRow(last);
         }
         private final int advance(int idx) {
-            if ( m_openrows == null )
-                return idx;
-            else if ( reverse )
-                for (; idx >= 0 && m_openrows.containsKey(idx); --idx);
-            else
-                for (; idx <= m_curid && m_openrows.containsKey(idx); ++idx);
+            if ( m_openrows == null ) {
+				return idx;
+			} else if ( reverse ) {
+				for (; idx >= 0 && m_openrows.containsKey(idx); --idx) {
+					;
+				}
+			} else {
+				for (; idx <= m_curid && m_openrows.containsKey(idx); ++idx) {
+					;
+				}
+			}
             return idx;
         }
     } // end of inner class RowIterator
-    
+
     /**
      * Iterator over the indices into a given data column,
      * mapped to from the rows of this RowManager.
      */
     public class ColumnRowIterator extends IntIterator {
-        private IntIterator rows;
+        private final IntIterator rows;
         private int row;
-        private int col;
+        private final int col;
         public ColumnRowIterator(IntIterator rows, int col) {
             this.rows = rows;
             this.col = col;
@@ -265,7 +272,8 @@ public class RowManager {
         public boolean hasNext() {
             return rows.hasNext();
         }
-        public int nextInt() {
+        @Override
+		public int nextInt() {
             row = rows.nextInt();
             return getColumnRow(row, col);
         }
@@ -273,5 +281,5 @@ public class RowManager {
             m_table.removeRow(row);
         }
     } // end of inner class ColumnRowIterator
-    
+
 } // end of class RowManager

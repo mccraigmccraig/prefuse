@@ -6,11 +6,15 @@ import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.CubicCurve2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
-import prefuse.Constants;
+import prefuse.Alignment;
 import prefuse.util.ColorLib;
 import prefuse.util.GraphicsLib;
 import prefuse.util.StrokeLib;
@@ -24,35 +28,47 @@ import prefuse.visual.VisualItem;
  * cubic Bezier curves. Subclasses can override the
  * {@link #getCurveControlPoints(EdgeItem, Point2D[], double, double, double, double)}
  * method to provide custom control point assignment for such curves.</p>
- * 
+ *
  * <p>This class also supports arrows for directed edges. See the
- * {@link #setArrowType(int)} method for more.</p>
- * 
+ * {@link #setArrowType(EdgeArrowType)} method for more.</p>
+ *
  * @version 1.0
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class EdgeRenderer extends AbstractShapeRenderer {
-    
-    public static final String EDGE_TYPE = "edgeType";
-    
+
+	public static enum EdgeType {
+		LINE, CURVE, CURVE_VIA_EDGE;
+	}
+
+	public static enum EdgeArrowType {
+	    /** No arrows on edges */
+	    NONE,
+	    /** Arrows on edges pointing from source to target */
+	    FORWARD,
+	    /** Arrows on edges pointing from target to source */
+	    REVERSE
+
+	}
+
     protected static final double HALF_PI = Math.PI / 2;
-    
+
     protected Line2D       m_line  = new Line2D.Float();
     protected CubicCurve2D m_cubic = new CubicCurve2D.Float();
 
-    protected int     m_edgeType  = Constants.EDGE_TYPE_LINE;
-    protected int     m_xAlign1   = Constants.CENTER;
-    protected int     m_yAlign1   = Constants.CENTER;
-    protected int     m_xAlign2   = Constants.CENTER;
-    protected int     m_yAlign2   = Constants.CENTER;
+    protected EdgeType m_edgeType = EdgeType.LINE;
+    protected Alignment     m_xAlign1   = Alignment.CENTER;
+    protected Alignment     m_yAlign1   = Alignment.CENTER;
+    protected Alignment     m_xAlign2   = Alignment.CENTER;
+    protected Alignment     m_yAlign2   = Alignment.CENTER;
     protected double  m_width     = 1;
     protected float   m_curWidth  = 1;
     protected Point2D m_tmpPoints[]  = new Point2D[2];
     protected Point2D m_ctrlPoints[] = new Point2D[2];
     protected Point2D m_isctPoints[] = new Point2D[2];
-    
+
     // arrow head handling
-    protected int     m_edgeArrow   = Constants.EDGE_ARROW_FORWARD;
+    protected EdgeArrowType m_edgeArrow   = EdgeArrowType.FORWARD;
     protected int     m_arrowWidth  = 8;
     protected int     m_arrowHeight = 12;
     protected Polygon m_arrowHead   = updateArrowHead(
@@ -60,108 +76,122 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     protected AffineTransform m_arrowTrans = new AffineTransform();
     protected Shape   m_curArrow;
 
-    /**
+    protected float splineSlack = 0.2f;
+
+	/**
      * Create a new EdgeRenderer.
      */
     public EdgeRenderer() {
         m_tmpPoints[0]  = new Point2D.Float();
         m_tmpPoints[1]  = new Point2D.Float();
         m_ctrlPoints[0] = new Point2D.Float();
-        m_ctrlPoints[1] = new Point2D.Float();      
+        m_ctrlPoints[1] = new Point2D.Float();
         m_isctPoints[0] = new Point2D.Float();
-        m_isctPoints[1] = new Point2D.Float();      
+        m_isctPoints[1] = new Point2D.Float();
     }
 
     /**
      * Create a new EdgeRenderer with the given edge type.
-     * @param edgeType the edge type, one of
-     * {@link prefuse.Constants#EDGE_TYPE_LINE} or
-     * {@link prefuse.Constants#EDGE_TYPE_CURVE}.
+     * @param edgeType the edge type
      */
-    public EdgeRenderer(int edgeType) {
-        this(edgeType, Constants.EDGE_ARROW_FORWARD);
+    public EdgeRenderer(EdgeType edgeType) {
+        this(edgeType, EdgeArrowType.FORWARD);
     }
-    
+
     /**
      * Create a new EdgeRenderer with the given edge and arrow types.
-     * @param edgeType the edge type, one of
-     * {@link prefuse.Constants#EDGE_TYPE_LINE} or
-     * {@link prefuse.Constants#EDGE_TYPE_CURVE}.
-     * @param arrowType the arrow type, one of
-     * {@link prefuse.Constants#EDGE_ARROW_FORWARD},
-     * {@link prefuse.Constants#EDGE_ARROW_REVERSE}, or
-     * {@link prefuse.Constants#EDGE_ARROW_NONE}.
-     * @see #setArrowType(int)
+     * @param edgeType the edge type
+     * @param arrowType the arrow type
+     * @see #setArrowType(EdgeArrowType)
      */
-    public EdgeRenderer(int edgeType, int arrowType) {
+    public EdgeRenderer(EdgeType edgeType, EdgeArrowType arrowType) {
         this();
         setEdgeType(edgeType);
         setArrowType(arrowType);
     }
-    
+
     /**
      * @see prefuse.render.AbstractShapeRenderer#getRenderType(prefuse.visual.VisualItem)
      */
-    public int getRenderType(VisualItem item) {
-        return RENDER_TYPE_DRAW;
+    @Override
+	public RenderType getRenderType(VisualItem<?> item) {
+        return AbstractShapeRenderer.RenderType.DRAW;
     }
-    
+
     /**
      * @see prefuse.render.AbstractShapeRenderer#getRawShape(prefuse.visual.VisualItem)
      */
-    protected Shape getRawShape(VisualItem item) {
-        EdgeItem   edge = (EdgeItem)item;
-        VisualItem item1 = edge.getSourceItem();
-        VisualItem item2 = edge.getTargetItem();
-        
-        int type = m_edgeType;
-        
-        getAlignedPoint(m_tmpPoints[0], item1.getBounds(),
+    @Override
+	protected Shape getRawShape(VisualItem<?> item) {
+        EdgeItem<?,?>   edge = (EdgeItem<?,?>)item;
+        VisualItem<?> item1 = edge.getSourceItem();
+        VisualItem<?> item2 = edge.getTargetItem();
+
+        if(item1 != item2) {
+        	GraphicsLib.getAlignedPoint(m_tmpPoints[0], item1.getBounds(),
                         m_xAlign1, m_yAlign1);
-        getAlignedPoint(m_tmpPoints[1], item2.getBounds(),
+        	GraphicsLib.getAlignedPoint(m_tmpPoints[1], item2.getBounds(),
                         m_xAlign2, m_yAlign2);
+        } else {
+        	// use the center of the item when the items are the same
+        	GraphicsLib.getAlignedPoint(m_tmpPoints[0], item1.getBounds(),
+                    Alignment.CENTER, Alignment.CENTER);
+        	GraphicsLib.getAlignedPoint(m_tmpPoints[1], item2.getBounds(),
+        			Alignment.CENTER, Alignment.CENTER);
+        }
+
         m_curWidth = (float)(m_width * getLineWidth(item));
-        
+
         // create the arrow head, if needed
-        EdgeItem e = (EdgeItem)item;
-        if ( e.isDirected() && m_edgeArrow != Constants.EDGE_ARROW_NONE ) {
+        EdgeItem<?,?> e = (EdgeItem<?,?>)item;
+
+        if ( e.isDirected() && m_edgeArrow != EdgeArrowType.NONE ) {
             // get starting and ending edge endpoints
-            boolean forward = (m_edgeArrow == Constants.EDGE_ARROW_FORWARD);
-            Point2D start = null, end = null;
-            start = m_tmpPoints[forward?0:1];
-            end   = m_tmpPoints[forward?1:0];
-            
+            boolean forward = m_edgeArrow == EdgeArrowType.FORWARD;
+            Point2D start = m_edgeType == EdgeType.CURVE_VIA_EDGE ? new Point2D.Double(e.getX(), e.getY()) : m_tmpPoints[forward?0:1];
+            Point2D end   = m_tmpPoints[forward?1:0];
+
             // compute the intersection with the target bounding box
-            VisualItem dest = forward ? e.getTargetItem() : e.getSourceItem();
+            VisualItem<?> dest = forward ? e.getTargetItem() : e.getSourceItem();
             int i = GraphicsLib.intersectLineRectangle(start, end,
                     dest.getBounds(), m_isctPoints);
-            if ( i > 0 ) end = m_isctPoints[0];
-            
+            if ( i > 0 ) {
+				end = m_isctPoints[0];
+			}
+
             // create the arrow head shape
             AffineTransform at = getArrowTrans(start, end, m_curWidth);
             m_curArrow = at.createTransformedShape(m_arrowHead);
-            
+
             // update the endpoints for the edge shape
             // need to bias this by arrow head size
-            Point2D lineEnd = m_tmpPoints[forward?1:0]; 
+            Point2D lineEnd = m_tmpPoints[forward?1:0];
             lineEnd.setLocation(0, -m_arrowHeight);
             at.transform(lineEnd, lineEnd);
         } else {
             m_curArrow = null;
         }
-        
+
+        // draw self-referencing edges
+        if(item1 == item2) {
+			Ellipse2D m_ellipse = new Ellipse2D.Double();
+		    m_ellipse.setFrame(m_tmpPoints[0].getX(), m_tmpPoints[0].getY(), 40, 30);
+		    return m_ellipse;
+        }
+
         // create the edge shape
         Shape shape = null;
         double n1x = m_tmpPoints[0].getX();
         double n1y = m_tmpPoints[0].getY();
         double n2x = m_tmpPoints[1].getX();
         double n2y = m_tmpPoints[1].getY();
-        switch ( type ) {
-            case Constants.EDGE_TYPE_LINE:          
+
+		switch ( m_edgeType) {
+            case LINE:
                 m_line.setLine(n1x, n1y, n2x, n2y);
                 shape = m_line;
                 break;
-            case Constants.EDGE_TYPE_CURVE:
+            case CURVE:
                 getCurveControlPoints(edge, m_ctrlPoints,n1x,n1y,n2x,n2y);
                 m_cubic.setCurve(n1x, n1y,
                                 m_ctrlPoints[0].getX(), m_ctrlPoints[0].getY(),
@@ -169,10 +199,48 @@ public class EdgeRenderer extends AbstractShapeRenderer {
                                 n2x, n2y);
                 shape = m_cubic;
                 break;
+            case CURVE_VIA_EDGE:
+
+            	Point2D eLoc = new Point2D.Double(e.getX(), e.getY());
+
+            	List<Float> splinePoints = new ArrayList<Float>();
+
+            	splinePoints.add((float)n1x);
+            	splinePoints.add((float)n1y);
+
+            	Point2D[] intersect = new Point2D[2];
+                if(GraphicsLib.intersectLineRectangle(eLoc, m_tmpPoints[0],
+                        item1.getBounds(), intersect) > 0) {
+                	splinePoints.add((float)intersect[0].getX());
+                	splinePoints.add((float)intersect[0].getY());
+                }
+
+                splinePoints.add((float) e.getX());
+                splinePoints.add((float) e.getY());
+
+                if(GraphicsLib.intersectLineRectangle(eLoc, m_tmpPoints[1],
+                        item2.getBounds(), intersect) > 0) {
+                	splinePoints.add((float)intersect[0].getX());
+                	splinePoints.add((float)intersect[0].getY());
+                }
+
+            	splinePoints.add((float)n2x);
+            	splinePoints.add((float)n2y);
+
+                float[] pts = new float[splinePoints.size()];
+
+                int i = 0;
+                for(float pt : splinePoints) {
+                	pts[i++] = pt;
+                }
+
+            	GeneralPath gp = GraphicsLib.cardinalSpline(pts, splineSlack, false);
+            	shape = gp;
+            	break;
             default:
                 throw new IllegalStateException("Unknown edge type");
         }
-        
+
         // return the edge shape
         return shape;
     }
@@ -180,12 +248,13 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     /**
      * @see prefuse.render.Renderer#render(java.awt.Graphics2D, prefuse.visual.VisualItem)
      */
-    public void render(Graphics2D g, VisualItem item) {
+    @Override
+	public void render(Graphics2D g, VisualItem<?> item) {
         // render the edge line
         super.render(g, item);
         // render the edge arrow head, if appropriate
         if ( m_curArrow != null ) {
-            g.setPaint(ColorLib.getColor(item.getFillColor()));
+            g.setPaint(ColorLib.getColor(item.getStrokeColor()));
             g.fill(m_curArrow);
         }
     }
@@ -195,11 +264,11 @@ public class EdgeRenderer extends AbstractShapeRenderer {
      * to the position and orientation specified by the provided
      * line segment end points.
      */
-    protected AffineTransform getArrowTrans(Point2D p1, Point2D p2, 
+    protected AffineTransform getArrowTrans(Point2D p1, Point2D p2,
                                             double width)
     {
         m_arrowTrans.setToTranslation(p2.getX(), p2.getY());
-        m_arrowTrans.rotate(-HALF_PI + 
+        m_arrowTrans.rotate(-HALF_PI +
             Math.atan2(p2.getY()-p1.getY(), p2.getX()-p1.getX()));
         if ( width > 1 ) {
             double scalar = width/4;
@@ -207,7 +276,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
         }
         return m_arrowTrans;
     }
-    
+
     /**
      * Update the dimensions of the arrow head, creating a new
      * arrow head if necessary. The return value is also set
@@ -228,20 +297,22 @@ public class EdgeRenderer extends AbstractShapeRenderer {
         m_arrowHead.addPoint(0, 0);
         return m_arrowHead;
     }
-        
-    
+
+
 
     /**
      * @see prefuse.render.AbstractShapeRenderer#getTransform(prefuse.visual.VisualItem)
      */
-    protected AffineTransform getTransform(VisualItem item) {
+    @Override
+	protected AffineTransform getTransform(VisualItem<?> item) {
         return null;
     }
-    
+
     /**
      * @see prefuse.render.Renderer#locatePoint(java.awt.geom.Point2D, prefuse.visual.VisualItem)
      */
-    public boolean locatePoint(Point2D p, VisualItem item) {
+    @Override
+	public boolean locatePoint(Point2D p, VisualItem<?> item) {
         Shape s = getShape(item);
         if ( s == null ) {
             return false;
@@ -253,21 +324,24 @@ public class EdgeRenderer extends AbstractShapeRenderer {
                                 width,width);
         }
     }
-    
+
     /**
      * @see prefuse.render.Renderer#setBounds(prefuse.visual.VisualItem)
      */
-    public void setBounds(VisualItem item) {
-        if ( !m_manageBounds ) return;
+    @Override
+	public void calculateBounds(VisualItem<?> item, Rectangle2D bounds) {
+        if ( !m_manageBounds ) {
+        	bounds.setRect(item.getX(), item.getY(), 0, 0);
+			return;
+		}
         Shape shape = getShape(item);
         if ( shape == null ) {
-            item.setBounds(item.getX(), item.getY(), 0, 0);
-            return;
+        	bounds.setRect(item.getX(), item.getY(), 0, 0);
+			return;
         }
-        GraphicsLib.setBounds(item, shape, getStroke(item));
+        GraphicsLib.calculateBounds(item, shape, getStroke(item), bounds);
         if ( m_curArrow != null ) {
-            Rectangle2D bbox = (Rectangle2D)item.get(VisualItem.BOUNDS);
-            Rectangle2D.union(bbox, m_curArrow.getBounds2D(), bbox);
+            Rectangle2D.union(bounds, m_curArrow.getBounds2D(), bounds);
         }
     }
 
@@ -281,10 +355,10 @@ public class EdgeRenderer extends AbstractShapeRenderer {
      * @param item the VisualItem for which to determine the line width
      * @return the desired line width, in pixels
      */
-    protected double getLineWidth(VisualItem item) {
+    protected double getLineWidth(VisualItem<?> item) {
         return item.getSize();
     }
-    
+
     /**
      * Returns the stroke value returned by {@link VisualItem#getStroke()},
      * scaled by the current line width
@@ -294,12 +368,13 @@ public class EdgeRenderer extends AbstractShapeRenderer {
      * member variable, which caches the result of <code>getLineWidth</code>.
      * @see prefuse.render.AbstractShapeRenderer#getStroke(prefuse.visual.VisualItem)
      */
-    protected BasicStroke getStroke(VisualItem item) {
+    @Override
+	protected BasicStroke getStroke(VisualItem<?> item) {
         return StrokeLib.getDerivedStroke(item.getStroke(), m_curWidth);
     }
 
     /**
-     * Determines the control points to use for cubic (Bezier) curve edges. 
+     * Determines the control points to use for cubic (Bezier) curve edges.
      * Override this method to provide custom curve specifications.
      * To reduce object initialization, the entries of the Point2D array are
      * already initialized, so use the <tt>Point2D.setLocation()</tt> method rather than
@@ -311,83 +386,47 @@ public class EdgeRenderer extends AbstractShapeRenderer {
      * @param x2 the x co-ordinate of the second node this edge connects to
      * @param y2 the y co-ordinate of the second node this edge connects to
      */
-    protected void getCurveControlPoints(EdgeItem eitem, Point2D[] cp, 
-                    double x1, double y1, double x2, double y2) 
+    protected void getCurveControlPoints(EdgeItem<?,?> eitem, Point2D[] cp,
+                    double x1, double y1, double x2, double y2)
     {
-        double dx = x2-x1, dy = y2-y1;      
+        double dx = x2-x1, dy = y2-y1;
         cp[0].setLocation(x1+2*dx/3,y1);
         cp[1].setLocation(x2-dx/8,y2-dy/8);
     }
 
     /**
-     * Helper method, which calculates the top-left co-ordinate of a rectangle
-     * given the rectangle's alignment.
+     * Returns the type of the drawn edge.
+     * @return the edge type
      */
-    protected static void getAlignedPoint(Point2D p, Rectangle2D r, int xAlign, int yAlign) {
-        double x = r.getX(), y = r.getY(), w = r.getWidth(), h = r.getHeight();
-        if ( xAlign == Constants.CENTER ) {
-            x = x+(w/2);
-        } else if ( xAlign == Constants.RIGHT ) {
-            x = x+w;
-        }
-        if ( yAlign == Constants.CENTER ) {
-            y = y+(h/2);
-        } else if ( yAlign == Constants.BOTTOM ) {
-            y = y+h;
-        }
-        p.setLocation(x,y);
+    public EdgeType getEdgeType() {
+        return m_edgeType;
     }
 
     /**
-     * Returns the type of the drawn edge. This is one of
-     * {@link prefuse.Constants#EDGE_TYPE_LINE} or
-     * {@link prefuse.Constants#EDGE_TYPE_CURVE}.
-     * @return the edge type
-     */
-    public int getEdgeType() {
-        return m_edgeType;
-    }
-    
-    /**
-     * Sets the type of the drawn edge. This must be one of
-    * {@link prefuse.Constants#EDGE_TYPE_LINE} or
-    * {@link prefuse.Constants#EDGE_TYPE_CURVE}.
+     * Sets the type of the drawn edge.
+     *
      * @param type the new edge type
      */
-    public void setEdgeType(int type) {
-        if ( type < 0 || type >= Constants.EDGE_TYPE_COUNT )
-            throw new IllegalArgumentException(
-                    "Unrecognized edge curve type: "+type);
+    public void setEdgeType(EdgeType type) {
         m_edgeType = type;
     }
-    
+
     /**
-     * Returns the type of the drawn edge. This is one of
-     * {@link prefuse.Constants#EDGE_ARROW_FORWARD},
-     * {@link prefuse.Constants#EDGE_ARROW_REVERSE}, or
-     * {@link prefuse.Constants#EDGE_ARROW_NONE}.
-     * @return the edge type
+     * Returns the type of the drawn edge.
      */
-    public int getArrowType() {
+    public EdgeArrowType getArrowType() {
         return m_edgeArrow;
     }
-    
+
     /**
-     * Sets the type of the drawn edge. This is either
-     * {@link prefuse.Constants#EDGE_ARROW_NONE} for no edge arrows,
-     * {@link prefuse.Constants#EDGE_ARROW_FORWARD} for arrows from source to
-     *  target on directed edges, or
-     * {@link prefuse.Constants#EDGE_ARROW_REVERSE} for arrows from target to
-     *  source on directed edges.
+     * Sets the type of the drawn edge.
+     *
      * @param type the new arrow type
      */
-    public void setArrowType(int type) {
-        if ( type < 0 || type >= Constants.EDGE_ARROW_COUNT )
-            throw new IllegalArgumentException(
-                    "Unrecognized edge arrow type: "+type);
+    public void setArrowType(EdgeArrowType type) {
         m_edgeArrow = type;
     }
-    
+
     /**
      * Sets the dimensions of an arrow head for a directed edge. This specifies
      * the pixel dimensions when both the zoom level and the size factor
@@ -402,7 +441,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
         m_arrowHeight = height;
         m_arrowHead = updateArrowHead(width, height);
     }
-    
+
     /**
      * Get the height of the untransformed arrow head. This is the distance,
      * in pixels, from the tip of the arrow to its base.
@@ -420,85 +459,73 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     public int getArrowHeadWidth() {
         return m_arrowWidth;
     }
-    
+
     /**
      * Get the horizontal aligment of the edge mount point with the first node.
-     * @return the horizontal alignment, one of {@link prefuse.Constants#LEFT},
-     * {@link prefuse.Constants#RIGHT}, or {@link prefuse.Constants#CENTER}.
+     * @return the horizontal alignment
      */
-    public int getHorizontalAlignment1() {
+    public Alignment getHorizontalAlignment1() {
         return m_xAlign1;
     }
-    
+
     /**
      * Get the vertical aligment of the edge mount point with the first node.
-     * @return the vertical alignment, one of {@link prefuse.Constants#TOP},
-     * {@link prefuse.Constants#BOTTOM}, or {@link prefuse.Constants#CENTER}.
+     * @return the vertical alignment
      */
-    public int getVerticalAlignment1() {
+    public Alignment getVerticalAlignment1() {
         return m_yAlign1;
     }
 
     /**
      * Get the horizontal aligment of the edge mount point with the second
      * node.
-     * @return the horizontal alignment, one of {@link prefuse.Constants#LEFT},
-     * {@link prefuse.Constants#RIGHT}, or {@link prefuse.Constants#CENTER}.
+     * @return the horizontal alignment
      */
-    public int getHorizontalAlignment2() {
+    public Alignment getHorizontalAlignment2() {
         return m_xAlign2;
     }
-    
+
     /**
      * Get the vertical aligment of the edge mount point with the second node.
-     * @return the vertical alignment, one of {@link prefuse.Constants#TOP},
-     * {@link prefuse.Constants#BOTTOM}, or {@link prefuse.Constants#CENTER}.
+     * @return the vertical alignment
      */
-    public int getVerticalAlignment2() {
+    public Alignment getVerticalAlignment2() {
         return m_yAlign2;
     }
-    
+
     /**
      * Set the horizontal aligment of the edge mount point with the first node.
-     * @param align the horizontal alignment, one of 
-     * {@link prefuse.Constants#LEFT}, {@link prefuse.Constants#RIGHT}, or
-     * {@link prefuse.Constants#CENTER}.
+     * @param align the horizontal alignment
      */
-    public void setHorizontalAlignment1(int align) {
+    public void setHorizontalAlignment1(Alignment align) {
         m_xAlign1 = align;
     }
-    
+
     /**
      * Set the vertical aligment of the edge mount point with the first node.
-     * @param align the vertical alignment, one of
-     * {@link prefuse.Constants#TOP}, {@link prefuse.Constants#BOTTOM}, or
-     * {@link prefuse.Constants#CENTER}.
+     * @param align the vertical alignment
      */
-    public void setVerticalAlignment1(int align) {
+    public void setVerticalAlignment1(Alignment align) {
         m_yAlign1 = align;
     }
 
     /**
      * Set the horizontal aligment of the edge mount point with the second
      * node.
-     * @param align the horizontal alignment, one of
-     * {@link prefuse.Constants#LEFT}, {@link prefuse.Constants#RIGHT}, or
-     * {@link prefuse.Constants#CENTER}.
+     * @param align the horizontal alignment
      */
-    public void setHorizontalAlignment2(int align) {
+    public void setHorizontalAlignment2(Alignment align) {
         m_xAlign2 = align;
     }
-    
+
     /**
      * Set the vertical aligment of the edge mount point with the second node.
-     * @param align the vertical alignment, one of
-     * {@link prefuse.Constants#TOP}, {@link prefuse.Constants#BOTTOM}, or
-     * {@link prefuse.Constants#CENTER}.
+     * @param align the vertical alignment
      */
-    public void setVerticalAlignment2(int align) {
+    public void setVerticalAlignment2(Alignment align) {
         m_yAlign2 = align;
     }
-    
+
     /**
      * Sets the default width of lines. This width value will
      * be scaled by the value of an item's size data field. The default
@@ -508,7 +535,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     public void setDefaultLineWidth(double w) {
         m_width = w;
     }
-    
+
     /**
      * Gets the default width of lines. This width value that will
      * be scaled by the value of an item's size data field. The default
@@ -518,5 +545,14 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     public double getDefaultLineWidth() {
         return m_width;
     }
+
+    public float getSplineSlack() {
+		return splineSlack;
+	}
+
+	public void setSplineSlack(float splineSlack) {
+		this.splineSlack = splineSlack;
+	}
+
 
 } // end of class EdgeRenderer

@@ -17,21 +17,21 @@ import prefuse.data.util.Index;
  * the results in prefuse Table instances. This class should not be
  * instantiated directly. To access a database, the {@link ConnectionFactory}
  * class should be used to retrieve an appropriate instance of this class.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class DatabaseDataSource {
 
     // logger
-    private static final Logger s_logger 
+    private static final Logger s_logger
         = Logger.getLogger(DatabaseDataSource.class.getName());
-    
+
     protected Connection       m_conn;
     protected Statement        m_stmt;
     protected SQLDataHandler m_handler;
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Creates a new DatabaseDataSource for reading data from a SQL relational
      * database. This constructor is only package visible and is not intended
@@ -43,18 +43,18 @@ public class DatabaseDataSource {
         m_conn = conn;
         m_handler = handler;
     }
-    
+
     // ------------------------------------------------------------------------
     // Synchronous Data Retrieval
-    
+
     /**
      * Executes a query and returns the results in a Table instance.
      * @param query the text SQL query to execute
      * @return a Table of the query results
-     * @throws DataIOException if an error occurs while executing the query 
+     * @throws DataIOException if an error occurs while executing the query
      * or adding the query results in a prefuse Table.
      */
-    public synchronized Table getData(String query) throws DataIOException {
+    public synchronized Table<?> getData(String query) throws DataIOException {
         return getData(null, query, null);
     }
 
@@ -64,30 +64,30 @@ public class DatabaseDataSource {
      * @param keyField the field to treat as a primary key, ensuring that this
      *  field is indexed in the resulting table instance.
      * @return a Table of the query results
-     * @throws DataIOException if an error occurs while executing the query 
+     * @throws DataIOException if an error occurs while executing the query
      * or adding the query results in a prefuse Table.
      */
-    public synchronized Table getData(String query, String keyField)
+    public synchronized Table<?> getData(String query, String keyField)
         throws DataIOException
     {
         return getData(null, query, keyField);
     }
-    
+
     /**
      * Executes a query and returns the results in a Table instance.
      * @param t the Table to store the results in. If this value is null, a
      * new table will automatically be created.
      * @param query the text SQL query to execute
      * @return a Table of the query results
-     * @throws DataIOException if an error occurs while executing the query 
+     * @throws DataIOException if an error occurs while executing the query
      * or adding the query results in a prefuse Table.
      */
-    public synchronized Table getData(Table t, String query) 
+    public synchronized Table<?> getData(Table<?> t, String query)
         throws DataIOException
     {
         return getData(t, query, null);
     }
-    
+
     /**
      * Executes a query and returns the results in a Table instance.
      * @param t the Table to store the results in. If this value is null, a
@@ -95,15 +95,15 @@ public class DatabaseDataSource {
      * @param query the text SQL query to execute
      * @param keyField used to determine if the row already exists in the table
      * @return a Table of the query results
-     * @throws DataIOException if an error occurs while executing the query 
+     * @throws DataIOException if an error occurs while executing the query
      * or adding the query results in a prefuse Table.
      */
-    public synchronized Table getData(Table t, String query, String keyField) 
+    public synchronized Table<?> getData(Table<?> t, String query, String keyField)
         throws DataIOException
     {
         return getData(t, query, keyField, null);
     }
-    
+
     /**
      * Executes a query and returns the results in a Table instance.
      * @param t the Table to store the results in. If this value is null, a
@@ -114,11 +114,11 @@ public class DatabaseDataSource {
      *  processing. This lock will be synchronized on whenever the Table is
      *  modified.
      * @return a Table of the query results
-     * @throws DataIOException if an error occurs while executing the query 
+     * @throws DataIOException if an error occurs while executing the query
      * or adding the query results in a prefuse Table.
      */
-    public synchronized Table getData(Table t, String query, 
-                                      String keyField, Object lock) 
+    public synchronized Table<?> getData(Table<?> t, String query,
+                                      String keyField, Object lock)
         throws DataIOException
     {
         ResultSet rs;
@@ -129,23 +129,23 @@ public class DatabaseDataSource {
         }
         return process(t, rs, keyField, lock);
     }
-    
+
     // ------------------------------------------------------------------------
     // Asynchronous Data Retrieval
 
     /**
-     * Asynchronously executes a query and stores the results in the given 
+     * Asynchronously executes a query and stores the results in the given
      * table instance. All data processing is done in a separate thread of
      * execution.
      * @param t the Table in which to store the results
      * @param query the query to execute
      */
-    public void loadData(Table t, String query) {
+    public void loadData(Table<?> t, String query) {
         loadData(t, query, null, null, null);
     }
 
     /**
-     * Asynchronously executes a query and stores the results in the given 
+     * Asynchronously executes a query and stores the results in the given
      * table instance. All data processing is done in a separate thread of
      * execution.
      * @param t the Table in which to store the results
@@ -153,12 +153,12 @@ public class DatabaseDataSource {
      * @param keyField the primary key field, comparisons on this field are
      *  performed to recognize data records already present in the table.
      */
-    public void loadData(Table t, String query, String keyField) {
+    public void loadData(Table<?> t, String query, String keyField) {
         loadData(t, query, keyField, null, null);
     }
-    
+
     /**
-     * Asynchronously executes a query and stores the results in the given 
+     * Asynchronously executes a query and stores the results in the given
      * table instance. All data processing is done in a separate thread of
      * execution.
      * @param t the Table in which to store the results
@@ -167,12 +167,12 @@ public class DatabaseDataSource {
      *  processing. This lock will be synchronized on whenever the Table is
      *  modified.
      */
-    public void loadData(Table t, String query, Object lock) {
+    public void loadData(Table<?> t, String query, Object lock) {
         loadData(t, query, null, lock, null);
     }
-    
+
     /**
-     * Asynchronously executes a query and stores the results in the given 
+     * Asynchronously executes a query and stores the results in the given
      * table instance. All data processing is done in a separate thread of
      * execution.
      * @param t the Table in which to store the results
@@ -183,12 +183,12 @@ public class DatabaseDataSource {
      *  processing. This lock will be synchronized on whenever the Table is
      *  modified.
      */
-    public void loadData(Table t, String query, String keyField, Object lock) {
+    public void loadData(Table<?> t, String query, String keyField, Object lock) {
         loadData(t, query, keyField, lock, null);
     }
-    
+
     /**
-     * Asynchronously executes a query and stores the results in the given 
+     * Asynchronously executes a query and stores the results in the given
      * table instance. All data processing is done in a separate thread of
      * execution.
      * @param t the Table in which to store the results
@@ -200,18 +200,18 @@ public class DatabaseDataSource {
      *  processing. This lock will be synchronized on whenever the Table is
      *  modified. A null value will result in no locking.
      * @param listener an optional listener that will provide notifications
-     *  before the query has been issued and after the query has been 
+     *  before the query has been issued and after the query has been
      *  processed. This is most useful for post-processing operations.
      */
-    public void loadData(Table t, String query, String keyField, 
+    public void loadData(Table<?> t, String query, String keyField,
                          Object lock, DataSourceWorker.Listener listener) {
         DataSourceWorker.Entry e = new DataSourceWorker.Entry(
                 this, t, query, keyField, lock, listener);
         DataSourceWorker.submit(e);
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Execute a query and return the corresponding result set
      * @param query the text SQL query to execute
@@ -219,25 +219,26 @@ public class DatabaseDataSource {
      * @throws SQLException if an error occurs issuing the query
      */
     private ResultSet executeQuery(String query) throws SQLException {
-        if ( m_stmt == null )
-            m_stmt = m_conn.createStatement();
-        
+        if ( m_stmt == null ) {
+			m_stmt = m_conn.createStatement();
+		}
+
         // clock in
         long timein = System.currentTimeMillis();
-        
+
         s_logger.info("Issuing query: "+query);
         ResultSet rset = m_stmt.executeQuery(query);
-        
+
         // clock out
         long time = System.currentTimeMillis()-timein;
         s_logger.info("External query processing completed: "
-                + (time/1000) + "." + (time%1000) + " seconds.");
-        
+                + time/1000 + "." + time%1000 + " seconds.");
+
         return rset;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Process the results of a SQL query, putting retrieved data into a
      * Table instance. If a null table is provided, a new table with the
@@ -246,7 +247,7 @@ public class DatabaseDataSource {
      * @param rset the SQL query result set
      * @return a Table containing the query results
      */
-    protected Table process(Table t, ResultSet rset, String key, Object lock)
+    protected Table<?> process(Table<?> t, ResultSet rset, String key, Object lock)
         throws DataIOException
     {
         // clock in
@@ -256,10 +257,10 @@ public class DatabaseDataSource {
         try {
             ResultSetMetaData metadata = rset.getMetaData();
             int ncols = metadata.getColumnCount();
-    
+
             // create a new table if necessary
             if ( t == null ) {
-                t = getSchema(metadata, m_handler).instantiate();
+                t = Table.createTable(getSchema(metadata, m_handler));
                 if ( key != null ) {
                     try {
                         t.index(key);
@@ -271,8 +272,8 @@ public class DatabaseDataSource {
             }
 
             // set the lock, lock on the table itself if nothing else provided
-            lock = (lock==null ? t : lock);
-            
+            lock = lock==null ? t : lock;
+
             // process the returned rows
             while ( rset.next() )
             {
@@ -282,28 +283,28 @@ public class DatabaseDataSource {
                     if ( row < 0 ) {
                         row = t.addRow();
                     }
-                    
+
                     //process each value in the current row
                     for ( int i=1; i<=ncols; ++i ) {
                         m_handler.process(t, row, rset, i);
                     }
                 }
-                
+
                 // increment row count
                 ++count;
             }
         } catch ( SQLException e ) {
             throw new DataIOException(e);
         }
-        
+
         // clock out
         long time = System.currentTimeMillis()-timein;
         s_logger.info("Internal query processing completed: "+count+" rows, "
-                + (time/1000) + "." + (time%1000) + " seconds.");
-        
+                + time/1000 + "." + time%1000 + " seconds.");
+
         return t;
     }
-    
+
     /**
      * See if a retrieved database row is already represented in the given
      * Table.
@@ -314,18 +315,20 @@ public class DatabaseDataSource {
      * @return the index of the existing row, or -1 if no match is found
      * @throws SQLException
      */
-    protected int getExistingRow(Table t, ResultSet rset, String keyField)
+    protected int getExistingRow(Table<?> t, ResultSet rset, String keyField)
         throws SQLException
     {
         // check if we have a keyField, bail if not
-        if ( keyField == null )
-            return -1;
-        
+        if ( keyField == null ) {
+			return -1;
+		}
+
         // retrieve the column data type, bail if column is not found
-        Class type = t.getColumnType(keyField);
-        if ( type == null )
-            return -1;
-        
+        Class<?> type = t.getColumnType(keyField);
+        if ( type == null ) {
+			return -1;
+		}
+
         // get the index and perform the lookup
         Index index = t.index(keyField);
         if ( type == int.class ) {
@@ -342,7 +345,7 @@ public class DatabaseDataSource {
             return -1;
         }
     }
-    
+
     /**
      * Given the metadata for a SQL result set and a data value handler for that
      * result set, returns a corresponding schema for a prefuse table.
@@ -356,16 +359,17 @@ public class DatabaseDataSource {
     {
         int ncols = metadata.getColumnCount();
         Schema schema = new Schema(ncols);
-        
+
         // determine the table schema
         for ( int i=1; i<=ncols; ++i ) {
             String name = metadata.getColumnName(i);
             int sqlType = metadata.getColumnType(i);
-            Class type = handler.getDataType(name, sqlType);
-            if ( type != null )
-                schema.addColumn(name, type);
+            Class<?> type = handler.getDataType(name, sqlType);
+            if ( type != null ) {
+				schema.addColumn(name, type);
+			}
         }
-        
+
         return schema;
     }
 

@@ -20,18 +20,18 @@ import prefuse.visual.VisualItem;
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class ZoomControl extends AbstractZoomControl {
-    
+
     private int yLast;
-    private Point2D down = new Point2D.Float();
-    private int button = RIGHT_MOUSE_BUTTON; 
-    
+    private final Point2D down = new Point2D.Float();
+    private int button = RIGHT_MOUSE_BUTTON;
+
     /**
      * Create a new zoom control.
      */
     public ZoomControl() {
         // do nothing
     }
-    
+
     /**
      * Create a new zoom control.
      * @param mouseButton the mouse button that should initiate a zoom. One of
@@ -41,11 +41,12 @@ public class ZoomControl extends AbstractZoomControl {
     public ZoomControl(int mouseButton) {
         button = mouseButton;
     }
-    
+
     /**
      * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
      */
-    public void mousePressed(MouseEvent e) {
+    @Override
+	public void mousePressed(MouseEvent e) {
         if ( UILib.isButtonPressed(e, button) ) {
             Display display = (Display)e.getComponent();
             if (display.isTranformInProgress()) {
@@ -59,28 +60,30 @@ public class ZoomControl extends AbstractZoomControl {
             yLast = e.getY();
         }
     }
-    
+
     /**
      * @see java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent)
      */
-    public void mouseDragged(MouseEvent e) {
+    @Override
+	public void mouseDragged(MouseEvent e) {
         if ( UILib.isButtonPressed(e, button) ) {
             Display display = (Display)e.getComponent();
             if (display.isTranformInProgress() || yLast == -1) {
                 yLast = -1;
                 return;
             }
-            
+
             int y = e.getY();
             int dy = y-yLast;
-            double zoom = 1 + ((double)dy) / 100;
-            
+            double zoom = 1 + (double)dy / 100;
+
             int status = zoom(display, down, zoom, true);
             int cursor = Cursor.N_RESIZE_CURSOR;
-            if ( status == NO_ZOOM )
-                cursor = Cursor.WAIT_CURSOR;
+            if ( status == NO_ZOOM ) {
+				cursor = Cursor.WAIT_CURSOR;
+			}
             display.setCursor(Cursor.getPredefinedCursor(cursor));
-            
+
             yLast = y;
         }
     }
@@ -88,34 +91,41 @@ public class ZoomControl extends AbstractZoomControl {
     /**
      * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
      */
-    public void mouseReleased(MouseEvent e) {
+    @Override
+	public void mouseReleased(MouseEvent e) {
         if ( UILib.isButtonPressed(e, button) ) {
             e.getComponent().setCursor(Cursor.getDefaultCursor());
         }
     }
-    
+
     /**
      * @see prefuse.controls.Control#itemPressed(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
      */
-    public void itemPressed(VisualItem item, MouseEvent e) {
-        if ( m_zoomOverItem )
-            mousePressed(e);
+    @Override
+	public void itemPressed(VisualItem<?> item, MouseEvent e) {
+        if ( m_zoomOverItem ) {
+			mousePressed(e);
+		}
     }
 
     /**
      * @see prefuse.controls.Control#itemDragged(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
      */
-    public void itemDragged(VisualItem item, MouseEvent e) {
-        if ( m_zoomOverItem )
-            mouseDragged(e);
+    @Override
+	public void itemDragged(VisualItem<?> item, MouseEvent e) {
+        if ( m_zoomOverItem ) {
+			mouseDragged(e);
+		}
     }
-    
+
     /**
      * @see prefuse.controls.Control#itemReleased(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
      */
-    public void itemReleased(VisualItem item, MouseEvent e) {
-        if ( m_zoomOverItem )
-            mouseReleased(e);
+    @Override
+	public void itemReleased(VisualItem<?> item, MouseEvent e) {
+        if ( m_zoomOverItem ) {
+			mouseReleased(e);
+		}
     }
-    
+
 } // end of class ZoomControl

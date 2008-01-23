@@ -1,19 +1,20 @@
 package prefuse.action;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import prefuse.Visualization;
 import prefuse.activity.Activity;
-import prefuse.util.collections.CopyOnWriteArrayList;
 
 /**
  * Abstract base class for Action implementations that hold a collection
  * of subclasses.
- *  
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public abstract class CompositeAction extends Action {
 
-    protected CopyOnWriteArrayList m_actions = new CopyOnWriteArrayList();
-    
+    protected CopyOnWriteArrayList<Action> m_actions = new CopyOnWriteArrayList<Action>();
+
     /**
      * Creates a new run-once CompositeAction.
      */
@@ -29,7 +30,7 @@ public abstract class CompositeAction extends Action {
     public CompositeAction(Visualization vis) {
         super(vis, 0);
     }
-    
+
     /**
      * Creates a new CompositeAction of specified duration and default
      * step time of 20 milliseconds.
@@ -38,7 +39,7 @@ public abstract class CompositeAction extends Action {
     public CompositeAction(long duration) {
         super(null, duration, Activity.DEFAULT_STEP_TIME);
     }
-    
+
     /**
      * Creates a new CompositeAction of specified duration and default
      * step time of 20 milliseconds that processes the given
@@ -49,7 +50,7 @@ public abstract class CompositeAction extends Action {
     public CompositeAction(Visualization vis, long duration) {
         super(vis, duration, Activity.DEFAULT_STEP_TIME);
     }
-    
+
     /**
      * Creates a new CompositeAction of specified duration and step time.
      * @param duration the duration of this Activity, in milliseconds
@@ -59,22 +60,23 @@ public abstract class CompositeAction extends Action {
     public CompositeAction(long duration, long stepTime) {
         super(null, duration, stepTime);
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Set the Visualization processed by this Action. This also calls
      * {@link Action#setVisualization(Visualization)} on all Action instances
      * contained within this composite.
      * @param vis the {@link prefuse.Visualization} to process
      */
-    public void setVisualization(Visualization vis) {
+    @Override
+	public void setVisualization(Visualization vis) {
         super.setVisualization(vis);
         for ( int i=0; i<m_actions.size(); ++i ) {
             get(i).setVisualization(vis);
         }
     }
-    
+
     /**
      * Returns the number of Actions in the composite.
      * @return the size of this composite
@@ -82,7 +84,7 @@ public abstract class CompositeAction extends Action {
     public int size() {
         return m_actions.size();
     }
-    
+
     /**
      * Adds an Action to the end of the composite list.
      * @param a the Action instance to add
@@ -90,7 +92,7 @@ public abstract class CompositeAction extends Action {
     public void add(Action a) {
         m_actions.add(a);
     }
-    
+
     /**
      * Adds an Action at the given index.
      * @param i the index at which to add the Action
@@ -99,16 +101,16 @@ public abstract class CompositeAction extends Action {
     public void add(int i, Action a) {
         m_actions.add(i, a);
     }
-    
+
     /**
      * Returns the Action at the specified index.
      * @param i the index
      * @return the requested Action
      */
     public Action get(int i) {
-        return (Action)m_actions.get(i);
+        return m_actions.get(i);
     }
-    
+
     /**
      * Removes a given Action from the composite.
      * @param a the Action to remove
@@ -117,14 +119,14 @@ public abstract class CompositeAction extends Action {
     public boolean remove(Action a) {
         return m_actions.remove(a);
     }
-    
+
     /**
      * Removes the Action at the specified index.
      * @param i the index
      * @return the removed Action
      */
     public Action remove(int i) {
-        return (Action)m_actions.remove(i);
+        return m_actions.remove(i);
     }
-    
+
 } // end of class CompositeAction

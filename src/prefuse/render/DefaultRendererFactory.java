@@ -10,7 +10,7 @@ import prefuse.visual.VisualItem;
 /**
  * <p>Default factory implementation from which to retrieve VisualItem
  * renderers.</p>
- * 
+ *
  * <p>
  * This class supports the use of a default renderer for EdgeItems (the default
  * edge renderer) and another for all other non-edge VisualItems (the default
@@ -19,11 +19,11 @@ import prefuse.visual.VisualItem;
  * for matching items. Predicate/Renderer mappings are checked in the order in
  * which they were added to the factory.
  * </p>
- * 
+ *
  * <p>If left unspecified, a {@link ShapeRenderer} is used as the default
  * item renderer and an {@link EdgeRenderer} instance is used as the default
  * edge renderer.</p>
- * 
+ *
  * <p>For example, the following code snippet creates a new
  * DefaultRendererFactory, changes the default edge renderer to be an
  * EdgeRenderer using curved edges, and adds a new rule which maps items in
@@ -34,15 +34,15 @@ import prefuse.visual.VisualItem;
  *   rf.setDefaultEdgeRenderer(new EdgeRenderer(Constants.EDGE_TYPE_CURVE);
  *   rf.add("INGROUP('data')", new LabelRenderer("label");
  * </pre>
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class DefaultRendererFactory implements RendererFactory {
 
-    private PredicateChain m_chain = new PredicateChain();
+    private final PredicateChain m_chain = new PredicateChain();
     private Renderer m_itemRenderer;
     private Renderer m_edgeRenderer;
-    
+
     /**
      * Default Constructor. A ShapeRenderer instance will be used for the
      * default item renderer and an EdgeRenderer instance will be used for the
@@ -53,7 +53,7 @@ public class DefaultRendererFactory implements RendererFactory {
     public DefaultRendererFactory() {
        this(new ShapeRenderer());
     }
-    
+
     /**
      * Constructor. Creates a new DefaultRendererFactory with the specified
      * default item renderer. An EdgeRenderer instance will be used for the
@@ -65,7 +65,7 @@ public class DefaultRendererFactory implements RendererFactory {
     public DefaultRendererFactory(Renderer itemRenderer) {
         this(itemRenderer, new EdgeRenderer());
     }
-    
+
     /**
      * Constructor. Creates a new DefaultRendererFactory with the specified
      * default item and edge renderers.
@@ -81,7 +81,7 @@ public class DefaultRendererFactory implements RendererFactory {
     }
 
     // ------------------------------------------------------------------------
-    
+
     /**
      * Sets the default renderer. This renderer will be returned by
      * {@link #getRenderer(VisualItem)} whenever there are no matching
@@ -94,7 +94,7 @@ public class DefaultRendererFactory implements RendererFactory {
     public void setDefaultRenderer(Renderer r) {
         m_itemRenderer = r;
     }
-    
+
     /**
      * Gets the default renderer. This renderer will be returned by
      * {@link #getRenderer(VisualItem)} whenever there are no matching
@@ -104,7 +104,7 @@ public class DefaultRendererFactory implements RendererFactory {
     public Renderer getDefaultRenderer() {
         return m_itemRenderer;
     }
-    
+
     /**
      * Sets the default edge renderer. This renderer will be returned by
      * {@link #getRenderer(VisualItem)} whenever there are no matching
@@ -117,7 +117,7 @@ public class DefaultRendererFactory implements RendererFactory {
     public void setDefaultEdgeRenderer(Renderer r) {
         m_edgeRenderer = r;
     }
-    
+
     /**
      * Gets the default edge renderer. This renderer will be returned by
      * {@link #getRenderer(VisualItem)} whenever there are no matching
@@ -127,7 +127,7 @@ public class DefaultRendererFactory implements RendererFactory {
     public Renderer getDefaultEdgeRenderer() {
         return m_edgeRenderer;
     }
-    
+
     /**
      * Adds a new mapping to this RendererFactory. If an input item to
      * {@link #getRenderer(VisualItem)} matches the predicate, then the
@@ -140,7 +140,7 @@ public class DefaultRendererFactory implements RendererFactory {
     public void add(Predicate p, Renderer r) {
         m_chain.add(p, r);
     }
-    
+
     /**
      * Adds a new mapping to this RendererFactory. If an input item to
      * {@link #getRenderer(VisualItem)} matches the predicate, then the
@@ -155,7 +155,7 @@ public class DefaultRendererFactory implements RendererFactory {
         Predicate p = (Predicate)ExpressionParser.parse(predicate);
         add(p, r);
     }
-    
+
     /**
      * Return a Renderer instance for the input VisualItem. The VisualItem
      * is matched against the registered Predicates, and if a match is found
@@ -165,14 +165,15 @@ public class DefaultRendererFactory implements RendererFactory {
      * (for all VisualItems except EdgeItems) or the default edge renderer (for
      * EdgeItems) is returned.
      */
-    public Renderer getRenderer(VisualItem item) {
+    public Renderer getRenderer(VisualItem<?> item) {
         Renderer r = (Renderer)m_chain.get(item);
-        if ( r != null )
-            return r;
-        else if ( item instanceof EdgeItem )
-            return m_edgeRenderer;
-        else
-            return m_itemRenderer;
+        if ( r != null ) {
+			return r;
+		} else if ( item instanceof EdgeItem ) {
+			return m_edgeRenderer;
+		} else {
+			return m_itemRenderer;
+		}
     }
-    
+
 } // end of class DefaultRendererFactory

@@ -1,6 +1,7 @@
 package prefuse.data.parser;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * Factory class that maintains a collection of parser instances and returns
@@ -9,13 +10,13 @@ import java.util.Arrays;
  * it against all available parsers, updating whether or not the parsers can
  * successfully parse the value. This method is used in a more automated
  * fashion by the {@link TypeInferencer} class.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  * @see TypeInferencer
  */
 public class ParserFactory implements Cloneable {
-    
-    private static final DataParser[] DEFAULT_PARSERS = 
+
+    private static final DataParser[] DEFAULT_PARSERS =
         new DataParser[] {
             new IntParser(),
             new LongParser(),
@@ -32,13 +33,13 @@ public class ParserFactory implements Cloneable {
             new DoubleArrayParser(),
             new StringParser()
         };
-    
+
     private static ParserFactory DEFAULT_FACTORY =
         new ParserFactory(DEFAULT_PARSERS);
-    
-    private DataParser[] m_parsers;
-    private boolean[]    m_isCandidate;
-    
+
+    private final DataParser[] m_parsers;
+    private final boolean[]    m_isCandidate;
+
     /**
      * Returns the default parser factory. The default factory tests for the
      * following data types (in the provided order of precedence):
@@ -48,16 +49,28 @@ public class ParserFactory implements Cloneable {
     public static ParserFactory getDefaultFactory() {
         return DEFAULT_FACTORY;
     }
-    
+
+	public static ParserFactory getFactory(Locale locale) {
+		DataParser[] parsers = new DataParser[] { new IntParser(),
+				new LongParser(), new DoubleParser(), new FloatParser(),
+				new BooleanParser(), new ColorIntParser(), new DateParser(locale),
+				new TimeParser(locale), new DateTimeParser(locale), new IntArrayParser(),
+				new LongArrayParser(), new FloatArrayParser(),
+				new DoubleArrayParser(), new StringParser() };
+		return new ParserFactory(parsers);
+	}
+
     /**
-     * Sets the default parser factory. This factory will be used by default
-     * by all readers to parse data values.
-     * @param factory the new default parser factory.
-     */
+	 * Sets the default parser factory. This factory will be used by default by
+	 * all readers to parse data values.
+	 *
+	 * @param factory
+	 *            the new default parser factory.
+	 */
     public static void setDefaultFactory(ParserFactory factory) {
     	DEFAULT_FACTORY = factory;
     }
-    
+
     /**
      * Constructor. Uses a default collection of parsers, testing for the
      * following data type in the followinf order of precedence:
@@ -66,37 +79,38 @@ public class ParserFactory implements Cloneable {
     public ParserFactory() {
         this(DEFAULT_PARSERS);
     }
-    
+
     /**
      * @see java.lang.Object#clone()
      */
-    public Object clone() {
+    @Override
+	public Object clone() {
         return new ParserFactory(m_parsers);
     }
-    
+
     /**
      * <p>Constructor. Takes an array of parsers to test. After creating this
-     * instance, sample data values can be passed in using the 
+     * instance, sample data values can be passed in using the
      * <code>sample()</code> method, and this class will check the sample
      * against the parsers, computing which parsers can successfully parse the
      * sample. This process of elimination disregards inappropriate parsers.
      * After a series of samples, the <code>getParser()</code>
      * method can be used to retrieve the highest ranking candidate parser.
      * </p>
-     * 
+     *
      * <p>
      * If no parser can parse all samples, a null value will be returned by
      * getParser(). For this reason, it is recommended to always use a
      * StringParser as the last element of the input array, as it is guaranteed
      * to always parse successfully (by simply returning its input String).
      * </p>
-     * 
+     *
      * <p>
-     * The ordering of parsers in the array is taken to be the desired order 
-     * of precendence of the parsers. For example, if both parser[0] and 
-     * parser[2] can parse all the available samples, parser[0] will be 
+     * The ordering of parsers in the array is taken to be the desired order
+     * of precendence of the parsers. For example, if both parser[0] and
+     * parser[2] can parse all the available samples, parser[0] will be
      * returned.
-     * </p> 
+     * </p>
      * @param parsers the input DataParsers to use.
      */
     public ParserFactory(DataParser[] parsers) {
@@ -112,7 +126,7 @@ public class ParserFactory implements Cloneable {
         m_isCandidate = new boolean[m_parsers.length];
         reset();
     }
-    
+
     /**
      * Reset the candidate parser settings, making each parser
      * equally likely.
@@ -120,7 +134,7 @@ public class ParserFactory implements Cloneable {
     protected void reset() {
         Arrays.fill(m_isCandidate, true);
     }
-    
+
     /**
      * Sample a data value against the parsers, updating the
      * parser candidates.
@@ -133,7 +147,7 @@ public class ParserFactory implements Cloneable {
             }
         }
     }
-    
+
     /**
      * Returns the highest ranking parser that successfully can
      * parse all the input samples viewed by this instance. If
@@ -148,14 +162,14 @@ public class ParserFactory implements Cloneable {
         }
         return null;
     }
-    
+
     /**
      * Returns a parser for the specified data type.
      * @param type the Class for the data type to parse
      * @return a parser for the given data type, or null
      * if no such parser can be found.
      */
-    public DataParser getParser(Class type) {
+    public DataParser getParser(Class<?> type) {
        for ( int i=0; i<m_parsers.length; ++i ) {
            if ( m_parsers[i].getType().equals(type) ) {
                return m_parsers[i];
@@ -163,7 +177,7 @@ public class ParserFactory implements Cloneable {
        }
        return null;
     }
-    
+
     /**
      * Analyzes the given array of String values to determine an
      * acceptable parser data type.
@@ -176,9 +190,9 @@ public class ParserFactory implements Cloneable {
     public DataParser getParser(String[] data, int startRow) {
         return getParser(new String[][] { data }, 0, startRow);
     }
-    
+
     /**
-     * Analyzes a column of the given array of String values to 
+     * Analyzes a column of the given array of String values to
      * determine an acceptable parser data type.
      * @param data an 2D array of String values to parse
      * @param col an index for the column to process
@@ -188,20 +202,21 @@ public class ParserFactory implements Cloneable {
      * of null if none.
      */
     public DataParser getParser(String[][] data, int col, int startRow) {
-        // sanity check input 
-        if ( data == null || data.length == 0 )
-            return null;
-        
+        // sanity check input
+        if ( data == null || data.length == 0 ) {
+			return null;
+		}
+
         int nrows = data.length;
-        
+
         // analyze each column in turn
         this.reset();
         for ( int row=startRow; row<nrows; ++row ) {
             this.sample(data[row][col]);
         }
-        
+
         DataParser parser = getParser();
         return parser;
     }
-    
+
 } // end of class ParserFactory

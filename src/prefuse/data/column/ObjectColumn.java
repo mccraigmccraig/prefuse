@@ -9,56 +9,56 @@ import prefuse.data.DataTypeException;
 
 /**
  * Column implementation for storing arbitrary Object values.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class ObjectColumn extends AbstractColumn {
 
     private Object[] m_values;
     private int      m_size;
-    
+
     /**
      * Create a new empty ObjectColumn. The type is assumed to be Object.
      */
     public ObjectColumn() {
         this(Object.class);
     }
-    
+
     /**
      * Create a new ObjectColumn.
-     * @param type the data type of Objects in this column 
+     * @param type the data type of Objects in this column
      */
-    public ObjectColumn(Class type) {
+    public ObjectColumn(Class<?> type) {
         this(type, 0, 10, null);
     }
-    
+
     /**
-     * Create a new ObjectColumn. The type is assumed to be Object. 
+     * Create a new ObjectColumn. The type is assumed to be Object.
      * @param nrows the initial size of the column
      */
     public ObjectColumn(int nrows) {
         this(Object.class, nrows, nrows, null);
     }
-    
+
     /**
      * Create a new ObjectColumn.
-     * @param type the data type of Objects in this column 
+     * @param type the data type of Objects in this column
      * @param nrows the initial size of the column
      */
-    public ObjectColumn(Class type, int nrows) {
+    public ObjectColumn(Class<?> type, int nrows) {
         this(type, nrows, nrows, null);
     }
-    
+
     /**
      * Create a new ObjectColumn.
-     * @param type the data type of Objects in this column 
+     * @param type the data type of Objects in this column
      * @param nrows the initial size of the column
      * @param capacity the initial capacity of the column
      * @param defaultValue the default value for the column. If this value
      * is cloneable, it will be cloned when assigned as defaultValue, otherwise
      * the input reference will be used for every default value.
      */
-    public ObjectColumn(Class type, int nrows, int capacity, Object defaultValue) {
+    public ObjectColumn(Class<?> type, int nrows, int capacity, Object defaultValue) {
         super(type, defaultValue);
         if ( capacity < nrows ) {
             throw new IllegalArgumentException(
@@ -69,14 +69,14 @@ public class ObjectColumn extends AbstractColumn {
             // since Object's clone method is protected, we default to
             // using reflection to create clones.
             Cloneable def = (Cloneable)defaultValue;
-            Method m = def.getClass().getMethod("clone", (Class[])null);
+            Method m = def.getClass().getMethod("clone");
             for ( int i=0; i<capacity; ++i ) {
-                m_values[i] = m.invoke(m_defaultValue, (Object[])null);
+                m_values[i] = m.invoke(m_defaultValue);
             }
         } catch ( Exception e ) {
             if ( defaultValue != null ) {
                 Logger.getLogger(getClass().getName()).fine(
-                    "Default value of type \"" + 
+                    "Default value of type \"" +
                     defaultValue.getClass().getName() + "\" is not " +
                     "cloneable. Using Object reference directly.");
             }
@@ -84,32 +84,32 @@ public class ObjectColumn extends AbstractColumn {
         }
         m_size = nrows;
     }
-    
+
     // ------------------------------------------------------------------------
     // Column Metadata
-    
+
     /**
      * @see prefuse.data.column.Column#getRowCount()
      */
     public int getRowCount() {
         return m_size;
     }
-    
+
     /**
      * @see prefuse.data.column.Column#setMaximumRow(int)
      */
     public void setMaximumRow(int nrows) {
         if ( nrows > m_values.length ) {
-            int capacity = Math.max((3*m_values.length)/2 + 1, nrows);
+            int capacity = Math.max(3*m_values.length/2 + 1, nrows);
             Object[] values = new Object[capacity];
             System.arraycopy(m_values, 0, values, 0, m_size);
             try {
                 // since Object's clone method is protected, we default to
                 // using reflection to create clones.
                 Cloneable def = (Cloneable)m_defaultValue;
-                Method m = def.getClass().getMethod("clone", (Class[])null);
+                Method m = def.getClass().getMethod("clone");
                 for ( int i=m_size; i<capacity; ++i ) {
-                    values[i] = m.invoke(m_defaultValue, (Object[])null);
+                    values[i] = m.invoke(m_defaultValue);
                 }
             } catch ( Exception e ) {
                 Arrays.fill(values, m_size, capacity, m_defaultValue);
@@ -121,19 +121,20 @@ public class ObjectColumn extends AbstractColumn {
 
     // ------------------------------------------------------------------------
     // Data Access Methods
-    
-    public void revertToDefault(int row) {
+
+    @Override
+	public void revertToDefault(int row) {
         try {
             // since Object's clone method is protected, we default to
             // using reflection to create clones.
             Cloneable def = (Cloneable)m_defaultValue;
-            Method m = def.getClass().getMethod("clone", (Class[])null);
-            set(m.invoke(m_defaultValue, (Object[])null), row);
+            Method m = def.getClass().getMethod("clone");
+            set(m.invoke(m_defaultValue), row);
         } catch ( Exception e ) {
             set(m_defaultValue, row);
         }
     }
-    
+
     /**
      * Get the data value at the specified row
      * @param row the row from which to retrieve the value
@@ -146,7 +147,7 @@ public class ObjectColumn extends AbstractColumn {
         }
         return m_values[row];
     }
-        
+
     /**
      * Set the data value at the specified row
      * @param val the value to set
@@ -161,19 +162,21 @@ public class ObjectColumn extends AbstractColumn {
         } else if ( val == null || canSet(val.getClass()) ) {
             // get the previous value
             Object prev = m_values[row];
-            
+
             // exit early if no change
             // do we trust .equals() here? for now, no.
-            if ( prev == val ) return;
-            
+            if ( prev == val ) {
+				return;
+			}
+
             // set the new value
             m_values[row] = val;
-            
+
             // fire a change event
             fireColumnEvent(row, prev);
         } else {
             throw new DataTypeException(val.getClass());
         }
     }
-    
+
 } // end of class ObjectColumn

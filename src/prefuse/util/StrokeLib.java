@@ -7,7 +7,7 @@ import prefuse.util.collections.IntObjectHashMap;
 /**
  * Library maintaining a cache of drawing strokes and other useful stroke
  * computation routines.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class StrokeLib {
@@ -22,7 +22,7 @@ public class StrokeLib {
     public static final float[] DASHES = new float[] { 5.0f, 5.0f };
     /** Dash pattern for longer uniform dashes */
     public static final float[] LONG_DASHES = new float[] { 10.0f, 10.0f };
-    
+
     /**
      * Get a square capped, miter joined, non-dashed stroke of the given width.
      * @param width the requested stroke width
@@ -31,7 +31,7 @@ public class StrokeLib {
     public static BasicStroke getStroke(float width) {
         return getStroke(width,BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER);
     }
-    
+
     /**
      * Get a square capped, miter joined, dashed stroke with the given width
      * and dashing attributes.
@@ -47,7 +47,7 @@ public class StrokeLib {
         return getStroke(width, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER,
                          10.0f, dashes, 0f);
     }
-    
+
     /**
      * Get a non-dashed stroke of the given width, cap, and join
      * @param width the requested stroke width
@@ -58,13 +58,13 @@ public class StrokeLib {
      * @param join the requested join type, one of
      * {@link java.awt.BasicStroke#JOIN_BEVEL},
      * {@link java.awt.BasicStroke#JOIN_MITER}, or
-     * {@link java.awt.BasicStroke#JOIN_ROUND} 
+     * {@link java.awt.BasicStroke#JOIN_ROUND}
      * @return the stroke
      */
     public static BasicStroke getStroke(float width, int cap, int join) {
         return getStroke(width, cap, join, 10.0f, null, 0f);
     }
-    
+
     /**
      * Get a dashed stroke of the given width, cap, join, miter limit,
      * and dashing attributes.
@@ -76,7 +76,7 @@ public class StrokeLib {
      * @param join the requested join type, one of
      * {@link java.awt.BasicStroke#JOIN_BEVEL},
      * {@link java.awt.BasicStroke#JOIN_MITER}, or
-     * {@link java.awt.BasicStroke#JOIN_ROUND} 
+     * {@link java.awt.BasicStroke#JOIN_ROUND}
      * @param miterLimit the miter limit at which to bevel miter joins
      * @param dashes an array describing the alternation pattern of
      * a dashed line. For example [5f, 3f] will create dashes of length 5
@@ -93,7 +93,7 @@ public class StrokeLib {
         int key = getStrokeKey(width,cap,join,miterLimit,dashes,dashPhase);
         BasicStroke s = null;
         if ( (s=(BasicStroke)strokeMap.get(key)) == null ) {
-            s = new BasicStroke(width, cap, join, 
+            s = new BasicStroke(width, cap, join,
                                 miterLimit, dashes, dashPhase);
             strokeMap.put(key, s);
             ++misses;
@@ -101,7 +101,7 @@ public class StrokeLib {
         ++lookups;
         return s;
     }
-    
+
     /**
      * Compute a hash-key for stroke storage and lookup.
      */
@@ -114,13 +114,13 @@ public class StrokeLib {
         hash = hash * 31 + Float.floatToIntBits(miterLimit);
         if (dashes != null) {
             hash = hash * 31 + Float.floatToIntBits(dashPhase);
-            for (int i = 0; i < dashes.length; i++) {
-                hash = hash * 31 + Float.floatToIntBits(dashes[i]);
+            for (float element : dashes) {
+                hash = hash * 31 + Float.floatToIntBits(element);
             }
         }
         return hash;
     }
-    
+
     /**
      * Get a stroke with the same properties as the given stroke, but with
      * a modified width value.
@@ -137,7 +137,7 @@ public class StrokeLib {
                     s.getDashArray(), s.getDashPhase());
         }
     }
-    
+
     /**
      * Get the number of cache misses to the Stroke object cache.
      * @return the number of cache misses
@@ -145,7 +145,7 @@ public class StrokeLib {
     public static int getCacheMissCount() {
         return misses;
     }
-    
+
     /**
      * Get the number of cache lookups to the Stroke object cache.
      * @return the number of cache lookups
@@ -153,12 +153,12 @@ public class StrokeLib {
     public static int getCacheLookupCount() {
         return lookups;
     }
-    
+
     /**
      * Clear the Stroke object cache.
      */
     public static void clearCache() {
         strokeMap.clear();
-    }    
-    
+    }
+
 } // end of class StrokeLib

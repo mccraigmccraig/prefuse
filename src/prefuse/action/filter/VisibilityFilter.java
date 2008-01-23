@@ -1,7 +1,5 @@
 package prefuse.action.filter;
 
-import java.util.Iterator;
-
 import prefuse.Visualization;
 import prefuse.action.GroupAction;
 import prefuse.data.expression.OrPredicate;
@@ -13,14 +11,14 @@ import prefuse.visual.expression.VisiblePredicate;
 /**
  * Filter Action that sets visible all items that meet a given Predicate
  * condition and sets all other items invisible.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class VisibilityFilter extends GroupAction {
-    
+
     private Predicate m_filter;
     private Predicate m_predicate;
-    
+
     /**
      * Create a new VisibilityFilter.
      * @param p the test predicate used to determine visibility
@@ -58,14 +56,13 @@ public class VisibilityFilter extends GroupAction {
         m_predicate = p;
         m_filter = new OrPredicate(p, VisiblePredicate.TRUE);
     }
-    
+
     /**
      * @see prefuse.action.Action#run(double)
      */
-    public void run(double frac) {
-        Iterator items = m_vis.items(m_group, m_filter);
-        while ( items.hasNext() ) {
-            VisualItem item = (VisualItem)items.next();
+    @Override
+	public void run(double frac) {
+        for(VisualItem<?> item :  m_vis.items(m_group, m_filter)) {
             PrefuseLib.updateVisible(item, m_predicate.getBoolean(item));
         }
     }

@@ -7,17 +7,17 @@ import java.util.NoSuchElementException;
 /**
  * Sorted map implementation using bit vectors to map from boolean keys to
  * int values.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class BooleanIntBitSetMap implements BooleanIntSortedMap {
 
-    private BitSet m_true = new BitSet();
-    private BitSet m_false = new BitSet();
-    
+    private final BitSet m_true = new BitSet();
+    private final BitSet m_false = new BitSet();
+
     public BooleanIntBitSetMap() {
     }
-    
+
     public boolean firstKey() {
         return false;
     }
@@ -114,15 +114,18 @@ public class BooleanIntBitSetMap implements BooleanIntSortedMap {
     public int getMedian() {
         int fsize = m_false.cardinality();
         int tsize = m_true.cardinality();
-        if ( fsize == 0 && tsize == 0 )
-            return Integer.MIN_VALUE;
+        if ( fsize == 0 && tsize == 0 ) {
+			return Integer.MIN_VALUE;
+		}
 
         int med = (fsize+tsize)/2;
-        BitSet set = ( fsize>tsize ? m_false : m_true );
-        for( int i=set.nextSetBit(0), j=0; i>=0; 
+        BitSet set = fsize>tsize ? m_false : m_true;
+        for( int i=set.nextSetBit(0), j=0; i>=0;
              i=set.nextSetBit(i+1), ++j )
         {
-            if ( j == med ) return i;
+            if ( j == med ) {
+				return i;
+			}
         }
         // shouldn't ever happen
         return Integer.MIN_VALUE;
@@ -130,8 +133,12 @@ public class BooleanIntBitSetMap implements BooleanIntSortedMap {
 
     public int getUniqueCount() {
         int count = 0;
-        if ( m_false.cardinality() > 0 ) ++count;
-        if ( m_true.cardinality() > 0 )  ++count;
+        if ( m_false.cardinality() > 0 ) {
+			++count;
+		}
+        if ( m_true.cardinality() > 0 ) {
+			++count;
+		}
         return count;
     }
 
@@ -168,12 +175,12 @@ public class BooleanIntBitSetMap implements BooleanIntSortedMap {
             return new BitSetIterator(m_false, m_true);
         }
     }
-    
+
     public class BitSetIterator extends IntIterator {
 
         private BitSet m_cur, m_next;
         private int m_val = -1;
-        
+
         public BitSetIterator(BitSet set) {
             this(set, null);
         }
@@ -203,14 +210,17 @@ public class BooleanIntBitSetMap implements BooleanIntSortedMap {
                 m_val = idx;
             }
         }
-        public int nextInt() {
-            if ( m_val < 0 )
-                throw new NoSuchElementException();
+        @Override
+		public int nextInt() {
+            if ( m_val < 0 ) {
+				throw new NoSuchElementException();
+			}
             int retval = m_val;
             advance();
             return retval;
         }
-        public boolean nextBoolean() {
+        @Override
+		public boolean nextBoolean() {
             if ( m_cur == m_true ) {
                 advance();
                 return true;

@@ -19,84 +19,85 @@ import prefuse.data.expression.ExpressionAnalyzer;
  * increase performance. This column maintains listeners for all referenced
  * columns discovered in the expression and for the expression itself,
  * invalidating all cached entries when an update to either occurs.</p>
- * 
+ *
  * <p>
  * WARNING: Infinite recursion, eventually resulting in a StackOverflowError,
  * could occur if an expression refers to its own column, or if two
- * ExpressionColumns have expressions referring to each other. The 
+ * ExpressionColumns have expressions referring to each other. The
  * responsibility for avoiding such situations is left with client programmers.
  * Note that it is fine for one ExpressionColumn to reference another;
  * however, the graph induced by such references must not contain any cycles.
  * </p>
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  * @see prefuse.data.expression
  */
 public class ExpressionColumn extends AbstractColumn {
-    
-    private Expression m_expr;
-    private Table m_table;
-    private Set m_columns;
-    
-    private BitSet m_valid;
-    private Column m_cache;
-    private Listener m_lstnr;
-    
+
+    private final Expression m_expr;
+    private final Table<?> m_table;
+    private Set<String> m_columns;
+
+    private final BitSet m_valid;
+    private final Column m_cache;
+    private final Listener m_lstnr;
+
     /**
      * Create a new ExpressionColumn.
      * @param table the table this column is a member of
      * @param expr the expression used to provide the column values
      */
-    public ExpressionColumn(Table table, Expression expr) {
+    public ExpressionColumn(Table<?> table, Expression expr) {
         super(expr.getType(table.getSchema()));
         m_table = table;
         m_expr = expr;
         m_lstnr = new Listener();
-        
+
         init();
-        
+
         int nrows = m_table.getRowCount();
         m_cache = ColumnFactory.getColumn(getColumnType(), nrows);
         m_valid = new BitSet(nrows);
         m_expr.addExpressionListener(m_lstnr);
     }
-    
+
     protected void init() {
         // first remove listeners on any current columns
         if ( m_columns != null && m_columns.size() > 0 ) {
-            Iterator iter = m_columns.iterator();
+            Iterator<String> iter = m_columns.iterator();
             while ( iter.hasNext() ) {
-                String field = (String)iter.next();
+                String field = iter.next();
                 Column col = m_table.getColumn(field);
                 col.removeColumnListener(m_lstnr);
             }
         }
         // now get the current set of columns
         m_columns = ExpressionAnalyzer.getReferencedColumns(m_expr);
-        
+
         // sanity check table and expression
-        Iterator iter = m_columns.iterator();
+        Iterator<String> iter = m_columns.iterator();
         while ( iter.hasNext() ) {
-            String name = (String)iter.next();
-            if ( m_table.getColumn(name) == null )
-                throw new IllegalArgumentException("Table must contain all "
+            String name = iter.next();
+            if ( m_table.getColumn(name) == null ) {
+				throw new IllegalArgumentException("Table must contain all "
                         + "columns referenced by the expression."
                         + " Bad column name: "+name);
-            
+			}
+
         }
-        
+
         // passed check, so now listen to columns
         iter = m_columns.iterator();
         while ( iter.hasNext() ) {
-            String field = (String)iter.next();
+            String field = iter.next();
             Column col = m_table.getColumn(field);
             col.addColumnListener(m_lstnr);
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Column Metadata
-    
+
     /**
      * @see prefuse.data.column.Column#getRowCount()
      */
@@ -113,7 +114,7 @@ public class ExpressionColumn extends AbstractColumn {
 
     // ------------------------------------------------------------------------
     // Cache Management
-    
+
     /**
      * Check if this ExpressionColumn has a valid cached value at the given
      * row.
@@ -123,7 +124,7 @@ public class ExpressionColumn extends AbstractColumn {
     public boolean isCacheValid(int row) {
         return m_valid.get(row);
     }
-    
+
     /**
      * Invalidate a range of the cache.
      * @param start the start of the range to invalidate
@@ -132,25 +133,27 @@ public class ExpressionColumn extends AbstractColumn {
     public void invalidateCache(int start, int end ) {
         m_valid.clear(start, end+1);
     }
-    
+
     // ------------------------------------------------------------------------
-    // Data Access Methods    
+    // Data Access Methods
 
     /**
      * Has no effect, as all values in this column are derived.
      * @param row the row to revert
      */
-    public void revertToDefault(int row) {
+    @Override
+	public void revertToDefault(int row) {
         // do nothing, as we don't have default values.
     }
-    
+
     /**
      * @see prefuse.data.column.AbstractColumn#canSet(java.lang.Class)
      */
-    public boolean canSet(Class type) {
+    @Override
+	public boolean canSet(Class<?> type) {
         return false;
     }
-    
+
     /**
      * @see prefuse.data.column.Column#get(int)
      */
@@ -160,7 +163,7 @@ public class ExpressionColumn extends AbstractColumn {
             return m_cache.get(row);
         }
         Object val = m_expr.get(m_table.getTuple(row));
-        Class type = val==null ? Object.class : val.getClass();
+        Class<?> type = val==null ? Object.class : val.getClass();
         if ( m_cache.canSet(type) ) {
             m_cache.set(val, row);
             m_valid.set(row);
@@ -174,22 +177,25 @@ public class ExpressionColumn extends AbstractColumn {
     public void set(Object val, int row) throws DataTypeException {
         throw new UnsupportedOperationException();
     }
-    
+
     private void rangeCheck(int row) {
-        if ( row < 0 || row >= getRowCount() )
-            throw new IndexOutOfBoundsException();
+        if ( row < 0 || row >= getRowCount() ) {
+			throw new IndexOutOfBoundsException();
+		}
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * @see prefuse.data.column.Column#getBoolean(int)
      */
-    public boolean getBoolean(int row) throws DataTypeException {
-        if ( !canGetBoolean() )
-            throw new DataTypeException(boolean.class);
+    @Override
+	public boolean getBoolean(int row) throws DataTypeException {
+        if ( !canGetBoolean() ) {
+			throw new DataTypeException(boolean.class);
+		}
         rangeCheck(row);
-        
+
         if ( isCacheValid(row) ) {
             return m_cache.getBoolean(row);
         } else {
@@ -212,74 +218,88 @@ public class ExpressionColumn extends AbstractColumn {
         }
         m_valid.set(row);
     }
-    
+
     /**
      * @see prefuse.data.column.Column#getInt(int)
      */
-    public int getInt(int row) throws DataTypeException {
-        if ( !canGetInt() )
-            throw new DataTypeException(int.class);
+    @Override
+	public int getInt(int row) throws DataTypeException {
+        if ( !canGetInt() ) {
+			throw new DataTypeException(int.class);
+		}
         rangeCheck(row);
-        
-        if ( !isCacheValid(row) )
-            computeNumber(row);
+
+        if ( !isCacheValid(row) ) {
+			computeNumber(row);
+		}
         return m_cache.getInt(row);
     }
 
     /**
      * @see prefuse.data.column.Column#getDouble(int)
      */
-    public double getDouble(int row) throws DataTypeException {
-        if ( !canGetDouble() )
-            throw new DataTypeException(double.class);
+    @Override
+	public double getDouble(int row) throws DataTypeException {
+        if ( !canGetDouble() ) {
+			throw new DataTypeException(double.class);
+		}
         rangeCheck(row);
-        
-        if ( !isCacheValid(row) )
-            computeNumber(row);
+
+        if ( !isCacheValid(row) ) {
+			computeNumber(row);
+		}
         return m_cache.getDouble(row);
     }
 
     /**
      * @see prefuse.data.column.Column#getFloat(int)
      */
-    public float getFloat(int row) throws DataTypeException {
-        if ( !canGetFloat() )
-            throw new DataTypeException(float.class);
+    @Override
+	public float getFloat(int row) throws DataTypeException {
+        if ( !canGetFloat() ) {
+			throw new DataTypeException(float.class);
+		}
         rangeCheck(row);
-        
-        if ( !isCacheValid(row) )
-            computeNumber(row);
+
+        if ( !isCacheValid(row) ) {
+			computeNumber(row);
+		}
         return m_cache.getFloat(row);
     }
 
     /**
      * @see prefuse.data.column.Column#getLong(int)
      */
-    public long getLong(int row) throws DataTypeException {
-        if ( !canGetLong() )
-            throw new DataTypeException(long.class);
+    @Override
+	public long getLong(int row) throws DataTypeException {
+        if ( !canGetLong() ) {
+			throw new DataTypeException(long.class);
+		}
         rangeCheck(row);
-        
-        if ( !isCacheValid(row) )
-            computeNumber(row);
+
+        if ( !isCacheValid(row) ) {
+			computeNumber(row);
+		}
         return m_cache.getLong(row);
     }
-    
+
     // ------------------------------------------------------------------------
     // Listener Methods
 
     private class Listener implements ColumnListener, ExpressionListener {
-    
+
         public void columnChanged(int start, int end) {
             // for a single index change with a valid cache value,
             // propagate a change event with the previous value
             if ( start == end && isCacheValid(start) ) {
-                if ( !m_table.isValidRow(start) ) return;
-                
+                if ( !m_table.isValidRow(start) ) {
+					return;
+				}
+
                 // invalidate the cache index
                 invalidateCache(start, end);
                 // fire change event including previous value
-                Class type = getColumnType();
+                Class<?> type = getColumnType();
                 if ( int.class == type ) {
                     fireColumnEvent(start, m_cache.getInt(start));
                 } else if ( long.class == type ) {
@@ -293,7 +313,7 @@ public class ExpressionColumn extends AbstractColumn {
                 } else {
                     fireColumnEvent(start, m_cache.get(start));
                 }
-                
+
             // otherwise send a generic update
             } else {
                 // invalidate cache indices
@@ -302,35 +322,35 @@ public class ExpressionColumn extends AbstractColumn {
                 fireColumnEvent(EventConstants.UPDATE, start, end);
             }
         }
-        
+
         public void columnChanged(Column src, int idx, boolean prev) {
             columnChanged(idx, idx);
         }
-    
+
         public void columnChanged(Column src, int idx, double prev) {
             columnChanged(idx, idx);
         }
-    
+
         public void columnChanged(Column src, int idx, float prev) {
             columnChanged(idx, idx);
         }
-    
+
         public void columnChanged(Column src, int type, int start, int end) {
             columnChanged(start, end);
         }
-    
+
         public void columnChanged(Column src, int idx, int prev) {
             columnChanged(idx, idx);
         }
-    
+
         public void columnChanged(Column src, int idx, long prev) {
             columnChanged(idx, idx);
         }
-    
+
         public void columnChanged(Column src, int idx, Object prev) {
             columnChanged(idx, idx);
         }
-    
+
         public void expressionChanged(Expression expr) {
             // mark everything as changed
             columnChanged(0, m_cache.getRowCount()-1);
@@ -338,5 +358,5 @@ public class ExpressionColumn extends AbstractColumn {
             init();
         }
     }
-    
+
 } // end of class DerivedColumn

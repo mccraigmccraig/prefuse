@@ -15,7 +15,7 @@ public class FontLib {
     private static final IntObjectHashMap fontMap = new IntObjectHashMap();
     private static int misses = 0;
     private static int lookups = 0;
-    
+
     /**
      * Get a Font instance with the given font family name and size. A
      * plain font style is assumed.
@@ -29,7 +29,7 @@ public class FontLib {
         int isize = (int)Math.floor(size);
         return getFont(name, Font.PLAIN, isize);
     }
-    
+
     /**
      * Get a Font instance with the given font family name, style, and size
      * @param name the font name. Any font installed on your system should
@@ -44,7 +44,7 @@ public class FontLib {
         int isize = (int)Math.floor(size);
         return getFont(name, style, isize);
     }
-    
+
     /**
      * Get a Font instance with the given font family name, style, and size
      * @param name the font name. Any font installed on your system should
@@ -66,7 +66,7 @@ public class FontLib {
         lookups++;
         return f;
     }
-    
+
     /**
      * Get the number of cache misses to the Font object cache.
      * @return the number of cache misses
@@ -74,7 +74,7 @@ public class FontLib {
     public static int getCacheMissCount() {
         return misses;
     }
-    
+
     /**
      * Get the number of cache lookups to the Font object cache.
      * @return the number of cache lookups
@@ -82,14 +82,14 @@ public class FontLib {
     public static int getCacheLookupCount() {
         return lookups;
     }
-    
+
     /**
      * Clear the Font object cache.
      */
     public static void clearCache() {
         fontMap.clear();
     }
-    
+
     /**
      * Interpolate between two font instances. Font sizes are interpolated
      * linearly. If the interpolation fraction is under 0.5, the face and
@@ -114,5 +114,5 @@ public class FontLib {
         size = (int)Math.round(frac*f2.getSize()+(1-frac)*f1.getSize());
         return getFont(name,style,size);
     }
-    
+
 } // end of class FontLib

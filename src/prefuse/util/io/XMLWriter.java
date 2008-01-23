@@ -13,23 +13,23 @@ import java.util.ArrayList;
  * tags, and adding content and comments. This class handles correct
  * XML formatting and will properly escape text to ensure that the
  * text remains valid XML.
- * 
+ *
  * <p>To use this class, create a new instance with the desired
  * PrintWriter to write the XML to. Call the {@link #begin()} or
  * {@link #begin(String, int)} method when ready to start outputting
  * XML. Then use the provided methods to generate the XML file.
  * Finally, call either the {@link #finish()} or {@link #finish(String)}
  * methods to signal the completion of the file.</p>
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class XMLWriter {
-    
-    private PrintWriter m_out;
+
+    private final PrintWriter m_out;
     private int m_bias = 0;
-    private int m_tab;
-    private ArrayList m_tagStack = new ArrayList();
-    
+    private final int m_tab;
+    private final ArrayList m_tagStack = new ArrayList();
+
     /**
      * Create a new XMLWriter.
      * @param out the print writer to write the XML to
@@ -48,7 +48,7 @@ public class XMLWriter {
         m_out = out;
         m_tab = 2;
     }
-    
+
     /**
      * Print <em>unescaped</em> text into the XML file. To print
      * escaped text, use the {@link #content(String)} method instead.
@@ -68,14 +68,14 @@ public class XMLWriter {
         m_out.print(s);
         m_out.print("\n");
     }
-    
+
     /**
      * Print a newline into the XML file.
      */
     public void println() {
         m_out.print("\n");
     }
-    
+
     /**
      * Begin the XML document. This must be called before any other
      * formatting methods. This method prints an XML header into
@@ -85,7 +85,7 @@ public class XMLWriter {
         m_out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         println();
     }
-    
+
     /**
      * Begin the XML document. This must be called before any other
      * formatting methods. This method prints an XML header into
@@ -99,7 +99,7 @@ public class XMLWriter {
         m_out.print(header);
         m_bias = bias;
     }
-    
+
     /**
      * Print a comment in the XML document. The comment will be printed
      * according to the current spacing and followed by a newline.
@@ -112,7 +112,7 @@ public class XMLWriter {
         m_out.print(" -->");
         println();
     }
-    
+
     /**
      * Internal method for printing a tag with attributes.
      * @param tag the tag name
@@ -136,15 +136,17 @@ public class XMLWriter {
             escapeString(values[i]);
             m_out.print('\"');
         }
-        if ( close ) m_out.print('/');
+        if ( close ) {
+			m_out.print('/');
+		}
         m_out.print('>');
         println();
-        
+
         if ( !close ) {
             m_tagStack.add(tag);
         }
     }
-    
+
     /**
      * Print a closed tag with attributes. The tag will be followed by a
      * newline.
@@ -157,7 +159,7 @@ public class XMLWriter {
     {
         tag(tag, names, values, nattr, true);
     }
-    
+
     /**
      * Print a start tag with attributes. The tag will be followed by a
      * newline, and the indentation level will be increased.
@@ -170,7 +172,7 @@ public class XMLWriter {
     {
         tag(tag, names, values, nattr, false);
     }
-    
+
     /**
      * Internal method for printing a tag with a single attribute.
      * @param tag the tag name
@@ -189,15 +191,17 @@ public class XMLWriter {
         m_out.print('\"');
         escapeString(value);
         m_out.print('\"');
-        if ( close ) m_out.print('/');
+        if ( close ) {
+			m_out.print('/');
+		}
         m_out.print('>');
         println();
-        
+
         if ( !close ) {
             m_tagStack.add(tag);
         }
     }
-    
+
     /**
      * Print a closed tag with one attribute. The tag will be followed by a
      * newline.
@@ -209,7 +213,7 @@ public class XMLWriter {
     {
         tag(tag, name, value, true);
     }
-    
+
     /**
      * Print a start tag with one attribute. The tag will be followed by a
      * newline, and the indentation level will be increased.
@@ -221,7 +225,7 @@ public class XMLWriter {
     {
         tag(tag, name, value, false);
     }
-    
+
     /**
      * Internal method for printing a tag with attributes.
      * @param tag the tag name
@@ -245,15 +249,17 @@ public class XMLWriter {
             escapeString((String)values.get(i));
             m_out.print('\"');
         }
-        if ( close ) m_out.print('/');
+        if ( close ) {
+			m_out.print('/');
+		}
         m_out.print('>');
         println();
-        
+
         if ( !close ) {
             m_tagStack.add(tag);
         }
     }
-    
+
     /**
      * Print a closed tag with attributes. The tag will be followed by a
      * newline.
@@ -266,7 +272,7 @@ public class XMLWriter {
     {
         tag(tag, names, values, nattr, true);
     }
-    
+
     /**
      * Print a start tag with attributes. The tag will be followed by a
      * newline, and the indentation level will be increased.
@@ -279,7 +285,7 @@ public class XMLWriter {
     {
         tag(tag, names, values, nattr, false);
     }
-    
+
     /**
      * Print a start tag without attributes. The tag will be followed by a
      * newline, and the indentation level will be increased.
@@ -302,7 +308,7 @@ public class XMLWriter {
         m_out.print('>');
         println();
     }
-    
+
     /**
      * Print a new content tag with a single attribute, consisting of an
      * open tag, content text, and a closing tag, all on one line.
@@ -311,19 +317,19 @@ public class XMLWriter {
      * @param value the value of the attribute, this text will be escaped
      * @param content the text content, this text will be escaped
      */
-    public void contentTag(String tag, String name, String value, 
+    public void contentTag(String tag, String name, String value,
                            String content)
     {
         spacing();
         m_out.print('<'); m_out.print(tag); m_out.print(' ');
         m_out.print(name); m_out.print('=');
         m_out.print('\"'); escapeString(value); m_out.print('\"');
-        m_out.print('>');    
+        m_out.print('>');
         escapeString(content);
         m_out.print('<'); m_out.print('/'); m_out.print(tag); m_out.print('>');
         println();
     }
-    
+
     /**
      * Print a new content tag with no attributes, consisting of an
      * open tag, content text, and a closing tag, all on one line.
@@ -337,7 +343,7 @@ public class XMLWriter {
         m_out.print('<'); m_out.print('/'); m_out.print(tag); m_out.print('>');
         println();
     }
-    
+
     /**
      * Print content text.
      * @param content the content text, this text will be escaped
@@ -345,7 +351,7 @@ public class XMLWriter {
     public void content(String content) {
         escapeString(content);
     }
-    
+
     /**
      * Finish the XML document.
      */
@@ -353,7 +359,7 @@ public class XMLWriter {
         m_bias = 0;
         m_out.flush();
     }
-    
+
     /**
      * Finish the XML document, printing the given footer text at the
      * end of the document.
@@ -364,7 +370,7 @@ public class XMLWriter {
         m_out.print(footer);
         m_out.flush();
     }
-    
+
     /**
      * Print the current spacing (determined by the indentation level)
      * into the document. This method is used by many of the other
@@ -374,22 +380,23 @@ public class XMLWriter {
      */
     public void spacing() {
         int len = m_bias + m_tagStack.size() * m_tab;
-        for ( int i=0; i<len; ++i )
-            m_out.print(' ');
+        for ( int i=0; i<len; ++i ) {
+			m_out.print(' ');
+		}
     }
-    
+
     // ------------------------------------------------------------------------
     // Escape Text
-    
+
     // unicode ranges and valid/invalid characters
     private static final char   LOWER_RANGE = 0x20;
     private static final char   UPPER_RANGE = 0x7f;
     private static final char[] VALID_CHARS = { 0x9, 0xA, 0xD };
-    
+
     private static final char[] INVALID = { '<', '>', '"', '\'', '&' };
-    private static final String[] VALID = 
+    private static final String[] VALID =
         { "&lt;", "&gt;", "&quot;", "&apos;", "&amp;" };
-    
+
     /**
      * Escape a string such that it is safe to use in an XML document.
      * @param str the string to escape
@@ -399,14 +406,14 @@ public class XMLWriter {
             m_out.print("null");
             return;
         }
-        
+
         int len = str.length();
         for (int i = 0; i < len; ++i) {
             char c = str.charAt(i);
-            
-            if ( (c < LOWER_RANGE     && c != VALID_CHARS[0] && 
-                  c != VALID_CHARS[1] && c != VALID_CHARS[2]) 
-                 || (c > UPPER_RANGE) )
+
+            if ( c < LOWER_RANGE     && c != VALID_CHARS[0] &&
+                  c != VALID_CHARS[1] && c != VALID_CHARS[2]
+                 || c > UPPER_RANGE )
             {
                 // character out of range, escape with character value
                 m_out.print("&#");
@@ -430,5 +437,5 @@ public class XMLWriter {
             }
         }
     }
-    
+
 } // end of class XMLWriter

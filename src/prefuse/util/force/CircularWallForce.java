@@ -9,13 +9,13 @@ package prefuse.util.force;
 public class CircularWallForce extends AbstractForce {
 
     private static String[] pnames = new String[] { "GravitationalConstant" };
-    
+
     public static final float DEFAULT_GRAV_CONSTANT = -0.1f;
     public static final float DEFAULT_MIN_GRAV_CONSTANT = -1.0f;
     public static final float DEFAULT_MAX_GRAV_CONSTANT = 1.0f;
     public static final int GRAVITATIONAL_CONST = 0;
-    
-    private float x, y, r;
+
+    private final float x, y, r;
 
     /**
      * Create a new CircularWallForce.
@@ -24,8 +24,8 @@ public class CircularWallForce extends AbstractForce {
      * @param y the center y-coordinate of the circle
      * @param r the radius of the circle
      */
-    public CircularWallForce(float gravConst, 
-        float x, float y, float r) 
+    public CircularWallForce(float gravConst,
+        float x, float y, float r)
     {
         params = new float[] { gravConst };
         minValues = new float[] { DEFAULT_MIN_GRAV_CONSTANT };
@@ -33,7 +33,7 @@ public class CircularWallForce extends AbstractForce {
         this.x = x; this.y = y;
         this.r = r;
     }
-    
+
     /**
      * Create a new CircularWallForce with default gravitational constant.
      * @param x the center x-coordinate of the circle
@@ -43,26 +43,29 @@ public class CircularWallForce extends AbstractForce {
     public CircularWallForce(float x, float y, float r) {
         this(DEFAULT_GRAV_CONSTANT,x,y,r);
     }
-    
+
     /**
      * Returns true.
      * @see prefuse.util.force.Force#isItemForce()
      */
-    public boolean isItemForce() {
+    @Override
+	public boolean isItemForce() {
         return true;
     }
-    
+
     /**
      * @see prefuse.util.force.AbstractForce#getParameterNames()
      */
-    protected String[] getParameterNames() {
+    @Override
+	protected String[] getParameterNames() {
         return pnames;
     }
-    
+
     /**
      * @see prefuse.util.force.Force#getForce(prefuse.util.force.ForceItem)
      */
-    public void getForce(ForceItem item) {
+    @Override
+	public void getForce(ForceItem item) {
         float[] n = item.location;
         float dx = x-n[0];
         float dy = y-n[1];

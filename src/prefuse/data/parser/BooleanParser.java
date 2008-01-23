@@ -4,49 +4,52 @@ package prefuse.data.parser;
  * DataParser instance that parses boolean values. The string "true" is
  * parsed to true values, "false" to false values. Both are case
  * insensitive.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class BooleanParser implements DataParser {
-    
+
     /** Text string indicating a "true" value. */
     public static final String TRUE = "true";
     /** Text string indicating a "false" value. */
     public static final String FALSE = "false";
-    
+
     /**
      * Returns boolean.class.
      * @see prefuse.data.parser.DataParser#getType()
      */
-    public Class getType() {
+    public Class<?> getType() {
         return boolean.class;
     }
-    
+
     /**
      * @see prefuse.data.parser.DataParser#format(java.lang.Object)
      */
     public String format(Object value) {
-        if ( value == null ) return null;
-        if ( !(value instanceof Boolean) )
-            throw new IllegalArgumentException(
+        if ( value == null ) {
+			return null;
+		}
+        if ( !(value instanceof Boolean) ) {
+			throw new IllegalArgumentException(
               "This class can only format Objects of type Boolean.");
+		}
         return ((Boolean)value).toString();
     }
-    
+
     /**
      * @see prefuse.data.parser.DataParser#canParse(java.lang.String)
      */
     public boolean canParse(String text) {
         return TRUE.equalsIgnoreCase(text) || FALSE.equalsIgnoreCase(text);
     }
-    
+
     /**
      * @see prefuse.data.parser.DataParser#parse(java.lang.String)
      */
     public Object parse(String text) throws DataParseException {
         return parseBoolean(text) ? Boolean.TRUE : Boolean.FALSE;
     }
-    
+
     /**
      * Parse a boolean value from a text string
      * @param text the text string to parse
@@ -63,5 +66,5 @@ public class BooleanParser implements DataParser {
                 "Input does not represent a boolean value: "+ text);
         }
     }
-    
+
 } // end of class BooleanParser

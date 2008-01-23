@@ -15,10 +15,10 @@ import prefuse.data.tuple.TupleSet;
  * callbacks into a generic {@link #update(Object)} method. For the
  * case of ComponentListener, only the resize event is funneled into
  * the update method.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public abstract class UpdateListener 
+public abstract class UpdateListener
     implements ExpressionListener, TupleSetListener, ComponentListener
 {
     /**
@@ -27,21 +27,21 @@ public abstract class UpdateListener
      * or Component that triggered this update event.
      */
     public abstract void update(Object source);
-    
+
     /**
      * @see prefuse.data.event.ExpressionListener#expressionChanged(prefuse.data.expression.Expression)
      */
     public void expressionChanged(Expression expr) {
         update(expr);
     }
-    
+
     /**
      * @see prefuse.data.event.TupleSetListener#tupleSetChanged(prefuse.data.tuple.TupleSet, prefuse.data.Tuple[], prefuse.data.Tuple[])
      */
     public void tupleSetChanged(TupleSet tset, Tuple[] added, Tuple[] removed) {
         update(tset);
     }
-    
+
     /**
      * @see java.awt.event.ComponentListener#componentResized(java.awt.event.ComponentEvent)
      */

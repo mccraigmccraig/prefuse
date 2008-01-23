@@ -6,31 +6,26 @@ import java.util.Iterator;
 /**
  * Abstract base class for Predicate instances that maintain one or
  * more sub-predicates (clauses).
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public abstract class CompositePredicate extends AbstractPredicate {
 
-    protected ArrayList m_clauses = new ArrayList(2);
-    
-    /**
-     * Create a new, empty CompositePredicate.
-     */
-    public CompositePredicate() {
-    }
-    
+    protected final ArrayList<Predicate> m_clauses;
+
     /**
      * Create a new CompositePredicate.
-     * @param p1 the first sub-predicate
-     * @param p2 the second sub-predicate
+     * @param predicates the predicates
      */
-    public CompositePredicate(Predicate p1, Predicate p2) {
-        m_clauses.add(p1);
-        m_clauses.add(p2);
+    public CompositePredicate(Predicate ... predicates) {
+    	m_clauses = new ArrayList<Predicate>(predicates.length);
+    	for (Predicate element : predicates) {
+    		m_clauses.add(element);
+    	}
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Add a new clause.
      * @param p the Predicate clause to add
@@ -42,7 +37,7 @@ public abstract class CompositePredicate extends AbstractPredicate {
         m_clauses.add(p);
         fireExpressionChange();
     }
-    
+
     /**
      * Remove a new clause.
      * @param p the Predicate clause to remove
@@ -56,7 +51,7 @@ public abstract class CompositePredicate extends AbstractPredicate {
             return false;
         }
     }
-    
+
     /**
      * Remove all clauses.
      */
@@ -65,7 +60,7 @@ public abstract class CompositePredicate extends AbstractPredicate {
         m_clauses.clear();
         fireExpressionChange();
     }
-    
+
     /**
      * Get the number of sub-predicate clauses.
      * @return the number of clauses
@@ -73,16 +68,16 @@ public abstract class CompositePredicate extends AbstractPredicate {
     public int size() {
         return m_clauses.size();
     }
-    
+
     /**
      * Get the sub-predicate at the given index.
      * @param idx the index to lookup
      * @return the sub-predicate at the given index
      */
     public Predicate get(int idx) {
-        return (Predicate)m_clauses.get(idx);
+        return m_clauses.get(idx);
     }
-    
+
     /**
      * Set the given predicate to be the only clause of thie composite.
      * @param p the new sole sub-predicate clause
@@ -91,10 +86,12 @@ public abstract class CompositePredicate extends AbstractPredicate {
         removeChildListeners();
         m_clauses.clear();
         m_clauses.add(p);
-        if ( hasListeners() ) addChildListeners();
+        if ( hasListeners() ) {
+			addChildListeners();
+		}
         fireExpressionChange();
     }
-    
+
     /**
      * Set the given predicates to be the clauses of thie composite.
      * @param p the new sub-predicate clauses
@@ -103,13 +100,16 @@ public abstract class CompositePredicate extends AbstractPredicate {
         removeChildListeners();
         m_clauses.clear();
         for ( int i=0; i<p.length; ++i ) {
-            if ( !m_clauses.contains(p) )
-                m_clauses.add(p[i]);
+            if ( !m_clauses.contains(p) ) {
+				m_clauses.add(p[i]);
+			}
         }
-        if ( hasListeners() ) addChildListeners();
+        if ( hasListeners() ) {
+			addChildListeners();
+		}
         fireExpressionChange();
     }
-    
+
     /**
      * Get a predicate instance just like this one but without
      * the given predicate as a clause.
@@ -119,60 +119,63 @@ public abstract class CompositePredicate extends AbstractPredicate {
     public Predicate getSubPredicate(Predicate p) {
         CompositePredicate cp = null;
         try {
-            cp  = (CompositePredicate)this.getClass().newInstance();
+            cp  = this.getClass().newInstance();
         } catch (InstantiationException e) {
             // won't happen
         } catch (IllegalAccessException e) {
             // won't happen
         }
         for ( int i=0; i<m_clauses.size(); ++i ) {
-            Predicate pp = (Predicate)m_clauses.get(i);
+            Predicate pp = m_clauses.get(i);
             if ( p != pp ) {
                 cp.add(pp);
             }
         }
         return cp;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * @see prefuse.data.expression.Expression#visit(prefuse.data.expression.ExpressionVisitor)
      */
-    public void visit(ExpressionVisitor v) {
+    @Override
+	public void visit(ExpressionVisitor v) {
         v.visitExpression(this);
-        Iterator iter = m_clauses.iterator();
+        Iterator<Predicate> iter = m_clauses.iterator();
         while ( iter.hasNext() ) {
             v.down();
             ((Expression)iter.next()).visit(v);
             v.up();
         }
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * @see prefuse.data.expression.AbstractExpression#addChildListeners()
      */
-    protected void addChildListeners() {
-        Iterator iter = m_clauses.iterator();
+    @Override
+	protected void addChildListeners() {
+        Iterator<Predicate> iter = m_clauses.iterator();
         while ( iter.hasNext() ) {
             ((Expression)iter.next()).addExpressionListener(this);
         }
     }
-    
+
     /**
      * @see prefuse.data.expression.AbstractExpression#removeChildListeners()
      */
-    protected void removeChildListeners() {
-        Iterator iter = m_clauses.iterator();
+    @Override
+	protected void removeChildListeners() {
+        Iterator<Predicate> iter = m_clauses.iterator();
         while ( iter.hasNext() ) {
             ((Expression)iter.next()).removeExpressionListener(this);
         }
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Return a String representation of this predicate.
      * @param op a String describing the operation this Predicate performs
@@ -182,11 +185,11 @@ public abstract class CompositePredicate extends AbstractPredicate {
         if ( m_clauses.size() == 1 ) {
             return m_clauses.get(0).toString();
         }
-        
+
         StringBuffer sbuf = new StringBuffer();
         sbuf.append('(');
 
-        Iterator iter = m_clauses.iterator();
+        Iterator<Predicate> iter = m_clauses.iterator();
         while ( iter.hasNext() ) {
             sbuf.append(iter.next().toString());
             if ( iter.hasNext() ) {
@@ -195,7 +198,7 @@ public abstract class CompositePredicate extends AbstractPredicate {
                 sbuf.append(" ");
             }
         }
-        
+
         sbuf.append(')');
         return sbuf.toString();
     }

@@ -1,6 +1,7 @@
 package prefuse.data.parser;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Infers the data types for a table of data by testing each value
@@ -10,15 +11,15 @@ import java.util.ArrayList;
  * supports one data field at a time, TypeInferencer maintains a collection
  * of ParserFactory instances to infer type for multiple data columns
  * simultaneously.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  * @see ParserFactory
  */
 public class TypeInferencer {
 
     public ParserFactory m_template;
-    public ArrayList m_factories = new ArrayList();
-    
+    public List<ParserFactory> m_factories = new ArrayList<ParserFactory>();
+
     /**
      * Create a new TypeInferencer using the default ParserFactory
      * settings, thus the default parsers and parser ordering will be used.
@@ -37,21 +38,24 @@ public class TypeInferencer {
     public TypeInferencer(ParserFactory template) {
         m_template = template;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     private void rangeCheck(int column, boolean grow) {
-        if ( column < 0 || (!grow && column >= m_factories.size()))
-            throw new IndexOutOfBoundsException(
+        if ( column < 0 || !grow && column >= m_factories.size()) {
+			throw new IndexOutOfBoundsException(
                 "Index out of bounds: "+column);
-        
-        if ( column < m_factories.size() )
-            return;
-        
-        for ( int i=m_factories.size(); i<=column; ++i )
-            m_factories.add(m_template.clone());
+		}
+
+        if ( column < m_factories.size() ) {
+			return;
+		}
+
+        for ( int i=m_factories.size(); i<=column; ++i ) {
+			m_factories.add((ParserFactory)m_template.clone());
+		}
     }
-    
+
     /**
      * Sample the given text string for the given data column index.
      * @param column the data column index of the sample
@@ -59,27 +63,27 @@ public class TypeInferencer {
      */
     public void sample(int column, String value) {
         rangeCheck(column, true);
-        ((ParserFactory)m_factories.get(column)).sample(value);
+        m_factories.get(column).sample(value);
     }
-    
+
     /**
      * Get the data type for the highest ranking candidate parser
      * still in the running for the given column index.
      * @param column the data column index
      * @return the currently inferred type of that column
      */
-    public Class getType(int column) {
+    public Class<?> getType(int column) {
         return getParser(column).getType();
     }
-    
+
     /**
      * Get the top-ranking candidate data parser for the given column index.
      * @param column the data column index
      * @return the data parser to use for that column
      */
     public DataParser getParser(int column) {
-        rangeCheck(column, false);
-        return ((ParserFactory)m_factories.get(column)).getParser();
+        rangeCheck(column, true);
+        return m_factories.get(column).getParser();
     }
-    
+
 } // end of class TypeInferencer

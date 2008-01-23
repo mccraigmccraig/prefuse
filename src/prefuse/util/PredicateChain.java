@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package prefuse.util;
 
@@ -12,14 +12,14 @@ import prefuse.data.expression.Predicate;
 /**
  * A chain of Predicates and associated values, maintain a large
  * if-statement structure for looking up values based on a Predicate
- * condition. 
+ * condition.
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class PredicateChain {
-    
+
     private Expression m_head = new ObjectLiteral(null);
     private IfExpression m_tail = null;
-    
+
     /**
      * Return the backing predicate chain as an Expression instance.
      * @return the predicate chain, either an IfExpression or
@@ -28,17 +28,17 @@ public class PredicateChain {
     public Expression getExpression() {
         return m_head;
     }
-    
+
     /**
      * Evaluate the predicate chain for the given Tuple.
      * @param t the Tuple
      * @return the object associated with the first Predicate
      * that successfully matches the Tuple.
      */
-    public Object get(Tuple t) {
+    public Object get(Tuple<?> t) {
         return m_head.get(t);
     }
-    
+
     /**
      * Add a new rule to the end of the chain, associating a Predicate
      * condition with an Object value.
@@ -56,7 +56,7 @@ public class PredicateChain {
             m_tail = ie;
         }
     }
-    
+
     /**
      * Remove rules using the given predicate from this predicate chain.
      * This method will not remove rules in which this predicate is used
@@ -66,24 +66,28 @@ public class PredicateChain {
      * @return true if a rule was successfully removed, false otherwise
      */
     public boolean remove(Predicate p) {
-        if ( p == null ) return false;
-        
+        if ( p == null ) {
+			return false;
+		}
+
         IfExpression prev = null;
         Expression expr = m_head;
         while ( expr instanceof IfExpression ) {
             IfExpression ifex = (IfExpression)expr;
-            Predicate test = (Predicate)ifex.getTestPredicate();
+            Predicate test = ifex.getTestPredicate();
             if ( p.equals(test) ) {
                 Expression elseex = ifex.getElseExpression();
                 ifex.setElseExpression(new ObjectLiteral(null));
                 if ( prev != null ) {
                     prev.setElseExpression(elseex);
-                    if ( ifex == m_tail )
-                        m_tail = prev;
+                    if ( ifex == m_tail ) {
+						m_tail = prev;
+					}
                 } else {
                     m_head = elseex;
-                    if ( ifex == m_tail )
-                        m_tail = null;
+                    if ( ifex == m_tail ) {
+						m_tail = null;
+					}
                 }
                 return true;
             } else {
@@ -93,7 +97,7 @@ public class PredicateChain {
         }
         return false;
     }
-    
+
     /**
      * Remove all rules from the predicate chain.
      */
@@ -101,5 +105,5 @@ public class PredicateChain {
         m_head = new ObjectLiteral(null);
         m_tail = null;
     }
-    
+
 } // end of class PredicateChain

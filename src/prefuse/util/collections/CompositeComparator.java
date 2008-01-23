@@ -5,13 +5,13 @@ import java.util.Comparator;
 /**
  * Comparator that makes comparison using an ordered list of
  * individual comparators;
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class CompositeComparator implements Comparator {
+public class CompositeComparator<E> implements Comparator<E> {
 
     private static final int INCREMENT = 2;
-    private Comparator[] m_cmp;
+    private Comparator<? super E>[] m_cmp;
     private int m_rev = 1;
     private int m_size = 0;
 
@@ -22,7 +22,7 @@ public class CompositeComparator implements Comparator {
     public CompositeComparator(int size) {
         this(size, false);
     }
-    
+
     /**
      * Creates an empty CompositeComparator with the given capacity.
      * @param size the starting capacity of this comparator
@@ -33,48 +33,50 @@ public class CompositeComparator implements Comparator {
         m_cmp = new Comparator[size];
         m_rev = reverse ? -1 : 1;
     }
-    
+
     /**
      * Creates a new CompositeComparator.
      * @param cmp the constituent comparators of this composite
      */
-    public CompositeComparator(Comparator[] cmp) {
+    public CompositeComparator(Comparator<? super E>[] cmp) {
         this(cmp, false);
     }
-    
+
     /**
      * Creates a new CompositeComparator.
      * @param cmp the constituent comparators of this composite
      * @param reverse when true, reverses the sort order of the included
      * comparators, when false, objects are sorted as usual
      */
-    public CompositeComparator(Comparator[] cmp, boolean reverse) {
+    public CompositeComparator(Comparator<? super E>[] cmp, boolean reverse) {
         this(cmp.length, reverse);
         System.arraycopy(cmp, 0, m_cmp, 0, cmp.length);
         m_size = cmp.length;
     }
-    
+
     /**
      * Adds an additional comparator to this composite.
      * @param c the Comparator to add
      */
-    public void add(Comparator c) {
-        if ( c == null ) return;
+    public void add(Comparator<? super E> c) {
+        if ( c == null ) {
+			return;
+		}
         if ( m_cmp.length == m_size ) {
-            Comparator[] cmp = new Comparator[m_size+INCREMENT];
+            Comparator<? super E>[] cmp = new Comparator[m_size+INCREMENT];
             System.arraycopy(m_cmp, 0, cmp, 0, m_size);
             m_cmp = cmp;
         }
         m_cmp[m_size++] = c;
     }
-    
+
     /**
      * Removes a comparator from this composite.
      * @param c the Comparator to remove
      * @return true if the comparator was successfully removed,
      * false otherwise
      */
-    public boolean remove(Comparator c) {
+    public boolean remove(Comparator<? super E> c) {
         for ( int i=0; i<m_size; ++i ) {
             if ( m_cmp[i].equals(c) ) {
                 System.arraycopy(m_cmp, i+1, m_cmp, i, m_size-i);
@@ -84,13 +86,13 @@ public class CompositeComparator implements Comparator {
         }
         return false;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(Object o1, Object o2) {
+    public int compare(E o1, E o2) {
         for ( int i=0; i<m_cmp.length; ++i ) {
             int c = m_cmp[i].compare(o1, o2);
             if ( c != 0 ) {

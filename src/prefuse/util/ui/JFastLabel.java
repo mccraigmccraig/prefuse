@@ -14,7 +14,7 @@ import javax.swing.SwingConstants;
  * Swing component that acts much like a JLabel, but does not revalidate
  * its bounds when updated, making it much faster but suitable only for
  * use in situations where the initial bounds are sufficient.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class JFastLabel extends JComponent {
@@ -24,14 +24,14 @@ public class JFastLabel extends JComponent {
     private int m_halign = SwingConstants.LEFT;
     private int m_fheight = -1;
     private boolean m_quality = false;
-    
+
     /**
      * Create a new JFastLabel with no text.
      */
     public JFastLabel() {
         this(null);
     }
-    
+
     /**
      * Create a new JFastLabel with the given text.
      * @param text the label text.
@@ -57,15 +57,16 @@ public class JFastLabel extends JComponent {
         this.m_text = text;
         repaint();
     }
-    
+
     /**
      * @see java.awt.Component#setFont(java.awt.Font)
      */
-    public void setFont(Font f) {
+    @Override
+	public void setFont(Font f) {
         super.setFont(f);
         m_fheight = -1;
     }
-    
+
     /**
      * Set the vertical alignment.
      * @param align the vertical alignment
@@ -75,7 +76,7 @@ public class JFastLabel extends JComponent {
         m_valign = align;
         m_fheight = -1;
     }
-    
+
     /**
      * Set the horizontal alignment.
      * @param align the horizontal alignment
@@ -84,7 +85,7 @@ public class JFastLabel extends JComponent {
     public void setHorizontalAlignment(int align) {
         m_halign = align;
     }
-    
+
     /**
      * Get the quality level of this label. High quality results in
      * anti-aliased rendering.
@@ -93,7 +94,7 @@ public class JFastLabel extends JComponent {
     public boolean getHighQuality() {
         return m_quality;
     }
-    
+
     /**
      * Set the quality level of this label. High quality results in
      * anti-aliased rendering.
@@ -102,27 +103,30 @@ public class JFastLabel extends JComponent {
     public void setHighQuality(boolean b) {
         m_quality = b;
     }
-    
+
     /**
      * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
      */
-    public void paintComponent(Graphics g) {
+    @Override
+	public void paintComponent(Graphics g) {
         Insets ins = getInsets();
         int w = getWidth()-ins.left-ins.right;
         int h = getHeight()-ins.top-ins.bottom;
         if ( m_fheight == -1 ) {
             FontMetrics fm = g.getFontMetrics(getFont());
-            if ( m_valign == SwingConstants.BOTTOM )
-                m_fheight = fm.getDescent();
-            else if ( m_valign == SwingConstants.TOP )
-                m_fheight = fm.getAscent();
+            if ( m_valign == SwingConstants.BOTTOM ) {
+				m_fheight = fm.getDescent();
+			} else if ( m_valign == SwingConstants.TOP ) {
+				m_fheight = fm.getAscent();
+			}
         }
         g.setColor(getBackground());
         g.fillRect(ins.left,ins.top,w,h);
-        
-        if ( m_text == null )
-            return;
-        
+
+        if ( m_text == null ) {
+			return;
+		}
+
         g.setFont(getFont());
         g.setColor(getForeground());
         if ( m_valign == SwingConstants.BOTTOM ) {
@@ -130,7 +134,7 @@ public class JFastLabel extends JComponent {
         } else {
             h = ins.top+m_fheight;
         }
-        
+
         switch ( m_halign ) {
         case SwingConstants.RIGHT: {
             FontMetrics fm = g.getFontMetrics(getFont());
@@ -148,7 +152,7 @@ public class JFastLabel extends JComponent {
                     RenderingHints.KEY_TEXT_ANTIALIASING,
                     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         }
-        g.drawString(m_text, w, h); 
+        g.drawString(m_text, w, h);
     }
-    
+
 } // end of class JFastLabel

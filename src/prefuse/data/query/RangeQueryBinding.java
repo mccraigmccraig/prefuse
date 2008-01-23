@@ -24,22 +24,22 @@ import prefuse.util.ui.ValuedRangeModel;
  */
 public class RangeQueryBinding extends DynamicQueryBinding {
 
-    private Class m_type;
-    private Listener m_lstnr;
+    private final Class<?> m_type;
+    private final Listener m_lstnr;
     private ValuedRangeModel m_model;
     private boolean m_ordinal;
-    
+
     private static FocusListener s_sliderAdj;
-    
+
     /**
      * Create a new RangeQueryBinding over the given set and data field.
      * @param ts the TupleSet to query
      * @param field the data field (Table column) to query
      */
-    public RangeQueryBinding(TupleSet ts, String field) {
+    public RangeQueryBinding(TupleSet<?> ts, String field) {
         this(ts, field, false);
     }
-    
+
     /**
      * Create a new RangeQueryBinding over the given set and data field,
      * optionally forcing an ordinal treatment of data.
@@ -53,7 +53,7 @@ public class RangeQueryBinding extends DynamicQueryBinding {
      * a {@link NumberRangeModel} will be used to represent the data. If
      * the argument is false, default inference mechanisms will be used.
      */
-    public RangeQueryBinding(TupleSet ts, String field, boolean forceOrdinal) {
+    public RangeQueryBinding(TupleSet<?> ts, String field, boolean forceOrdinal) {
         super(ts, field);
         m_type = DataLib.inferType(ts, field);
         m_ordinal = forceOrdinal;
@@ -61,12 +61,12 @@ public class RangeQueryBinding extends DynamicQueryBinding {
         initPredicate();
         initModel();
     }
-    
+
     private void initPredicate() {
         // determine minimum and maximum values
         Object min = DataLib.min(m_tuples, m_field).get(m_field);
         Object max = DataLib.max(m_tuples, m_field).get(m_field);
-        
+
         // set up predicate
         Literal left = Literal.getLiteral(min, m_type);
         Literal right = Literal.getLiteral(max, m_type);
@@ -74,11 +74,12 @@ public class RangeQueryBinding extends DynamicQueryBinding {
         RangePredicate rp = new RangePredicate(ce, left, right);
         setPredicate(rp);
     }
-    
+
     public void initModel() {
-        if ( m_model != null )
-            m_model.removeChangeListener(m_lstnr);
-        
+        if ( m_model != null ) {
+			m_model.removeChangeListener(m_lstnr);
+		}
+
         // set up data / selection model
         ValuedRangeModel model = null;
         if ( TypeLib.isNumericType(m_type) && !m_ordinal ) {
@@ -102,51 +103,52 @@ public class RangeQueryBinding extends DynamicQueryBinding {
     public ValuedRangeModel getModel() {
         return m_model;
     }
-    
+
     /**
-     * Attempts to return the ValuedRangeModel for this binding as a 
+     * Attempts to return the ValuedRangeModel for this binding as a
      * NumberRangeModel. If the range model is not an instance of
      * {@link NumberRangeModel}, a null value is returned.
-     * @return the ValuedRangeModel for this binding as a 
+     * @return the ValuedRangeModel for this binding as a
      * {@link NumberRangeModel}, or null if the range is not numerical.
      */
     public NumberRangeModel getNumberModel() {
-        return (m_model instanceof NumberRangeModel ? 
-                (NumberRangeModel)m_model : null);
+        return m_model instanceof NumberRangeModel ?
+                (NumberRangeModel)m_model : null;
     }
-    
+
     /**
-     * Attempts to return the ValuedRangeModel for this binding as an 
+     * Attempts to return the ValuedRangeModel for this binding as an
      * ObjectRangeModel. If the range model is not an instance of
      * {@link ObjectRangeModel}, a null value is returned.
      * @return the ValuedRangeModel for this binding as an
      * {@link ObjectRangeModel}, or null if the range is numerical.
      */
     public ObjectRangeModel getObjectModel() {
-        return (m_model instanceof ObjectRangeModel ? 
-                (ObjectRangeModel)m_model : null);
+        return m_model instanceof ObjectRangeModel ?
+                (ObjectRangeModel)m_model : null;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Create a new horizontal range slider for interacting with the query.
      * @return a {@link prefuse.util.ui.JRangeSlider} bound to this dynamic
      * query.
      * @see prefuse.data.query.DynamicQueryBinding#createComponent()
      */
-    public JComponent createComponent() {
+    @Override
+	public JComponent createComponent() {
         return createHorizontalRangeSlider();
     }
-    
+
     /**
      * Create a new horizontal range slider for interacting with the query.
      * @return a {@link prefuse.util.ui.JRangeSlider} bound to this dynamic
      * query.
      */
     public JRangeSlider createHorizontalRangeSlider() {
-        return createRangeSlider(JRangeSlider.HORIZONTAL, 
-                JRangeSlider.LEFTRIGHT_TOPBOTTOM);
+        return createRangeSlider(JRangeSlider.Orientation.HORIZONTAL,
+                JRangeSlider.Direction.LEFTRIGHT_TOPBOTTOM);
     }
 
     /**
@@ -155,24 +157,24 @@ public class RangeQueryBinding extends DynamicQueryBinding {
      * query.
      */
     public JRangeSlider createVerticalRangeSlider() {
-        return createRangeSlider(JRangeSlider.VERTICAL, 
-                JRangeSlider.RIGHTLEFT_BOTTOMTOP);
+        return createRangeSlider(JRangeSlider.Orientation.VERTICAL,
+                JRangeSlider.Direction.RIGHTLEFT_BOTTOMTOP);
     }
-    
+
     /**
      * Create a new range slider for interacting with the query, using the
      * given orientation and direction.
      * @param orientation the orientation (horizontal or vertical) of the
      * slider (see {@link prefuse.util.ui.JRangeSlider})
-     * @param direction the direction (direction of data values) of the slider 
+     * @param direction the direction (direction of data values) of the slider
      * (see {@link prefuse.util.ui.JRangeSlider})
      * @return a {@link prefuse.util.ui.JRangeSlider} bound to this dynamic
      * query.
      */
-    public JRangeSlider createRangeSlider(int orientation, int direction) {
+    public JRangeSlider createRangeSlider(JRangeSlider.Orientation orientation, JRangeSlider.Direction direction) {
         return new JRangeSlider(m_model, orientation, direction);
     }
-    
+
     /**
      * Create a new regular (non-range) slider for interacting with the query.
      * This allows you to select a single value at a time.
@@ -183,15 +185,16 @@ public class RangeQueryBinding extends DynamicQueryBinding {
         slider.addFocusListener(getSliderAdjuster());
         return slider;
     }
-    
+
     private synchronized static FocusListener getSliderAdjuster() {
-        if ( s_sliderAdj == null )
-            s_sliderAdj = new SliderAdjuster();
+        if ( s_sliderAdj == null ) {
+			s_sliderAdj = new SliderAdjuster();
+		}
         return s_sliderAdj;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     private static class SliderAdjuster implements FocusListener {
         public void focusGained(FocusEvent e) {
             ((JSlider)e.getSource()).setExtent(0);
@@ -200,13 +203,13 @@ public class RangeQueryBinding extends DynamicQueryBinding {
             // do nothing
         }
     } // end of inner class SliderAdjuster
-    
+
     private class Listener implements ChangeListener {
         public void stateChanged(ChangeEvent e) {
             ValuedRangeModel model = (ValuedRangeModel)e.getSource();
             Object lo = model.getLowValue();
             Object hi = model.getHighValue();
-            
+
             RangePredicate rp = (RangePredicate)m_query;
             rp.setLeftExpression(Literal.getLiteral(lo, m_type));
             rp.setRightExpression(Literal.getLiteral(hi, m_type));

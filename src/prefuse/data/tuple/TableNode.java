@@ -1,24 +1,23 @@
 package prefuse.data.tuple;
 
-import java.util.Iterator;
+import java.util.List;
 
-import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Table;
 
 /**
  * Node implementation that reads Node data from a backing node table.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class TableNode extends TableTuple implements Node {
+public class TableNode extends TableTuple<TableNode> implements Node<TableNode, TableEdge> {
 
     /**
      * The backing graph.
      */
-    protected Graph m_graph;
-    
+    protected Graph<TableTuple<?>,TableNode,TableEdge> m_graph;
+
     /**
      * Initialize a new Node backed by a node table. This method is used by
      * the appropriate TupleManager instance, and should not be called
@@ -29,22 +28,23 @@ public class TableNode extends TableTuple implements Node {
      * @param row the row in the node table to which this Node instance
      *  corresponds.
      */
-    protected void init(Table table, Graph graph, int row) {
-        m_table = table;
-        m_graph = graph;
+    @Override
+	public void init(Table<?> table, Graph<?,?,?> graph, int row) {
+        m_table = (Table<TableNode>) table;
+        m_graph = (Graph<TableTuple<?>,TableNode,TableEdge>) (Object) graph;
         m_row = m_table.isValidRow(row) ? row : -1;
     }
-    
+
     /**
-     * @see prefuse.data.Node#getGraph()
+     *
      */
-    public Graph getGraph() {
+    public Graph<?,TableNode,TableEdge> getGraph() {
         return m_graph;
     }
-    
+
     // ------------------------------------------------------------------------
     // Graph Methods
-    
+
     /**
      * @see prefuse.data.Node#getInDegree()
      */
@@ -69,123 +69,88 @@ public class TableNode extends TableTuple implements Node {
     /**
      * @see prefuse.data.Node#inEdges()
      */
-    public Iterator inEdges() {
+    public List<TableEdge> inEdges() {
         return m_graph.inEdges(this);
     }
 
     /**
      * @see prefuse.data.Node#outEdges()
      */
-    public Iterator outEdges() {
+    public List<TableEdge> outEdges() {
         return m_graph.outEdges(this);
     }
 
     /**
      * @see prefuse.data.Node#edges()
      */
-    public Iterator edges() {
+    public List<TableEdge> edges() {
         return m_graph.edges(this);
     }
-    
+
     /**
      * @see prefuse.data.Node#inNeighbors()
      */
-    public Iterator inNeighbors() {
+    public List<TableNode> inNeighbors() {
         return m_graph.inNeighbors(this);
     }
-    
+
     /**
      * @see prefuse.data.Node#outNeighbors()
      */
-    public Iterator outNeighbors() {
+    public List<TableNode> outNeighbors() {
         return m_graph.outNeighbors(this);
     }
-    
+
     /**
      * @see prefuse.data.Node#neighbors()
      */
-    public Iterator neighbors() {
+    public List<TableNode> neighbors() {
         return m_graph.neighbors(this);
     }
 
-    
+
     // ------------------------------------------------------------------------
     // Tree Methods
 
     /**
      * @see prefuse.data.Node#getParent()
      */
-    public Node getParent() {
+    public TableNode getParent() {
         return m_graph.getSpanningTree().getParent(this);
     }
 
     /**
      * @see prefuse.data.Node#getParentEdge()
      */
-    public Edge getParentEdge() {
+    public TableEdge getParentEdge() {
         return m_graph.getSpanningTree().getParentEdge(this);
-    }
-    
-    /**
-     * @see prefuse.data.Node#getChildCount()
-     */
-    public int getChildCount() {
-        return m_graph.getSpanningTree().getChildCount(m_row);
     }
 
     /**
-     * @see prefuse.data.Node#getChildIndex(prefuse.data.Node)
-     */
-    public int getChildIndex(Node child) {
-        return m_graph.getSpanningTree().getChildIndex(this, child);
-    }
-    
-    /**
-     * @see prefuse.data.Node#getChild(int)
-     */
-    public Node getChild(int idx) {
-        return m_graph.getSpanningTree().getChild(this, idx);
-    }
-    
-    /**
-     * @see prefuse.data.Node#getFirstChild()
-     */
-    public Node getFirstChild() {
-        return m_graph.getSpanningTree().getFirstChild(this);
-    }
-    
-    /**
-     * @see prefuse.data.Node#getLastChild()
-     */
-    public Node getLastChild() {
-        return m_graph.getSpanningTree().getLastChild(this);
-    }
-    
-    /**
      * @see prefuse.data.Node#getPreviousSibling()
      */
-    public Node getPreviousSibling() {
+    public TableNode getPreviousSibling() {
         return m_graph.getSpanningTree().getPreviousSibling(this);
     }
-    
+
     /**
      * @see prefuse.data.Node#getNextSibling()
      */
-    public Node getNextSibling() {
+    public TableNode getNextSibling() {
         return m_graph.getSpanningTree().getNextSibling(this);
     }
-    
+
     /**
      * @see prefuse.data.Node#children()
      */
-    public Iterator children() {
+    public List<TableNode> children() {
         return m_graph.getSpanningTree().children(this);
     }
 
     /**
      * @see prefuse.data.Node#childEdges()
      */
-    public Iterator childEdges() {
+    public List<TableEdge> childEdges() {
         return m_graph.getSpanningTree().childEdges(this);
     }
 
@@ -193,7 +158,7 @@ public class TableNode extends TableTuple implements Node {
      * @see prefuse.data.Node#getDepth()
      */
     public int getDepth() {
-        return m_graph.getSpanningTree().getDepth(m_row);
+        return m_graph.getSpanningTree().getDepth(this);
     }
 
 } // end of class TableNode

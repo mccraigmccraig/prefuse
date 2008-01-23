@@ -7,7 +7,7 @@ import prefuse.visual.VisualItem;
 
 /**
  * GroupExpression that returns the size of a data group.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class GroupSizeFunction extends GroupExpression {
@@ -18,7 +18,7 @@ public class GroupSizeFunction extends GroupExpression {
      */
     public GroupSizeFunction() {
     }
-    
+
     /**
      * Create a new GroupSizeFunction using the given data group name
      * as the Function parameter.
@@ -27,7 +27,7 @@ public class GroupSizeFunction extends GroupExpression {
     public GroupSizeFunction(String group) {
         super(group);
     }
-    
+
     /**
      * @see prefuse.data.expression.Function#getName()
      */
@@ -45,38 +45,43 @@ public class GroupSizeFunction extends GroupExpression {
     /**
      * @see prefuse.data.expression.Expression#get(prefuse.data.Tuple)
      */
-    public Object get(Tuple t) {
+    @Override
+	public Object get(Tuple t) {
         return new Integer(getInt(t));
     }
 
     /**
      * @see prefuse.data.expression.Expression#getDouble(prefuse.data.Tuple)
      */
-    public double getDouble(Tuple t) {
+    @Override
+	public double getDouble(Tuple t) {
         return getInt(t);
     }
 
     /**
      * @see prefuse.data.expression.Expression#getFloat(prefuse.data.Tuple)
      */
-    public float getFloat(Tuple t) {
+    @Override
+	public float getFloat(Tuple t) {
         return getInt(t);
     }
 
     /**
      * @see prefuse.data.expression.Expression#getInt(prefuse.data.Tuple)
      */
-    public int getInt(Tuple t) {
+    @Override
+	public int getInt(Tuple t) {
         String group = getGroup(t);
         if ( group == null ) { return -1; }
         TupleSet ts = ((VisualItem)t).getVisualization().getGroup(group);
-        return ( ts==null ? 0 : ts.getTupleCount() );
+        return ts==null ? 0 : ts.getTupleCount();
     }
 
     /**
      * @see prefuse.data.expression.Expression#getLong(prefuse.data.Tuple)
      */
-    public long getLong(Tuple t) {
+    @Override
+	public long getLong(Tuple t) {
         return getInt(t);
     }
 

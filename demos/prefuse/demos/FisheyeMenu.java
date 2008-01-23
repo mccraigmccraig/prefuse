@@ -18,7 +18,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import prefuse.Constants;
+import prefuse.Alignment;
 import prefuse.Display;
 import prefuse.Visualization;
 import prefuse.action.ActionList;
@@ -40,12 +40,12 @@ import prefuse.visual.VisualItem;
  * <p>A prefuse-based implementation of Fisheye Menus, showcasing the use of
  * visual distortion to provide access to a large number of data items
  * without scrolling.</p>
- * 
+ *
  * <p>This implementation is inspired by the Fisheye Menu research conducted
  * by Ben Bederson at the University of Maryland. See the
  * <a href="http://www.cs.umd.edu/hcil/fisheyemenu/">Fisheye Menu project
  * web site</a> for more details.</p>
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class FisheyeMenu extends Display {
@@ -56,7 +56,7 @@ public class FisheyeMenu extends Display {
     public static final String LABEL = "label";
     /** The action data field for menu items. */
     public static final String ACTION = "action";
-    
+
     /**
      * This schema holds the data representation for internal storage of
      * menu items.
@@ -66,12 +66,12 @@ public class FisheyeMenu extends Display {
         ITEM_SCHEMA.addColumn(LABEL, String.class);
         ITEM_SCHEMA.addColumn(ACTION, ActionListener.class);
     }
-    
-    private Table m_items = ITEM_SCHEMA.instantiate(); // table of menu items
-    
-    private double m_maxHeight = 500; // maximum menu height in pixels
-    private double m_scale = 7;       // scale parameter for fisheye distortion
-    
+
+    private final Table<?> m_items = Table.createTable(ITEM_SCHEMA); // table of menu items
+
+    private final double m_maxHeight = 500; // maximum menu height in pixels
+    private final double m_scale = 7;       // scale parameter for fisheye distortion
+
     /**
      * Create a new, empty FisheyeMenu.
      * @see #addMenuItem(String, javax.swing.Action)
@@ -79,33 +79,34 @@ public class FisheyeMenu extends Display {
     public FisheyeMenu() {
         super(new Visualization());
         m_vis.addTable(ITEMS, m_items);
-        
+
         // set up the renderer to use
         LabelRenderer renderer = new LabelRenderer(LABEL);
         renderer.setHorizontalPadding(0);
         renderer.setVerticalPadding(1);
-        renderer.setHorizontalAlignment(Constants.LEFT);
+        renderer.setHorizontalAlignment(Alignment.LEFT);
         m_vis.setRendererFactory(new DefaultRendererFactory(renderer));
-        
+
         // set up this display
         setSize(100,470);
         setHighQuality(true);
         setBorder(BorderFactory.createEmptyBorder(10,10,10,5));
         addControlListener(new ControlAdapter() {
             // dispatch an action event to the menu item
-            public void itemClicked(VisualItem item, MouseEvent e) {
+            @Override
+			public void itemClicked(VisualItem<?> item, MouseEvent e) {
                 ActionListener al = (ActionListener)item.get(ACTION);
                 al.actionPerformed(new ActionEvent(item, e.getID(),
                     "click", e.getWhen(), e.getModifiers()));
             }
         });
-        
+
         // text color function
         // items with the mouse over printed in red, otherwise black
         ColorAction colors = new ColorAction(ITEMS, VisualItem.TEXTCOLOR);
         colors.setDefaultColor(ColorLib.gray(0));
         colors.add("hover()", ColorLib.rgb(255,0,0));
-        
+
         // initial layout and coloring
         ActionList init = new ActionList();
         init.add(new VerticalLineLayout(m_maxHeight));
@@ -120,12 +121,12 @@ public class FisheyeMenu extends Display {
         distort.add(colors);
         distort.add(new RepaintAction());
         m_vis.putAction("distort", distort);
-        
+
         // update the distortion anchor position to be the current
         // location of the mouse pointer
         addControlListener(new AnchorUpdateControl(feye, "distort"));
     }
-    
+
     /**
      * Adds a menu item to the fisheye menu.
      * @param name the menu label to use
@@ -138,7 +139,7 @@ public class FisheyeMenu extends Display {
         m_items.set(row, LABEL, name);
         m_items.set(row, ACTION, listener);
     }
-    
+
     /**
      * Run a demonstration of the FisheyeMenu
      */
@@ -147,7 +148,7 @@ public class FisheyeMenu extends Display {
         Logger.getLogger("prefuse").setLevel(Level.WARNING);
 
         FisheyeMenu fm = demo();
-        
+
         // create and display application window
         JFrame f = new JFrame("p r e f u s e  |  f i s h e y e");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -155,7 +156,7 @@ public class FisheyeMenu extends Display {
         f.pack();
         f.setVisible(true);
     }
-    
+
     public static FisheyeMenu demo() {
         // create a new fisheye menu and populate it
         FisheyeMenu fm = new FisheyeMenu();
@@ -164,7 +165,7 @@ public class FisheyeMenu extends Display {
             fm.addMenuItem(String.valueOf(i), new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     System.out.println("clicked item: "+
-                        ((VisualItem)e.getSource()).get(LABEL));
+                        ((VisualItem<?>)e.getSource()).get(LABEL));
                     System.out.flush();
                 }
             });
@@ -172,7 +173,7 @@ public class FisheyeMenu extends Display {
         fm.getVisualization().run("init");
         return fm;
     }
-    
+
     /**
      * Lines up all VisualItems vertically. Also scales the size such that
      * all items fit within the maximum layout size, and updates the
@@ -180,47 +181,48 @@ public class FisheyeMenu extends Display {
      */
     public class VerticalLineLayout extends Layout {
         private double m_maxHeight = 600;
-        
+
         public VerticalLineLayout(double maxHeight) {
             m_maxHeight = maxHeight;
         }
-        
-        public void run(double frac) {
+
+        @Override
+		public void run(double frac) {
             // first pass
             double w = 0, h = 0;
-            Iterator iter = m_vis.items();
+            Iterator<? extends VisualItem<?>> iter = m_vis.items().iterator();
             while ( iter.hasNext() ) {
-                VisualItem item = (VisualItem)iter.next();
+                VisualItem<?> item = iter.next();
                 item.setSize(1.0);
                 h += item.getBounds().getHeight();
             }
             double scale = h > m_maxHeight ? m_maxHeight/h : 1.0;
-            
+
             Display d = m_vis.getDisplay(0);
             Insets ins = d.getInsets();
-            
+
             // second pass
             h = ins.top;
             double ih, y=0, x=ins.left;
-            iter = m_vis.items();
+            iter = m_vis.items().iterator();
             while ( iter.hasNext() ) {
-                VisualItem item = (VisualItem)iter.next();
+                VisualItem<?> item = iter.next();
                 item.setSize(scale); item.setEndSize(scale);
                 Rectangle2D b = item.getBounds();
-                
+
                 w = Math.max(w, b.getWidth());
                 ih = b.getHeight();
-                y = h+(ih/2);
+                y = h+ih/2;
                 setX(item, null, x);
                 setY(item, null, y);
                 h += ih;
             }
-            
+
             // set the display size to fit text
             setSize(d, (int)Math.round(2*m_scale*w + ins.left + ins.right),
                        (int)Math.round(h + ins.bottom));
         }
-        
+
         private void setSize(final Display d, final int width, final int height)
         {
         	SwingUtilities.invokeLater(new Runnable() {
@@ -229,6 +231,7 @@ public class FisheyeMenu extends Display {
         		}
         	});
         }
+
     } // end of inner class VerticalLineLayout
-    
+
 } // end of class FisheyeMenu

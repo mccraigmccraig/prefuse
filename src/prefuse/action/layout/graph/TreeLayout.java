@@ -2,9 +2,10 @@ package prefuse.action.layout.graph;
 
 import prefuse.action.layout.Layout;
 import prefuse.data.Graph;
-import prefuse.data.Tree;
+import prefuse.data.tree.DeclarativeTree;
 import prefuse.data.tuple.TupleSet;
 import prefuse.visual.NodeItem;
+import prefuse.visual.VisualItem;
 
 /**
  * Abstract base class providing convenience methods for tree layout algorithms.
@@ -14,7 +15,7 @@ import prefuse.visual.NodeItem;
  */
 public abstract class TreeLayout extends Layout {
 
-    protected NodeItem m_root;
+    protected NodeItem<?,?> m_root;
 
     /**
      * Create a new TreeLayout.
@@ -32,7 +33,7 @@ public abstract class TreeLayout extends Layout {
     public TreeLayout(String group) {
         super(group);
     }
-    
+
     // ------------------------------------------------------------------------
 
     /**
@@ -44,29 +45,31 @@ public abstract class TreeLayout extends Layout {
      * @throws IllegalArgumentException if the provided root is not a member of
      * this layout's data group.
      */
-    public void setLayoutRoot(NodeItem root) {
-        if ( !root.isInGroup(m_group) )
-            throw new IllegalArgumentException("Input node is not a member "
+    public void setLayoutRoot(NodeItem<?,?> root) {
+        if ( !root.isInGroup(m_group) ) {
+			throw new IllegalArgumentException("Input node is not a member "
                     + "of this layout's data group");
+		}
         m_root = root;
     }
-    
+
     /**
      * Return the NodeItem to use as the root for this tree layout.
      * @return the root node to use for this tree layout.
      * @throws IllegalStateException if the action's data group does not
      * resolve to a {@link prefuse.data.Graph} instance.
      */
-    public NodeItem getLayoutRoot() {
-        if ( m_root != null )
-            return m_root;
-        
-        TupleSet ts = m_vis.getGroup(m_group);
+    public NodeItem<?,?> getLayoutRoot() {
+        if ( m_root != null ) {
+			return m_root;
+		}
+
+        TupleSet<? extends VisualItem<?>> ts = m_vis.getGroup(m_group);
         if ( ts instanceof Graph ) {
-            Tree tree = ((Graph)ts).getSpanningTree();
-            return (NodeItem)tree.getRoot();
+            DeclarativeTree<?,?> tree = ((Graph<?, ?, ?>)ts).getSpanningTree();
+            return (NodeItem<?,?>) (Object) tree.getRoot();
         } else {
-            throw new IllegalStateException("This action's data group does" +
+            throw new IllegalStateException("This action's data group does " +
                     "not resolve to a Graph instance.");
         }
     }

@@ -2,6 +2,7 @@ package prefuse.data.search;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -24,7 +25,7 @@ import org.apache.lucene.store.RAMDirectory;
  * text, for use within a single application session. The class can, however,
  * be parameterized for any number of other configurations, including accessing
  * persistent search indices.
- *  
+ *
  * @version 1.0
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
@@ -34,26 +35,26 @@ public class LuceneSearcher {
     public static final String FIELD = "prefuse-text";
     /** Document field used to store the document ID number. */
     public static final String ID = "prefuse-id";
-    
-    private Directory directory;
+
+    private final Directory directory;
     private Analyzer analyzer;
     private String[] fields;
-    
+
     private Searcher searcher;
     private IndexReader reader;
     private IndexWriter writer;
     private boolean m_readMode = true;
     private boolean m_readOnly = false;
-    
-    private HashMap m_hitCountCache;
-        
+
+    private final Map<String,Integer> m_hitCountCache;
+
     /**
      * Create a new LuceneSearcher using an in-memory search index.
      */
     public LuceneSearcher() {
         this(new RAMDirectory(), FIELD, false);
     }
-    
+
     /**
      * Create a new LuceneSearcher using the specified search index location.
      * @param dir the Lucene Directory indicating the search index to use.
@@ -61,7 +62,7 @@ public class LuceneSearcher {
     public LuceneSearcher(Directory dir) {
         this(dir, FIELD, false);
     }
-    
+
     /**
      * Create a new LuceneSearcher using a specified search index location,
      * a particular Document field to index, and given read/write status.
@@ -72,7 +73,7 @@ public class LuceneSearcher {
     public LuceneSearcher(Directory dir, String field, boolean readOnly) {
         this(dir, new String[]{field}, readOnly);
     }
-    
+
     /**
      * Create a new LuceneSearcher using a specified search index location,
      * a particular Document fields to index, and given read/write status.
@@ -81,10 +82,10 @@ public class LuceneSearcher {
      * @param readOnly if this index is read-only or is writable.
      */
     public LuceneSearcher(Directory dir, String[] fields, boolean readOnly) {
-        m_hitCountCache = new HashMap();
+        m_hitCountCache = new HashMap<String,Integer>();
         directory = dir;
         analyzer = new StandardAnalyzer();
-        this.fields = (String[])fields.clone();
+        this.fields = fields.clone();
         try {
             writer = new IndexWriter(directory, analyzer, !readOnly);
             writer.close();
@@ -100,9 +101,9 @@ public class LuceneSearcher {
             setReadMode(true);
         }
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Sets if this LuceneSearcher is in read mode or write mode. In read more
      * searches can be issued, in write mode new Documents can be indexed.
@@ -112,15 +113,23 @@ public class LuceneSearcher {
      */
     public boolean setReadMode(boolean mode) {
         // return false if this is read-only
-        if ( m_readOnly && mode == false ) return false;
+        if ( m_readOnly && mode == false ) {
+			return false;
+		}
         // do nothing if already in the mode
-        if ( m_readMode == mode ) return true;
+        if ( m_readMode == mode ) {
+			return true;
+		}
         // otherwise switch modes
         if ( !mode ) {
             // close any open searcher and reader
             try {
-                if ( searcher != null ) searcher.close();
-                if ( reader   != null ) reader.close();
+                if ( searcher != null ) {
+					searcher.close();
+				}
+                if ( reader   != null ) {
+					reader.close();
+				}
             } catch ( Exception e ) {
                 e.printStackTrace();
                 return false;
@@ -155,7 +164,7 @@ public class LuceneSearcher {
         m_readMode = mode;
         return true;
     }
-    
+
     /**
      * Searches the Lucene index using the given query String, returns an object
      * which provides access to the search results.
@@ -180,7 +189,7 @@ public class LuceneSearcher {
                     "the LuceneSearcher is in read mode");
         }
     }
-    
+
     /**
      * Return the result count for the given search query. To allow quick
      * repeated look ups, the hit count is cached (this cache is cleared
@@ -193,14 +202,14 @@ public class LuceneSearcher {
      */
     public int numHits(String query) throws ParseException, IOException {
         Integer count;
-        if ( (count=(Integer)m_hitCountCache.get(query)) == null ) {
+        if ( (count = m_hitCountCache.get(query)) == null ) {
             Hits hits = search(query);
             count = new Integer(hits.length());
             m_hitCountCache.put(query, count);
         }
         return count.intValue();
     }
-    
+
     /**
      * Add a document to the Lucene search index.
      * @param d the Document to add
@@ -220,7 +229,7 @@ public class LuceneSearcher {
                     "the LuceneSearcher is not in read mode");
         }
     }
-    
+
     /**
      * Returns the Analyzer used to process text. See Lucene documentation
      * for more details.
@@ -229,7 +238,7 @@ public class LuceneSearcher {
     public Analyzer getAnalyzer() {
         return analyzer;
     }
-    
+
     /**
      * Sets the Analyzer used to process text. See Lucene documentation
      * for more details.
@@ -238,7 +247,7 @@ public class LuceneSearcher {
     public void setAnalyzer(Analyzer analyzer) {
         this.analyzer = analyzer;
     }
-    
+
     /**
      * Returns the indexed Document fields. These fields determine which
      * fields are indexed as Documents are added and which fields are
@@ -246,9 +255,9 @@ public class LuceneSearcher {
      * @return returns the indexed Document fields
      */
     public String[] getFields() {
-        return (String[])fields.clone();
+        return fields.clone();
     }
-    
+
     /**
      * Sets the indexed Document fields. These fields determine which
      * fields are indexed as Documents are added and which fields are
@@ -256,9 +265,9 @@ public class LuceneSearcher {
      * param fields the indexed Document fields to use
      */
     public void setFields(String[] fields) {
-        this.fields = (String[])fields.clone();
+        this.fields = fields.clone();
     }
-    
+
     /**
      * Returns the Lucene IndexReader. See Lucene documentation
      * for more details.
@@ -267,7 +276,7 @@ public class LuceneSearcher {
     public IndexReader getIndexReader() {
         return reader;
     }
-    
+
     /**
      * Returns the Lucene IndexSearcher. See Lucene documentation
      * for more details.
@@ -276,7 +285,7 @@ public class LuceneSearcher {
     public Searcher getIndexSearcher() {
         return searcher;
     }
-    
+
     /**
      * Indicates if ths LuceneSearcher is read-only.
      * @return true if read-only, false if writes are allowed
@@ -284,5 +293,5 @@ public class LuceneSearcher {
     public boolean isReadOnly() {
         return m_readOnly;
     }
-    
+
 } // end of class LuceneSearcher

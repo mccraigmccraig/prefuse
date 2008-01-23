@@ -23,26 +23,26 @@ import javax.swing.event.ListSelectionListener;
  * Swing component representing a group of toggle buttons -- either checkboxes
  * or radio buttons. This class uses a ListModel and ListSelectionModel to
  * represent the selection state of the buttons.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class JToggleGroup extends JPanel {
 
     public static final int CHECKBOX = 0;
     public static final int RADIO    = 1;
-    
+
     protected final int m_type;
     protected int m_margin  = 0;
     protected int m_spacing = 0;
     protected int m_axis = BoxLayout.X_AXIS;
-    
+
     protected ListModel          m_data;
     protected ListSelectionModel m_sel;
     protected String[]           m_labels;
     protected ButtonGroup        m_group;
-    
-    private Listener m_lstnr;
-    
+
+    private final Listener m_lstnr;
+
     /**
      * Create a new JToggleGroup.
      * @param type the toggle button type to use, one of {@link #CHECKBOX}
@@ -50,16 +50,16 @@ public class JToggleGroup extends JPanel {
      * @param data the list data that should populate the toggle group
      */
     public JToggleGroup(int type, Object[] data) {
-        this(type, new DefaultListModel(), 
+        this(type, new DefaultListModel(),
                 new DefaultListSelectionModel());
-        
+
         DefaultListModel model = (DefaultListModel)m_data;
         for ( int i=0; i<data.length; ++i ) {
             model.addElement(data[i]);
         }
         initUI();
     }
-    
+
     /**
      * Create a new JToggleGroup.
      * @param type the toggle button type to use, one of {@link #CHECKBOX}
@@ -69,7 +69,7 @@ public class JToggleGroup extends JPanel {
     public JToggleGroup(int type, ListModel data) {
         this(type, data, new DefaultListSelectionModel());
     }
-    
+
     /**
      * Create a new JToggleGroup.
      * @param type the toggle button type to use, one of {@link #CHECKBOX}
@@ -91,14 +91,15 @@ public class JToggleGroup extends JPanel {
 
         m_lstnr = new Listener();
         m_sel.addListSelectionListener(m_lstnr);
-        
-        if ( m_data.getSize() > 0 )
-            initUI();
+
+        if ( m_data.getSize() > 0 ) {
+			initUI();
+		}
         setFocusable(false);
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Initialize the UI.
      */
@@ -106,22 +107,27 @@ public class JToggleGroup extends JPanel {
         // unregister all active components
         for ( int i=0; i<getComponentCount(); ++i ) {
             Component c = getComponent(i);
-            if ( !(c instanceof JToggleButton) ) continue;
+            if ( !(c instanceof JToggleButton) ) {
+				continue;
+			}
             JToggleButton tb = (JToggleButton)c;
             tb.removeActionListener(m_lstnr);
-            if ( m_group != null )
-                m_group.remove(tb);
+            if ( m_group != null ) {
+				m_group.remove(tb);
+			}
         }
-        
+
         // clear this container and add new components
         removeAll();
         UILib.addStrut(this, m_axis, m_margin);
         for ( int i=0; i<m_data.getSize(); ++i ) {
-            if ( i>0 ) UILib.addStrut(this, m_axis, m_spacing);
-            
+            if ( i>0 ) {
+				UILib.addStrut(this, m_axis, m_spacing);
+			}
+
             Object data  = m_data.getElementAt(i);
             String label = m_labels==null ? data.toString() : m_labels[i];
-            
+
             JToggleButton tb = null;
             if ( m_type == CHECKBOX ) {
                 tb = new JCheckBox(label);
@@ -134,13 +140,13 @@ public class JToggleGroup extends JPanel {
             add(tb);
         }
         UILib.addStrut(this, m_axis, m_margin);
-        
+
         // make sure the selection status shows up
         m_lstnr.valueChanged(null);
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Set the Box axis type used to orient the toggle group component.
      * @param axis the axis type, one of
@@ -154,7 +160,7 @@ public class JToggleGroup extends JPanel {
         m_axis = axis;
         initUI();
     }
-    
+
     /**
      * Get the Box axis type used to orient the toggle group component.
      * @return the axis type, one of
@@ -166,14 +172,15 @@ public class JToggleGroup extends JPanel {
     public int getAxisType() {
         return m_axis;
     }
-    
+
     /**
      * Set the margin, in pixels, to use at the ends of the JToggleGroup.
      * @param margin the margin in pixels
      */
     public void setMargin(int margin) {
-        if ( margin < 0 )
-            throw new IllegalArgumentException("Margin is less than zero.");
+        if ( margin < 0 ) {
+			throw new IllegalArgumentException("Margin is less than zero.");
+		}
         m_margin = margin;
         initUI();
     }
@@ -185,18 +192,19 @@ public class JToggleGroup extends JPanel {
     public int getMargin() {
         return m_margin;
     }
-    
+
     /**
      * Set the spacing between toggle group components.
      * @param spacing the spacing, in pixels, to use between components
      */
     public void setSpacing(int spacing) {
-        if ( spacing < 0 )
-            throw new IllegalArgumentException("Spacing is less than zero.");
+        if ( spacing < 0 ) {
+			throw new IllegalArgumentException("Spacing is less than zero.");
+		}
         m_spacing = spacing;
         initUI();
     }
-    
+
     /**
      * Get the spacing between toggle group components.
      * @return the spacing, in pixels, to use between components
@@ -204,16 +212,15 @@ public class JToggleGroup extends JPanel {
     public int getSpacing() {
         return m_spacing;
     }
-    
+
     /**
      * Set the ListModel backing this component.
-     * @param model the list model to use
      */
     public void setModel(ListModel model) {
         m_data = model;
         initUI();
     }
-    
+
     /**
      * Get the ListModel backing this component.
      * @return the list model
@@ -221,7 +228,7 @@ public class JToggleGroup extends JPanel {
     public ListModel getModel() {
         return m_data;
     }
-    
+
     /**
      * Set the ListSelectionModel used by this component.
      * @param sel the list selection model to use
@@ -232,7 +239,7 @@ public class JToggleGroup extends JPanel {
         m_sel.addListSelectionListener(m_lstnr);
         m_lstnr.valueChanged(null);
     }
-    
+
     /**
      * Get the ListSelectionModel used by this component.
      * @return the list selection model to use
@@ -240,7 +247,7 @@ public class JToggleGroup extends JPanel {
     public ListSelectionModel getSelectionModel() {
         return m_sel;
     }
-    
+
     /**
      * Set the labels to use for the Objects contained in the list model.
      * @param labels the display labels to use in the interface component
@@ -252,37 +259,40 @@ public class JToggleGroup extends JPanel {
         m_labels = labels;
         initUI();
     }
-    
+
     /**
      * Set the background color of this toggle group.
      * @see java.awt.Component#setBackground(java.awt.Color)
      */
-    public void setBackground(Color background) {
+    @Override
+	public void setBackground(Color background) {
         for ( int i=0; i<getComponentCount(); ++i ) {
             getComponent(i).setBackground(background);
         }
     }
-    
+
     /**
      * Set the foreground color of this toggle group.
      * @see java.awt.Component#setBackground(java.awt.Color)
      */
-    public void setForeground(Color foreground) {
+    @Override
+	public void setForeground(Color foreground) {
         for ( int i=0; i<getComponentCount(); ++i ) {
             getComponent(i).setForeground(foreground);
         }
     }
-    
+
     /**
      * Set the font used by this toggle group.
      * @see java.awt.Component#setFont(java.awt.Font)
      */
-    public void setFont(Font font) {
+    @Override
+	public void setFont(Font font) {
         for ( int i=0; i<getComponentCount(); ++i ) {
             getComponent(i).setFont(font);
         }
     }
-    
+
     /**
      * Sets if the various toggle buttons can receive the keyboard focus.
      * @param b true to set toggle buttons keyboard accessible, false to
@@ -291,31 +301,33 @@ public class JToggleGroup extends JPanel {
     public void setGroupFocusable(boolean b) {
         for ( int i=0; i<getComponentCount(); ++i ) {
             Component c = getComponent(i);
-            if ( c instanceof JToggleButton )
-                c.setFocusable(b);
+            if ( c instanceof JToggleButton ) {
+				c.setFocusable(b);
+			}
         }
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     private class Listener implements ListSelectionListener, ActionListener {
 
         private boolean m_ignore = false;
-        
+
         public void valueChanged(ListSelectionEvent neverUsed) {
             if ( m_ignore ) { return; } else { m_ignore = true; }
-            
+
             if ( m_type == RADIO ) {
                 int idx = m_sel.getMinSelectionIndex();
-                boolean sel = (idx >= 0);
+                boolean sel = idx >= 0;
                 JToggleButton tb = null;
-                
+
                 for ( int i=0, j=0; i<getComponentCount(); ++i ) {
                     Component c = getComponent(i);
                     if ( c instanceof JToggleButton ) {
                         tb = (JToggleButton)c;
-                        if ( (!sel && tb.isSelected()) || (sel && idx==j) )
-                            break;
+                        if ( !sel && tb.isSelected() || sel && idx==j ) {
+							break;
+						}
                         ++j;
                     }
                 }
@@ -328,13 +340,13 @@ public class JToggleGroup extends JPanel {
                     }
                 }
             }
-            
+
             m_ignore = false;
         }
 
         public void actionPerformed(ActionEvent e) {
             if ( m_ignore ) { return; } else { m_ignore = true; }
-            
+
             JToggleButton tb = (JToggleButton)e.getSource();
             boolean sel = tb.isSelected();
             int idx = ((Integer)tb.getClientProperty("idx")).intValue();
@@ -345,10 +357,10 @@ public class JToggleGroup extends JPanel {
             } else {
                 m_sel.removeSelectionInterval(idx,idx);
             }
-            
+
             m_ignore = false;
         }
-        
+
     }
-    
+
 } // end of class JToggleGroup

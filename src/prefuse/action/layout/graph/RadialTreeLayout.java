@@ -3,13 +3,14 @@ package prefuse.action.layout.graph;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
+import java.util.List;
 
 import prefuse.data.Graph;
-import prefuse.data.Node;
 import prefuse.data.Schema;
 import prefuse.data.tuple.TupleSet;
 import prefuse.util.ArrayLib;
 import prefuse.util.MathLib;
+import prefuse.visual.EdgeItem;
 import prefuse.visual.NodeItem;
 
 
@@ -17,7 +18,7 @@ import prefuse.visual.NodeItem;
  * <p>TreeLayout instance that computes a radial layout, laying out subsequent
  * depth levels of a tree on circles of progressively increasing radius.
  * </p>
- * 
+ *
  * <p>The algorithm used is that of Ka-Ping Yee, Danyel Fisher, Rachna Dhamija,
  * and Marti Hearst in their research paper
  * <a href="http://citeseer.ist.psu.edu/448292.html">Animated Exploration of
@@ -26,11 +27,11 @@ import prefuse.visual.NodeItem;
  * both orientation and ordering constraints to facilitate smooth and
  * understandable transitions between layout configurations.
  * </p>
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class RadialTreeLayout extends TreeLayout {
-    
+
     public static final int DEFAULT_RADIUS = 50;
     private static final int MARGIN = 30;
 
@@ -39,10 +40,10 @@ public class RadialTreeLayout extends TreeLayout {
     protected double m_theta1, m_theta2;
     protected boolean m_setTheta = false;
     protected boolean m_autoScale = true;
-    
+
     protected Point2D m_origin;
-    protected NodeItem m_prevRoot;
-    
+    protected NodeItem<?,?> m_prevRoot;
+
     /**
      * Creates a new RadialTreeLayout. Automatic scaling of the radius
      * values to fit the layout bounds is enabled by default.
@@ -56,7 +57,7 @@ public class RadialTreeLayout extends TreeLayout {
         m_theta1 = 0;
         m_theta2 = m_theta1 + MathLib.TWO_PI;
     }
-    
+
     /**
      * Creates a new RadialTreeLayout using the specified radius increment
      * between levels of the layout. Automatic scaling of the radius values
@@ -81,7 +82,7 @@ public class RadialTreeLayout extends TreeLayout {
     public double getRadiusIncrement() {
         return m_radiusInc;
     }
-    
+
     /**
      * Set the radius increment to use between concentric circles. Note
      * that this value is used only if auto-scaling is disabled.
@@ -99,7 +100,7 @@ public class RadialTreeLayout extends TreeLayout {
     public boolean getAutoScale() {
         return m_autoScale;
     }
-    
+
     /**
      * Set whether or not the layout should automatically scale itself
      * to fit the layout bounds.
@@ -123,53 +124,60 @@ public class RadialTreeLayout extends TreeLayout {
     /**
      * @see prefuse.action.Action#run(double)
      */
-    public void run(double frac) {
-        Graph g = (Graph)m_vis.getGroup(m_group);
+    @Override
+	public void run(double frac) {
+        Graph<?,? extends NodeItem<?,?>,? extends EdgeItem<?,?>> g = (Graph<?,? extends NodeItem<?,?>,? extends EdgeItem<?,?>>)m_vis.getGroup(m_group);
         initSchema(g.getNodes());
-        
+
         m_origin = getLayoutAnchor();
-        NodeItem n = getLayoutRoot();
+        NodeItem<?,?> n = getLayoutRoot();
         Params np = (Params)n.get(PARAMS);
-        
+
         // calc relative widths and maximum tree depth
         // performs one pass over the tree
         m_maxDepth = 0;
         calcAngularWidth(n, 0);
-        
-        if ( m_autoScale ) setScale(getLayoutBounds());
-        if ( !m_setTheta ) calcAngularBounds(n);
-                
+
+        if ( m_autoScale ) {
+			setScale(getLayoutBounds());
+		}
+        if ( !m_setTheta ) {
+			calcAngularBounds(n);
+		}
+
         // perform the layout
-        if ( m_maxDepth > 0 )
-            layout(n, m_radiusInc, m_theta1, m_theta2);
-        
+        if ( m_maxDepth > 0 ) {
+			layout(n, m_radiusInc, m_theta1, m_theta2);
+		}
+
         // update properties of the root node
         setX(n, null, m_origin.getX());
         setY(n, null, m_origin.getY());
         np.angle = m_theta2-m_theta1;
     }
-    
+
     protected void setScale(Rectangle2D bounds) {
         double r = Math.min(bounds.getWidth(),bounds.getHeight())/2.0;
-        if ( m_maxDepth > 0 )
-            m_radiusInc = (r-MARGIN)/m_maxDepth;
+        if ( m_maxDepth > 0 ) {
+			m_radiusInc = (r-MARGIN)/m_maxDepth;
+		}
     }
 
     /**
      * Calculates the angular bounds of the layout, attempting to
      * preserve the angular orientation of the display across transitions.
      */
-    private void calcAngularBounds(NodeItem r) {
+    private void calcAngularBounds(NodeItem<?,?> r) {
         if ( m_prevRoot == null || !m_prevRoot.isValid() || r == m_prevRoot )
         {
             m_prevRoot = r;
             return;
         }
-        
+
         // try to find previous parent of root
-        NodeItem p = m_prevRoot;
+        NodeItem<?,?> p = m_prevRoot;
         while ( true ) {
-            NodeItem pp = (NodeItem)p.getParent();
+        	NodeItem<?,?> pp = p.getParent();
             if ( pp == r ) {
                 break;
             } else if ( pp == null ) {
@@ -181,10 +189,10 @@ public class RadialTreeLayout extends TreeLayout {
 
         // compute offset due to children's angular width
         double dt = 0;
-        Iterator iter = sortedChildren(r);
-        while ( iter.hasNext() ) {
-            Node n = (Node)iter.next();
-            if ( n == p ) break;
+        for(NodeItem<?,?> n : sortedChildren(r)) {
+            if ( n == p ) {
+				break;
+			}
             dt += ((Params)n.get(PARAMS)).width;
         }
         double rw = ((Params)r.get(PARAMS)).width;
@@ -194,29 +202,29 @@ public class RadialTreeLayout extends TreeLayout {
         // set angular bounds
         m_theta1 = dt + Math.atan2(p.getY()-r.getY(), p.getX()-r.getX());
         m_theta2 = m_theta1 + MathLib.TWO_PI;
-        m_prevRoot = r;     
+        m_prevRoot = r;
     }
 
     /**
      * Computes relative measures of the angular widths of each
      * expanded subtree. Node diameters are taken into account
      * to improve space allocation for variable-sized nodes.
-     * 
-     * This method also updates the base angle value for nodes 
+     *
+     * This method also updates the base angle value for nodes
      * to ensure proper ordering of nodes.
      */
-    private double calcAngularWidth(NodeItem n, int d) {
-        if ( d > m_maxDepth ) m_maxDepth = d;       
+    private double calcAngularWidth(NodeItem<?,?> n, int d) {
+        if ( d > m_maxDepth ) {
+			m_maxDepth = d;
+		}
         double aw = 0;
-        
+
         Rectangle2D bounds = n.getBounds();
         double w = bounds.getWidth(), h = bounds.getHeight();
         double diameter = d==0 ? 0 : Math.sqrt(w*w+h*h) / d;
-        
-        if ( n.isExpanded() && n.getChildCount() > 0 ) {
-            Iterator childIter = n.children();
-            while ( childIter.hasNext() ) {
-                NodeItem c = (NodeItem)childIter.next();
+
+        if ( n.isExpanded() && !n.children().isEmpty()) {
+        	for(NodeItem<?,?> c : n.children()) {
                 aw += calcAngularWidth(c,d+1);
             }
             aw = Math.max(diameter, aw);
@@ -226,7 +234,7 @@ public class RadialTreeLayout extends TreeLayout {
         ((Params)n.get(PARAMS)).width = aw;
         return aw;
     }
-    
+
     private static final double normalize(double angle) {
         while ( angle > MathLib.TWO_PI ) {
             angle -= MathLib.TWO_PI;
@@ -236,51 +244,59 @@ public class RadialTreeLayout extends TreeLayout {
         }
         return angle;
     }
-    
-    private Iterator sortedChildren(final NodeItem n) {
+
+    private Iterable<? extends NodeItem<?,?>> sortedChildren(final NodeItem<?,?> n) {
         double base = 0;
         // update base angle for node ordering
-        NodeItem p = (NodeItem)n.getParent();
+        NodeItem<?,?> p = n.getParent();
         if ( p != null ) {
             base = normalize(Math.atan2(p.getY()-n.getY(), p.getX()-n.getX()));
         }
-        int cc = n.getChildCount();
-        if ( cc == 0 ) return null;
 
-        NodeItem c = (NodeItem)n.getFirstChild();
-        
+        final List<NodeItem<?,?>> children = (List<NodeItem<?,?>>) (Object) n.children();
+        int cc = n.children().size();
+        if ( cc == 0 ) {
+			return null;
+		}
+
+        NodeItem<?,?> c = children.get(0);
+
         // TODO: this is hacky and will break when filtering
         // how to know that a branch is newly expanded?
         // is there an alternative property we should check?
         if ( !c.isStartVisible() ) {
             // use natural ordering for previously invisible nodes
-            return n.children();
+            return children;
         }
-        
+
         double angle[] = new double[cc];
         final int idx[] = new int[cc];
-        for ( int i=0; i<cc; ++i, c=(NodeItem)c.getNextSibling() ) {
+        for ( int i=0; i<cc; ++i, c=c.getNextSibling() ) {
             idx[i] = i;
             angle[i] = normalize(-base +
                 Math.atan2(c.getY()-n.getY(), c.getX()-n.getX()));
         }
         ArrayLib.sort(angle, idx);
-        
+
         // return iterator over sorted children
-        return new Iterator() {
-            int cur = 0;
-            public Object next() {
-                return n.getChild(idx[cur++]);
-            }
-            public boolean hasNext() {
-                return cur < idx.length;
-            }
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
+        return new Iterable<NodeItem<?,?>>() {
+			public Iterator<NodeItem<?, ?>> iterator() {
+				return new Iterator<NodeItem<?,?>>() {
+		            int cur = 0;
+		            public NodeItem<?,?> next() {
+		                return children.get(idx[cur++]);
+		            }
+		            public boolean hasNext() {
+		                return cur < idx.length;
+		            }
+		            public void remove() {
+		                throw new UnsupportedOperationException();
+		            }
+				};
+			}
         };
     }
-    
+
     /**
      * Compute the layout.
      * @param n the root of the current subtree under consideration
@@ -288,26 +304,28 @@ public class RadialTreeLayout extends TreeLayout {
      * @param theta1 the start (in radians) of this subtree's angular region
      * @param theta2 the end (in radians) of this subtree's angular region
      */
-    protected void layout(NodeItem n, double r, double theta1, double theta2) {
-        double dtheta  = (theta2-theta1);
+    protected void layout(NodeItem<?,?> n, double r, double theta1, double theta2) {
+        double dtheta  = theta2-theta1;
         double dtheta2 = dtheta / 2.0;
         double width = ((Params)n.get(PARAMS)).width;
         double cfrac, nfrac = 0.0;
-        
-        Iterator childIter = sortedChildren(n);
-        while ( childIter != null && childIter.hasNext() ) {
-            NodeItem c = (NodeItem)childIter.next();
+
+        for(NodeItem<?,?> c : sortedChildren(n)) {
+        	// TODO: is this check really necessary?
+        	if(c == null) {
+        		break;
+        	}
             Params cp = (Params)c.get(PARAMS);
             cfrac = cp.width / width;
-            if ( c.isExpanded() && c.getChildCount()>0 ) {
-                layout(c, r+m_radiusInc, theta1 + nfrac*dtheta, 
+            if ( c.isExpanded() && !c.children().isEmpty() ) {
+                layout(c, r+m_radiusInc, theta1 + nfrac*dtheta,
                                          theta1 + (nfrac+cfrac)*dtheta);
             }
             setPolarLocation(c, n, r, theta1 + nfrac*dtheta + cfrac*dtheta2);
             cp.angle = cfrac*dtheta;
             nfrac += cfrac;
         }
-        
+
     }
 
     /**
@@ -317,14 +335,14 @@ public class RadialTreeLayout extends TreeLayout {
      * @param r the radius
      * @param t the angle theta
      */
-    protected void setPolarLocation(NodeItem n, NodeItem p, double r, double t) {
+    protected void setPolarLocation(NodeItem<?,?> n, NodeItem<?,?> p, double r, double t) {
         setX(n, p, m_origin.getX() + r*Math.cos(t));
         setY(n, p, m_origin.getY() + r*Math.sin(t));
     }
-    
+
     // ------------------------------------------------------------------------
     // Params
-    
+
     /**
      * The data field in which the parameters used by this layout are stored.
      */
@@ -336,18 +354,19 @@ public class RadialTreeLayout extends TreeLayout {
     static {
         PARAMS_SCHEMA.addColumn(PARAMS, Params.class, new Params());
     }
-    
-    protected void initSchema(TupleSet ts) {
+
+    protected void initSchema(TupleSet<?> ts) {
         ts.addColumns(PARAMS_SCHEMA);
     }
-    
+
     /**
      * Wrapper class holding parameters used for each node in this layout.
      */
     public static class Params implements Cloneable {
         double width;
         double angle;
-        public Object clone() {
+        @Override
+		public Object clone() {
             Params p = new Params();
             p.width = this.width;
             p.angle = this.angle;

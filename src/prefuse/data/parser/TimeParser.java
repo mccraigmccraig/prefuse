@@ -2,6 +2,7 @@ package prefuse.data.parser;
 
 import java.sql.Time;
 import java.text.DateFormat;
+import java.util.Locale;
 
 /**
  * DataParser instance that parses Date values as java.util.Time instances,
@@ -22,7 +23,7 @@ public class TimeParser extends DateParser {
     public TimeParser() {
         this(DateFormat.getTimeInstance(DateFormat.SHORT));
     }
-    
+
     /**
      * Create a new TimeParser.
      * @param dateFormat the DateFormat instance to use for parsing
@@ -30,19 +31,25 @@ public class TimeParser extends DateParser {
     public TimeParser(DateFormat dateFormat) {
         super(dateFormat);
     }
-    
-    /**
+
+    public TimeParser(Locale locale) {
+    	this(DateFormat.getTimeInstance(DateFormat.SHORT, locale));
+	}
+
+	/**
      * Returns java.sql.Time.class.
      * @see prefuse.data.parser.DataParser#getType()
      */
-    public Class getType() {
+    @Override
+	public Class<?> getType() {
         return Time.class;
     }
-    
+
     /**
      * @see prefuse.data.parser.DataParser#canParse(java.lang.String)
      */
-    public boolean canParse(String val) {
+    @Override
+	public boolean canParse(String val) {
         try {
             parseTime(val);
             return true;
@@ -50,14 +57,15 @@ public class TimeParser extends DateParser {
             return false;
         }
     }
-    
+
     /**
      * @see prefuse.data.parser.DataParser#parse(java.lang.String)
      */
-    public Object parse(String val) throws DataParseException {
+    @Override
+	public Object parse(String val) throws DataParseException {
         return parseTime(val);
     }
-    
+
     /**
      * Parse a Time value from a text string.
      * @param text the text string to parse
@@ -67,7 +75,7 @@ public class TimeParser extends DateParser {
     public Time parseTime(String text) throws DataParseException {
         m_pos.setErrorIndex(0);
         m_pos.setIndex(0);
-        
+
         // parse the data value, convert to the wrapper type
         Time t = null;
         try {
@@ -82,7 +90,7 @@ public class TimeParser extends DateParser {
                 t = new Time(d1.getTime());
             }
         }
-        
+
         // date format will parse substrings successfully, so we need
         // to check the position to make sure the whole value was used
         if ( t == null || m_pos.getIndex() < text.length() ) {
@@ -91,5 +99,5 @@ public class TimeParser extends DateParser {
             return t;
         }
     }
-        
+
 } // end of class TimeParser

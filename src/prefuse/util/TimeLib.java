@@ -10,7 +10,7 @@ import java.util.GregorianCalendar;
  * are given as long values, indicating the number of milliseconds since
  * the epoch (January 1, 1970). This is the same time format returned
  * by the {@link java.lang.System#currentTimeMillis()} method.
- * 
+ *
  * @author jeffrey heer
  */
 public class TimeLib {
@@ -21,7 +21,7 @@ public class TimeLib {
     public static final int CENTURY   = -100;
     /** Represents a decade, 10 years */
     public static final int DECADE    = -10;
-    
+
     private static final double SECOND_MILLIS    = 1000;
     private static final double MINUTE_MILLIS    = SECOND_MILLIS*60;
     private static final double HOUR_MILLIS      = MINUTE_MILLIS*60;
@@ -32,16 +32,16 @@ public class TimeLib {
     private static final double DECADE_MILLIS    = YEAR_MILLIS * 10;
     private static final double CENTURY_MILLIS   = DECADE_MILLIS * 10;
     private static final double MILLENIUM_MILLIS = CENTURY_MILLIS * 10;
-    
+
     private static final int[] CALENDAR_FIELDS = {
         Calendar.YEAR, Calendar.MONTH, Calendar.DATE, Calendar.HOUR_OF_DAY,
-        Calendar.MINUTE, Calendar.SECOND, Calendar.MILLISECOND    
+        Calendar.MINUTE, Calendar.SECOND, Calendar.MILLISECOND
     };
-    
+
     private TimeLib() {
         // prevent instantiation
     }
-    
+
     /**
      * Get the number of time units between the two given timestamps.
      * @param t0 the first timestamp (as a long)
@@ -61,7 +61,7 @@ public class TimeLib {
         GregorianCalendar gc2 = new GregorianCalendar();
         gc1.setTimeInMillis(t0);
         gc2.setTimeInMillis(t1);
-        
+
         // add 2 units less than the estimate to 1st date,
         // then serially add units till we exceed 2nd date
         int est = estimateUnitsBetween(t0, t1, field);
@@ -81,7 +81,7 @@ public class TimeLib {
             }
         }
     }
-    
+
     /**
      * Based on code posted at
      *  http://forum.java.sun.com/thread.jspa?threadID=488676&messageID=2292012
@@ -118,7 +118,7 @@ public class TimeLib {
             return 0;
         }
     }
-        
+
     /**
      * Increment a calendar by a given number of time units.
      * @param c the calendar to increment
@@ -134,7 +134,7 @@ public class TimeLib {
             c.add(field, val);
         }
     }
-    
+
     /**
      * Get the value of the given time field for a Calendar. Just like the
      * {@link java.util.Calendar#get(int)} method, but include support for
@@ -147,15 +147,15 @@ public class TimeLib {
     public static int get(Calendar c, int field) {
         if ( isMultiYear(field) ) {
             int y = c.get(Calendar.YEAR);
-            return -field * (y/-field);
+            return -field * y/-field;
         } else {
             return c.get(field);
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Date Access
-    
+
     /**
      * Get the timestamp for the given year, month, and, day.
      * @param c a Calendar to use to help compute the result. The state of the
@@ -186,7 +186,7 @@ public class TimeLib {
         c.set(1970, 0, 1, hour, minute, second);
         return c.getTimeInMillis();
     }
-    
+
     /**
      * Get a new Date instance of the specified subclass and given long value.
      * @param type the concrete subclass of the Date instance, must be an
@@ -194,19 +194,19 @@ public class TimeLib {
      * @param d the date/time value as a long
      * @return the new Date instance, or null if the class type is not valid
      */
-    public static Date getDate(Class type, long d) {
+    public static Date getDate(Class<? extends Date> type, long d) {
         try {
-            Constructor c = type.getConstructor(new Class[] {long.class});
-            return (Date)c.newInstance(new Object[] {new Long(d)});
+            Constructor<? extends Date> c = type.getConstructor(new Class[] {long.class});
+            return c.newInstance(new Object[] {new Long(d)});
         } catch ( Exception e ) {
             e.printStackTrace();
             return null;
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Date Normalization
-    
+
     /**
      * Get the timestamp resulting from clearing (setting to zero) all time
      * values less than or equal to that of the given field. For example,
@@ -226,7 +226,7 @@ public class TimeLib {
         TimeLib.clearTo(c, field);
         return c.getTimeInMillis();
     }
-    
+
     /**
      * Clear the given calendar, setting to zero all time
      * values less than or equal to that of the given field. For example,
@@ -242,17 +242,17 @@ public class TimeLib {
     public static Calendar clearTo(Calendar c, int field) {
         int i = CALENDAR_FIELDS.length-1;
         for ( ; i>=1 && field != CALENDAR_FIELDS[i]; i-- ) {
-            int val = (CALENDAR_FIELDS[i]==Calendar.DATE?1:0);
+            int val = CALENDAR_FIELDS[i]==Calendar.DATE?1:0;
             c.set(CALENDAR_FIELDS[i],val);
         }
         if ( isMultiYear(field) ) {
             int y = c.get(Calendar.YEAR);
-            y = -field * (y/-field);
+            y = -field * y/-field;
             c.set(Calendar.YEAR, y);
         }
         return c;
     }
-    
+
     /**
      * Indicates if a field value indicates a timespan greater than one
      * year. These multi-year spans are the extended fields introduced by
@@ -261,7 +261,7 @@ public class TimeLib {
      * @return true if the field is multi-year, false otherwise
      */
     public static boolean isMultiYear(int field) {
-        return ( field == DECADE || field == CENTURY || field == MILLENIUM );
+        return field == DECADE || field == CENTURY || field == MILLENIUM;
     }
-    
+
 } // end of class TimeLib

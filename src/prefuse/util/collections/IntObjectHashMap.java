@@ -1,9 +1,9 @@
 /*
  Copyright © 1999 CERN - European Organization for Nuclear Research.
- Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
- is hereby granted without fee, provided that the above copyright notice appear in all copies and 
- that both that copyright notice and this permission notice appear in supporting documentation. 
- CERN makes no representations about the suitability of this software for any purpose. 
+ Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose
+ is hereby granted without fee, provided that the above copyright notice appear in all copies and
+ that both that copyright notice and this permission notice appear in supporting documentation.
+ CERN makes no representations about the suitability of this software for any purpose.
  It is provided "as is" without expressed or implied warranty.
  */
 package prefuse.util.collections;
@@ -17,24 +17,24 @@ import java.util.Arrays;
  * with double hashing. First see the <a href="package-summary.html">package
  * summary</a> and javadoc <a href="package-tree.html">tree view</a> to get
  * the broad picture.
- * 
+ *
  * This class has been adapted from the corresponding class in the COLT
  * library for scientfic computing.
- * 
+ *
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
  * @see java.util.HashMap
  */
 public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
-    
+
     protected static final int defaultCapacity = 277;
     protected static final double defaultMinLoadFactor = 0.2;
     protected static final double defaultMaxLoadFactor = 0.5;
-    
+
     protected static final byte FREE = 0;
     protected static final byte FULL = 1;
     protected static final byte REMOVED = 2;
-    
+
     /**
      * The hash table keys.
      */
@@ -54,7 +54,7 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
      * The number of table entries in state==FREE.
      */
     protected int freeEntries;
-    
+
     /**
      * Constructs an empty map with default capacity and default load factors.
      */
@@ -65,7 +65,7 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
     /**
      * Constructs an empty map with the specified initial capacity and default
      * load factors.
-     * 
+     *
      * @param initialCapacity
      *            the initial capacity of the map.
      * @throws IllegalArgumentException
@@ -78,7 +78,7 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
     /**
      * Constructs an empty map with the specified initial capacity and the
      * specified minimum and maximum load factor.
-     * 
+     *
      * @param initialCapacity
      *            the initial capacity.
      * @param minLoadFactor
@@ -98,10 +98,11 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
      * Removes all (key,value) associations from the receiver. Implicitly calls
      * <tt>trimToSize()</tt>.
      */
-    public void clear() {
+    @Override
+	public void clear() {
         Arrays.fill(state, FREE);
         Arrays.fill(values, null);
-        
+
         this.distinct = 0;
         this.freeEntries = table.length; // delta
         trimToSize();
@@ -111,12 +112,13 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
      * Returns a deep copy of the receiver.
      * @return a deep copy of the receiver.
      */
-    public Object clone() {
+    @Override
+	public Object clone() {
         try {
             IntObjectHashMap copy = (IntObjectHashMap) super.clone();
-            copy.table = (int[]) copy.table.clone();
-            copy.values = (Object[]) copy.values.clone();
-            copy.state = (byte[]) copy.state.clone();
+            copy.table = copy.table.clone();
+            copy.values = copy.values.clone();
+            copy.state = copy.state.clone();
             return copy;
         } catch (CloneNotSupportedException e) {
             // won't happen
@@ -150,11 +152,12 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
      * Calling this method before <tt>put()</tt>ing a large number of
      * associations boosts performance, because the receiver will grow only once
      * instead of potentially many times and hash collisions get less probable.
-     * 
+     *
      * @param minCapacity
      *            the desired minimum capacity.
      */
-    public void ensureCapacity(int minCapacity) {
+    @Override
+	public void ensureCapacity(int minCapacity) {
         if (table.length < minCapacity) {
             int newCapacity = nextPrime(minCapacity);
             rehash(newCapacity);
@@ -166,7 +169,7 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
      * idea to first check with {@link #containsKey(int)} whether the given key
      * has a value associated or not, i.e. whether there exists an association
      * for the given key or not.
-     * 
+     *
      * @param key
      *            the key to be searched for.
      * @return the value associated with the specified key; <tt>null</tt> if
@@ -174,8 +177,9 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
      */
     public Object get(int key) {
         int i = indexOfKey(key);
-        if (i < 0)
-            return null; // not contained
+        if (i < 0) {
+			return null; // not contained
+		}
         return values[i];
     }
 
@@ -199,16 +203,18 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
         // double hashing, see http://www.eece.unm.edu/faculty/heileman/hash/node4.html
         int decrement = hash % (length - 2);
         // int decrement = (hash / length) % length;
-        if (decrement == 0)
-            decrement = 1;
+        if (decrement == 0) {
+			decrement = 1;
+		}
 
         // stop if we find a removed or free slot, or if we find the key itself
         // do NOT skip over removed slots (yes, open addressing is like that...)
         while (stat[i] == FULL && tab[i] != key) {
             i -= decrement;
             // hashCollisions++;
-            if (i < 0)
-                i += length;
+            if (i < 0) {
+				i += length;
+			}
         }
 
         if (stat[i] == REMOVED) {
@@ -219,11 +225,13 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
             while (stat[i] != FREE && (stat[i] == REMOVED || tab[i] != key)) {
                 i -= decrement;
                 // hashCollisions++;
-                if (i < 0)
-                    i += length;
+                if (i < 0) {
+					i += length;
+				}
             }
-            if (stat[i] == FREE)
-                i = j;
+            if (stat[i] == FREE) {
+				i = j;
+			}
         }
 
         if (stat[i] == FULL) {
@@ -252,20 +260,23 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
         // double hashing, see http://www.eece.unm.edu/faculty/heileman/hash/node4.html
         int decrement = hash % (length - 2);
         // int decrement = (hash / length) % length;
-        if (decrement == 0)
-            decrement = 1;
+        if (decrement == 0) {
+			decrement = 1;
+		}
 
         // stop if we find a free slot, or if we find the key itself.
         // do skip over removed slots (yes, open addressing is like that...)
         while (stat[i] != FREE && (stat[i] == REMOVED || tab[i] != key)) {
             i -= decrement;
             // hashCollisions++;
-            if (i < 0)
-                i += length;
+            if (i < 0) {
+				i += length;
+			}
         }
 
-        if (stat[i] == FREE)
-            return -1; // not found
+        if (stat[i] == FREE) {
+			return -1; // not found
+		}
         return i; // found, return index where key is contained
     }
 
@@ -280,8 +291,9 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
         final byte stat[] = state;
 
         for (int i = stat.length; --i >= 0;) {
-            if (stat[i] == FULL && val[i] == value)
-                return i;
+            if (stat[i] == FULL && val[i] == value) {
+				return i;
+			}
         }
 
         return -1; // not found
@@ -291,7 +303,7 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
      * Returns the first key the given value is associated with. It is often a
      * good idea to first check with {@link #containsValue(Object)} whether
      * there exists an association from a key to this value.
-     * 
+     *
      * @param value the value to search for.
      * @return the first key for which holds <tt>get(key) == value</tt>;
      *         returns <tt>Integer.MIN_VALUE</tt> if no such key exists.
@@ -300,8 +312,9 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
         // returns the first key found; there may be more matching keys,
         // however.
         int i = indexOfValue(value);
-        if (i < 0)
-            return Integer.MIN_VALUE;
+        if (i < 0) {
+			return Integer.MIN_VALUE;
+		}
         return table[i];
     }
 
@@ -311,21 +324,23 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
      * has a new size that equals <tt>this.size()</tt>.
      * <p>
      * This method can be used to iterate over the keys of the receiver.
-     * 
+     *
      * @param list
-     *            the list to be filled 
+     *            the list to be filled
      */
     public int keys(int[] list) {
         int[] tab = table;
         byte[] stat = state;
 
-        if ( list.length < distinct )
-            return -1;
-        
+        if ( list.length < distinct ) {
+			return -1;
+		}
+
         int j = 0;
         for (int i = tab.length; i-- > 0;) {
-            if (stat[i] == FULL)
-                list[j++] = tab[i];
+            if (stat[i] == FULL) {
+				list[j++] = tab[i];
+			}
         }
         return distinct;
     }
@@ -333,7 +348,7 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
     /**
      * Associates the given key with the given value. Replaces any old
      * <tt>(key,someOtherValue)</tt> association, if existing.
-     * 
+     *
      * @param key
      *            the key the value shall be associated with.
      * @param value
@@ -360,8 +375,9 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
 
         this.table[i] = key;
         this.values[i] = value;
-        if (this.state[i] == FREE)
-            this.freeEntries--;
+        if (this.state[i] == FREE) {
+			this.freeEntries--;
+		}
         this.state[i] = FULL;
         this.distinct++;
 
@@ -415,7 +431,7 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
     /**
      * Removes the given key with its associated element from the receiver, if
      * present.
-     * 
+     *
      * @param key
      *            the key to be removed from the receiver.
      * @return <tt>true</tt> if the receiver contained the specified key,
@@ -423,8 +439,9 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
      */
     public boolean removeKey(int key) {
         int i = indexOfKey(key);
-        if (i < 0)
-            return false; // key not contained
+        if (i < 0) {
+			return false; // key not contained
+		}
 
         this.state[i] = REMOVED;
         this.values[i] = null; // delta
@@ -441,7 +458,7 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
 
     /**
      * Initializes the receiver.
-     * 
+     *
      * @param initialCapacity
      *            the initial capacity of the receiver.
      * @param minLoadFactor
@@ -452,13 +469,15 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
      *             if
      *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>.
      */
-    protected void setUp(int initialCapacity, double minLoadFactor,
+    @Override
+	protected void setUp(int initialCapacity, double minLoadFactor,
             double maxLoadFactor) {
         int capacity = initialCapacity;
         super.setUp(capacity, minLoadFactor, maxLoadFactor);
         capacity = nextPrime(capacity);
-        if (capacity == 0)
-            capacity = 1; // open addressing needs at least one FREE slot at any time.
+        if (capacity == 0) {
+			capacity = 1; // open addressing needs at least one FREE slot at any time.
+		}
 
         this.table = new int[capacity];
         this.values = new Object[capacity];
@@ -466,10 +485,11 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
 
         // memory will be exhausted long before this pathological case happens, anyway.
         this.minLoadFactor = minLoadFactor;
-        if (capacity == PrimeFinder.largestPrime)
-            this.maxLoadFactor = 1.0;
-        else
-            this.maxLoadFactor = maxLoadFactor;
+        if (capacity == PrimeFinder.largestPrime) {
+			this.maxLoadFactor = 1.0;
+		} else {
+			this.maxLoadFactor = maxLoadFactor;
+		}
 
         this.distinct = 0;
         this.freeEntries = capacity; // delta
@@ -483,11 +503,12 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
     }
 
     /**
-     * Trims the capacity of the receiver to be the receiver's current 
-     * size. Releases any superfluous internal memory. An application can use this operation to minimize the 
+     * Trims the capacity of the receiver to be the receiver's current
+     * size. Releases any superfluous internal memory. An application can use this operation to minimize the
      * storage of the receiver.
      */
-    public void trimToSize() {
+    @Override
+	public void trimToSize() {
         // * 1.2 because open addressing's performance exponentially degrades beyond that point
         // so that even rehashing the table can take very long
         int newCapacity = nextPrime((int) (1 + 1.2 * size()));
@@ -511,9 +532,10 @@ public class IntObjectHashMap extends AbstractHashMap implements Cloneable {
         byte[] stat = state;
 
         for (int i = stat.length; i-- > 0;) {
-            if (stat[i] == FULL)
-                list.add(val[i]);
+            if (stat[i] == FULL) {
+				list.add(val[i]);
+			}
         }
     }
-    
+
 } // end of class IntObjectHashMap

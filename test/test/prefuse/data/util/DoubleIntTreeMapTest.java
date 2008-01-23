@@ -8,24 +8,26 @@ import prefuse.util.collections.DoubleIntTreeMap;
 import prefuse.util.collections.LiteralIterator;
 
 public class DoubleIntTreeMapTest extends TestCase {
-    
+
     DoubleIntTreeMap map = new DoubleIntTreeMap(true);
     int[] keys = { 1, 2, 5, 3, 4, 5, 10 };
     int[] sort;
-    
+
     public DoubleIntTreeMapTest() {
-        sort = (int[])keys.clone();
+        sort = keys.clone();
         Arrays.sort(sort);
     }
-    
-    protected void setUp() throws Exception {
+
+    @Override
+	protected void setUp() throws Exception {
         super.setUp();
         for ( int i=0; i<keys.length; ++i ) {
             map.put(keys[i],keys[i]);
         }
     }
 
-    protected void tearDown() throws Exception {
+    @Override
+	protected void tearDown() throws Exception {
         super.tearDown();
         map.clear();
     }
@@ -111,17 +113,21 @@ public class DoubleIntTreeMapTest extends TestCase {
      */
     public void testSubMap() {
         int k1, i1, i2, i, k, len = sort.length-1;
-        for ( i=0, k=sort[0]; k==sort[0]; ++i, k=sort[i] );
+        for ( i=0, k=sort[0]; k==sort[0]; ++i, k=sort[i] ) {
+			;
+		}
         k1 = k; i1 = i;
-        for ( i=len, k=sort[len]; i>=0 && k==sort[len]; --i, k=sort[i] );
+        for ( i=len, k=sort[len]; i>=0 && k==sort[len]; --i, k=sort[i] ) {
+			;
+		}
         i2 = i;
-        
+
         LiteralIterator iter = map.keyRangeIterator(k1, true, sort[len], false);
         for ( i=i1; iter.hasNext() && i <= i2; ++i ) {
             assertEquals((int)iter.nextDouble(), sort[i]);
         }
         assertTrue(!iter.hasNext() && i == i2+1);
-        
+
         iter = map.valueRangeIterator(k1, true, sort[len], false);
         for ( i=i1; iter.hasNext() && i <= i2; ++i ) {
             assertEquals(iter.nextInt(), sort[i]);

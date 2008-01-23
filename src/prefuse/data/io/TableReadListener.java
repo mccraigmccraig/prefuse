@@ -5,7 +5,7 @@ import prefuse.data.parser.DataParseException;
 /**
  * Callback interface used by AbstractTextTableReader instances to be
  * used when a table value is encountered in parsing.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public interface TableReadListener {
@@ -21,5 +21,5 @@ public interface TableReadListener {
      */
     public void readValue(int line, int col, String value)
         throws DataParseException;
-    
+
 } // end of interface TableReadListener

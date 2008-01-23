@@ -28,21 +28,21 @@ public class ListQueryBinding extends DynamicQueryBinding {
 
     /** String used to indicate inclusion of all data values. */
     private static final String ALL = "All";
-    
-    private Class m_type;
+
+    private final Class<?> m_type;
     private ListModel m_model;
-    private Listener m_lstnr;
-    private boolean m_includeAll;
-    
+    private final Listener m_lstnr;
+    private final boolean m_includeAll;
+
     /**
      * Create a new ListQueryBinding over the given set and data field.
      * @param ts the TupleSet to query
      * @param field the data field (Table column) to query
      */
-    public ListQueryBinding(TupleSet ts, String field) {
+    public ListQueryBinding(TupleSet<?> ts, String field) {
         this(ts, field, true);
     }
-    
+
     /**
      * Create a new ListQueryBinding over the given set and data field.
      * @param ts the TupleSet to query
@@ -50,7 +50,7 @@ public class ListQueryBinding extends DynamicQueryBinding {
      * @param includeAllOption indicates if the dynamic queries should
      * include an "All" option for including all data values
      */
-    public ListQueryBinding(TupleSet ts, String field, boolean includeAllOption) {
+    public ListQueryBinding(TupleSet<?> ts, String field, boolean includeAllOption) {
         super(ts, field);
         m_type = DataLib.inferType(ts, field);
         m_lstnr = new Listener();
@@ -58,22 +58,23 @@ public class ListQueryBinding extends DynamicQueryBinding {
         initPredicate();
         initModel();
     }
-    
+
     private void initPredicate() {
         // set up predicate
         OrPredicate orP = new OrPredicate();
         orP.add(BooleanLiteral.TRUE);
         setPredicate(orP);
     }
-    
-    private void initModel() {        
-        if ( m_model != null )
-            m_model.removeListSelectionListener(m_lstnr);
-        
+
+    private void initModel() {
+        if ( m_model != null ) {
+			m_model.removeListSelectionListener(m_lstnr);
+		}
+
         // set up data / selection model
         Object[] o = null;
         if ( m_tuples instanceof Table ) {
-            ColumnMetadata md = ((Table)m_tuples).getMetadata(m_field);
+            ColumnMetadata md = ((Table<?>)m_tuples).getMetadata(m_field);
             o = md.getOrdinalArray();
         } else {
             o = DataLib.ordinalArray(m_tuples.tuples(), m_field);
@@ -86,8 +87,8 @@ public class ListQueryBinding extends DynamicQueryBinding {
         }
     }
 
-    // ------------------------------------------------------------------------    
-    
+    // ------------------------------------------------------------------------
+
     /**
      * Returns a list model for creating custom dynamic query widgets.
      * This list model acts both as a data model and a selection model,
@@ -97,17 +98,18 @@ public class ListQueryBinding extends DynamicQueryBinding {
     public ListModel getListModel() {
         return m_model;
     }
-    
+
     /**
      * Creates a new group of check boxes for interacting with the query.
      * @return a {@link prefuse.util.ui.JToggleGroup} of check boxes bound to
      * this dynamic query.
      * @see prefuse.data.query.DynamicQueryBinding#createComponent()
      */
-    public JComponent createComponent() {
+    @Override
+	public JComponent createComponent() {
         return createCheckboxGroup();
     }
-    
+
     /**
      * Create a new interactive list for interacting with the query.
      * @return a {@link javax.swing.JList} bound to this dynamic query.
@@ -117,7 +119,7 @@ public class ListQueryBinding extends DynamicQueryBinding {
         list.setSelectionModel(m_model);
         return list;
     }
-    
+
     /**
      * Create a new drop-down combo box for interacting with the query.
      * @return a {@link javax.swing.JComboBox} bound to this dynamic query.
@@ -134,7 +136,7 @@ public class ListQueryBinding extends DynamicQueryBinding {
     public JToggleGroup createCheckboxGroup() {
         return createToggleGroup(JToggleGroup.CHECKBOX);
     }
-    
+
     /**
      * Creates a new group of radio buttons for interacting with the query.
      * @return a {@link prefuse.util.ui.JToggleGroup} of radio buttons bound to
@@ -143,13 +145,13 @@ public class ListQueryBinding extends DynamicQueryBinding {
     public JToggleGroup createRadioGroup() {
         return createToggleGroup(JToggleGroup.RADIO);
     }
-    
+
     private JToggleGroup createToggleGroup(int type) {
         return new JToggleGroup(type, m_model, m_model);
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Create a comparison predicate fof the given data value
      */
@@ -158,13 +160,13 @@ public class ListQueryBinding extends DynamicQueryBinding {
         Expression right = Literal.getLiteral(o, m_type);
         return new ComparisonPredicate(ComparisonPredicate.EQ, left, right);
     }
-    
+
     private class Listener implements ListSelectionListener {
 
         public void valueChanged(ListSelectionEvent e) {
             ListModel model = (ListModel)e.getSource();
             OrPredicate orP = (OrPredicate)m_query;
-            
+
             if ( model.isSelectionEmpty() )
             {
                 orP.clear();
@@ -179,10 +181,11 @@ public class ListQueryBinding extends DynamicQueryBinding {
                 int max   = model.getMaxSelectionIndex();
                 int count = 0;
                 for ( int i=min; i<=max; ++i ) {
-                    if ( model.isSelectedIndex(i) )
-                        ++count;
+                    if ( model.isSelectedIndex(i) ) {
+						++count;
+					}
                 }
-            
+
                 if ( count == model.getSize() ) {
                     orP.set(BooleanLiteral.TRUE);
                 } else if ( count == 1 ) {
@@ -190,13 +193,14 @@ public class ListQueryBinding extends DynamicQueryBinding {
                 } else {
                     Predicate[] p = new Predicate[count];
                     for ( int i=min, j=0; i<=max; ++i ) {
-                        if ( model.isSelectedIndex(i) )
-                            p[j++] = getComparison(model.getElementAt(i));
+                        if ( model.isSelectedIndex(i) ) {
+							p[j++] = getComparison(model.getElementAt(i));
+						}
                     }
                     orP.set(p);
                 }
             }
         }
     }
-    
+
 } // end of class ListQueryBinding

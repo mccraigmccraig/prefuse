@@ -7,11 +7,13 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
-import java.util.Hashtable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Library of utility routines pertaining to Strings.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class StringLib {
@@ -31,13 +33,15 @@ public class StringLib {
         sbuf.append('[');
         int size = Array.getLength(a);
         for ( int i=0; i<size; ++i ) {
-            if ( i>0 ) sbuf.append(", ");
+            if ( i>0 ) {
+				sbuf.append(", ");
+			}
             sbuf.append(Array.get(a, i));
         }
         sbuf.append(']');
         return sbuf.toString();
     }
-    
+
     /**
      * Format the given number as a String, including the given number of
      * decimal places.
@@ -51,27 +55,30 @@ public class StringLib {
         if ( idx1 == -1 ) {
             return s;
         } else {
-            int idx2 = s.indexOf('E');        
+            int idx2 = s.indexOf('E');
             int dp = decimalPlaces + (idx2>=0 ? 0 : 1);
             String t = s.substring(0, Math.min(idx1+dp, s.length()));
-            if ( idx2 >= 0 )
-                t += s.substring(idx2);
+            if ( idx2 >= 0 ) {
+				t += s.substring(idx2);
+			}
             return t;
         }
     }
-    
+
     /**
      * Capitalize all letters preceded by whitespace, and lower case
-     * all other letters. 
+     * all other letters.
      * @param s the String to capitalize
      * @return the capitalized string
      */
     public static String capitalizeFirstOnly(String s) {
-        if ( s == null )
-            return null;
-        if ( s.length() == 0 )
-            return s;
-        
+        if ( s == null ) {
+			return null;
+		}
+        if ( s.length() == 0 ) {
+			return s;
+		}
+
         StringBuffer sbuf = new StringBuffer();
         char c = s.charAt(0);
         sbuf.append(Character.toUpperCase(c));
@@ -90,7 +97,7 @@ public class StringLib {
         }
         return sbuf.toString();
     }
-    
+
     /**
      * Get the stack trace of the given Throwable as a String.
      * @param t the Throwable
@@ -103,13 +110,13 @@ public class StringLib {
         pw.close();
         return sw.toString();
     }
-    
+
     // ------------------------------------------------------------------------
     // Abbreviation Methods
-    
+
     private static final String SUFFIX = "suffix";
     private static final String PREFIX = "prefix";
-    private static Hashtable prefixSuffixT = new Hashtable();
+    private static Map<String, String> prefixSuffixT = Collections.synchronizedMap(new HashMap<String, String>());
     static {
         prefixSuffixT.put( "mr",    PREFIX );
         prefixSuffixT.put( "mr.",   PREFIX );
@@ -133,7 +140,7 @@ public class StringLib {
         prefixSuffixT.put( "sr",    SUFFIX );
         prefixSuffixT.put( "sr.",   SUFFIX );
     }
-    
+
     /**
      * Abbreviate a String by simply truncating it.
      * @param str the String to abbreviate
@@ -151,7 +158,7 @@ public class StringLib {
         nchars++;
         }
         if ( nchars < str.length() && lastblank > 0 ) { nchars = lastblank; }
-        return ( nchars > 0 ? str.substring(0, nchars) : str );
+        return nchars > 0 ? str.substring(0, nchars) : str;
     }
 
     /**
@@ -163,11 +170,15 @@ public class StringLib {
      */
     public static String abbreviateName(String str, FontMetrics fm, int width)
     {
-        if (fm.stringWidth(str) > width) str = abbreviateName(str, false);
-        if (fm.stringWidth(str) > width) str = abbreviateName(str, true);
+        if (fm.stringWidth(str) > width) {
+			str = abbreviateName(str, false);
+		}
+        if (fm.stringWidth(str) > width) {
+			str = abbreviateName(str, true);
+		}
         return str;
     }
-    
+
     /**
      * String abbreviation helper method for name strings.
      * @param inString the String to abbreviate
@@ -200,10 +211,13 @@ public class StringLib {
             case ',':
                 break out;
             case StreamTokenizer.TT_WORD:
-                if (p.sval.endsWith(":")) outString.append(p.sval + " ");
-                else if (prefixSuffixT.get(p.sval.toLowerCase()) == null) {
+                if (p.sval.endsWith(":")) {
+					outString.append(p.sval + " ");
+				} else if (prefixSuffixT.get(p.sval.toLowerCase()) == null) {
                     if (!lastOnly) {
-                        if (lastInitialHold != null) outString.append(lastInitialHold);
+                        if (lastInitialHold != null) {
+							outString.append(lastInitialHold);
+						}
                         lastInitialHold = p.sval.substring(0,1)+". ";
                     }
                     lastNameHold = p.sval;
@@ -219,5 +233,5 @@ public class StringLib {
         }
         return outString.toString();
     }
-    
+
 } // end of class StringLib

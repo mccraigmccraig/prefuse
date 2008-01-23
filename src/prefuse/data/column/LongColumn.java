@@ -7,31 +7,31 @@ import prefuse.data.DataTypeException;
 
 /**
  * Column implementation for storing long values.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class LongColumn extends AbstractColumn {
 
     private long[] m_values;
     private int    m_size;
-    
+
     /**
-     * Create a new empty LongColumn. 
+     * Create a new empty LongColumn.
      */
     public LongColumn() {
         this(0, 10, 0L);
     }
 
     /**
-     * Create a new LongColumn. 
+     * Create a new LongColumn.
      * @param nrows the initial size of the column
      */
     public LongColumn(int nrows) {
         this(nrows, nrows, 0L);
     }
-    
+
     /**
-     * Create a new LongColumn. 
+     * Create a new LongColumn.
      * @param nrows the initial size of the column
      * @param capacity the initial capacity of the column
      * @param defaultValue the default value for the column
@@ -46,23 +46,23 @@ public class LongColumn extends AbstractColumn {
         Arrays.fill(m_values, defaultValue);
         m_size = nrows;
     }
-    
+
     // ------------------------------------------------------------------------
     // Column Metadata
-    
+
     /**
      * @see prefuse.data.column.Column#getRowCount()
      */
     public int getRowCount() {
         return m_size;
     }
-    
+
     /**
      * @see prefuse.data.column.Column#setMaximumRow(int)
      */
     public void setMaximumRow(int nrows) {
         if ( nrows > m_values.length ) {
-            int capacity = Math.max((3*m_values.length)/2 + 1, nrows);
+            int capacity = Math.max(3*m_values.length/2 + 1, nrows);
             long[] values = new long[capacity];
             System.arraycopy(m_values, 0, values, 0, m_size);
             Arrays.fill(values, m_size, capacity,
@@ -74,7 +74,7 @@ public class LongColumn extends AbstractColumn {
 
     // ------------------------------------------------------------------------
     // Data Access Methods
-    
+
     /**
      * @see prefuse.data.column.Column#get(int)
      */
@@ -103,11 +103,12 @@ public class LongColumn extends AbstractColumn {
 
     // ------------------------------------------------------------------------
     // Data Type Convenience Methods
-    
+
     /**
      * @see prefuse.data.column.AbstractColumn#getLong(int)
      */
-    public long getLong(int row) throws DataTypeException {
+    @Override
+	public long getLong(int row) throws DataTypeException {
         if ( row < 0 || row > m_size ) {
             throw new IllegalArgumentException("Row index out of bounds: "+row);
         }
@@ -117,7 +118,8 @@ public class LongColumn extends AbstractColumn {
     /**
      * @see prefuse.data.column.AbstractColumn#setLong(long, int)
      */
-    public void setLong(long val, int row) throws DataTypeException {
+    @Override
+	public void setLong(long val, int row) throws DataTypeException {
         if ( m_readOnly ) {
             throw new DataReadOnlyException();
         } else if ( row < 0 || row >= m_size ) {
@@ -125,17 +127,19 @@ public class LongColumn extends AbstractColumn {
         }
         // get the previous value
         long prev = m_values[row];
-        
+
         // exit early if no change
-        if ( prev == val ) return;
-        
+        if ( prev == val ) {
+			return;
+		}
+
         // set the new value
         m_values[row] = val;
-        
+
         // fire a change event
         fireColumnEvent(row, prev);
     }
-    
+
 //    /**
 //     * @see prefuse.data.column.AbstractColumn#getString(int)
 //     */
@@ -151,26 +155,29 @@ public class LongColumn extends AbstractColumn {
 //    }
 
     // ------------------------------------------------------------------------
-    
+
     /**
      * @see prefuse.data.column.Column#getInt(int)
      */
-    public int getInt(int row) throws DataTypeException {
+    @Override
+	public int getInt(int row) throws DataTypeException {
         return (int)getLong(row);
     }
-    
+
     /**
      * @see prefuse.data.column.Column#getFloat(int)
      */
-    public float getFloat(int row) throws DataTypeException {
+    @Override
+	public float getFloat(int row) throws DataTypeException {
         return getLong(row);
     }
-    
+
     /**
      * @see prefuse.data.column.Column#getDouble(int)
      */
-    public double getDouble(int row) throws DataTypeException {
+    @Override
+	public double getDouble(int row) throws DataTypeException {
         return getLong(row);
     }
-    
+
 } // end of class LongColumn

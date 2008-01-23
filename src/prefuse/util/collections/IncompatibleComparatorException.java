@@ -3,7 +3,7 @@ package prefuse.util.collections;
 /**
  * Exception indicating a comparator is incompatible with the data type
  * to be compared.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class IncompatibleComparatorException extends Exception {

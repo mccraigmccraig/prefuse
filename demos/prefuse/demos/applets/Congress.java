@@ -7,7 +7,8 @@ import prefuse.util.ui.JPrefuseApplet;
 
 public class Congress extends JPrefuseApplet {
 
-    public void init() {
+    @Override
+	public void init() {
         // load the data
         Table t = null;
         try {
@@ -18,5 +19,5 @@ public class Congress extends JPrefuseApplet {
         }
         this.getContentPane().add(new prefuse.demos.Congress(t));
     }
-    
+
 } // end of class Congress

@@ -10,7 +10,7 @@ import prefuse.visual.VisualItem;
 /**
  * Expression that indicates if an item is currently under the mouse
  * pointer.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class HoverPredicate extends ColumnExpression
@@ -20,7 +20,7 @@ public class HoverPredicate extends ColumnExpression
     public static final Predicate TRUE = new HoverPredicate();
     /** Convenience instance for the hover == false case. */
     public static final Predicate FALSE = new NotPredicate(TRUE);
-    
+
     /**
      * Create a new HoverPredicate.
      */
@@ -48,11 +48,12 @@ public class HoverPredicate extends ColumnExpression
     public int getParameterCount() {
         return 0;
     }
-    
+
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return getName()+"()";
     }
 

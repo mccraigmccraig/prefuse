@@ -98,19 +98,19 @@ public class ParseException extends RuntimeException {
     if (!specialConstructor) {
       return super.getMessage();
     }
-    String expected = "";
+    StringBuffer expected = new StringBuffer();
     int maxSize = 0;
-    for (int i = 0; i < expectedTokenSequences.length; i++) {
-      if (maxSize < expectedTokenSequences[i].length) {
-        maxSize = expectedTokenSequences[i].length;
+    for (int[] element : expectedTokenSequences) {
+      if (maxSize < element.length) {
+        maxSize = element.length;
       }
-      for (int j = 0; j < expectedTokenSequences[i].length; j++) {
-        expected += tokenImage[expectedTokenSequences[i][j]] + " ";
+      for (int j = 0; j < element.length; j++) {
+        expected.append(tokenImage[element[j]]).append(" ");
       }
-      if (expectedTokenSequences[i][expectedTokenSequences[i].length - 1] != 0) {
-        expected += "...";
+      if (element[element.length - 1] != 0) {
+        expected.append("...");
       }
-      expected += eol + "    ";
+      expected.append(eol).append("    ");
     }
     String retval = "Encountered \"";
     Token tok = currentToken.next;
@@ -121,7 +121,7 @@ public class ParseException extends RuntimeException {
         break;
       }
       retval += add_escapes(tok.image);
-      tok = tok.next; 
+      tok = tok.next;
     }
     retval += "\" at line " + currentToken.next.beginLine + ", column " + currentToken.next.beginColumn;
     retval += "." + eol;
@@ -130,7 +130,7 @@ public class ParseException extends RuntimeException {
     } else {
       retval += "Was expecting one of:" + eol + "    ";
     }
-    retval += expected;
+    retval += expected.toString();
     return retval;
   }
 
@@ -138,7 +138,7 @@ public class ParseException extends RuntimeException {
    * The end of line string for this machine.
    */
   protected String eol = System.getProperty("line.separator", "\n");
- 
+
   /**
    * Used to convert raw characters to their escaped version
    * when these raw version cannot be used as part of an ASCII

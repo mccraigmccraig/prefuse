@@ -18,7 +18,7 @@ import prefuse.util.io.IOLib;
  * a different file by putting the full path to the file into the
  * "prefuse.config" System property (for example by using a -D flag at the
  * Java runtime command line).</p>
- * 
+ *
  * <p>
  * Some of the supported configuration properties include:
  * <ul>
@@ -33,29 +33,29 @@ import prefuse.util.io.IOLib;
  * considered. The default value is 300.</li>
  * <li><code>util.logdir</code> - the directory in which to write prefuse log
  * files. The default is "null" which defaults logging output to standard
- * output.</li> 
+ * output.</li>
  * <li><code>util.logfile</code> - the filename pattern to use for naming
  * prefuse log files. The default is "prefuse_log_%g.txt", where the %g
  * indicates a unique number for the log file.</li>
  * </ul>
  * </p>
- * 
+ *
  * <p>
  * Application creators are welcome to add their own custom properties
  * to the configuration files and use the PrefuseConfig instance to
  * access those properties. This class is a singleton, accessed through
  * a static accessor method.
  * </p>
- *  
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class PrefuseConfig extends Properties {
 
-    private static final Logger s_logger 
+    private static final Logger s_logger
         = Logger.getLogger(PrefuseConfig.class.getName());
-    
+
     private static final PrefuseConfig s_config = new PrefuseConfig();
-    
+
     /**
      * Get the global PrefuseConfig instance.
      * @return the configuration instance
@@ -63,10 +63,10 @@ public class PrefuseConfig extends Properties {
     public static PrefuseConfig getConfig() {
         return s_config;
     }
-    
+
     private PrefuseConfig() {
         setDefaults();
-        
+
         String configFile;
         try {
             configFile = System.getProperty("prefuse.config");
@@ -74,15 +74,16 @@ public class PrefuseConfig extends Properties {
             // in applet mode, we could run afoul of the security manager
             configFile = null;
         }
-        if ( configFile == null )
-            configFile = "prefuse.conf";
+        if ( configFile == null ) {
+			configFile = "prefuse.conf";
+		}
         try {
             load(IOLib.streamFromString(configFile));
             s_logger.info("Loaded config file: "+configFile);
         } catch ( Exception e ) {
             // do nothing, just go with the defaults
         }
-        
+
         // direct logging file directory, as set by config properties
         // default of java.util.Logger is to output to standard error
         String logdir = getProperty("util.logdir");
@@ -99,7 +100,7 @@ public class PrefuseConfig extends Properties {
             }
         }
     }
-    
+
     /**
      * Get a prefuse configuration property.
      * @param key the name of the property to lookup
@@ -140,7 +141,7 @@ public class PrefuseConfig extends Properties {
             return Long.MIN_VALUE;
         }
     }
-    
+
     /**
      * Get a prefuse configuration property as a float.
      * @param key the name of the property to lookup
@@ -156,7 +157,7 @@ public class PrefuseConfig extends Properties {
             return Float.NaN;
         }
     }
-    
+
     /**
      * Get a prefuse configuration property as a double.
      * @param key the name of the property to lookup
@@ -172,7 +173,7 @@ public class PrefuseConfig extends Properties {
             return Double.NaN;
         }
     }
-    
+
     /**
      * Get a prefuse configuration property as a boolean.
      * @param key the name of the property to lookup
@@ -184,24 +185,24 @@ public class PrefuseConfig extends Properties {
         String val = s_config.getProperty(key);
         return "true".equalsIgnoreCase(val);
     }
-    
+
     /**
      * Sets default values for Prefuse properties
      */
-    private void setDefaults() {        
+    private void setDefaults() {
         setProperty("size.scale2D", "0.5");
         setProperty("activity.threadPriority", "6");
         setProperty("data.delimiter", ".");
         setProperty("data.graph.nodeGroup", "nodes");
         setProperty("data.graph.edgeGroup", "edges");
         setProperty("data.visual.fieldPrefix", "_");
-        setProperty("data.io.worker.threadPriority", 
+        setProperty("data.io.worker.threadPriority",
                 String.valueOf(Thread.NORM_PRIORITY));
-        
+
         // prefuse will only attempt to optimize filtering operations
         // on tables with more rows than this threshold value
         setProperty("data.filter.optimizeThreshold", "300");
-        
+
         // setProperty("data.graph.nodeKey", null); // intentionally null
         setProperty("data.graph.sourceKey", "source");
         setProperty("data.graph.targetKey", "target");
@@ -211,9 +212,9 @@ public class PrefuseConfig extends Properties {
         setProperty("visualization.focusItems", "_focus_");
         setProperty("visualization.selectedItems", "_selected_");
         setProperty("visualization.searchItems", "_search_");
-        
+
         // setProperty("util.logdir", null); // intentionally null
         setProperty("util.logfile", "prefuse_log_%g.txt");
     }
-    
+
 } // end of class PrefuseConfig

@@ -20,30 +20,32 @@ import test.prefuse.TestConfig;
 public class CascadedTableTest extends TestCase implements TableTestData {
 
     Table t;
-    
+
     /**
      * @see junit.framework.TestCase#setUp()
      */
-    protected void setUp() throws Exception {
+    @Override
+	protected void setUp() throws Exception {
         super.setUp();
         t = TableTest.getTestCaseTable();
     }
-    
+
     /**
      * @see junit.framework.TestCase#tearDown()
      */
-    protected void tearDown() throws Exception {
+    @Override
+	protected void tearDown() throws Exception {
         super.tearDown();
         t = null;
     }
-    
+
     public void testCascadedTableRangeFilters() {
         double lo = 1;
         double hi = 20;
 
         // index the double column
         t.index(HEADERS[4]);
-        
+
         // where id > 0 && dub > 1 && dub < 20
         ColumnExpression id = new ColumnExpression(HEADERS[0]);
         ColumnExpression dub = new ColumnExpression(HEADERS[4]);
@@ -63,8 +65,8 @@ public class CascadedTableTest extends TestCase implements TableTestData {
         if ( TestConfig.verbose() ) {
             System.out.println(filter.toString());
         }
-        
-        CascadedTable ft = new CascadedTable(t, filter);
+
+        CascadedTable ft = CascadedTable.createCascadedTable(t, filter);
 
         TableIterator iter = ft.iterator();
         while ( iter.hasNext() ) {
@@ -100,22 +102,23 @@ public class CascadedTableTest extends TestCase implements TableTestData {
             } catch ( Exception e ) { e.printStackTrace(); }
         }
     }
-    
+
     /*
      * Test method for
      * 'prefuse.data.CascadedTable.CascadedTable(Table,RowFilter)'
      */
     public void testCascadedTableTableRowFilter() {
         final float thresh = 5.0f;
-        
+
         Predicate p = new AbstractPredicate() {
-            public boolean getBoolean(Tuple t) {
+            @Override
+			public boolean getBoolean(Tuple t) {
                 return t.getFloat(HEADERS[3]) < thresh;
             }
         };
-        
-        CascadedTable ft = new CascadedTable(t, p);
-        
+
+        CascadedTable ft = CascadedTable.createCascadedTable(t, p);
+
         for ( int i=0, r=0; i<NROWS; ++i ) {
             float val = ((Float)TABLE[3][i]).floatValue();
             if ( val < thresh ) {
@@ -131,7 +134,7 @@ public class CascadedTableTest extends TestCase implements TableTestData {
                 }
             }
         }
-        
+
         // add an extra column to the cascaded table
         String name = "test";
         ft.addColumn(name, double.class, new Double(Math.PI));
@@ -141,14 +144,14 @@ public class CascadedTableTest extends TestCase implements TableTestData {
             iter.setDouble(name, Math.E);
             assertTrue(Math.E == ft.getDouble(row, name));
         }
-        
+
         int nr = t.addRow();
         t.setFloat(nr, HEADERS[3], 0.5f);
         t.setInt(nr, HEADERS[0], 77);
         nr = t.addRow();
         t.setFloat(nr, HEADERS[3], 0.5f);
         t.setInt(nr, HEADERS[0], 99);
-        
+
         if ( TestConfig.verbose() ) {
             try {
                 new DelimitedTextTableWriter().writeTable(ft, System.out);

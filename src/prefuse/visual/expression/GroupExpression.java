@@ -13,7 +13,7 @@ import prefuse.data.expression.ObjectLiteral;
  * within a Visualization. Maintains an Expression that serves as the
  * paremter to this Function; this Expression should return a valid
  * group name when evaluated on a given Tuple.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public abstract class GroupExpression extends AbstractExpression
@@ -23,14 +23,14 @@ public abstract class GroupExpression extends AbstractExpression
         = Logger.getLogger(GroupExpression.class.getName());
 
     protected Expression m_group;
-    
+
     /**
      * Create a new GroupExpression.
      */
     protected GroupExpression() {
         m_group = null;
     }
-    
+
     /**
      * Create a new GroupExpression over the given group name.
      * @param group the data group name
@@ -38,31 +38,32 @@ public abstract class GroupExpression extends AbstractExpression
     protected GroupExpression(String group) {
         m_group = new ObjectLiteral(group);
     }
-    
+
     /**
      * Evaluate the group name expression for the given Tuple
      * @param t the input Tuple to the group name expression
      * @return the String result of the expression
      */
-    protected String getGroup(Tuple t) {
+    protected String getGroup(Tuple<?> t) {
         String group = (String)m_group.get(t);
         if ( group == null ) {
             s_logger.warning("Null group lookup");
         }
         return group;
     }
-    
-    
+
+
     /**
      * Attempts to add the given expression as the group expression.
      * @see prefuse.data.expression.Function#addParameter(prefuse.data.expression.Expression)
      */
     public void addParameter(Expression e) {
-        if ( m_group == null )
-            m_group = e;
-        else
-            throw new IllegalStateException(
+        if ( m_group == null ) {
+			m_group = e;
+		} else {
+			throw new IllegalStateException(
                "This function takes only 1 parameter.");
+		}
     }
 
     /**
@@ -71,12 +72,13 @@ public abstract class GroupExpression extends AbstractExpression
     public int getParameterCount() {
         return 1;
     }
-    
+
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return getName()+"("+m_group+")";
     }
-    
+
 } // end of class GroupExpression

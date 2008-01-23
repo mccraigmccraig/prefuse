@@ -12,7 +12,7 @@ public class ColorMap {
 
     private int[] palette;
     private double minValue, maxValue;
-    
+
     /**
      * Creates a new ColorMap instance using the given internal color map
      * array and minimum and maximum index values.
@@ -25,7 +25,7 @@ public class ColorMap {
         minValue = min;
         maxValue = max;
     }
-    
+
     /**
      * Returns the color associated with the given value. If the value
      * is outside the range defined by this map's minimum or maximum
@@ -98,5 +98,5 @@ public class ColorMap {
     public void setMinValue(double minValue) {
         this.minValue = minValue;
     }
-    
+
 } // end of class ColorMap

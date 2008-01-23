@@ -11,7 +11,7 @@ import prefuse.data.Graph;
  * implementations for all but the
  * {@link prefuse.data.io.GraphWriter#writeGraph(Graph, OutputStream)}
  * method.
- *  
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public abstract class AbstractGraphWriter implements GraphWriter {
@@ -19,7 +19,7 @@ public abstract class AbstractGraphWriter implements GraphWriter {
     /**
      * @see prefuse.data.io.GraphWriter#writeGraph(prefuse.data.Graph, java.lang.String)
      */
-    public void writeGraph(Graph graph, String filename) throws DataIOException
+    public void writeGraph(Graph<?,?,?> graph, String filename) throws DataIOException
     {
         writeGraph(graph, new File(filename));
     }
@@ -27,7 +27,7 @@ public abstract class AbstractGraphWriter implements GraphWriter {
     /**
      * @see prefuse.data.io.GraphWriter#writeGraph(prefuse.data.Graph, java.io.File)
      */
-    public void writeGraph(Graph graph, File f) throws DataIOException {
+    public void writeGraph(Graph<?,?,?> graph, File f) throws DataIOException {
         try {
             writeGraph(graph, new FileOutputStream(f));
         } catch ( FileNotFoundException e ) {

@@ -1,7 +1,5 @@
 package prefuse.action;
 
-import java.util.Iterator;
-
 import prefuse.Visualization;
 import prefuse.data.expression.Predicate;
 import prefuse.visual.VisualItem;
@@ -12,14 +10,14 @@ import prefuse.visual.expression.VisiblePredicate;
  * it only processes items that are visible. Use the
  * {@link #setFilterPredicate(Predicate)} method
  * to change the filtering criteria.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public abstract class ItemAction extends GroupAction {
-    
+
     /** A reference to filtering predicate for this Action */
     protected Predicate m_predicate;
-    
+
     /**
      * Create a new ItemAction that processes all groups.
      * @see Visualization#ALL_ITEMS
@@ -27,7 +25,7 @@ public abstract class ItemAction extends GroupAction {
     public ItemAction() {
         this((Visualization)null);
     }
-    
+
     /**
      * Create a new ItemAction that processes all groups.
      * @param vis the {@link prefuse.Visualization} to process
@@ -36,7 +34,7 @@ public abstract class ItemAction extends GroupAction {
     public ItemAction(Visualization vis) {
         this(vis, Visualization.ALL_ITEMS);
     }
-    
+
     /**
      * Create a new ItemAction that processes the specified group.
      * @param group the name of the group to process
@@ -44,7 +42,7 @@ public abstract class ItemAction extends GroupAction {
     public ItemAction(String group) {
         this(null, group);
     }
-    
+
     /**
      * Create a new ItemAction that processes the specified group.
      * @param group the name of the group to process
@@ -53,7 +51,7 @@ public abstract class ItemAction extends GroupAction {
     public ItemAction(String group, Predicate filter) {
         this(null, group, filter);
     }
-    
+
     /**
      * Create a new ItemAction that processes the specified group.
      * @param vis the {@link prefuse.Visualization} to process
@@ -73,9 +71,9 @@ public abstract class ItemAction extends GroupAction {
         super(vis, group);
         m_predicate = filter;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Returns the filtering predicate used by this Action.
      * @return the filtering {@link prefuse.data.expression.Predicate}
@@ -92,22 +90,22 @@ public abstract class ItemAction extends GroupAction {
     public void setFilterPredicate(Predicate filter) {
         m_predicate = filter;
     }
-    
+
     /**
      * @see prefuse.action.Action#run(double)
      */
-    public void run(double frac) {
-        Iterator items = getVisualization().items(m_group, m_predicate);
-        while ( items.hasNext() ) {
-            process((VisualItem)items.next(), frac);
+    @Override
+	public void run(double frac) {
+        for(VisualItem<?> item : getVisualization().items(m_group, m_predicate)) {
+            process(item, frac);
         }
     }
-    
+
     /**
      * Processes an individual item.
      * @param item the VisualItem to process
      * @param frac the fraction of elapsed duration time
      */
-    public abstract void process(VisualItem item, double frac);
+    public abstract void process(VisualItem<?> item, double frac);
 
 } // end of class ItemAction

@@ -14,38 +14,41 @@ import test.prefuse.TestConfig;
 public class VisualItemTableTest extends TestCase implements TableTestData {
 
     Table t;
-    
+
     /**
      * @see junit.framework.TestCase#setUp()
      */
-    protected void setUp() throws Exception {
+    @Override
+	protected void setUp() throws Exception {
         super.setUp();
         t = TableTest.getTestCaseTable();
     }
-    
+
     /**
      * @see junit.framework.TestCase#tearDown()
      */
-    protected void tearDown() throws Exception {
+    @Override
+	protected void tearDown() throws Exception {
         super.tearDown();
         t = null;
     }
-    
+
     /*
      * Test method for 'edu.berkeley.guir.prefuse.data.VisualItemTable.VisualItemTable(Table, RowFilter)'
      */
     public void testVisualItemTableTableRowFilter() {
         final float thresh = 5.0f;
-        
+
         Predicate p = new AbstractPredicate() {
-            public boolean getBoolean(Tuple t) {
+            @Override
+			public boolean getBoolean(Tuple t) {
                 return t.getFloat(HEADERS[3]) < thresh;
             }
         };
-        
+
         Visualization vis = new Visualization();
-        VisualTable vt = new VisualTable(t, vis, "data", p);
-        
+        VisualTable vt = VisualTable.createVisualTable(t, vis, "data", p);
+
         for ( int i=0, r=0; i<NROWS; ++i ) {
             float val = ((Float)TABLE[3][i]).floatValue();
             if ( val < thresh ) {
@@ -61,7 +64,7 @@ public class VisualItemTableTest extends TestCase implements TableTestData {
                 }
             }
         }
-        
+
         // add an extra column to the filtered table
         String name = "test";
         vt.addColumn(name, double.class, new Double(Math.PI));
@@ -71,10 +74,10 @@ public class VisualItemTableTest extends TestCase implements TableTestData {
             iter.setDouble(name, Math.E);
             assertTrue(Math.E == vt.getDouble(row, name));
         }
-        
+
         int nr = t.addRow();
         t.setFloat(nr, HEADERS[3], 0.5f);
-        
+
         if ( TestConfig.verbose() ) {
             try {
                 new DelimitedTextTableWriter().writeTable(vt, System.out);

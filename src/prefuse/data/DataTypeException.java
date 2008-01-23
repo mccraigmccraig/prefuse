@@ -2,7 +2,7 @@ package prefuse.data;
 
 /**
  * Exception indicating an incompatible data type assignment.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class DataTypeException extends RuntimeException {
@@ -40,13 +40,13 @@ public class DataTypeException extends RuntimeException {
     public DataTypeException(Throwable cause) {
         super(cause);
     }
-    
+
     /**
      * Create a new DataTypeException.
      * @param type the incompatible data type
      */
-    public DataTypeException(Class type) {
+    public DataTypeException(Class<?> type) {
         super("Type "+type.getName()+" not supported.");
     }
-    
+
 } // end of class DataTypeException

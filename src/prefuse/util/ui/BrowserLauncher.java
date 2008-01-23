@@ -46,7 +46,7 @@ public abstract class BrowserLauncher {
     /**
      * Display a file in the system browser.  If you want to display a
      * file, you must include the absolute path name.
-     * @param url the file's url (the url must start with either 
+     * @param url the file's url (the url must start with either
      *   "http://" or "file://").
      */
     public static void showDocument(String url) {
@@ -95,7 +95,7 @@ public abstract class BrowserLauncher {
      */
     public static boolean isWindowsPlatform() {
         String os = System.getProperty("os.name");
-        return (os != null && os.startsWith(WIN_ID));
+        return os != null && os.startsWith(WIN_ID);
     }
 
     /**

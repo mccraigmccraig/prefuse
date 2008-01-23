@@ -6,7 +6,7 @@ import prefuse.data.column.Column;
 
 /**
  * Listener interface for monitoring changes to a data column.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public interface ColumnListener extends EventListener {
@@ -20,7 +20,7 @@ public interface ColumnListener extends EventListener {
      * @param end the last column index that has been changed
      */
     public void columnChanged(Column src, int type, int start, int end);
-    
+
     /**
      * Notification that a data column has changed.
      * @param src the column that has changed
@@ -28,7 +28,7 @@ public interface ColumnListener extends EventListener {
      * @param prev the previous value at the given location
      */
     public void columnChanged(Column src, int idx, int prev);
-    
+
     /**
      * Notification that a data column has changed.
      * @param src the column that has changed
@@ -36,7 +36,7 @@ public interface ColumnListener extends EventListener {
      * @param prev the previous value at the given location
      */
     public void columnChanged(Column src, int idx, long prev);
-    
+
     /**
      * Notification that a data column has changed.
      * @param src the column that has changed
@@ -44,7 +44,7 @@ public interface ColumnListener extends EventListener {
      * @param prev the previous value at the given location
      */
     public void columnChanged(Column src, int idx, float prev);
-    
+
     /**
      * Notification that a data column has changed.
      * @param src the column that has changed
@@ -52,7 +52,7 @@ public interface ColumnListener extends EventListener {
      * @param prev the previous value at the given location
      */
     public void columnChanged(Column src, int idx, double prev);
-    
+
     /**
      * Notification that a data column has changed.
      * @param src the column that has changed
@@ -60,7 +60,7 @@ public interface ColumnListener extends EventListener {
      * @param prev the previous value at the given location
      */
     public void columnChanged(Column src, int idx, boolean prev);
-    
+
     /**
      * Notification that a data column has changed.
      * @param src the column that has changed
@@ -68,5 +68,5 @@ public interface ColumnListener extends EventListener {
      * @param prev the previous value at the given location
      */
     public void columnChanged(Column src, int idx, Object prev);
-    
+
 } // end of interface ColumnListener

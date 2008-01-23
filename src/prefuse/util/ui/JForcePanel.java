@@ -22,10 +22,10 @@ import prefuse.util.force.ForceSimulator;
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class JForcePanel extends JPanel {
-    
-    private ForcePanelChangeListener lstnr = new ForcePanelChangeListener();
-    private ForceSimulator fsim;
-    
+
+    private final ForcePanelChangeListener lstnr = new ForcePanelChangeListener();
+    private final ForceSimulator fsim;
+
     /**
      * Create a new JForcePanel
      * @param fsim the ForceSimulator to configure
@@ -35,15 +35,14 @@ public class JForcePanel extends JPanel {
         this.setBackground(Color.WHITE);
         initUI();
     }
-    
+
     /**
      * Initialize the UI.
      */
     private void initUI() {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         Force[] forces = fsim.getForces();
-        for ( int i=0; i<forces.length; i++ ) {
-            Force f = forces[i];
+        for (Force f : forces) {
             Box v = new Box(BoxLayout.Y_AXIS);
             for ( int j=0; j<f.getParameterCount(); j++ ) {
                 JValueSlider field = createField(f,j);
@@ -56,7 +55,7 @@ public class JForcePanel extends JPanel {
             this.add(v);
         }
     }
-    
+
     /**
      * Create an entry for configuring a single parameter.
      */
@@ -65,7 +64,7 @@ public class JForcePanel extends JPanel {
         double min   = f.getMinValue(param);
         double max   = f.getMaxValue(param);
         String name = f.getParameterName(param);
-        
+
         JValueSlider s = new JValueSlider(name,min,max,value);
         s.setBackground(Color.WHITE);
         s.putClientProperty("force", f);
@@ -74,7 +73,7 @@ public class JForcePanel extends JPanel {
         s.setMaximumSize(new Dimension(300,30));
         return s;
     }
-    
+
     /**
      * Change listener that updates paramters in response to interaction.
      */
@@ -87,7 +86,7 @@ public class JForcePanel extends JPanel {
             f.setParameter(p.intValue(), val);
         }
     } // end of inner class ForcePanelChangeListener
-    
+
     /**
      * Create and displays a new window showing a configuration panel
      * for the given ForceSimulator.
@@ -102,5 +101,5 @@ public class JForcePanel extends JPanel {
         frame.setVisible(true);
         return frame;
     }
-    
+
 } // end of class JForcePanel

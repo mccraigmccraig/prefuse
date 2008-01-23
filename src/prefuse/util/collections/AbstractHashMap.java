@@ -1,9 +1,9 @@
 /*
  Copyright © 1999 CERN - European Organization for Nuclear Research.
- Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
- is hereby granted without fee, provided that the above copyright notice appear in all copies and 
- that both that copyright notice and this permission notice appear in supporting documentation. 
- CERN makes no representations about the suitability of this software for any purpose. 
+ Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose
+ is hereby granted without fee, provided that the above copyright notice appear in all copies and
+ that both that copyright notice and this permission notice appear in supporting documentation.
+ CERN makes no representations about the suitability of this software for any purpose.
  It is provided "as is" without expressed or implied warranty.
  */
 package prefuse.util.collections;
@@ -15,7 +15,7 @@ package prefuse.util.collections;
  * javadoc <a href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * Note that implementations are not synchronized.
- * 
+ *
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
  * @see java.util.HashMap
@@ -72,13 +72,13 @@ public abstract class AbstractHashMap {
      */
     protected int chooseGrowCapacity(int size, double minLoad, double maxLoad) {
         return nextPrime(Math.max(size + 1,
-                (int) ((4 * size / (3 * minLoad + maxLoad)))));
+                (int) (4 * size / (3 * minLoad + maxLoad))));
     }
 
     /**
      * Returns new high water mark threshold based on current capacity and
      * maxLoadFactor.
-     * 
+     *
      * @return int the new threshold.
      */
     protected int chooseHighWaterMark(int capacity, double maxLoad) {
@@ -93,7 +93,7 @@ public abstract class AbstractHashMap {
     /**
      * Returns new low water mark threshold based on current capacity and
      * minLoadFactor.
-     * 
+     *
      * @return int the new threshold.
      */
     protected int chooseLowWaterMark(int capacity, double minLoad) {
@@ -108,7 +108,7 @@ public abstract class AbstractHashMap {
      */
     protected int chooseMeanCapacity(int size, double minLoad, double maxLoad) {
         return nextPrime(Math.max(size + 1,
-                (int) ((2 * size / (minLoad + maxLoad)))));
+                (int) (2 * size / (minLoad + maxLoad))));
     }
 
     /**
@@ -119,7 +119,7 @@ public abstract class AbstractHashMap {
      */
     protected int chooseShrinkCapacity(int size, double minLoad, double maxLoad) {
         return nextPrime(Math.max(size + 1,
-                (int) ((4 * size / (minLoad + 3 * maxLoad)))));
+                (int) (4 * size / (minLoad + 3 * maxLoad))));
     }
 
     /**
@@ -139,7 +139,7 @@ public abstract class AbstractHashMap {
      * <p>
      * <b>This default implementation does nothing.</b> Override this method if
      * necessary.
-     * 
+     *
      * @param minCapacity
      *            the desired minimum capacity.
      */
@@ -149,7 +149,7 @@ public abstract class AbstractHashMap {
     /**
      * Returns <tt>true</tt> if the receiver contains no (key,value)
      * associations.
-     * 
+     *
      * @return <tt>true</tt> if the receiver contains no (key,value)
      *         associations.
      */
@@ -161,7 +161,7 @@ public abstract class AbstractHashMap {
      * Returns a prime number which is <code>&gt;= desiredCapacity</code> and
      * very close to <code>desiredCapacity</code> (within 11% if
      * <code>desiredCapacity &gt;= 1000</code>).
-     * 
+     *
      * @param desiredCapacity
      *            the capacity desired by the user.
      * @return the capacity which should be used for a hashtable.
@@ -173,7 +173,7 @@ public abstract class AbstractHashMap {
     /**
      * Initializes the receiver. You will almost certainly need to override this
      * method in subclasses to initialize the hash table.
-     * 
+     *
      * @param initialCapacity
      *            the initial capacity of the receiver.
      * @param minLoadFactor
@@ -186,19 +186,23 @@ public abstract class AbstractHashMap {
      */
     protected void setUp(int initialCapacity, double minLoadFactor,
             double maxLoadFactor) {
-        if (initialCapacity < 0)
-            throw new IllegalArgumentException(
+        if (initialCapacity < 0) {
+			throw new IllegalArgumentException(
                     "Initial Capacity must not be less than zero: "
                             + initialCapacity);
-        if (minLoadFactor < 0.0 || minLoadFactor >= 1.0)
-            throw new IllegalArgumentException("Illegal minLoadFactor: "
+		}
+        if (minLoadFactor < 0.0 || minLoadFactor >= 1.0) {
+			throw new IllegalArgumentException("Illegal minLoadFactor: "
                     + minLoadFactor);
-        if (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0)
-            throw new IllegalArgumentException("Illegal maxLoadFactor: "
+		}
+        if (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) {
+			throw new IllegalArgumentException("Illegal maxLoadFactor: "
                     + maxLoadFactor);
-        if (minLoadFactor >= maxLoadFactor)
-            throw new IllegalArgumentException("Illegal minLoadFactor: "
+		}
+        if (minLoadFactor >= maxLoadFactor) {
+			throw new IllegalArgumentException("Illegal minLoadFactor: "
                     + minLoadFactor + " and maxLoadFactor: " + maxLoadFactor);
+		}
     }
 
     /**
@@ -211,13 +215,13 @@ public abstract class AbstractHashMap {
     }
 
     /**
-     * Trims the capacity of the receiver to be the receiver's current 
-     * size. Releases any superfluous internal memory. An application can use this operation to minimize the 
+     * Trims the capacity of the receiver to be the receiver's current
+     * size. Releases any superfluous internal memory. An application can use this operation to minimize the
      * storage of the receiver.
      * <p>
      * This default implementation does nothing. Override this method if necessary.
      */
     public void trimToSize() {
     }
-    
+
 } // end of class AbstractHashMap

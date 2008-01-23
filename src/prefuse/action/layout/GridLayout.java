@@ -1,7 +1,6 @@
 package prefuse.action.layout;
 
 import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
 
 import prefuse.data.Node;
 import prefuse.data.tuple.TupleSet;
@@ -12,7 +11,7 @@ import prefuse.visual.VisualItem;
  * Implements a uniform grid-based layout. This component can either use
  * preset grid dimensions or analyze a grid-shaped graph to determine them
  * automatically.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class GridLayout extends Layout {
@@ -20,7 +19,7 @@ public class GridLayout extends Layout {
     protected int rows;
     protected int cols;
     protected boolean analyze = false;
-    
+
     /**
      * Create a new GridLayout without preset dimensions. The layout will
      * attempt to analyze an input graph to determine grid parameters.
@@ -32,7 +31,7 @@ public class GridLayout extends Layout {
         super(group);
         analyze = true;
     }
-    
+
     /**
      * Create a new GridLayout using the specified grid dimensions. If the
      * input data has more elements than the grid dimensions can hold, the
@@ -47,39 +46,40 @@ public class GridLayout extends Layout {
         cols = ncols;
         analyze = false;
     }
-    
+
     /**
      * @see prefuse.action.Action#run(double)
      */
-    public void run(double frac) {
+    @Override
+	public void run(double frac) {
         Rectangle2D b = getLayoutBounds();
         double bx = b.getMinX(), by = b.getMinY();
         double w = b.getWidth(), h = b.getHeight();
-        
-        TupleSet ts = m_vis.getGroup(m_group);
+
+        TupleSet<? extends VisualItem<?>> ts = m_vis.getGroup(m_group);
         int m = rows, n = cols;
         if ( analyze ) {
             int[] d = analyzeGraphGrid(ts);
             m = d[0]; n = d[1];
         }
-        
-        Iterator iter = ts.tuples();
+
         // layout grid contents
-        for ( int i=0; iter.hasNext() && i < m*n; ++i ) {
-            VisualItem item = (VisualItem)iter.next();
-            item.setVisible(true);
-            double x = bx + w*((i%n)/(double)(n-1));
-            double y = by + h*((i/n)/(double)(m-1));
-            setX(item,null,x);
-            setY(item,null,y);
-        }
-        // set left-overs invisible
-        while ( iter.hasNext() ) {
-            VisualItem item = (VisualItem)iter.next();
-            item.setVisible(false);
+        int i = 0;
+        for(VisualItem<?> item : ts.tuples()) {
+        	if(i >= m * n) {
+                // set left-overs invisible
+                item.setVisible(false);
+        	} else {
+        		item.setVisible(true);
+        		double x = bx + w*i%n/(n-1);
+        		double y = by + h*i/n/(m-1);
+        		setX(item,null,x);
+        		setY(item,null,y);
+        		i++;
+        	}
         }
     }
-    
+
     /**
      * Analyzes a set of nodes to try and determine grid dimensions. Currently
      * looks for the edge count on a node to drop to 2 to determine the end of
@@ -88,19 +88,21 @@ public class GridLayout extends Layout {
      * <b>must</b> implement be Node instances.
      * @return a two-element int array with the row and column lengths
      */
-    public static int[] analyzeGraphGrid(TupleSet ts) {
+    public static int[] analyzeGraphGrid(TupleSet<? extends VisualItem<?>> ts) {
         // TODO: more robust grid analysis?
-        int m, n;
-        Iterator iter = ts.tuples(); iter.next();
-        for ( n=2; iter.hasNext(); n++ ) {
-            Node nd = (Node)iter.next();
-            if ( nd.getDegree() == 2 )
-                break;
+        int m = 0;
+        int n = 2;
+        for (VisualItem<?> item : ts.tuples()) {
+            Node<?,?> nd = (Node<?,?>) item;
+            if ( nd.getDegree() == 2 ) {
+				break;
+			}
+            n++;
         }
         m = ts.getTupleCount() / n;
         return new int[] {m,n};
     }
-    
+
     /**
      * Get the number of grid columns.
      * @return the number of grid columns
@@ -108,7 +110,7 @@ public class GridLayout extends Layout {
     public int getNumCols() {
         return cols;
     }
-    
+
     /**
      * Set the number of grid columns.
      * @param cols the number of grid columns to use
@@ -116,7 +118,7 @@ public class GridLayout extends Layout {
     public void setNumCols(int cols) {
         this.cols = cols;
     }
-    
+
     /**
      * Get the number of grid rows.
      * @return the number of grid rows
@@ -124,7 +126,7 @@ public class GridLayout extends Layout {
     public int getNumRows() {
         return rows;
     }
-    
+
     /**
      * Set the number of grid rows.
      * @param rows the number of grid rows to use
@@ -132,5 +134,5 @@ public class GridLayout extends Layout {
     public void setNumRows(int rows) {
         this.rows = rows;
     }
-    
+
 } // end of class GridLayout

@@ -49,7 +49,7 @@ public class ExpressionTest extends TestCase {
         ObjectLiteral.class,
         ObjectLiteral.class
     };
-    
+
     public void testExpressionParser() {
         for ( int i=0; i<expr.length; ++i ) {
             try {
@@ -65,5 +65,5 @@ public class ExpressionTest extends TestCase {
             }
         }
     }
-    
+
 }

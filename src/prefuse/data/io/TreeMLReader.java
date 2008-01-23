@@ -25,18 +25,19 @@ import prefuse.data.parser.ParserFactory;
  * TreeML is
  * <a href="http://www.nomencurator.org/InfoVis2003/download/treeml.dtd">
  *  available online</a>.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class TreeMLReader extends AbstractGraphReader {
 
-    private ParserFactory m_pf = ParserFactory.getDefaultFactory();
+    private final ParserFactory m_pf = ParserFactory.getDefaultFactory();
 
     /**
      * @see prefuse.data.io.GraphReader#readGraph(java.io.InputStream)
      */
-    public Graph readGraph(InputStream is) throws DataIOException {
-        try {       
+    @Override
+	public Graph<?,?,?> readGraph(InputStream is) throws DataIOException {
+        try {
             TreeMLHandler    handler   = new TreeMLHandler();
             SAXParserFactory factory   = SAXParserFactory.newInstance();
             SAXParser        saxParser = factory.newSAXParser();
@@ -58,10 +59,10 @@ public class TreeMLReader extends AbstractGraphReader {
         public static final String NAME   = "name";
         public static final String VALUE  = "value";
         public static final String TYPE   = "type";
-        
+
         public static final String DECLS  = "declarations";
         public static final String DECL   = "attributeDecl";
-        
+
         public static final String INT = "Int";
         public static final String INTEGER = "Integer";
         public static final String LONG = "Long";
@@ -70,42 +71,45 @@ public class TreeMLReader extends AbstractGraphReader {
         public static final String STRING = "String";
         public static final String DATE = "Date";
         public static final String CATEGORY = "Category";
-        
+
         // prefuse-specific allowed types
         public static final String BOOLEAN = "Boolean";
         public static final String DOUBLE = "Double";
     }
-    
+
     /**
      * A SAX Parser for TreeML data files.
      */
     public class TreeMLHandler extends DefaultHandler implements Tokens {
-        
-        private Table m_nodes = null;
-        private Tree m_tree = null;
-        
-        private Node m_activeNode = null;
+
+        private Table<?> m_nodes = null;
+        private Tree<?,?,?> m_tree = null;
+
+        private Node<?,?> m_activeNode = null;
         private boolean m_inSchema = true;
-        
-        public void startDocument() {
-            m_tree = new Tree();
+
+        @Override
+		public void startDocument() {
+            m_tree = Tree.createTree();
             m_nodes = m_tree.getNodeTable();
         }
-        
+
         private void schemaCheck() {
             if ( m_inSchema ) {
                 m_inSchema = false;
             }
         }
-        
-        public void endElement(String namespaceURI, String localName, String qName) {
+
+        @Override
+		public void endElement(String namespaceURI, String localName, String qName) {
             if ( qName.equals(BRANCH) || qName.equals(LEAF) ) {
                 m_activeNode = m_activeNode.getParent();
             }
         }
-        
-        public void startElement(String namespaceURI, String localName,
-                                 String qName, Attributes atts) {           
+
+        @Override
+		public void startElement(String namespaceURI, String localName,
+                                 String qName, Attributes atts) {
             if ( qName.equals(DECL) ) {
                 if ( !m_inSchema ) {
                     throw new RuntimeException("All declarations must be done "
@@ -113,14 +117,14 @@ public class TreeMLReader extends AbstractGraphReader {
                 }
                 String name = atts.getValue(NAME);
                 String type = atts.getValue(TYPE);
-                Class t = parseType(type);
+                Class<?> t = parseType(type);
                 m_nodes.addColumn(name, t);
             }
             else if ( qName.equals(BRANCH) || qName.equals(LEAF) ) {
                 schemaCheck();
-                
+
                 // parse a node element
-                Node n;
+                Node<?,?> n;
                 if ( m_activeNode == null ) {
                     n = m_tree.addRoot();
                 } else {
@@ -133,7 +137,7 @@ public class TreeMLReader extends AbstractGraphReader {
                 parseAttribute(atts);
             }
         }
-        
+
         protected void parseAttribute(Attributes atts) {
             String alName, name = null, value = null;
             for ( int i = 0; i < atts.getLength(); i++ ) {
@@ -156,15 +160,15 @@ public class TreeMLReader extends AbstractGraphReader {
                 throw new RuntimeException(e);
             }
         }
-        
-        protected Object parse(String s, Class type)
+
+        protected Object parse(String s, Class<?> type)
             throws DataParseException
         {
             DataParser dp = m_pf.getParser(type);
             return dp.parse(s);
         }
-        
-        protected Class parseType(String type) {
+
+        protected Class<?> parseType(String type) {
             type = Character.toUpperCase(type.charAt(0)) +
                    type.substring(1).toLowerCase();
             if ( type.equals(INT) || type.equals(INTEGER) ) {
@@ -185,11 +189,11 @@ public class TreeMLReader extends AbstractGraphReader {
                 throw new RuntimeException("Unrecognized data type: "+type);
             }
         }
-        
-        public Tree getTree() {
+
+        public Tree<?,?,?> getTree() {
             return m_tree;
         }
-        
+
     } // end of inner class TreeMLHandler
-    
+
 } // end of class TreeMLTReeReader

@@ -12,23 +12,23 @@ import prefuse.util.StringLib;
  * ActionList also implements the Action interface, so ActionLists can be placed
  * within other ActionList or {@link ActionSwitch} instances,
  * allowing recursive composition of different sets of Actions.</p>
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  * @see prefuse.activity.Activity
  * @see prefuse.action.Action
  */
 public class ActionList extends CompositeAction {
 
-    private static final Logger s_logger = 
+    private static final Logger s_logger =
         Logger.getLogger(ActionList.class.getName());
-    
+
     /**
      * Creates a new run-once ActionList.
      */
     public ActionList() {
         super(0);
     }
-    
+
     /**
      * Creates a new run-once ActionList that processes the given
      * Visualization.
@@ -37,7 +37,7 @@ public class ActionList extends CompositeAction {
     public ActionList(Visualization vis) {
         super(vis);
     }
-    
+
     /**
      * Creates a new ActionList of specified duration and default
      * step time of 20 milliseconds.
@@ -46,7 +46,7 @@ public class ActionList extends CompositeAction {
     public ActionList(long duration) {
         super(duration, Activity.DEFAULT_STEP_TIME);
     }
-    
+
     /**
      * Creates a new ActionList which processes the given Visualization
      * and has the specified duration and a default step time of 20
@@ -57,7 +57,7 @@ public class ActionList extends CompositeAction {
     public ActionList(Visualization vis, long duration) {
         super(vis, duration);
     }
-    
+
     /**
      * Creates a new ActionList of specified duration and step time.
      * @param duration the duration of this Activity, in milliseconds
@@ -71,12 +71,13 @@ public class ActionList extends CompositeAction {
     /**
      * @see prefuse.action.Action#run(double)
      */
-    public void run(double frac) {
-        Object[] actions = m_actions.getArray();
-        for ( int i=0; i<actions.length; ++i ) {
-            Action a = (Action)actions[i];
+    @Override
+	public void run(double frac) {
+    	for(Action a : m_actions) {
             try {
-                if ( a.isEnabled() ) a.run(frac);
+                if ( a.isEnabled() ) {
+					a.run(frac);
+				}
             } catch ( Exception e ) {
                 s_logger.warning(e.getMessage() + '\n'
                         + StringLib.getStackTrace(e));

@@ -6,7 +6,7 @@ import prefuse.data.Table;
 
 /**
  * Listener interface for monitoring changes to a table.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public interface TableListener extends EventListener {
@@ -23,6 +23,6 @@ public interface TableListener extends EventListener {
      * {@link EventConstants#INSERT}, {@link EventConstants#DELETE}, or
      * {@link EventConstants#UPDATE}.
      */
-    public void tableChanged(Table t, int start, int end, int col, int type);
-    
+    public void tableChanged(Table<?> t, int start, int end, int col, int type);
+
 } // end of interface TableListener

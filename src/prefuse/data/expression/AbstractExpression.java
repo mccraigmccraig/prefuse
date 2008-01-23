@@ -1,21 +1,22 @@
 package prefuse.data.expression;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import prefuse.data.Tuple;
 import prefuse.data.event.ExpressionListener;
-import prefuse.util.collections.CopyOnWriteArrayList;
 
 /**
  * Abstract base class for Expression implementations. Provides support for
  * listeners and defaults every Expression evaluation method to an
  * unsupported operation.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public abstract class AbstractExpression
     implements Expression, ExpressionListener
 {
-    private CopyOnWriteArrayList m_listeners = new CopyOnWriteArrayList();
-    
+    private final CopyOnWriteArrayList<ExpressionListener> m_listeners = new CopyOnWriteArrayList<ExpressionListener>();
+
     /**
      * @see prefuse.data.expression.Expression#visit(prefuse.data.expression.ExpressionVisitor)
      */
@@ -32,14 +33,15 @@ public abstract class AbstractExpression
             addChildListeners();
         }
     }
-    
+
     /**
      * @see prefuse.data.expression.Expression#removeExpressionListener(prefuse.data.event.ExpressionListener)
      */
     public final void removeExpressionListener(ExpressionListener lstnr) {
         m_listeners.remove(lstnr);
-        if ( m_listeners.size() == 0 )
-            removeChildListeners();
+        if ( m_listeners.size() == 0 ) {
+			removeChildListeners();
+		}
     }
 
     /**
@@ -49,17 +51,16 @@ public abstract class AbstractExpression
     protected final boolean hasListeners() {
         return m_listeners != null && m_listeners.size() > 0;
     }
-    
+
     /**
      * Fire an expression change.
      */
     protected final void fireExpressionChange() {
-        Object[] lstnrs = m_listeners.getArray();
-        for ( int i=0; i<lstnrs.length; ++i ) {
-            ((ExpressionListener)lstnrs[i]).expressionChanged(this);
+        for(ExpressionListener l : m_listeners) {
+        	l.expressionChanged(this);
         }
     }
-    
+
     /**
      * Add child listeners to catch and propagate sub-expression updates.
      */
@@ -81,15 +82,15 @@ public abstract class AbstractExpression
     public void expressionChanged(Expression expr) {
         fireExpressionChange();
     }
-    
+
     // ------------------------------------------------------------------------
     // Default Implementation
-    
+
     /**
      * By default, throws an UnsupportedOperationException.
      * @see prefuse.data.expression.Expression#get(prefuse.data.Tuple)
      */
-    public Object get(Tuple t) {
+    public Object get(Tuple<?> t) {
         throw new UnsupportedOperationException();
     }
 
@@ -97,7 +98,7 @@ public abstract class AbstractExpression
      * By default, throws an UnsupportedOperationException.
      * @see prefuse.data.expression.Expression#getInt(prefuse.data.Tuple)
      */
-    public int getInt(Tuple t) {
+    public int getInt(Tuple<?> t) {
         throw new UnsupportedOperationException();
     }
 
@@ -105,7 +106,7 @@ public abstract class AbstractExpression
      * By default, throws an UnsupportedOperationException.
      * @see prefuse.data.expression.Expression#getLong(prefuse.data.Tuple)
      */
-    public long getLong(Tuple t) {
+    public long getLong(Tuple<?> t) {
         throw new UnsupportedOperationException();
     }
 
@@ -113,7 +114,7 @@ public abstract class AbstractExpression
      * By default, throws an UnsupportedOperationException.
      * @see prefuse.data.expression.Expression#getFloat(prefuse.data.Tuple)
      */
-    public float getFloat(Tuple t) {
+    public float getFloat(Tuple<?> t) {
         throw new UnsupportedOperationException();
     }
 
@@ -121,7 +122,7 @@ public abstract class AbstractExpression
      * By default, throws an UnsupportedOperationException.
      * @see prefuse.data.expression.Expression#getDouble(prefuse.data.Tuple)
      */
-    public double getDouble(Tuple t) {
+    public double getDouble(Tuple<?> t) {
         throw new UnsupportedOperationException();
     }
 
@@ -129,8 +130,8 @@ public abstract class AbstractExpression
      * By default, throws an UnsupportedOperationException.
      * @see prefuse.data.expression.Expression#getBoolean(prefuse.data.Tuple)
      */
-    public boolean getBoolean(Tuple t) {
+    public boolean getBoolean(Tuple<?> t) {
         throw new UnsupportedOperationException();
     }
-    
+
 } // end of abstract class AbstractExpression

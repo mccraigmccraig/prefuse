@@ -2,7 +2,7 @@ package prefuse.util;
 
 /**
  * Library routines dealing with Java Class types.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class TypeLib {
@@ -10,9 +10,9 @@ public class TypeLib {
     private TypeLib() {
         // prevent instantiation
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Check if an object is an instance of a given class, or, if the class
      * is a primitive type, if the Object is an instance of the wrapper class
@@ -22,11 +22,11 @@ public class TypeLib {
      * @return true if the object is an instance of the given class, or if
      * of the appropriate primitive wrapper type.
      */
-    public static boolean typeCheck(Class type, Object instance) {
+    public static boolean typeCheck(Class<?> type, Object instance) {
         return type.isAssignableFrom(instance.getClass()) ||
             isWrapperInstance(type, instance);
     }
-    
+
     /**
      * Get the nearest shared ancestor class of two objects. Note: this
      * currently does not compute the actual least common ancestor, but
@@ -37,10 +37,10 @@ public class TypeLib {
      * @return the nearest class instance of which both objects
      * are instances
      */
-    public static Class getSharedType(Object o1, Object o2) {
+    public static Class<?> getSharedType(Object o1, Object o2) {
         return getSharedType(o1.getClass(), o2.getClass());
     }
-    
+
     /**
      * Get the nearest shared ancestor class of two classes. Note: this
      * currently does not compute the actual least common ancestor, but
@@ -51,7 +51,7 @@ public class TypeLib {
      * @return the nearest class instance which is equal to or a
      * superclass of the two class instances
      */
-    public static Class getSharedType(Class type1, Class type2) {
+    public static Class<?> getSharedType(Class<?> type1, Class<?> type2) {
         if ( type1 == type2 ) {
             return type1;
         } else if ( type1.isAssignableFrom(type2) ) {
@@ -62,7 +62,7 @@ public class TypeLib {
             return null;
         }
     }
-    
+
     /**
      * Indicates if an object is an instance of a wrapper class for a given
      * primitive type.
@@ -72,10 +72,11 @@ public class TypeLib {
      * @return true if the object is a wrapper instance of the given
      * primitive type
      */
-    public static boolean isWrapperInstance(Class type, Object instance) {
-        if ( !type.isPrimitive() )
-            throw new IllegalArgumentException("Input type must be a primitive");
-        
+    public static boolean isWrapperInstance(Class<?> type, Object instance) {
+        if ( !type.isPrimitive() ) {
+			throw new IllegalArgumentException("Input type must be a primitive");
+		}
+
         if ( int.class == type && instance instanceof Integer ) {
             return true;
         } else if ( long.class == type && instance instanceof Long ) {
@@ -96,7 +97,7 @@ public class TypeLib {
             return false;
         }
     }
-    
+
     /**
      * Given a numeric (byte, short, int, long, float, or double) class type or
      * associated wrapper class type, return the primitive class type
@@ -104,7 +105,7 @@ public class TypeLib {
      * either primitive or a wrapper.
      * @return the primitive class type
      */
-    public static Class getPrimitiveType(Class type) {
+    public static Class<?> getPrimitiveType(Class<?> type) {
         if ( Integer.class.equals(type) || type == int.class ) {
             return int.class;
         } else if ( Long.class.equals(type) || type == long.class ) {
@@ -122,14 +123,14 @@ public class TypeLib {
                 "Input class must be a numeric type");
         }
     }
-    
+
     /**
      * Get the wrapper class type for a primitive class type.
      * @param type a class type
      * @return the wrapper class for the input type if it is a
      * primitive class type, otherwise returns the input type
      */
-    public static Class getWrapperType(Class type) {
+    public static Class<?> getWrapperType(Class<?> type) {
         if ( !type.isPrimitive() ) {
             return type;
         } else if ( int.class == type ) {
@@ -154,30 +155,30 @@ public class TypeLib {
             throw new IllegalArgumentException();
         }
     }
-    
+
     /**
      * Indicates if a given class type is a primitive integer type
      * (one of byte, short, int, or long).
      * @param type the type to check
      * @return true if it is a primitive numeric type, false otherwise
      */
-    public static boolean isIntegerType(Class type) {
-        return ( type == byte.class || type == short.class ||
-                 type == int.class  || type == long.class);
+    public static boolean isIntegerType(Class<?> type) {
+        return type == byte.class || type == short.class ||
+                 type == int.class  || type == long.class;
     }
-    
+
     /**
      * Indicates if a given class type is a primitive numeric one type
      * (one of byte, short, int, long, float, or double).
      * @param type the type to check
      * @return true if it is a primitive numeric type, false otherwise
      */
-    public static boolean isNumericType(Class type) {
-        return ( type == byte.class   || type == short.class ||
-                 type == int.class    || type == long.class  || 
-                 type == double.class || type == float.class );
+    public static boolean isNumericType(Class<?> type) {
+        return type == byte.class   || type == short.class ||
+                 type == int.class    || type == long.class  ||
+                 type == double.class || type == float.class;
     }
-    
+
     /**
      * Get a compatible numeric type for two primitive numeric
      * class types. Any of (byte, short, int) will resolve to int.
@@ -186,7 +187,7 @@ public class TypeLib {
      * @return the compatible numeric type for binary operations involving
      * both types.
      */
-    public static Class getNumericType(Class c1, Class c2) {
+    public static Class<?> getNumericType(Class<?> c1, Class<?> c2) {
         if ( !isNumericType(c1) || !isNumericType(c2) ) {
             throw new IllegalArgumentException(
                 "Input types must be primitive number types");
@@ -201,5 +202,5 @@ public class TypeLib {
             return int.class;
         }
     }
-    
+
 } // end of class TypeLib

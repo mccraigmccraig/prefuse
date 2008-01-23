@@ -12,23 +12,25 @@ public class PredicateChainTest extends TestCase {
 
     private PredicateChain m_chain;
     private Table m_table;
-    
+
     private Predicate p1, p2, p3;
-    
-    protected void setUp() throws Exception {
+
+    @Override
+	protected void setUp() throws Exception {
         m_table = TableTest.getTestCaseTable();
-        
+
         p1 = (Predicate)ExpressionParser.parse("id=3");
         p2 = (Predicate)ExpressionParser.parse("float<2");
         p3 = (Predicate)ExpressionParser.parse("id>3");
-        
+
         m_chain = new PredicateChain();
         m_chain.add(p1, new Integer(1));
         m_chain.add(p2, new Integer(2));
         m_chain.add(p3, new Integer(3));
     }
 
-    protected void tearDown() throws Exception {
+    @Override
+	protected void tearDown() throws Exception {
         m_chain = null;
         m_table = null;
         p1 = null;
@@ -62,17 +64,17 @@ public class PredicateChainTest extends TestCase {
         assertTrue(m_chain.getExpression() instanceof IfExpression);
         assertTrue(m_chain.remove(p1));
         assertEquals(new Integer(2), m_chain.get(m_table.getTuple(2)));
-        
+
         assertTrue(m_chain.getExpression() instanceof IfExpression);
         assertTrue(m_chain.remove(p2));
         assertEquals(null, m_chain.get(m_table.getTuple(0)));
         assertEquals(null, m_chain.get(m_table.getTuple(1)));
         assertEquals(null, m_chain.get(m_table.getTuple(2)));
-        
+
         assertTrue(m_chain.getExpression() instanceof IfExpression);
         assertTrue(m_chain.remove(p3));
         assertEquals(null, m_chain.get(m_table.getTuple(3)));
-        
+
         assertFalse(m_chain.getExpression() instanceof IfExpression);
         assertFalse(m_chain.remove(p1));
         assertFalse(m_chain.remove(p2));
@@ -103,5 +105,5 @@ public class PredicateChainTest extends TestCase {
         pc.add(p2, new Integer(2));
         assertTrue(pc.remove(p2));
     }
-    
+
 }

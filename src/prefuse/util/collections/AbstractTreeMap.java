@@ -8,32 +8,32 @@ import java.util.NoSuchElementException;
 /**
  * Abstract base class for red-black trees that map a key value to
  * an int value.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public abstract class AbstractTreeMap implements IntSortedMap {
 
     protected static final boolean RED   = false;
     protected static final boolean BLACK = true;
-    
+
     protected static final Entry NIL = new Entry(Integer.MIN_VALUE);
     static {
         NIL.left = NIL.right = NIL.p = NIL;
     }
-    
+
     protected LiteralComparator cmp = null;
     protected Entry root = NIL;
-    
+
     protected boolean allowDuplicates;
     protected int size = 0;
     protected int unique = 0;
     protected int modCount = 0;
     protected int lastOrder = 0;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
 
-    public AbstractTreeMap(LiteralComparator comparator, 
+    public AbstractTreeMap(LiteralComparator comparator,
                                boolean allowDuplicates)
     {
         this.cmp = comparator==null ? DefaultLiteralComparator.getInstance()
@@ -43,32 +43,32 @@ public abstract class AbstractTreeMap implements IntSortedMap {
 
     // ------------------------------------------------------------------------
     // Accessor Methods
-    
+
     public boolean isAllowDuplicates() {
         return allowDuplicates;
     }
-    
+
     /**
      * @see java.util.Map#size()
      */
     public int size() {
         return size;
     }
-    
+
     public boolean isEmpty() {
         return root == NIL;
     }
-    
+
     /**
      * @see java.util.SortedMap#comparator()
      */
-    public Comparator comparator() {
+    public Comparator<Object> comparator() {
         return cmp;
     }
-    
+
     // ------------------------------------------------------------------------
     // SortedMap Methods
-    
+
     /**
      * @see java.util.Map#clear()
      */
@@ -81,97 +81,107 @@ public abstract class AbstractTreeMap implements IntSortedMap {
     public int getMinimum() {
         return minimum(root).getValue();
     }
-    
+
     public int getMaximum() {
         return maximum(root).getValue();
     }
-    
+
     public int getMedian() {
         Entry e = minimum(root);
-        for ( int i=0; i<size/2; ++i, e=successor(e) );
+        for ( int i=0; i<size/2; ++i, e=successor(e) ) {
+			;
+		}
         return e.getValue();
     }
-    
+
     public int getUniqueCount() {
         return unique;
     }
-    
+
     /**
      * @see java.util.Map#containsValue(java.lang.Object)
      */
     public boolean containsValue(int value) {
-        return (root == NIL ? false : containsValue(root, value));
+        return root == NIL ? false : containsValue(root, value);
     }
-    
+
     private boolean containsValue(Entry e, int value) {
         if ( e.val == value ) {
             return true;
         } else {
-            return (e.left  != NIL && containsValue(e.left,  value)) ||
-                   (e.right != NIL && containsValue(e.right, value));
+            return e.left  != NIL && containsValue(e.left,  value) ||
+                   e.right != NIL && containsValue(e.right, value);
         }
     }
-    
+
     // -- Collection view methods ---------------------------------------------
-    
+
     public IntIterator valueIterator(boolean ascend) {
         return new ValueIterator(new EntryIterator(!ascend));
     }
-    
+
     // ------------------------------------------------------------------------
     // Internal update methods
-    
+
     protected void incrementSize(boolean isUnique) {
         ++size; ++modCount;
-        if ( isUnique ) ++unique;
+        if ( isUnique ) {
+			++unique;
+		}
     }
-    
+
     protected void decrementSize(boolean isUnique) {
         --size; ++modCount;
-        if ( isUnique ) --unique;
+        if ( isUnique ) {
+			--unique;
+		}
     }
-    
+
     // ------------------------------------------------------------------------
     // Internal Binary Search Tree / Red-Black Tree methods
     // Adapted from Cormen, Leiserson, and Rivest's Introduction to Algorithms
-    
+
     protected abstract int compare(Entry e1, Entry e2);
-    
+
     protected Entry find(Entry x) {
         Entry y = root;
         while (y != NIL) {
             int cmp = compare(x, y);
-            if (cmp == 0)
-                return y;
-            else if (cmp < 0)
-                y = y.left;
-            else
-                y = y.right;
+            if (cmp == 0) {
+				return y;
+			} else if (cmp < 0) {
+				y = y.left;
+			} else {
+				y = y.right;
+			}
         }
         return y;
     }
-    
+
     protected Entry findPredecessor(Entry x) {
         Entry y = root;
         while (y != NIL) {
             int cmp = compare(x, y);
             if (cmp > 0) {
-                if ( y.right == NIL )
-                    return y;
+                if ( y.right == NIL ) {
+					return y;
+				}
                 y = y.right;
             } else {
                 if ( y.left != NIL ) {
                     y = y.left;
                 } else {
                     Entry up = y.p, c = y;
-                    for ( ; up != NIL && c == up.left; c = up, up = up.p );
+                    for ( ; up != NIL && c == up.left; c = up, up = up.p ) {
+						;
+					}
                     return up;
                 }
             }
         }
         return y;
     }
-    
+
     protected Entry findCeiling(Entry x) {
         Entry y = root;
 
@@ -180,37 +190,46 @@ public abstract class AbstractTreeMap implements IntSortedMap {
             if (cmp == 0) {
                 return y;
             } else if (cmp < 0) {
-                if (y.left != NIL)
-                    y = y.left;
-                else
-                    return y;
+                if (y.left != NIL) {
+					y = y.left;
+				} else {
+					return y;
+				}
             } else {
                 if (y.right != NIL) {
                     y = y.right;
                 } else {
                     Entry up = y.p, c = y;
-                    for ( ; up != NIL && c == up.right; c = up, up = up.p );
+                    for ( ; up != NIL && c == up.right; c = up, up = up.p ) {
+						;
+					}
                     return up;
                 }
             }
         }
         return y;
     }
-    
+
     protected Entry minimum(Entry x) {
-        for ( ; x.left != NIL; x = x.left );
+        for ( ; x.left != NIL; x = x.left ) {
+			;
+		}
         return x;
     }
-    
+
     protected Entry maximum(Entry x) {
-        for ( ; x.right != NIL; x = x.right );
+        for ( ; x.right != NIL; x = x.right ) {
+			;
+		}
         return x;
     }
-    
+
     protected Entry successor(Entry x) {
         // easy case - just traverse to the right
-        if ( x.right != NIL ) return minimum(x.right);
-        
+        if ( x.right != NIL ) {
+			return minimum(x.right);
+		}
+
         // else have to climb up
         Entry y = x.p;
         while ( y != NIL && x == y.right ) {
@@ -219,11 +238,13 @@ public abstract class AbstractTreeMap implements IntSortedMap {
         }
         return y;
     }
-    
+
     protected Entry predecessor(Entry x) {
         // easy case - just traverse to the left
-        if ( x.left != NIL ) return maximum(x.left);
-        
+        if ( x.left != NIL ) {
+			return maximum(x.left);
+		}
+
         // else have to climb up
         Entry y = x.p;
         while ( y != NIL && x == y.left ) {
@@ -232,19 +253,21 @@ public abstract class AbstractTreeMap implements IntSortedMap {
         }
         return y;
     }
-    
+
     protected void rotateLeft(Entry x) {
         Entry y = x.right;
         x.right = y.left;
-        if (y.left != NIL)
-            y.left.p = x;
+        if (y.left != NIL) {
+			y.left.p = x;
+		}
         y.p = x.p;
-        if (x.p == NIL)
-            root = y;
-        else if (x.p.left == x)
-            x.p.left = y;
-        else
-            x.p.right = y;
+        if (x.p == NIL) {
+			root = y;
+		} else if (x.p.left == x) {
+			x.p.left = y;
+		} else {
+			x.p.right = y;
+		}
         y.left = x;
         x.p = y;
     }
@@ -252,14 +275,17 @@ public abstract class AbstractTreeMap implements IntSortedMap {
     protected void rotateRight(Entry x) {
         Entry y = x.left;
         x.left = y.right;
-        if (y.right != NIL)
-            y.right.p = x;
+        if (y.right != NIL) {
+			y.right.p = x;
+		}
         y.p = x.p;
-        if (x.p == NIL)
-            root = y;
-        else if (x.p.right == x)
-            x.p.right = y;
-        else x.p.left = y;
+        if (x.p == NIL) {
+			root = y;
+		} else if (x.p.right == x) {
+			x.p.right = y;
+		} else {
+			x.p.left = y;
+		}
         y.right = x;
         x.p = y;
     }
@@ -282,8 +308,9 @@ public abstract class AbstractTreeMap implements IntSortedMap {
                     }
                     x.p.color = BLACK;
                     x.p.p.color = RED;
-                    if (x.p.p != NIL) 
-                        rotateRight(x.p.p);
+                    if (x.p.p != NIL) {
+						rotateRight(x.p.p);
+					}
                 }
             } else {
                 // mirror image case
@@ -300,14 +327,15 @@ public abstract class AbstractTreeMap implements IntSortedMap {
                     }
                     x.p.color = BLACK;
                     x.p.p.color = RED;
-                    if (x.p.p != NIL) 
-                        rotateLeft(x.p.p);
+                    if (x.p.p != NIL) {
+						rotateLeft(x.p.p);
+					}
                 }
             }
         }
         root.color = BLACK;
     }
-    
+
     protected void fixUpRemove(Entry x) {
         while (x != root && x.color == BLACK) {
             if (x == x.p.left) {
@@ -320,7 +348,7 @@ public abstract class AbstractTreeMap implements IntSortedMap {
                     sib = x.p.right;
                 }
 
-                if (sib.left.color  == BLACK && 
+                if (sib.left.color  == BLACK &&
                     sib.right.color == BLACK) {
                     sib.color = RED;
                     x = x.p;
@@ -348,7 +376,7 @@ public abstract class AbstractTreeMap implements IntSortedMap {
                     sib = x.p.left;
                 }
 
-                if (sib.right.color == BLACK && 
+                if (sib.right.color == BLACK &&
                     sib.left.color == BLACK) {
                     sib.color =  RED;
                     x = x.p;
@@ -368,17 +396,17 @@ public abstract class AbstractTreeMap implements IntSortedMap {
             }
         }
 
-        x.color = BLACK; 
+        x.color = BLACK;
     }
-    
+
     protected void remove(Entry z) {
-        boolean isUnique = !( z.keyEquals(z.left) || 
+        boolean isUnique = !( z.keyEquals(z.left) ||
             z.keyEquals(z.right) || z.keyEquals(z.p) );
-        
-        Entry y = ( z.left != NIL && z.right != NIL ? successor(z) : z );
-        Entry x = ( y.left != NIL ? y.left : y.right );
+
+        Entry y = z.left != NIL && z.right != NIL ? successor(z) : z;
+        Entry x = y.left != NIL ? y.left : y.right;
         x.p = y.p;
-        
+
         if (y.p == NIL) {
             root = x;
         } else if (y == y.p.left) {
@@ -386,35 +414,36 @@ public abstract class AbstractTreeMap implements IntSortedMap {
         } else {
             y.p.right = x;
         }
-        
+
         if (y != z) {
             z.copyFields(y);
         }
-        if (y.color == BLACK)
-            fixUpRemove(x);
-        
+        if (y.color == BLACK) {
+			fixUpRemove(x);
+		}
+
         decrementSize(isUnique);
     }
-    
+
     // ========================================================================
     // Inner classes
-    
+
     // ------------------------------------------------------------------------
     // Entry class - represents a Red-Black Tree Node
-    
+
     public static class Entry {
         int val;
         int order; // used to determine ordering for duplicate keys
-        
+
         Entry left = null;
         Entry right = null;
         Entry p;
         boolean color = BLACK;
-        
+
         public Entry(int val) {
             this.val = val;
         }
-        
+
         public Entry(int val, Entry parent, int order) {
             this.val = val;
             this.p = parent;
@@ -422,23 +451,23 @@ public abstract class AbstractTreeMap implements IntSortedMap {
             this.left = NIL;
             this.right = NIL;
         }
-        
+
         public int getIntKey() {
             throw new UnsupportedOperationException("Unsupported");
         }
-        
+
         public long getLongKey() {
             throw new UnsupportedOperationException("Unsupported");
         }
-        
+
         public float getFloatKey() {
             throw new UnsupportedOperationException("Unsupported");
         }
-        
+
         public double getDoubleKey() {
             throw new UnsupportedOperationException("Unsupported");
         }
-        
+
         public Object getKey() {
             return null;
         }
@@ -450,47 +479,51 @@ public abstract class AbstractTreeMap implements IntSortedMap {
         public int getOrder() {
             return order;
         }
-        
+
         public int setValue(int value) {
             int old = val;
             val = value;
             return old;
         }
-        
+
         public boolean keyEquals(Entry e) {
             Object k = getKey();
-            return ( k==null ? k==e.getKey() : k.equals(e.getKey()) );
-        }
-        
-        public boolean equals(Object o) {
-            if (!(o instanceof Entry))
-                return false;
-            
-            Entry e = (Entry)o;
-            
-            return (val == e.val && getKey() == e.getKey());
+            return k==null ? k==e.getKey() : k.equals(e.getKey());
         }
 
-        public int hashCode() {
+        @Override
+		public boolean equals(Object o) {
+            if (!(o instanceof Entry)) {
+				return false;
+			}
+
+            Entry e = (Entry)o;
+
+            return val == e.val && getKey() == e.getKey();
+        }
+
+        @Override
+		public int hashCode() {
             int khash = getKey().hashCode();
             int vhash = val;
             return khash^vhash;
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             return getKey() + "=" + val;
         }
-        
+
         public void copyFields(Entry x) {
             this.val = x.val;
             this.order = x.order;
         }
-        
+
     }
-    
+
     // ------------------------------------------------------------------------
     // Iterators
-    
+
     protected class EntryIterator extends AbstractLiteralIterator {
         private int expectedModCount = AbstractTreeMap.this.modCount;
         private Entry lastReturned = NIL;
@@ -505,8 +538,8 @@ public abstract class AbstractTreeMap implements IntSortedMap {
         EntryIterator(Entry first, Entry last) {
             next = first;
             end = last;
-            reverse = first==NIL ? true 
-                    : last==NIL ? false 
+            reverse = first==NIL ? true
+                    : last==NIL ? false
                     : compare(first,last) > 0;
         }
 
@@ -515,10 +548,12 @@ public abstract class AbstractTreeMap implements IntSortedMap {
         }
 
         final Entry nextEntry() {
-            if (!hasNext())
-                throw new NoSuchElementException();
-            if (modCount != expectedModCount)
-                throw new ConcurrentModificationException();
+            if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+            if (modCount != expectedModCount) {
+				throw new ConcurrentModificationException();
+			}
             lastReturned = next;
             next = reverse ? predecessor(next) : successor(next);
             /// XXX DEBUG
@@ -533,12 +568,15 @@ public abstract class AbstractTreeMap implements IntSortedMap {
         }
 
         public void remove() {
-            if (lastReturned == NIL)
-                throw new IllegalStateException();
-            if (modCount != expectedModCount)
-                throw new ConcurrentModificationException();
-            if (lastReturned.left != NIL && lastReturned.right != NIL) 
-                next = lastReturned; 
+            if (lastReturned == NIL) {
+				throw new IllegalStateException();
+			}
+            if (modCount != expectedModCount) {
+				throw new ConcurrentModificationException();
+			}
+            if (lastReturned.left != NIL && lastReturned.right != NIL) {
+				next = lastReturned;
+			}
             AbstractTreeMap.this.remove(lastReturned);
             ++expectedModCount;
             lastReturned = NIL;
@@ -552,26 +590,28 @@ public abstract class AbstractTreeMap implements IntSortedMap {
         public KeyIterator(Entry start, Entry end) {
             super(start, end);
         }
-        public Object next() {
+        @Override
+		public Object next() {
             return nextEntry().getKey();
         }
     }
 
     protected class ValueIterator extends IntIterator {
         EntryIterator m_iter;
-        
+
         public ValueIterator(EntryIterator iter) {
             m_iter = iter;
         }
         public boolean hasNext() {
             return m_iter.hasNext();
         }
-        public int nextInt() {
+        @Override
+		public int nextInt() {
             return m_iter.nextEntry().val;
         }
         public void remove() {
             m_iter.remove();
         }
     }
-        
+
 } // end of abstract class AbstractTreeMap

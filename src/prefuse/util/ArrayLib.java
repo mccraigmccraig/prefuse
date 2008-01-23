@@ -7,21 +7,21 @@ import java.util.Random;
 import java.util.StringTokenizer;
 
 /**
- * Library of supplementary array routines not 
+ * Library of supplementary array routines not
  *  supported by the java.util.Arrays class.
  *
  * @author jeffrey heer
  */
 public abstract class ArrayLib {
-    
+
     /**
      * Arrays with lengths beneath this value will be insertion sorted.
      */
     public static final int SORT_THRESHOLD = 30;
-    
+
     // ------------------------------------------------------------------------
     // Shuffle
-    
+
     /**
      * Randomly permute the contents of an array.
      * @param a the array to shuffle
@@ -30,7 +30,7 @@ public abstract class ArrayLib {
     public static final void shuffle(int[] a, Random r) {
         shuffle(a, 0, a.length, r);
     }
-    
+
     /**
      * Randomly permute the contents of a range an array.
      * @param a the array to shuffle
@@ -45,7 +45,7 @@ public abstract class ArrayLib {
             a[j] = t;
         }
     }
-    
+
     /**
      * Randomly permute the contents of an array.
      * @param a the array to shuffle
@@ -54,7 +54,7 @@ public abstract class ArrayLib {
     public static final void shuffle(long[] a, Random r) {
         shuffle(a, 0, a.length, r);
     }
-    
+
     /**
      * Randomly permute the contents of a range an array.
      * @param a the array to shuffle
@@ -70,7 +70,7 @@ public abstract class ArrayLib {
             a[j] = t;
         }
     }
-    
+
     /**
      * Randomly permute the contents of an array.
      * @param a the array to shuffle
@@ -79,7 +79,7 @@ public abstract class ArrayLib {
     public static final void shuffle(float[] a, Random r) {
         shuffle(a, 0, a.length, r);
     }
-    
+
     /**
      * Randomly permute the contents of a range an array.
      * @param a the array to shuffle
@@ -95,7 +95,7 @@ public abstract class ArrayLib {
             a[j] = t;
         }
     }
-    
+
     /**
      * Randomly permute the contents of an array.
      * @param a the array to shuffle
@@ -104,7 +104,7 @@ public abstract class ArrayLib {
     public static final void shuffle(double[] a, Random r) {
         shuffle(a, 0, a.length, r);
     }
-    
+
     /**
      * Randomly permute the contents of a range an array.
      * @param a the array to shuffle
@@ -120,7 +120,7 @@ public abstract class ArrayLib {
             a[j] = t;
         }
     }
-    
+
     /**
      * Randomly permute the contents of an array.
      * @param a the array to shuffle
@@ -129,7 +129,7 @@ public abstract class ArrayLib {
     public static final void shuffle(Object[] a, Random r) {
         shuffle(a, 0, a.length, r);
     }
-    
+
     /**
      * Randomly permute the contents of a range an array.
      * @param a the array to shuffle
@@ -145,10 +145,10 @@ public abstract class ArrayLib {
             a[j] = t;
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Max / Min / Sum
-    
+
     /**
      * Find the maximum value in an array.
      * @param a the array
@@ -157,8 +157,9 @@ public abstract class ArrayLib {
     public static final double max(double[] a) {
         double max = Double.NEGATIVE_INFINITY;
         for ( int i=0; i<a.length; ++i ) {
-            if ( a[i] > max )
-                max = a[i];
+            if ( a[i] > max ) {
+				max = a[i];
+			}
         }
         return max;
     }
@@ -171,12 +172,13 @@ public abstract class ArrayLib {
     public static final double min(double[] a) {
         double min = Double.POSITIVE_INFINITY;
         for ( int i=0; i<a.length; ++i ) {
-            if ( a[i] < min )
-                min = a[i];
+            if ( a[i] < min ) {
+				min = a[i];
+			}
         }
         return min;
     }
-    
+
     /**
      * Compute the sum of the values in an array.
      * @param a the array
@@ -189,7 +191,7 @@ public abstract class ArrayLib {
         }
         return sum;
     }
-    
+
     //// -----------------------------------------------
     //// -- Searching Functions ------------------------
 
@@ -199,7 +201,7 @@ public abstract class ArrayLib {
      * @param key the key to search for
      * @return the index of the given key if it exists in the array,
      * otherwise -1 times the index value at the insertion point that
-     * would be used if the key were added to the array. 
+     * would be used if the key were added to the array.
      */
     public static final int binarySearch(int[] a, int key) {
         int x1 = 0;
@@ -226,7 +228,7 @@ public abstract class ArrayLib {
      * @param length the the length of the range to search over.
      * @return the index of the given key if it exists in the array,
      * otherwise -1 times the index value at the insertion point that
-     * would be used if the key were added to the array. 
+     * would be used if the key were added to the array.
      */
     public static final int binarySearch(int[] a, int key, int length) {
         int x1 = 0;
@@ -255,7 +257,7 @@ public abstract class ArrayLib {
      * @param end the ending index of the range, exclusive
      * @return the index of the given key if it exists in the array,
      * otherwise -1 times the index value at the insertion point that
-     * would be used if the key were added to the array. 
+     * would be used if the key were added to the array.
      */
     public static final int binarySearch(int[] a, int key, int begin, int end) {
         int x1 = begin;
@@ -282,7 +284,7 @@ public abstract class ArrayLib {
      * @param key the key to search for
      * @return the index of the given key if it exists in the array,
      * otherwise -1 times the index value at the insertion point that
-     * would be used if the key were added to the array. 
+     * would be used if the key were added to the array.
      */
     public static final int binarySearch(Object[] a, Object key) {
         int x1 = 0;
@@ -310,7 +312,7 @@ public abstract class ArrayLib {
      * @param length the the length of the range to search over.
      * @return the index of the given key if it exists in the array,
      * otherwise -1 times the index value at the insertion point that
-     * would be used if the key were added to the array. 
+     * would be used if the key were added to the array.
      */
     public static final int binarySearch(Object[] a, Object key, int length) {
         int x1 = 0;
@@ -340,7 +342,7 @@ public abstract class ArrayLib {
      * @param end the ending index of the range, exclusive
      * @return the index of the given key if it exists in the array,
      * otherwise -1 times the index value at the insertion point that
-     * would be used if the key were added to the array. 
+     * would be used if the key were added to the array.
      */
     public static final int binarySearch(Object[] a, Object key, int begin, int end) {
         int x1 = begin;
@@ -369,7 +371,7 @@ public abstract class ArrayLib {
      * @param cp the comparator to use to compare key values
      * @return the index of the given key if it exists in the array,
      * otherwise -1 times the index value at the insertion point that
-     * would be used if the key were added to the array. 
+     * would be used if the key were added to the array.
      */
     public static final int binarySearch(Object[] a, Object key, Comparator cp) {
         int x1 = 0;
@@ -398,7 +400,7 @@ public abstract class ArrayLib {
      * @param length the the length of the range to search over.
      * @return the index of the given key if it exists in the array,
      * otherwise -1 times the index value at the insertion point that
-     * would be used if the key were added to the array. 
+     * would be used if the key were added to the array.
      */
     public static final int binarySearch(Object[] a, Object key, Comparator cp, int length) {
         int x1 = 0;
@@ -429,7 +431,7 @@ public abstract class ArrayLib {
      * @param end the ending index of the range, exclusive
      * @return the index of the given key if it exists in the array,
      * otherwise -1 times the index value at the insertion point that
-     * would be used if the key were added to the array. 
+     * would be used if the key were added to the array.
      */
     public static final int binarySearch(Object[] a, Object key, Comparator cp, int begin, int end) {
         int x1 = begin;
@@ -518,12 +520,14 @@ public abstract class ArrayLib {
      * allocated and the contents of the original array are copied over.
      */
     public static final int[] resize(int[] a, int size) {
-        if ( a.length >= size ) return a;
+        if ( a.length >= size ) {
+			return a;
+		}
         int[] b = new int[size];
         System.arraycopy(a, 0, b, 0, a.length);
         return b;
     }
-    
+
     /**
      * Resize the given array as needed to meet a target size.
      * @param a the array to potentially resize
@@ -533,12 +537,14 @@ public abstract class ArrayLib {
      * allocated and the contents of the original array are copied over.
      */
     public static final float[] resize(float[] a, int size) {
-        if ( a.length >= size ) return a;
+        if ( a.length >= size ) {
+			return a;
+		}
         float[] b = new float[size];
         System.arraycopy(a, 0, b, 0, a.length);
         return b;
     }
-    
+
     /**
      * Resize the given array as needed to meet a target size.
      * @param a the array to potentially resize
@@ -548,12 +554,14 @@ public abstract class ArrayLib {
      * allocated and the contents of the original array are copied over.
      */
     public static final double[] resize(double[] a, int size) {
-        if ( a.length >= size ) return a;
+        if ( a.length >= size ) {
+			return a;
+		}
         double[] b = new double[size];
         System.arraycopy(a, 0, b, 0, a.length);
         return b;
     }
-    
+
     /**
      * Resize the given array as needed to meet a target size.
      * @param a the array to potentially resize
@@ -563,7 +571,9 @@ public abstract class ArrayLib {
      * allocated and the contents of the original array are copied over.
      */
     public static final Object[] resize(Object[] a, int size) {
-        if ( a.length >= size ) return a;
+        if ( a.length >= size ) {
+			return a;
+		}
         Object[] b = new Object[size];
         System.arraycopy(a, 0, b, 0, a.length);
         return b;
@@ -604,7 +614,7 @@ public abstract class ArrayLib {
             return b;
         }
     }
-    
+
     /**
      * Trims an array to be exactly the target a size.
      * @param a the array to trim
@@ -622,7 +632,7 @@ public abstract class ArrayLib {
             return b;
         }
     }
-    
+
     /**
      * Trims an array to be exactly the target a size.
      * @param a the array to trim
@@ -640,7 +650,7 @@ public abstract class ArrayLib {
             return b;
         }
     }
-    
+
     //// -----------------------------------------------
     //// -- Sorting Functions --------------------------
 
@@ -853,12 +863,12 @@ public abstract class ArrayLib {
      */
     public static final void sort(int[] a, Object[] b, int begin, int end) {
         int length = end-begin;
-        
+
         if ( length < SORT_THRESHOLD ) {
             insertionsort(a, b, begin, end-1);
             return;
         }
-        
+
         // allocate source arrays
         int[] ks = new int[length];
         Object[] vs = new Object[length];
@@ -868,7 +878,7 @@ public abstract class ArrayLib {
         }
         mergesort(ks, a, vs, b, begin, end, -begin);
     }
-    
+
     /**
      * Sort two arrays simultaneously, using the sort order of the values
      * in the first array to determine the sort order for both arrays.
@@ -882,16 +892,16 @@ public abstract class ArrayLib {
      * @param begin the start index of the range to sort
      * @param end the end index, exclusive, of the range to sort
      */
-    public static final void sort(int[] a, Object[] b, 
+    public static final void sort(int[] a, Object[] b,
             int[] abuf, Object[] bbuf, int begin, int end)
     {
         int length = end-begin;
-        
+
         if ( length < SORT_THRESHOLD ) {
             insertionsort(a, b, begin, end-1);
             return;
         }
-        
+
         // allocate source arrays
         for ( int i=0, idx=begin; i<length; ++i, ++idx ) {
             abuf[i] = a[idx];
@@ -920,7 +930,7 @@ public abstract class ArrayLib {
     }
 
     // -- Mergesort --
-    
+
     protected static void mergesort(int ks[], int kd[], Object[] vs,
             Object[] vd, int lo, int hi, int off)
     {
@@ -936,7 +946,7 @@ public abstract class ArrayLib {
         int dhi = hi;
         lo += off;
         hi += off;
-        int mid = (lo + hi) >> 1;
+        int mid = lo + hi >> 1;
         mergesort(kd, ks, vd, vs, lo, mid, -off);
         mergesort(kd, ks, vd, vs, mid, hi, -off);
 
@@ -959,7 +969,7 @@ public abstract class ArrayLib {
             }
         }
     }
-    
+
     protected static final void merge(int[] a, Object[] b, int p, int q, int r) {
         int[] t = new int[r - p + 1];
         Object[] v = new Object[r - p + 1];
@@ -1083,8 +1093,8 @@ public abstract class ArrayLib {
             b[p1] = v[i];
             a[p1] = t[i];
         }
-    }    
-    
+    }
+
     // -- float / int sorting -------------------------------------------
 
     /**
@@ -1184,7 +1194,7 @@ public abstract class ArrayLib {
     }
 
     // -- Object / int sorting ------------------------------------------------
-    
+
     /**
      * Sort two arrays simultaneously, using the sort order of the values
      * in the first array to determine the sort order for both arrays.
@@ -1193,7 +1203,7 @@ public abstract class ArrayLib {
      * first array.
      * @param cmp the comparator to use to compare key values
      */
-    public static final void sort(Object[] a, int[] b, Comparator cmp) {
+    public static final void sort(Object[] a, int[] b, Comparator<Object> cmp) {
         mergesort(a, b, 0, a.length - 1, cmp);
     }
 
@@ -1206,8 +1216,8 @@ public abstract class ArrayLib {
      * @param length the length of the range to be sorted
      * @param cmp the comparator to use to compare key values
      */
-    public static final void sort(Object[] a, int[] b, int length, 
-            Comparator cmp)
+    public static final void sort(Object[] a, int[] b, int length,
+            Comparator<Object> cmp)
     {
         mergesort(a, b, 0, length - 1, cmp);
     }
@@ -1222,8 +1232,8 @@ public abstract class ArrayLib {
      * @param end the end index, exclusive, of the range to sort
      * @param cmp the comparator to use to compare key values
      */
-    public static final void sort(Object[] a, int[] b, int begin, int end, 
-            Comparator cmp)
+    public static final void sort(Object[] a, int[] b, int begin, int end,
+            Comparator<Object> cmp)
     {
         mergesort(a, b, begin, end - 1, cmp);
     }
@@ -1231,7 +1241,7 @@ public abstract class ArrayLib {
     // -- Insertion Sort --
 
     protected static final void insertionsort(Object[] a, int[] b, int p, int r,
-            Comparator cmp)
+            Comparator<Object> cmp)
     {
         for (int j = p + 1; j <= r; ++j) {
             Object key = a[j];
@@ -1250,7 +1260,7 @@ public abstract class ArrayLib {
     // -- Mergesort --
 
     protected static final void mergesort(Object[] a, int[] b, int p, int r,
-            Comparator cmp)
+            Comparator<Object> cmp)
     {
         if (p >= r) {
             return;
@@ -1266,7 +1276,7 @@ public abstract class ArrayLib {
     }
 
     protected static final void merge(Object[] a, int[] b, int p, int q, int r,
-            Comparator cmp)
+            Comparator<Object> cmp)
     {
         Object[] t = new Object[r - p + 1];
         int[] v = new int[r - p + 1];
@@ -1293,10 +1303,10 @@ public abstract class ArrayLib {
             a[p1] = t[i];
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Array File I/O
-    
+
     /**
      * Read in a text file as an array of integers. Uses the default java
      * StringTokenizer to segment the text file. Additionally, tokens beginning
@@ -1312,15 +1322,17 @@ public abstract class ArrayLib {
             StringTokenizer st = new StringTokenizer(line);
             int maxlen = st.countTokens();
             int len = 0;
-            array = new int[maxlen];            
+            array = new int[maxlen];
             while ( st.hasMoreTokens() ) {
                 String tok = st.nextToken();
-                if ( tok.startsWith("#") ) // commented int
-                    continue;
+                if ( tok.startsWith("#") ) {
+					continue;
+				}
                 array[len++] = Integer.parseInt(tok);
             }
-            if ( len != maxlen )
-                array = ArrayLib.trim(array, len);
+            if ( len != maxlen ) {
+				array = ArrayLib.trim(array, len);
+			}
             return array;
         } catch ( Exception e ) {
             e.printStackTrace();

@@ -1,6 +1,7 @@
 package prefuse.data.parser;
 
 import java.text.DateFormat;
+import java.util.Locale;
 
 /**
  * DataParser instance that parses Date values as java.util.Date instances,
@@ -14,7 +15,7 @@ import java.text.DateFormat;
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class DateTimeParser extends DateParser {
-    
+
     /**
      * Create a new DateTimeParser.
      */
@@ -22,7 +23,7 @@ public class DateTimeParser extends DateParser {
         this(DateFormat.getDateTimeInstance(
                 DateFormat.SHORT, DateFormat.SHORT));
     }
-    
+
     /**
      * Create a new DateTimeParser.
      * @param dateFormat the DateFormat instance to use for parsing
@@ -30,5 +31,10 @@ public class DateTimeParser extends DateParser {
     public DateTimeParser(DateFormat dateFormat) {
         super(dateFormat);
     }
+
+	public DateTimeParser(Locale locale) {
+        this(DateFormat.getDateTimeInstance(
+                DateFormat.SHORT, DateFormat.SHORT, locale));
+	}
 
 } // end of class DateTimeParser

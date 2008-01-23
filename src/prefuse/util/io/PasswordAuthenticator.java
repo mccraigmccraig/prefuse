@@ -14,7 +14,7 @@ public class PasswordAuthenticator extends Authenticator {
     private String m_username;
     private String m_password;
     private PasswordAuthentication m_auth;
-    
+
     /**
      * Create a new password authenticator.
      * @param username the user name
@@ -24,7 +24,7 @@ public class PasswordAuthenticator extends Authenticator {
         this.m_password = password;
         this.m_username = username;
     }
-    
+
     /**
      * Get the password.
      * @return the password
@@ -49,7 +49,7 @@ public class PasswordAuthenticator extends Authenticator {
     String getUsername() {
         return m_username;
     }
-    
+
     /**
      * Set the user name.
      * @return the user name to use
@@ -63,7 +63,8 @@ public class PasswordAuthenticator extends Authenticator {
      * Get the singleton PasswordAuthentication instance.
      * @return the PasswordAuthentication instance
      */
-    protected PasswordAuthentication getPasswordAuthentication() {
+    @Override
+	protected PasswordAuthentication getPasswordAuthentication() {
         if ( m_auth == null ) {
             m_auth = new PasswordAuthentication(
                         m_username, m_password.toCharArray());
@@ -72,7 +73,7 @@ public class PasswordAuthenticator extends Authenticator {
     }
 
     // ------------------------------------------------------------------------
-    
+
     /**
      * Creates a new PasswordAuthenticator for the given name and password and
      * sets it as the default Authenticator for use within Java networking.
@@ -80,5 +81,5 @@ public class PasswordAuthenticator extends Authenticator {
     public static void setAuthentication(String username, String password) {
         Authenticator.setDefault(new PasswordAuthenticator(username,password));
     }
-    
+
 } // end of class PasswordAuthenticator

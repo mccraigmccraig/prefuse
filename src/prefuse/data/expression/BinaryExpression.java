@@ -4,7 +4,7 @@ package prefuse.data.expression;
  * Abstract base class for Expression implementations that maintain two
  * sub-expressions. These are referred to as the left expression (the first
  * one) and the right expression (the second one).
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public abstract class BinaryExpression extends AbstractExpression {
@@ -12,7 +12,7 @@ public abstract class BinaryExpression extends AbstractExpression {
     protected int m_op;
     protected Expression m_left;
     protected Expression m_right;
-    
+
     /**
      * Create a new BinaryExpression.
      * @param operation int value indicating the operation to be
@@ -40,7 +40,7 @@ public abstract class BinaryExpression extends AbstractExpression {
         this.m_left = left;
         this.m_right = right;
     }
-    
+
     /**
      * Get the left sub-expression.
      * @return the left sub-expression
@@ -56,7 +56,7 @@ public abstract class BinaryExpression extends AbstractExpression {
     public Expression getRightExpression() {
         return m_right;
     }
-    
+
     /**
      * Set the left sub-expression. Any listeners will be notified.
      * @param e the left sub-expression to use
@@ -64,10 +64,12 @@ public abstract class BinaryExpression extends AbstractExpression {
     public void setLeftExpression(Expression e) {
         m_left.removeExpressionListener(this);
         m_left = e;
-        if ( hasListeners() ) e.addExpressionListener(this);
+        if ( hasListeners() ) {
+			e.addExpressionListener(this);
+		}
         fireExpressionChange();
     }
-    
+
     /**
      * Set the right sub-expression. Any listeners will be notified.
      * @param e the right sub-expression to use
@@ -75,10 +77,12 @@ public abstract class BinaryExpression extends AbstractExpression {
     public void setRightExpression(Expression e) {
         m_right.removeExpressionListener(this);
         m_right = e;
-        if ( hasListeners() ) e.addExpressionListener(this);
+        if ( hasListeners() ) {
+			e.addExpressionListener(this);
+		}
         fireExpressionChange();
     }
-    
+
     /**
      * Get the operation code for this expression. The meaning of this
      * code is left for subclasses to determine.
@@ -87,28 +91,31 @@ public abstract class BinaryExpression extends AbstractExpression {
     public int getOperation() {
         return m_op;
     }
-    
+
     /**
      * @see prefuse.data.expression.Expression#visit(prefuse.data.expression.ExpressionVisitor)
      */
-    public void visit(ExpressionVisitor v) {
+    @Override
+	public void visit(ExpressionVisitor v) {
         v.visitExpression(this);
         v.down(); m_left.visit(v);  v.up();
         v.down(); m_right.visit(v); v.up();
     }
-    
+
     /**
      * @see prefuse.data.expression.AbstractExpression#addChildListeners()
      */
-    protected void addChildListeners() {
+    @Override
+	protected void addChildListeners() {
         m_left.addExpressionListener(this);
         m_right.addExpressionListener(this);
     }
-    
+
     /**
      * @see prefuse.data.expression.AbstractExpression#removeChildListeners()
      */
-    protected void removeChildListeners() {
+    @Override
+	protected void removeChildListeners() {
         m_left.removeExpressionListener(this);
         m_right.removeExpressionListener(this);
     }

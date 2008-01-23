@@ -3,6 +3,7 @@ package prefuse.data.parser;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.ParsePosition;
+import java.util.Locale;
 
 /**
  * DataParser instance that parses Date values as java.sql.Time instances,
@@ -12,21 +13,21 @@ import java.text.ParsePosition;
  * constructor, or by default the DateFormat returned by
  * {@link java.text.DateFormat#getDateInstance(int)} with an
  * argument of {@link java.text.DateFormat#SHORT} is used.
- *  
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class DateParser implements DataParser {
-    
+
     protected DateFormat    m_dfmt;
     protected ParsePosition m_pos;
-    
+
     /**
      * Create a new DateParser.
      */
     public DateParser() {
         this(DateFormat.getDateInstance(DateFormat.SHORT));
     }
-    
+
     /**
      * Create a new DateParser.
      * @param dateFormat the DateFormat instance to use for parsing
@@ -35,22 +36,26 @@ public class DateParser implements DataParser {
         m_dfmt = dateFormat;
         m_pos = new ParsePosition(0);
     }
-    
-    /**
+
+    public DateParser(Locale locale) {
+    	this(DateFormat.getDateInstance(DateFormat.SHORT, locale));
+	}
+
+	/**
      * Returns java.sql.Date.
      * @see prefuse.data.parser.DataParser#getType()
      */
-    public Class getType() {
+    public Class<?> getType() {
         return Date.class;
     }
-    
+
     /**
      * @see prefuse.data.parser.DataParser#format(java.lang.Object)
      */
     public String format(Object value) {
         return value==null ? null : m_dfmt.format(value);
     }
-    
+
     /**
      * @see prefuse.data.parser.DataParser#canParse(java.lang.String)
      */
@@ -62,14 +67,14 @@ public class DateParser implements DataParser {
             return false;
         }
     }
-    
+
     /**
      * @see prefuse.data.parser.DataParser#parse(java.lang.String)
      */
     public Object parse(String text) throws DataParseException {
         return parseDate(text);
     }
-    
+
     /**
      * Parse a Date value from a text string.
      * @param text the text string to parse
@@ -79,7 +84,7 @@ public class DateParser implements DataParser {
     public Date parseDate(String text) throws DataParseException {
         m_pos.setErrorIndex(0);
         m_pos.setIndex(0);
-        
+
         // parse the data value, convert to the wrapper type
         Date d = null;
         try {
@@ -94,7 +99,7 @@ public class DateParser implements DataParser {
                 d = new Date(d1.getTime());
             }
         }
-        
+
         // date format will parse substrings successfully, so we need
         // to check the position to make sure the whole value was used
         if ( d == null || m_pos.getIndex() < text.length() ) {
@@ -103,5 +108,5 @@ public class DateParser implements DataParser {
             return d;
         }
     }
-    
+
 } // end of class DateParser

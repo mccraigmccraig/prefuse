@@ -2,6 +2,7 @@ package prefuse.render;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import prefuse.visual.VisualItem;
@@ -10,7 +11,7 @@ import prefuse.visual.VisualItem;
 /**
  * Interface for rendering VisualItems, providing drawing as well as location
  * checking and bounding box routines.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  * @author alan newberger
  */
@@ -29,23 +30,31 @@ public interface Renderer {
      * @param g the Graphics2D context
      * @param item the visual item to draw
      */
-    public void render(Graphics2D g, VisualItem item);
+    public void render(Graphics2D g, VisualItem<?> item);
 
     /**
      * Returns true if the Point is located inside the extents of the item.
-     * This calculation matches against the exaxt item shape, and so is more
+     * This calculation matches against the exact item shape, and so is more
      * sensitive than just checking within a bounding box.
      * @param p the point to test for containment
      * @param item the item to test containment against
      * @return true if the point is contained within the the item, else false
      */
-    public boolean locatePoint(Point2D p, VisualItem item);
+    public boolean locatePoint(Point2D p, VisualItem<?> item);
+
 
     /**
-     * Calculates and sets the bounding rectangle for an item. This is called
+     * Calculates the bounding rectangle for an item. This is called
      * by a VisualItem when it validates its bounds.
      * @param item the item to compute the bounding box for
+     * @param bounds the rectangle to populate with the bounding box
      */
-    public void setBounds(VisualItem item);
+    public void calculateBounds(VisualItem<?> item, Rectangle2D bounds);
+
+    /**
+     *
+     * @return true iff the renderer manages the bounds of the items it renders
+     */
+	public boolean managesBounds();
 
 } // end of interface Renderer

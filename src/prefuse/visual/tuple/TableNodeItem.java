@@ -1,22 +1,20 @@
 package prefuse.visual.tuple;
 
-import java.util.Iterator;
+import java.util.List;
 
-import prefuse.data.Edge;
 import prefuse.data.Graph;
-import prefuse.data.Node;
 import prefuse.data.Table;
 import prefuse.visual.NodeItem;
 
 /**
  * NodeItem implementation that used data values from a backing
  * VisualTable of nodes.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class TableNodeItem extends TableVisualItem implements NodeItem {
+public class TableNodeItem extends TableVisualItem<TableNodeItem> implements NodeItem<TableNodeItem,TableEdgeItem> {
 
-    protected Graph m_graph;
+    protected Graph<?,TableNodeItem,TableEdgeItem> m_graph;
 
     /**
      * Initialize a new TableNodeItem for the given graph, table, and row.
@@ -28,23 +26,24 @@ public class TableNodeItem extends TableVisualItem implements NodeItem {
      * @param row the row in the node table to which this Node instance
      *  corresponds.
      */
-    protected void init(Table table, Graph graph, int row) {
+    @Override
+	public void init(Table table, Graph graph, int row) {
         m_table = table;
         m_graph = graph;
         m_row = m_table.isValidRow(row) ? row : -1;
     }
-    
+
     /**
-     * @see prefuse.data.Node#getGraph()
+     *
      */
-    public Graph getGraph() {
+    public Graph<?,TableNodeItem,TableEdgeItem> getGraph() {
         return m_graph;
     }
-    
+
     // ------------------------------------------------------------------------
     // If only we had multiple inheritance or categories....
     // Instead we must re-implement the entire Node interface.
-    
+
     /**
      * @see prefuse.data.Node#getInDegree()
      */
@@ -69,121 +68,86 @@ public class TableNodeItem extends TableVisualItem implements NodeItem {
     /**
      * @see prefuse.data.Node#inEdges()
      */
-    public Iterator inEdges() {
+    public List<TableEdgeItem> inEdges() {
         return m_graph.inEdges(this);
     }
 
     /**
      * @see prefuse.data.Node#outEdges()
      */
-    public Iterator outEdges() {
+    public List<TableEdgeItem> outEdges() {
         return m_graph.outEdges(this);
     }
-    
+
     /**
      * @see prefuse.data.Node#edges()
      */
-    public Iterator edges() {
+    public List<TableEdgeItem> edges() {
         return m_graph.edges(this);
     }
-    
+
     /**
      * @see prefuse.data.Node#inNeighbors()
      */
-    public Iterator inNeighbors() {
+    public List<TableNodeItem> inNeighbors() {
         return m_graph.inNeighbors(this);
     }
-    
+
     /**
      * @see prefuse.data.Node#outNeighbors()
      */
-    public Iterator outNeighbors() {
+    public List<TableNodeItem> outNeighbors() {
         return m_graph.outNeighbors(this);
     }
-    
+
     /**
      * @see prefuse.data.Node#neighbors()
      */
-    public Iterator neighbors() {
+    public List<TableNodeItem> neighbors() {
         return m_graph.neighbors(this);
     }
 
     // ------------------------------------------------------------------------
-    
+
     /**
      * @see prefuse.data.Node#getParent()
      */
-    public Node getParent() {
+    public TableNodeItem getParent() {
         return m_graph.getSpanningTree().getParent(this);
     }
 
     /**
      * @see prefuse.data.Node#getParentEdge()
      */
-    public Edge getParentEdge() {
+    public TableEdgeItem getParentEdge() {
         return m_graph.getSpanningTree().getParentEdge(this);
-    }
-    
-    /**
-     * @see prefuse.data.Node#getChildCount()
-     */
-    public int getChildCount() {
-        return m_graph.getSpanningTree().getChildCount(m_row);
     }
 
     /**
-     * @see prefuse.data.Node#getChildIndex(prefuse.data.Node)
-     */
-    public int getChildIndex(Node child) {
-        return m_graph.getSpanningTree().getChildIndex(this, child);
-    }
-    
-    /**
-     * @see prefuse.data.Node#getChild(int)
-     */
-    public Node getChild(int idx) {
-        return m_graph.getSpanningTree().getChild(this, idx);
-    }
-    
-    /**
-     * @see prefuse.data.Node#getFirstChild()
-     */
-    public Node getFirstChild() {
-        return m_graph.getSpanningTree().getFirstChild(this);
-    }
-    
-    /**
-     * @see prefuse.data.Node#getLastChild()
-     */
-    public Node getLastChild() {
-        return m_graph.getSpanningTree().getLastChild(this);
-    }
-    
-    /**
      * @see prefuse.data.Node#getPreviousSibling()
      */
-    public Node getPreviousSibling() {
+    public TableNodeItem getPreviousSibling() {
         return m_graph.getSpanningTree().getPreviousSibling(this);
     }
-    
+
     /**
      * @see prefuse.data.Node#getNextSibling()
      */
-    public Node getNextSibling() {
+    public TableNodeItem getNextSibling() {
         return m_graph.getSpanningTree().getNextSibling(this);
     }
-    
+
     /**
      * @see prefuse.data.Node#children()
      */
-    public Iterator children() {
+    public List<TableNodeItem> children() {
         return m_graph.getSpanningTree().children(this);
     }
 
     /**
      * @see prefuse.data.Node#childEdges()
      */
-    public Iterator childEdges() {
+    public List<TableEdgeItem> childEdges() {
         return m_graph.getSpanningTree().childEdges(this);
     }
 
@@ -191,7 +155,7 @@ public class TableNodeItem extends TableVisualItem implements NodeItem {
      * @see prefuse.data.Node#getDepth()
      */
     public int getDepth() {
-        return m_graph.getSpanningTree().getDepth(m_row);
+        return m_graph.getSpanningTree().getDepth(this);
     }
-    
+
 } // end of class TableNodeItem

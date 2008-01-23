@@ -18,8 +18,8 @@ import prefuse.util.ui.JForcePanel;
  */
 public class ForceConfigAction extends AbstractAction {
 
-    private JDialog dialog;
-    
+    private final JDialog dialog;
+
     /**
      * Create a new ForceConfigAction.
      * @param frame the parent frame for which to create the dialog
@@ -32,7 +32,7 @@ public class ForceConfigAction extends AbstractAction {
         dialog.getContentPane().add(forcePanel);
         dialog.pack();
     }
-    
+
     /**
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */

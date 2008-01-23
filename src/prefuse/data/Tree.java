@@ -1,9 +1,14 @@
 package prefuse.data;
 
-import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
+import prefuse.data.tree.DeclarativeTree;
+import prefuse.data.tuple.TableEdge;
+import prefuse.data.tuple.TableNode;
+import prefuse.data.tuple.TableTuple;
 import prefuse.util.PrefuseConfig;
+import prefuse.util.collections.CompositeList;
 import prefuse.util.collections.IntIterator;
 
 /**
@@ -21,47 +26,61 @@ import prefuse.util.collections.IntIterator;
  * tables, and use {@link prefuse.data.Node} and
  * {@link prefuse.data.Edge} instances to provide object-oriented access
  * to nodes and edges.</p>
- * 
+ *
  * <p>The Tree class does not currently enforce that the graph structure remain
  * a valid tree. This is to allow a chain of editing operations that may break
  * the tree structure at some point before repairing it. Use the
  * {@link #isValidTree()} method to test the validity of a tree.</p>
- * 
+ *
  * <p>By default, the {@link #getSpanningTree()} method simply returns a
  * reference to this Tree instance. However, if a spanning tree is created at a
  * new root u sing the {@link #getSpanningTree(Node)} method, a new
  * {@link SpanningTree} instance is generated.</p>
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class Tree extends Graph {
+public class Tree <T extends Tuple<?>, N extends Node<N,E>, E extends Edge<N,E>> extends Graph<T,N,E> implements DeclarativeTree<N,E> {
 
     private static final Logger s_logger
         = Logger.getLogger(Tree.class.getName());
-    
+
     /** Default data field used to denote the source node in an edge table */
-    public static final String DEFAULT_SOURCE_KEY 
+    public static final String DEFAULT_SOURCE_KEY
         = PrefuseConfig.get("data.tree.sourceKey");
     /** Default data field used to denote the target node in an edge table */
     public static final String DEFAULT_TARGET_KEY
         = PrefuseConfig.get("data.tree.targetKey");
-    
+
     // implement as graph with limitations on edge settings
     // catch external modification events and throw exceptions as necessary
-    
+
     /** The node table row number for the root node of the tree. */
     protected int m_root = -1;
-    
+
     // ------------------------------------------------------------------------
     // Constructors
-    
+
     /**
      * Create a new, empty Tree.
      */
-    public Tree() {
-        super(new Table(), false);
+    public static Tree<TableTuple<?>,TableNode,TableEdge> createTree() {
+    	Table<TableNode> nodeTable = new Table<TableNode>(0, 0) {
+			@Override
+			public TableNode createTupleInstance() {
+				return new TableNode();
+			}
+		};
+		Table<TableEdge> edgeTable = new Table<TableEdge>(0, 0) {
+			@Override
+			public TableEdge createTupleInstance() {
+				return new TableEdge();
+			}
+		};
+		edgeTable.addColumn(DEFAULT_SOURCE_KEY, int.class, new Integer(-1));
+		edgeTable.addColumn(DEFAULT_TARGET_KEY, int.class, new Integer(-1));
+		return new Tree<TableTuple<?>, TableNode, TableEdge>(nodeTable, edgeTable);
     }
-    
+
     /**
      * Create a new Tree.
      * @param nodes the backing table to use for node data.
@@ -69,7 +88,7 @@ public class Tree extends Graph {
      * @param edges the backing table to use for edge data.
      * Edge instances of this graph will get their data from this table.
      */
-    public Tree(Table nodes, Table edges) {
+    public Tree(Table<N> nodes, Table<E> edges) {
         this(nodes, edges, DEFAULT_SOURCE_KEY, DEFAULT_TARGET_KEY);
     }
 
@@ -84,10 +103,10 @@ public class Tree extends Graph {
      * @param targetKey data field used to denote the target node in an edge
      * table
      */
-    public Tree(Table nodes, Table edges, String sourceKey, String targetKey) {
+    public Tree(Table<N> nodes, Table<E> edges, String sourceKey, String targetKey) {
         this(nodes, edges, DEFAULT_NODE_KEY, sourceKey, targetKey);
     }
-    
+
     /**
      * Create a new Tree.
      * @param nodes the backing table to use for node data.
@@ -101,11 +120,11 @@ public class Tree extends Graph {
      * @param targetKey data field used to denote the target node in an edge
      * table
      */
-    public Tree(Table nodes, Table edges, String nodeKey,
+    public Tree(Table<N> nodes, Table<E> edges, String nodeKey,
             String sourceKey, String targetKey)
     {
         super(nodes, edges, false, nodeKey, sourceKey, targetKey);
-        
+
         for ( IntIterator rows = nodes.rows(); rows.hasNext(); ) {
             int n = rows.nextInt();
             if ( getParent(n) < 0 ) {
@@ -114,28 +133,30 @@ public class Tree extends Graph {
             }
         }
     }
-    
+
     /**
      * Internal method for setting the root node.
      * @param root the root node to set
      */
-    void setRoot(Node root) {
+    void setRoot(N root) {
         m_root = root.getRow();
     }
-        
+
     /**
      * @see prefuse.data.Graph#createLinkTable()
      */
-    protected Table createLinkTable() {
-        Table links = super.createLinkTable();
+    @Override
+	protected Table<TableTuple<?>> createLinkTable() {
+        Table<TableTuple<?>> links = super.createLinkTable();
         links.addColumns(TREE_LINKS_SCHEMA);
         return links;
     }
-    
+
     /**
      * @see prefuse.data.Graph#updateDegrees(int, int, int, int)
      */
-    protected void updateDegrees(int e, int s, int t, int incr) {
+    @Override
+	protected void updateDegrees(int e, int s, int t, int incr) {
         super.updateDegrees(e, s, t, incr);
         int od = getOutDegree(s);
         if ( incr > 0 ) {
@@ -151,10 +172,10 @@ public class Tree extends Graph {
             m_links.setInt(t, CHILDINDEX, -1);
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Tree Mutators
-    
+
     /**
      * Add a new root node to an empty Tree.
      * @return the node id (node table row number) of the new root node.
@@ -164,17 +185,17 @@ public class Tree extends Graph {
             throw new IllegalStateException(
                     "Can only add a root node to an empty tree");
         }
-        return (m_root = addNodeRow());
+        return m_root = addNodeRow();
     }
-    
+
     /**
      * Add a new root node to an empty Tree.
      * @return the newly added root Node
      */
-    public Node addRoot() {
+    public N addRoot() {
         return getNode(addRootRow());
     }
-    
+
     /**
      * Add a child node to the given parent node. An edge between the two
      * will also be created.
@@ -186,18 +207,18 @@ public class Tree extends Graph {
         addChildEdge(parent, child);
         return child;
     }
-    
+
     /**
      * Add a child node to the given parent node. An edge between the two
      * will also be created.
      * @param parent the parent node
      * @return the added child node
      */
-    public Node addChild(Node parent) {
+    public N addChild(Node<?,?> parent) {
         nodeCheck(parent, true);
         return getNode(addChild(parent.getRow()));
     }
-    
+
     /**
      * Add a child edge between the given nodes.
      * @param parent the parent node id (node table row number)
@@ -214,12 +235,12 @@ public class Tree extends Graph {
      * @param child the child node
      * @return the added child edge
      */
-    public Edge addChildEdge(Node parent, Node child) {
+    public E addChildEdge(Node<?,?> parent, Node<?,?> child) {
         nodeCheck(parent, true);
         nodeCheck(child, true);
         return getEdge(addChildEdge(parent.getRow(), child.getRow()));
     }
-    
+
     /**
      * Remove a child edge from the Tree. The child node and its subtree
      * will also be removed from the Tree.
@@ -238,11 +259,11 @@ public class Tree extends Graph {
      * @return true if the edge and attached subtree is successfully removed,
      * false otherwise
      */
-    public boolean removeChildEdge(Edge e) {
+    public boolean removeChildEdge(Edge<?,?> e) {
         edgeCheck(e, true);
         return removeChild(getTargetNode(e.getRow()));
     }
-    
+
     /**
      * Remove a node and its entire subtree rooted at the node from the tree.
      * @param node the node id (node table row number) to remove
@@ -255,21 +276,21 @@ public class Tree extends Graph {
         }
         return removeNode(node);
     }
-    
+
     /**
      * Remove a node and its entire subtree rooted at the node from the tree.
      * @param n the node to remove
      * @return true if the node and its subtree is successfully removed,
      * false otherwise
      */
-    public boolean removeChild(Node n) {
+    public boolean removeChild(Node<?,?> n) {
         nodeCheck(n, true);
         return removeChild(n.getRow());
     }
-    
+
     // ------------------------------------------------------------------------
     // Tree Accessors
-    
+
     /**
      * Get the root node id (node table row number).
      * @return the root node id
@@ -277,13 +298,13 @@ public class Tree extends Graph {
     public int getRootRow() {
         return m_root;
     }
-    
+
     /**
      * Get the root node.
      * @return the root Node
      */
-    public Node getRoot() {
-        return (Node)m_nodeTuples.getTuple(m_root);
+    public N getRoot() {
+        return m_nodeTuples.getTuple(m_root);
     }
 
     /**
@@ -294,22 +315,13 @@ public class Tree extends Graph {
      */
     public int getChildRow(int node, int idx) {
         int cc = getChildCount(node);
-        if ( idx < 0 || idx >= cc ) return -1;
+        if ( idx < 0 || idx >= cc ) {
+			return -1;
+		}
         int[] links = (int[])m_links.get(node, OUTLINKS);
         return getTargetNode(links[idx]);
     }
-    
-    /**
-     * Get the child node at the given index.
-     * @param node the parent Node
-     * @param idx the child index
-     * @return the child Node
-     */
-    public Node getChild(Node node, int idx) {
-        int c = getChildRow(node.getRow(), idx);
-        return ( c<0 ? null : getNode(c) );
-    }
-    
+
     /**
      * Get the child index (order number of the child) for the given parent
      * node id and child node id.
@@ -317,27 +329,15 @@ public class Tree extends Graph {
      * @param child the child node id (node table row number)
      * @return the index of the child, or -1 if the given child node is not
      * actually a child of the given parent node, or either node is
-     * invalud.
+     * invalid.
      */
     public int getChildIndex(int parent, int child) {
-        if ( getParent(child) != parent )
-            return -1;
+        if ( getParent(child) != parent ) {
+			return -1;
+		}
         return m_links.getInt(child, CHILDINDEX);
     }
-    
-    /**
-     * Get the child index (order number of the child) for the given parent
-     * and child nodes.
-     * @param p the parent Node
-     * @param c the child Node
-     * @return the index of the child, or -1 if the given child node is not
-     * actually a child of the given parent node, or either node is
-     * invalud.
-     */
-    public int getChildIndex(Node p, Node c) {
-        return getChildIndex(p.getRow(), c.getRow());
-    }
-    
+
     /**
      * Get the node id of the first child of the given parent node id.
      * @param node the parent node id (node table row number)
@@ -348,15 +348,6 @@ public class Tree extends Graph {
     }
 
     /**
-     * Get the first child node of the given parent node.
-     * @param node the parent Node
-     * @return the first child Node
-     */
-    public Node getFirstChild(Node node) {
-        return getChild(node, 0);
-    }
-    
-    /**
      * Get the node id of the last child of the given parent node id.
      * @param node the parent node id (node table row number)
      * @return the node id of the last child
@@ -364,16 +355,7 @@ public class Tree extends Graph {
     public int getLastChildRow(int node) {
         return getChildRow(node, getChildCount(node)-1);
     }
-    
-    /**
-     * Get the last child node of the given parent node.
-     * @param node the parent Node
-     * @return the last child Node
-     */
-    public Node getLastChild(Node node) {
-        return getChild(node, node.getChildCount()-1);
-    }
-    
+
     /**
      * Get the node id of the previous sibling of the given node id.
      * @param node a node id (node table row number)
@@ -382,23 +364,56 @@ public class Tree extends Graph {
      */
     public int getPreviousSiblingRow(int node) {
         int p = getParent(node);
-        if ( p < 0 )
-            return -1;
+        if ( p < 0 ) {
+			return -1;
+		}
         int[] links = (int[])m_links.get(p, OUTLINKS);
         int idx = m_links.getInt(node, CHILDINDEX);
-        return ( idx<=0 ? -1 : getTargetNode(links[idx-1]));
+        return idx<=0 ? -1 : getTargetNode(links[idx-1]);
     }
-    
+
     /**
      * Get the previous sibling of the given node.
      * @param node a node
      * @return the previous sibling, or null if there is no previous sibling
      */
-    public Node getPreviousSibling(Node node) {
+    public N getPreviousSibling(N node) {
         int n = getPreviousSiblingRow(node.getRow());
-        return ( n<0 ? null : getNode(n) );
+        return n<0 ? null : getNode(n);
     }
-    
+
+    public List<Integer> edgeRows(int node, int direction) {
+        if ( direction==OUTEDGES ) {
+            int[] outedges = (int[])m_links.get(node, OUTLINKS);
+            return new TreeIntArrayList(outedges, getOutDegree(node));
+        } else if ( direction==INEDGES ) {
+            int[] inedges = (int[])m_links.get(node, INLINKS);
+            return new TreeIntArrayList(inedges, getInDegree(node));
+        } else if ( direction==UNDIRECTED ) {
+            return new CompositeList<Integer>(
+                edgeRows(node, OUTEDGES), edgeRows(node, INEDGES));
+        } else {
+            throw new IllegalArgumentException("Unrecognized edge type: "
+                + direction + ". Type should be one of Graph.OUTEDGES, "
+                + "Graph.INEDGES, or Graph.ALL");
+        }
+    }
+
+    protected class TreeIntArrayList extends IntArrayList {
+
+		public TreeIntArrayList(int[] ints, int len) {
+			super(ints, len);
+		}
+
+    	public int indexOf(Object o) {
+    		if(!(o instanceof Integer)) {
+    			return -1;
+    		}
+            return m_links.getInt((Integer) o, CHILDINDEX);
+    	}
+
+    }
+
     /**
      * Get the node id of the next sibling of the given node id.
      * @param node a node id (node table row number)
@@ -407,24 +422,29 @@ public class Tree extends Graph {
      */
     public int getNextSiblingRow(int node) {
         int p = getParent(node);
-        if ( p < 0 )
-            return -1;
+        if ( p < 0 ) {
+			return -1;
+		}
         int[] links = (int[])m_links.get(p, OUTLINKS);
         int idx = m_links.getInt(node, CHILDINDEX);
         int max = getChildCount(p)-1;
-        return ( idx<0 || idx>=max ? -1 : getTargetNode(links[idx+1]));
+        return idx<0 || idx>=max ? -1 : getTargetNode(links[idx+1]);
     }
-    
+
     /**
      * Get the next sibling of the given node.
      * @param node a node
      * @return the next sibling, or null if there is no next sibling
      */
-    public Node getNextSibling(Node node) {
+    public N getNextSibling(N node) {
         int n = getNextSiblingRow(node.getRow());
-        return ( n<0 ? null : getNode(n) );
+        return n<0 ? null : getNode(n);
     }
-    
+
+	public int getDepth(N n) {
+		return getDepth(n.getRow());
+	}
+
     /**
      * Get the depth of the given node id in the tree.
      * @param node a node id (node table row number)
@@ -434,15 +454,17 @@ public class Tree extends Graph {
      * in the tree.
      */
     public int getDepth(int node) {
-        if ( !getNodeTable().isValidRow(node) )
-            return -1;
-        
-        int depth = 0;
+        if ( !getNodeTable().isValidRow(node) ) {
+			return -1;
+		}
         if ( node!=m_root && getParent(node) < 0 ) return -1;
-        for ( int i=node; i!=m_root && i>=0; ++depth, i=getParent(i) );
+        int depth = 0;
+        for ( int i=node; i!=m_root && i>=0; ++depth, i=getParent(i) ) {
+			;
+		}
         return depth;
     }
-    
+
     /**
      * Get the number of children of the given node id.
      * @param node a node id (node table row number)
@@ -451,7 +473,7 @@ public class Tree extends Graph {
     public int getChildCount(int node) {
         return getOutDegree(node);
     }
-    
+
     /**
      * Get the edge id of the edge to the given node's parent.
      * @param node the node id (node table row number)
@@ -465,18 +487,18 @@ public class Tree extends Graph {
             return -1;
         }
     }
-    
+
     /**
      * Get the edge to the given node's parent.
      * @param n a Node instance
      * @return the parent Edge connecting the given node to its parent
      */
-    public Edge getParentEdge(Node n) {
+    public E getParentEdge(N n) {
         nodeCheck(n, true);
         int pe = getParentEdge(n.getRow());
-        return ( pe < 0 ? null : getEdge(pe) );
+        return pe < 0 ? null : getEdge(pe);
     }
-    
+
     /**
      * Get a node's parent node id
      * @param node the child node id (node table row number)
@@ -484,7 +506,7 @@ public class Tree extends Graph {
      */
     public int getParent(int node) {
         int pe = getParentEdge(node);
-        return ( pe < 0 ? -1 : getSourceNode(pe) );
+        return pe < 0 ? -1 : getSourceNode(pe);
     }
 
     /**
@@ -492,14 +514,14 @@ public class Tree extends Graph {
      * @param n the child node
      * @return the parent node, or null if there is no parent
      */
-    public Node getParent(Node n) {
+    public N getParent(N n) {
         int p = getParent(n.getRow());
-        return ( p < 0 ? null : getNode(p) );
+        return p < 0 ? null : getNode(p);
     }
-    
+
     // ------------------------------------------------------------------------
     // Iterators
-    
+
     /**
      * Get an iterator over the edge ids for edges connecting child nodes to
      * a given parent
@@ -507,32 +529,32 @@ public class Tree extends Graph {
      * @return an iterator over the edge ids for edges conencting child nodes
      * to a given parent
      */
-    public IntIterator childEdgeRows(int node) {
+    public List<Integer> childEdgeRows(int node) {
         return super.outEdgeRows(node);
     }
-    
+
     /**
-     * Get an iterator over the edges connecting child nodes to a given parent 
+     * Get an iterator over the edges connecting child nodes to a given parent
      * @param n the parent node
      * @return an iterator over the edges connecting child nodes to a given
      * parent
      */
-    public Iterator childEdges(Node n) {
+    public List<E> childEdges(N n) {
         return super.outEdges(n);
     }
-    
+
     /**
      * Get an iterator over the child nodes of a parent node.
      * @param n the parent node
      * @return an iterator over the child nodes of a parent node
      */
-    public Iterator children(Node n) {
+    public List<N> children(N n) {
         return super.outNeighbors(n);
     }
-    
+
     // ------------------------------------------------------------------------
     // Sanity Test
-    
+
     /**
      * Check that the underlying graph structure forms a valid tree.
      * @return true if this is a valid tree, false otherwise
@@ -541,13 +563,13 @@ public class Tree extends Graph {
         // TODO: write a visitor interface and use that instead?
         int nnodes = getNodeCount();
         int nedges = getEdgeCount();
-        
+
         // first make sure there are n nodes and n-1 edges
         if ( nnodes != nedges+1 ) {
             s_logger.warning("Node/edge counts incorrect.");
             return false;
         }
-        
+
         // iterate through nodes, make sure each one has the right
         // number of parents
         int root = getRootRow();
@@ -563,7 +585,7 @@ public class Tree extends Graph {
                 return false;
             }
         }
-        
+
         // now do a traversal and make sure we visit everything
         int[] counts = new int[] { 0, nedges };
         isValidHelper(getRootRow(), counts);
@@ -578,76 +600,78 @@ public class Tree extends Graph {
         }
         return true;
     }
-    
+
     /**
      * isValidTree's recursive helper method.
      */
     private void isValidHelper(int node, int[] counts) {
-        IntIterator edges = childEdgeRows(node);
+        List<Integer> edges = childEdgeRows(node);
         int ncount = 0;
-        while ( edges.hasNext() ) {
+        for ( int edge : edges ) {
             // get next edge, increment count
-            int edge = edges.nextInt();
             ++ncount; ++counts[0];
             // visit the next edge
             int c = getAdjacentNode(edge, node);
             isValidHelper(c, counts);
             // check the counts
-            if ( counts[0] > counts[1] )
-                return;
+            if ( counts[0] > counts[1] ) {
+				return;
+			}
         }
     }
 
     // ------------------------------------------------------------------------
     // Spanning Tree Methods
-    
+
     /**
      * Returns a spanning tree over this tree. If no spanning tree
      * has been constructed at an alternative root, this method simply returns
      * a pointer to this Tree instance. If a spanning tree rooted at an
      * alternative node has been created, that tree is returned.
-     * 
+     *
      * @return a spanning tree over this tree
      * @see #getSpanningTree(Node)
      * @see Graph#clearSpanningTree()
      */
-    public Tree getSpanningTree() {
+    @Override
+	public DeclarativeTree<N,E> getSpanningTree() {
         return m_spanning==null ? this : m_spanning;
     }
-    
+
     /**
      * Returns a spanning tree over this tree, rooted at the given root. If
      * the given root is not the same as that of this Tree, a new spanning
      * tree instance will be constructed, made the current spanning tree
      * for this Tree instance, and returned.
-     * 
+     *
      * To clear out any generated spanning trees use the clearSpanningTree()
      * method of the Graph class. After calling clearSpanningTree(), the
      * getSpanningTree() method (with no arguments) will return a pointer
      * to this Tree instance instead of any generated spanning trees.
-     * 
+     *
      * @param root the node at which to root the spanning tree.
      * @return a spanning tree over this tree, rooted at the given root
      * @see #getSpanningTree()
      * @see Graph#clearSpanningTree()
      */
-    public Tree getSpanningTree(Node root) {
+    @Override
+	public DeclarativeTree<N,E> getSpanningTree(N root) {
         nodeCheck(root, true);
         if ( m_spanning == null ) {
             if ( m_root == root.getRow() ) {
                 return this;
             } else {
-                m_spanning = new SpanningTree(this, root);
+                m_spanning = new SpanningTree<T,N,E>(this, root);
             }
         } else if ( m_spanning.getRoot() != root ) {
             m_spanning.buildSpanningTree(root);
         }
         return m_spanning;
     }
-    
+
     // ------------------------------------------------------------------------
     // Tree Linkage Schema (appended to the Graph Linkage Schema)
-    
+
     /** Links table data field storing the index number of a child node */
     protected static final String CHILDINDEX = "_childIndex";
     /** Schema addition to be added onto {@link Graph#LINKS_SCHEMA}. */
@@ -656,5 +680,5 @@ public class Tree extends Graph {
         TREE_LINKS_SCHEMA.addColumn(CHILDINDEX, int.class, new Integer(-1));
         TREE_LINKS_SCHEMA.lockSchema();
     }
-    
+
 } // end of class Tree

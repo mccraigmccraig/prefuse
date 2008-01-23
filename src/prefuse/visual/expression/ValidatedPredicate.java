@@ -9,7 +9,7 @@ import prefuse.visual.VisualItem;
 
 /**
  * Expression that indicates if an item's validated flag is set.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class ValidatedPredicate extends ColumnExpression
@@ -19,14 +19,14 @@ public class ValidatedPredicate extends ColumnExpression
     public static final Predicate TRUE = new ValidatedPredicate();
     /** Convenience instance for the validated == false case. */
     public static final Predicate FALSE = new NotPredicate(TRUE);
-    
+
     /**
      * Create a new ValidatedPredicate.
      */
     public ValidatedPredicate() {
         super(VisualItem.VALIDATED);
     }
-    
+
     /**
      * @see prefuse.data.expression.Function#getName()
      */
@@ -47,11 +47,12 @@ public class ValidatedPredicate extends ColumnExpression
     public int getParameterCount() {
         return 0;
     }
-    
+
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return getName()+"()";
     }
 

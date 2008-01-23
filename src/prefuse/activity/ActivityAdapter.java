@@ -3,7 +3,7 @@ package prefuse.activity;
 /**
  * Adapter class for ActivityListeners. Provides empty implementations of
  * ActivityListener routines.
- * 
+ *
  * @version 1.0
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */

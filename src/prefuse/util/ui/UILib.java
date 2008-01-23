@@ -14,20 +14,20 @@ import javax.swing.UIManager;
 
 /**
  * Library routines for user interface tasks.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class UILib {
 
 //    private static Image s_appIcon;
-    
+
     /**
      * Not instantiable.
      */
     private UILib() {
         // prevent instantiation
     }
-    
+
 //    public static synchronized Image getApplicationIcon() {
 //        if ( s_appIcon == null ) {
 //            try {
@@ -39,7 +39,7 @@ public class UILib {
 //        }
 //        return s_appIcon;
 //    }
-    
+
     /**
      * Indicates if a given mouse button is being pressed.
      * @param e the InputEvent to check
@@ -58,8 +58,8 @@ public class UILib {
      */
     public static final void setPlatformLookAndFeel() {
         try {
-            String laf = UIManager.getSystemLookAndFeelClassName();             
-            UIManager.setLookAndFeel(laf);  
+            String laf = UIManager.getSystemLookAndFeelClassName();
+            UIManager.setLookAndFeel(laf);
         } catch ( Exception e ) {}
     }
 
@@ -74,12 +74,12 @@ public class UILib {
      * @return a new Box instance with the given properties.
      * @see javax.swing.Box
      */
-    public static Box getBox(Component[] c, boolean horiz, 
+    public static Box getBox(Component[] c, boolean horiz,
             int margin, int spacing)
     {
         return getBox(c, horiz, margin, margin, spacing);
     }
-    
+
     /**
      * Convenience method for creating a Box user interface widget container.
      * @param c an array of components to include in the box
@@ -107,7 +107,7 @@ public class UILib {
         addStrut(b, horiz, margin2);
         return b;
     }
-    
+
     /**
      * Add a strut, or rigid spacing, to a UI component
      * @param b the component to add the strut to, should be either a Box or a
@@ -117,11 +117,13 @@ public class UILib {
      * @param size the length, in pixels, of the strut
      */
     public static void addStrut(JComponent b, boolean horiz, int size) {
-        if ( size < 1 ) return;
+        if ( size < 1 ) {
+			return;
+		}
         b.add(horiz ? Box.createHorizontalStrut(size)
                     : Box.createVerticalStrut(size) );
     }
-    
+
     /**
      * Add a glue, or variable spacing, to a UI component
      * @param b the component to add the glue to, should be either a Box or a
@@ -133,7 +135,7 @@ public class UILib {
         b.add(horiz ? Box.createHorizontalGlue()
                     : Box.createVerticalGlue());
     }
-    
+
     /**
      * Add a strut, or rigid spacing, to a UI component
      * @param b the component to add the strut to, should be either a Box or a
@@ -146,12 +148,14 @@ public class UILib {
      * @param size the length, in pixels, of the strut
      */
     public static void addStrut(JComponent b, int layout, int size) {
-        if ( size < 1 ) return;
+        if ( size < 1 ) {
+			return;
+		}
         b.add( getAxis(b, layout) == BoxLayout.X_AXIS
                 ? Box.createHorizontalStrut(size)
                 : Box.createVerticalStrut(size) );
     }
-    
+
     /**
      * Add a glue, or variable spacing, to a UI component
      * @param b the component to add the glue to, should be either a Box or a
@@ -163,11 +167,11 @@ public class UILib {
      * {@link javax.swing.BoxLayout#PAGE_AXIS}.
      */
     public static void addGlue(JComponent b, int layout) {
-        b.add( getAxis(b, layout) == BoxLayout.X_AXIS 
+        b.add( getAxis(b, layout) == BoxLayout.X_AXIS
                 ? Box.createHorizontalGlue()
                 : Box.createVerticalGlue());
     }
-    
+
     /**
      * Resolve the axis type of a component, given a layout orientation
      * @param c a Swing Component, should be either a Box or a Container
@@ -191,7 +195,7 @@ public class UILib {
             return layout;
         }
     }
-    
+
     /**
      * Sets the foreground and background color for a component and all
      * components contained within it.
@@ -204,11 +208,12 @@ public class UILib {
         c.setForeground(fore);
         if ( c instanceof Container ) {
             Container con = (Container)c;
-            for ( int i=0; i<con.getComponentCount(); ++i )
-                setColor(con.getComponent(i), back, fore);
+            for ( int i=0; i<con.getComponentCount(); ++i ) {
+				setColor(con.getComponent(i), back, fore);
+			}
         }
     }
-    
+
     /**
      * Sets the font for a component and all
      * components contained within it.
@@ -219,9 +224,10 @@ public class UILib {
         c.setFont(font);
         if ( c instanceof Container ) {
             Container con = (Container)c;
-            for ( int i=0; i<con.getComponentCount(); ++i )
-                setFont(con.getComponent(i), font);
+            for ( int i=0; i<con.getComponentCount(); ++i ) {
+				setFont(con.getComponent(i), font);
+			}
         }
     }
-    
+
 } // end of class UILib

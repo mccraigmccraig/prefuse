@@ -12,16 +12,16 @@ import prefuse.visual.VisualItem;
  * Follows the mouse cursor, updating the anchor parameter for any number
  * of layout instances to match the current cursor position. Will also
  * run a given activity in response to cursor updates.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class AnchorUpdateControl extends ControlAdapter {
-    
-    private boolean m_anchorOverItem;
-    private Layout[] m_layouts;
-    private String m_action;
-    private Point2D  m_tmp = new Point2D.Double();
-    
+
+    private final boolean m_anchorOverItem;
+    private final Layout[] m_layouts;
+    private final String m_action;
+    private final Point2D  m_tmp = new Point2D.Double();
+
     /**
      * Create a new AnchorUpdateControl.
      * @param layout the layout for which to update the anchor point
@@ -50,7 +50,7 @@ public class AnchorUpdateControl extends ControlAdapter {
     {
         this(new Layout[] {layout}, action, overItem);
     }
-    
+
     /**
      * Create a new AnchorUpdateControl.
      * @param layout the layouts for which to update the anchor point
@@ -59,7 +59,7 @@ public class AnchorUpdateControl extends ControlAdapter {
     public AnchorUpdateControl(Layout[] layout, String action) {
         this(layout, action, true);
     }
-    
+
     /**
      * Create a new AnchorUpdateControl.
      * @param layout the layouts for which to update the anchor point
@@ -69,50 +69,60 @@ public class AnchorUpdateControl extends ControlAdapter {
      */
     public AnchorUpdateControl(Layout[] layout, String action, boolean overItem)
     {
-        m_layouts = (Layout[])layout.clone();
+        m_layouts = layout.clone();
         m_action = action;
         m_anchorOverItem = overItem;
     }
-    
+
     // ------------------------------------------------------------------------
 
     /**
      * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
      */
-    public void mouseExited(MouseEvent e) {
-        for ( int i=0; i<m_layouts.length; i++ ) 
-            m_layouts[i].setLayoutAnchor(null);
+    @Override
+	public void mouseExited(MouseEvent e) {
+        for (Layout element : m_layouts) {
+			element.setLayoutAnchor(null);
+		}
         runAction(e);
     }
-    
+
     /**
      * @see java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
      */
-    public void mouseMoved(MouseEvent e) {
+    @Override
+	public void mouseMoved(MouseEvent e) {
         moveEvent(e);
     }
-    
+
     /**
      * @see java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent)
      */
-    public void mouseDragged(MouseEvent e) {
+    @Override
+	public void mouseDragged(MouseEvent e) {
         moveEvent(e);
     }
-    
+
     /**
      * @see prefuse.controls.Control#itemDragged(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
      */
-    public void itemDragged(VisualItem item, MouseEvent e) {
-        if ( m_anchorOverItem ) moveEvent(e);
+    @Override
+	public void itemDragged(VisualItem<?> item, MouseEvent e) {
+        if ( m_anchorOverItem ) {
+			moveEvent(e);
+		}
     }
 
     /**
      * @see prefuse.controls.Control#itemMoved(prefuse.visual.VisualItem, java.awt.event.MouseEvent)
      */
-    public void itemMoved(VisualItem item, MouseEvent e) {
-        if ( m_anchorOverItem ) moveEvent(e);
+    @Override
+	public void itemMoved(VisualItem<?> item, MouseEvent e) {
+        if ( m_anchorOverItem ) {
+			moveEvent(e);
+		}
     }
-    
+
     /**
      * Registers a mouse move event, updating the anchor point for all
      * registered layout instances.
@@ -121,8 +131,9 @@ public class AnchorUpdateControl extends ControlAdapter {
     public void moveEvent(MouseEvent e) {
         Display d = (Display)e.getSource();
         d.getAbsoluteCoordinate(e.getPoint(), m_tmp);
-        for ( int i=0; i<m_layouts.length; i++ ) 
-            m_layouts[i].setLayoutAnchor(m_tmp);
+        for (Layout element : m_layouts) {
+			element.setLayoutAnchor(m_tmp);
+		}
         runAction(e);
     }
 
@@ -136,5 +147,5 @@ public class AnchorUpdateControl extends ControlAdapter {
             d.getVisualization().run(m_action);
         }
     }
-        
+
 } // end of class AnchorUpdateControl

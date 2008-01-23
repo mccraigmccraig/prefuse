@@ -6,7 +6,7 @@ import prefuse.util.TypeLib;
 /**
  * Abstarct base class for a Literal Expression that evaluates to a
  * constant value.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public abstract class Literal extends AbstractExpression {
@@ -19,8 +19,8 @@ public abstract class Literal extends AbstractExpression {
      * @return a new Literal expression containing the
      * value of the Tuple's data field
      */
-    public static Literal getLiteral(Tuple t, String field) {
-        Class type = t.getColumnType(field);
+    public static Literal getLiteral(Tuple<?> t, String field) {
+        Class<?> type = t.getColumnType(field);
         if ( type == int.class )
         {
             return new NumericLiteral(t.getInt(field));
@@ -46,7 +46,7 @@ public abstract class Literal extends AbstractExpression {
             return new ObjectLiteral(t.get(field));
         }
     }
-    
+
     /**
      * Return the given object as a new Literal instance.
      * @param val the object value
@@ -57,7 +57,7 @@ public abstract class Literal extends AbstractExpression {
     public static Literal getLiteral(Object val) {
         return getLiteral(val, val.getClass());
     }
-    
+
     /**
      * Return the given object as a new Literal instance.
      * @param val the object value
@@ -65,7 +65,7 @@ public abstract class Literal extends AbstractExpression {
      * @return a new Literal expression containing the
      * object value
      */
-    public static Literal getLiteral(Object val, Class type) {
+    public static Literal getLiteral(Object val, Class<?> type) {
         if ( TypeLib.isNumericType(type) )
         {
             return new NumericLiteral(val);
@@ -84,5 +84,5 @@ public abstract class Literal extends AbstractExpression {
             }
         }
     }
-    
+
 } // end of abstarct class Literal

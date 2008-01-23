@@ -2,8 +2,6 @@ package prefuse.action.distortion;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
-
 import prefuse.action.layout.Layout;
 import prefuse.visual.VisualItem;
 
@@ -16,13 +14,13 @@ import prefuse.visual.VisualItem;
  */
 public abstract class Distortion extends Layout {
 
-    private Point2D m_tmp = new Point2D.Double();
+    private final Point2D m_tmp = new Point2D.Double();
     protected boolean m_distortSize = true;
     protected boolean m_distortX = true;
     protected boolean m_distortY = true;
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Create a new Distortion instance.
      */
@@ -37,7 +35,7 @@ public abstract class Distortion extends Layout {
     public Distortion(String group) {
         super(group);
     }
-    
+
     // ------------------------------------------------------------------------
 
     /**
@@ -47,7 +45,7 @@ public abstract class Distortion extends Layout {
     public void setSizeDistorted(boolean s) {
         m_distortSize = s;
     }
-    
+
     /**
      * Indicates whether the item sizes are distorted along with the item
      * locations.
@@ -56,40 +54,42 @@ public abstract class Distortion extends Layout {
     public boolean isSizeDistorted() {
         return m_distortSize;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * @see prefuse.action.Action#run(double)
      */
-    public void run(double frac) {
+    @Override
+	public void run(double frac) {
         Rectangle2D bounds = getLayoutBounds();
         Point2D anchor = correct(m_anchor, bounds);
-        
-        final Iterator iter = getVisualization().visibleItems(m_group);
-        
-        while ( iter.hasNext() ) {
-            VisualItem item = (VisualItem)iter.next();
-            if ( item.isFixed() ) continue;
-            
+
+        for(VisualItem<?> item :  getVisualization().visibleItems(m_group)) {
+            if ( item.isFixed() ) {
+				continue;
+			}
+
             // reset distorted values
             // TODO - make this play nice with animation?
             item.setX(item.getEndX());
             item.setY(item.getEndY());
             item.setSize(item.getEndSize());
-            
+
             // compute distortion if we have a distortion focus
             if ( anchor != null ) {
                 Rectangle2D bbox = item.getBounds();
                 double x = item.getX();
                 double y = item.getY();
-                
+
                 // position distortion
-                if ( m_distortX )
-                    item.setX(x=distortX(x, anchor, bounds));
-                if ( m_distortY )
-                    item.setY(y=distortY(y, anchor, bounds));
-                
+                if ( m_distortX ) {
+					item.setX(x=distortX(x, anchor, bounds));
+				}
+                if ( m_distortY ) {
+					item.setY(y=distortY(y, anchor, bounds));
+				}
+
                 // size distortion
                 if ( m_distortSize ) {
                     double sz = distortSize(bbox, x, y, anchor, bounds);
@@ -98,7 +98,7 @@ public abstract class Distortion extends Layout {
             }
         }
     }
-    
+
     /**
      * Corrects the anchor position, such that if the anchor is outside the
      * layout bounds, the anchor is adjusted to be the nearest point on the
@@ -108,17 +108,19 @@ public abstract class Distortion extends Layout {
      * @return the corrected anchor point
      */
     protected Point2D correct(Point2D anchor, Rectangle2D bounds) {
-        if ( anchor == null ) return anchor;
+        if ( anchor == null ) {
+			return anchor;
+		}
         double x = anchor.getX(), y = anchor.getY();
         double x1 = bounds.getMinX(), y1 = bounds.getMinY();
         double x2 = bounds.getMaxX(), y2 = bounds.getMaxY();
-        x = (x < x1 ? x1 : (x > x2 ? x2 : x));
-        y = (y < y1 ? y1 : (y > y2 ? y2 : y));
-        
+        x = x < x1 ? x1 : x > x2 ? x2 : x;
+        y = y < y1 ? y1 : y > y2 ? y2 : y;
+
         m_tmp.setLocation(x,y);
         return m_tmp;
     }
-    
+
     /**
      * Distorts an item's x-coordinate.
      * @param x the undistorted x coordinate
@@ -136,7 +138,7 @@ public abstract class Distortion extends Layout {
      * @return the distorted y-coordinate
      */
     protected abstract double distortY(double y, Point2D anchor, Rectangle2D bounds);
-    
+
     /**
      * Returns the scaling factor by which to transform the size of an item.
      * @param bbox the bounding box of the undistorted item
@@ -146,7 +148,7 @@ public abstract class Distortion extends Layout {
      * @param bounds the layout bounds
      * @return the scaling factor by which to change the size
      */
-    protected abstract double distortSize(Rectangle2D bbox, double x, double y, 
+    protected abstract double distortSize(Rectangle2D bbox, double x, double y,
             Point2D anchor, Rectangle2D bounds);
 
 } // end of abstract class Distortion

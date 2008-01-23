@@ -16,25 +16,25 @@ import prefuse.visual.VisualTupleSet;
  * of the {@link prefuse.data.search.SearchTupleSet} class from the
  * {@link prefuse.data.search} package can be used to control the type of
  * search index used.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  * @see prefuse.data.search.SearchTupleSet
  */
-public class SearchQueryBinding extends DynamicQueryBinding {
+public class SearchQueryBinding <T extends Tuple<?>> extends DynamicQueryBinding {
 
-    private SearchTupleSet m_set;
-    private Listener m_lstnr;
+    private final SearchTupleSet<T> m_set;
+    private final Listener m_lstnr;
     private Object m_lock;
-    
+
     /**
      * Create a new SearchQueryBinding over the given set and data field.
      * @param ts the TupleSet to query
      * @param field the data field (Table column) to query
      */
-    public SearchQueryBinding(TupleSet ts, String field) {
-        this(ts, field, new PrefixSearchTupleSet());
+    public SearchQueryBinding(TupleSet<? extends T> ts, String field) {
+        this(ts, field, new PrefixSearchTupleSet<T>());
     }
-    
+
     /**
      * Create a new SearchQueryBinding over the given set and data field,
      * using the specified SearchTupleSet instance. Use this constructor to
@@ -44,37 +44,39 @@ public class SearchQueryBinding extends DynamicQueryBinding {
      * @param field the data field (Table column) to query
      * @param set the {@link prefuse.data.search.SearchTupleSet} to use.
      */
-    public SearchQueryBinding(TupleSet ts, String field, SearchTupleSet set) {
+    public SearchQueryBinding(TupleSet<? extends T> ts, String field, SearchTupleSet<T> set) {
         super(ts, field);
         m_lstnr = new Listener();
         setPredicate(new SearchBindingPredicate());
-        
+
         m_set = set;
         m_set.index(ts.tuples(), field);
         m_set.addTupleSetListener(m_lstnr);
-        
-        if ( ts instanceof VisualTupleSet )
-            m_lock = ((VisualTupleSet)ts).getVisualization();
+
+        if ( ts instanceof VisualTupleSet ) {
+			m_lock = ((VisualTupleSet<? extends T>)(Object)ts).getVisualization();
+		}
     }
-    
+
     /**
      * Return the SearchTupleSet used for conducting searches.
      * @return the {@link prefuse.data.search.SearchTupleSet} used by this
      * dynamic query binding.
      */
-    public SearchTupleSet getSearchSet() {
+    public SearchTupleSet<T> getSearchSet() {
         return m_set;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Create a new search text panel for searching over the data.
      * @return a {@link prefuse.util.ui.JSearchPanel} bound to this
      * dynamic query.
      * @see prefuse.data.query.DynamicQueryBinding#createComponent()
      */
-    public JComponent createComponent() {
+    @Override
+	public JComponent createComponent() {
         return createSearchPanel();
     }
 
@@ -86,7 +88,7 @@ public class SearchQueryBinding extends DynamicQueryBinding {
     public JSearchPanel createSearchPanel() {
         return createSearchPanel(m_set instanceof PrefixSearchTupleSet);
     }
-    
+
     /**
      * Create a new search text panel for searching over the data.
      * @param monitorKeystrokes if true, each keystroke will cause the
@@ -101,23 +103,24 @@ public class SearchQueryBinding extends DynamicQueryBinding {
         if ( m_lock != null ) { jsp.setLock(m_lock); }
         return jsp;
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     private class SearchBindingPredicate extends AbstractPredicate {
-        public boolean getBoolean(Tuple t) {
+        @Override
+		public boolean getBoolean(Tuple<?> t) {
             String q = m_set.getQuery();
-            return (q==null || q.length()==0 || m_set.containsTuple(t));
+            return q==null || q.length()==0 || m_set.containsTuple(t);
         }
         public void touch() {
             this.fireExpressionChange();
         }
     }
-    
+
     private class Listener implements TupleSetListener {
-        public void tupleSetChanged(TupleSet tset, Tuple[] added, Tuple[] removed) {
+        public void tupleSetChanged(TupleSet<?> tset, Tuple<?>[] added, Tuple<?>[] removed) {
             ((SearchBindingPredicate)getPredicate()).touch();
-        }        
+        }
     }
 
 } // end of class SearchQueryBinding

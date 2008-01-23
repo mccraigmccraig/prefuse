@@ -9,7 +9,7 @@ import prefuse.visual.VisualItem;
 
 /**
  * Expression that indicates if an item's visible flag is set.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class VisiblePredicate extends ColumnExpression
@@ -20,7 +20,7 @@ public class VisiblePredicate extends ColumnExpression
     public static final Predicate TRUE = new VisiblePredicate();
     /** Convenience instance for the visible == false case. */
     public static final Predicate FALSE = new NotPredicate(TRUE);
-    
+
     /**
      * Create a new VisiblePredicate.
      */
@@ -48,11 +48,12 @@ public class VisiblePredicate extends ColumnExpression
     public int getParameterCount() {
         return 0;
     }
-    
+
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return getName()+"()";
     }
 

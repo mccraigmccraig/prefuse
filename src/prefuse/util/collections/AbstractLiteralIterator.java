@@ -2,7 +2,7 @@ package prefuse.util.collections;
 
 /**
  * Abstract base class for a LiteralIterator implementations.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public abstract class AbstractLiteralIterator implements LiteralIterator {
@@ -76,5 +76,5 @@ public abstract class AbstractLiteralIterator implements LiteralIterator {
     public boolean isLongSupported() {
         return false;
     }
-    
+
 } // end of class AbstractLiteralIterator

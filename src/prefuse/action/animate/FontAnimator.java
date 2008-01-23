@@ -13,7 +13,7 @@ import prefuse.visual.VisualItem;
  * animation fraction is under 0.5, the face and style of the starting
  * font are used, otherwise the face and style of the second font are
  * applied.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class FontAnimator extends ItemAction {
@@ -36,7 +36,8 @@ public class FontAnimator extends ItemAction {
     /**
      * @see prefuse.action.ItemAction#process(prefuse.visual.VisualItem, double)
      */
-    public void process(VisualItem item, double frac) {
+    @Override
+	public void process(VisualItem<?> item, double frac) {
         Font f1 = item.getStartFont(), f2 = item.getEndFont();
         item.setFont(FontLib.getIntermediateFont(f1,f2,frac));
     }

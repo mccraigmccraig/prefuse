@@ -16,11 +16,11 @@ public class TableTest extends TestCase implements TableTestData {
 
     int rows[] = { -1, NROWS+1, 2*NROWS };
     int cols[] = { -1, NCOLS+1, 2*NCOLS };
-    
+
     Table t;
-    
+
     public static Table getTestCaseTable() {
-        Table t = new Table(NROWS, NCOLS);
+        Table t = Table.createTable(NROWS, NCOLS);
         for ( int c=0; c<NCOLS; ++c ) {
             t.addColumn(HEADERS[c], TYPES[c]);
             for ( int r=0; r<NROWS; ++r ) {
@@ -29,19 +29,21 @@ public class TableTest extends TestCase implements TableTestData {
         }
         return t;
     }
-    
+
     /**
      * @see junit.framework.TestCase#setUp()
      */
-    protected void setUp() throws Exception {
+    @Override
+	protected void setUp() throws Exception {
         super.setUp();
         t = getTestCaseTable();
     }
-    
+
     /**
      * @see junit.framework.TestCase#tearDown()
      */
-    protected void tearDown() throws Exception {
+    @Override
+	protected void tearDown() throws Exception {
         super.tearDown();
         t = null;
     }
@@ -109,11 +111,11 @@ public class TableTest extends TestCase implements TableTestData {
             assertEquals(i, r);
             assertEquals(NROWS, t.getRowCount());
         }
-        
+
         try {
             tearDown(); setUp();
         } catch ( Exception e ) {}
-        
+
         for ( int i=0; i<NROWS; ++i ) {
             t.removeRow(i);
             assertEquals(NROWS-i-1, t.getRowCount());
@@ -163,14 +165,14 @@ public class TableTest extends TestCase implements TableTestData {
     public void testAddColumn() {
         String[] names = { "polygon", "boolean" };
         Class[]  types = { GeneralPath.class, boolean.class };
-        
+
         for ( int i=0; i < names.length; ++i ) {
             t.addColumn(names[i], types[i]);
             Column col = t.getColumn(names[i]);
             assertTrue(col.getRowCount() >= t.getRowCount());
             assertTrue(col.canSet(types[i]));
             assertFalse(col.canSet(Math.class));
-            
+
             assertEquals(NCOLS+i+1, t.getColumnCount());
             assertEquals(types[i], t.getColumnType(names[i]));
         }
@@ -222,7 +224,7 @@ public class TableTest extends TestCase implements TableTestData {
                 assertEquals(TABLE[c][r], t.get(r, HEADERS[c]));
             }
         }
-        
+
         for ( int i=0; i<rows.length; ++i ) {
             try {
                 t.get(rows[i],HEADERS[0]);
@@ -230,7 +232,7 @@ public class TableTest extends TestCase implements TableTestData {
             } catch ( Exception success ) {
             }
         }
-        
+
         for ( int i=0; i<cols.length; ++i ) {
             try {
                 t.get(0,cols[i]);
@@ -248,7 +250,7 @@ public class TableTest extends TestCase implements TableTestData {
             t.set(0, HEADERS[c], TABLE[c][1]);
             assertEquals(TABLE[c][1], t.get(0, HEADERS[c]));
         }
-        
+
         for ( int i=0; i<rows.length; ++i ) {
             try {
                 t.set(rows[i],HEADERS[0],TABLE[0][i]);
@@ -256,7 +258,7 @@ public class TableTest extends TestCase implements TableTestData {
             } catch ( Exception success ) {
             }
         }
-        
+
         for ( int i=0; i<cols.length; ++i ) {
             try {
                 t.set(0,cols[i],TABLE[i][0]);
@@ -269,12 +271,13 @@ public class TableTest extends TestCase implements TableTestData {
     public void testSort() {
         String h1 = HEADERS[2];
         String h2 = HEADERS[1];
-        Iterator iter = t.tuples(null, Sort.parse(h1+", "+h2+" desc"));
+        Iterator iter = t.tuples(null, Sort.parse(h1+", "+h2+" desc")).iterator();
         Tuple[] tpls = new Tuple[t.getRowCount()];
         for ( int i=0; iter.hasNext(); ++i ) {
             tpls[i] = (Tuple)iter.next();
-            if ( TestConfig.verbose() )
-                System.err.println(tpls[i]);
+            if ( TestConfig.verbose() ) {
+				System.err.println(tpls[i]);
+			}
         }
         Comparator cmp = DefaultLiteralComparator.getInstance();
         for ( int i=0; i<tpls.length-1; ++i ) {
@@ -285,8 +288,8 @@ public class TableTest extends TestCase implements TableTestData {
                 c = cmp.compare(t1.get(h2), t2.get(h2));
                 assertTrue(c>=0);
             }
-                
+
         }
     }
-    
+
 }

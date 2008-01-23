@@ -9,7 +9,7 @@ import prefuse.data.Tuple;
 
 /**
  * A trie data structure for fast-lookup of words based on their
- * prefixes. The name "Trie" is a play on the words "tree" and 
+ * prefixes. The name "Trie" is a play on the words "tree" and
  * "retrieval". This class builds a tree structure representing a set of
  * words by their prefixes. It is useful for performing prefix-based
  * searches over large amounts of text in an efficient manner.
@@ -27,7 +27,7 @@ public class Trie {
         boolean isLeaf;
         int leafCount = 0;
     }
-    
+
     /**
      * A TrieNode implementation representing a branch in the tree. The
      * class maintains a list of characters (the next character in the
@@ -37,29 +37,29 @@ public class Trie {
         char[] chars = new char[] {0};
         TrieNode[] children = new TrieNode[1];
     }
-    
+
     /**
      * A TrieNode implementation representing a leaf in the tree. The class
      * stores the word and tuple for the leaf, as well as a reference to the
      * successor leaf node in the trie.
      */
     public class TrieLeaf extends TrieNode {
-        public TrieLeaf(String word, Tuple t) {
+        public TrieLeaf(String word, Tuple<?> t) {
             this.word = word;
             tuple = t;
             next = null;
             leafCount = 1;
         }
         String word;
-        Tuple tuple;
+        Tuple<?> tuple;
         TrieLeaf next;
     }
-    
+
     /**
      * An iterator for traversing a subtree of the Trie.
      */
     public class TrieIterator implements Iterator {
-        private LinkedList queue;
+        private final LinkedList queue;
         public TrieIterator(TrieNode node) {
             queue = new LinkedList();
             queue.add(node);
@@ -68,24 +68,27 @@ public class Trie {
             return !queue.isEmpty();
         }
         public Object next() {
-            if ( queue.isEmpty() )
-                throw new NoSuchElementException();
-            
+            if ( queue.isEmpty() ) {
+				throw new NoSuchElementException();
+			}
+
             TrieNode n = (TrieNode)queue.removeFirst();
             Object o;
             if ( n instanceof TrieLeaf ) {
                 TrieLeaf l = (TrieLeaf)n;
                 o = l.tuple;
-                if ( l.next != null )
-                    queue.addFirst(l.next);
+                if ( l.next != null ) {
+					queue.addFirst(l.next);
+				}
                 return o;
             } else {
                 TrieBranch b = (TrieBranch)n;
                 for ( int i = b.chars.length-1; i > 0; i-- ) {
                     queue.addFirst(b.children[i]);
                 }
-                if ( b.children[0] != null )
-                    queue.addFirst(b.children[0]);
+                if ( b.children[0] != null ) {
+					queue.addFirst(b.children[0]);
+				}
                 return next();
             }
         }
@@ -93,10 +96,10 @@ public class Trie {
             throw new UnsupportedOperationException();
         }
     } // end of inner clas TrieIterator
-    
-    private TrieBranch root = new TrieBranch();
+
+    private final TrieBranch root = new TrieBranch();
     private boolean caseSensitive = false;
-    
+
     /**
      * Create a new Trie with the specified case-sensitivity.
      * @param caseSensitive true if the index should be case sensitive for
@@ -105,7 +108,7 @@ public class Trie {
     public Trie(boolean caseSensitive) {
         this.caseSensitive = caseSensitive;
     }
-    
+
     /**
      * Indicates if this Trie's index takes the case of letters
      * into account.
@@ -114,7 +117,7 @@ public class Trie {
     public boolean isCaseSensitive() {
         return caseSensitive;
     }
-    
+
     /**
      * Add a new word to the trie, associated with the given Tuple.
      * @param word the word to add to the Trie
@@ -124,7 +127,7 @@ public class Trie {
         TrieLeaf leaf = new TrieLeaf(word,t);
         addLeaf(root, leaf, 0);
     }
-    
+
     /**
      * Remove a word/Tuple pair from the trie.
      * @param word the word to remove
@@ -133,38 +136,45 @@ public class Trie {
     public void removeString(String word, Tuple t) {
         removeLeaf(root, word, t, 0);
     }
-    
+
     private final int getIndex(char[] chars, char c) {
-        for ( int i=0; i<chars.length; i++ )
-            if ( chars[i] == c ) return i;
+        for ( int i=0; i<chars.length; i++ ) {
+			if ( chars[i] == c ) {
+				return i;
+			}
+		}
         return -1;
     }
-    
+
     private final char getChar(String s, int i) {
-        char c = ( i < 0 || i >= s.length() ? 0 : s.charAt(i) );
-        return ( caseSensitive ? c : Character.toLowerCase(c) );
+        char c = i < 0 || i >= s.length() ? 0 : s.charAt(i);
+        return caseSensitive ? c : Character.toLowerCase(c);
     }
-    
+
     private final TrieNode equalityCheck(String word, TrieLeaf l) {
         if ( caseSensitive ) {
             return l.word.startsWith(word) ? l : null;
         } else {
             // do our own looping to avoid string allocation for case change
             int len = word.length();
-            if ( len > l.word.length() ) return null;
+            if ( len > l.word.length() ) {
+				return null;
+			}
             for ( int i=0; i<len; ++i ) {
                 char c1 = Character.toLowerCase(word.charAt(i));
                 char c2 = Character.toLowerCase(l.word.charAt(i));
-                if ( c1 != c2 ) return null;
+                if ( c1 != c2 ) {
+					return null;
+				}
             }
             return l;
         }
     }
-    
+
     private boolean removeLeaf(TrieBranch b, String word, Tuple t, int depth) {
         char c = getChar(word, depth);
         int i = getIndex(b.chars, c);
-        
+
         if ( i == -1 ) {
             // couldn't find leaf
             return false;
@@ -175,16 +185,18 @@ public class Trie {
                 boolean rem = removeLeaf(tb, word, t, depth+1);
                 if ( rem ) {
                     b.leafCount--;
-                    if ( tb.leafCount == 1 )
-                        b.children[i] = tb.children[tb.children[0]!=null?0:1];
+                    if ( tb.leafCount == 1 ) {
+						b.children[i] = tb.children[tb.children[0]!=null?0:1];
+					}
                 }
                 return rem;
             } else {
                 TrieLeaf nl = (TrieLeaf)n;
                 if ( nl.tuple == t ) {
                     b.children[i] = nl.next;
-                    if ( nl.next == null )
-                        repairBranch(b,i);
+                    if ( nl.next == null ) {
+						repairBranch(b,i);
+					}
                     b.leafCount--;
                     return true;
                 } else {
@@ -192,21 +204,23 @@ public class Trie {
                     while ( nnl != null && nnl.tuple != t ) {
                         nl = nnl; nnl = nnl.next;
                     }
-                    if ( nnl == null )
-                        return false; // couldn't find leaf
-                    
+                    if ( nnl == null ) {
+						return false; // couldn't find leaf
+					}
+
                     // update leaf counts
-                    for ( TrieLeaf tl = (TrieLeaf)n; tl.tuple != t; tl = tl.next )
-                        tl.leafCount--;
-                    
+                    for ( TrieLeaf tl = (TrieLeaf)n; tl.tuple != t; tl = tl.next ) {
+						tl.leafCount--;
+					}
+
                     nl.next = nnl.next;
                     b.leafCount--;
                     return true;
-                }     
+                }
             }
         }
     }
-    
+
     private void repairBranch(TrieBranch b, int i) {
         if ( i == 0 ) {
             b.children[0] = null;
@@ -222,13 +236,13 @@ public class Trie {
             b.children = nkids;
         }
     }
-    
+
     private void addLeaf(TrieBranch b, TrieLeaf l, int depth) {
         b.leafCount += l.leafCount;
-        
+
         char c = getChar(l.word, depth);
         int i = getIndex(b.chars, c);
-        
+
         if ( i == -1 ) {
             addChild(b,l,c);
         } else {
@@ -242,12 +256,13 @@ public class Trie {
             } else {
                 // node is a leaf, need to do a split?
                 TrieLeaf nl = (TrieLeaf)n;
-                if ( i==0 || (caseSensitive ? nl.word.equals(l.word) 
+                if ( i==0 || (caseSensitive ? nl.word.equals(l.word)
                                   : nl.word.equalsIgnoreCase(l.word)) )
                 {
                     // same word, so chain the entries
-                    for ( ; nl.next != null; nl = nl.next )
-                        nl.leafCount++;
+                    for ( ; nl.next != null; nl = nl.next ) {
+						nl.leafCount++;
+					}
                     nl.leafCount++;
                     nl.next = l;
                 } else {
@@ -260,7 +275,7 @@ public class Trie {
             }
         }
     }
-    
+
     private void addChild(TrieBranch b, TrieNode n, char c) {
         int len = b.chars.length;
         char[] nchars = new char[len+1];
@@ -272,7 +287,7 @@ public class Trie {
         b.chars = nchars;
         b.children = nkids;
     }
-    
+
     /**
      * Look up the given word in this Trie. If a match is found, a TrieNode
      * is returned. This node is the root of a subtree containing all the
@@ -282,9 +297,9 @@ public class Trie {
      * null value is returned if no match is found.
      */
     public TrieNode find(String word) {
-        return (word.length() < 1 ? null : find(word, root, 0));
+        return word.length() < 1 ? null : find(word, root, 0);
     }
-    
+
     private TrieNode find(String word, TrieBranch b, int depth) {
         char c = getChar(word, depth);
         int i = getIndex(b.chars, c);
@@ -298,5 +313,5 @@ public class Trie {
             return find(word, (TrieBranch)b.children[i], depth+1); // recurse
         }
     }
-    
+
 } // end of class Trie

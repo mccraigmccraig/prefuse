@@ -6,28 +6,31 @@ package prefuse.data.parser;
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class DoubleParser implements DataParser {
-    
-    private boolean m_blockExplicitFloats = true;
-    
+
+    private final boolean m_blockExplicitFloats = true;
+
     /**
      * Returns double.class.
      * @see prefuse.data.parser.DataParser#getType()
      */
-    public Class getType() {
+    public Class<?> getType() {
         return double.class;
     }
-    
+
     /**
      * @see prefuse.data.parser.DataParser#format(java.lang.Object)
      */
     public String format(Object value) {
-        if ( value == null ) return null;
-        if ( !(value instanceof Number) )
-            throw new IllegalArgumentException(
+        if ( value == null ) {
+			return null;
+		}
+        if ( !(value instanceof Number) ) {
+			throw new IllegalArgumentException(
               "This class can only format Objects of type Number.");
+		}
         return String.valueOf(((Number)value).doubleValue());
     }
-    
+
     /**
      * @see prefuse.data.parser.DataParser#canParse(java.lang.String)
      */
@@ -43,14 +46,14 @@ public class DoubleParser implements DataParser {
             return false;
         }
     }
-    
+
     /**
      * @see prefuse.data.parser.DataParser#parse(java.lang.String)
      */
     public Object parse(String text) throws DataParseException {
         return new Double(parseDouble(text));
     }
-    
+
     /**
      * Parse a double value from a text string.
      * @param text the text string to parse
@@ -64,5 +67,5 @@ public class DoubleParser implements DataParser {
             throw new DataParseException(e);
         }
     }
-    
+
 } // end of class DoubleParser

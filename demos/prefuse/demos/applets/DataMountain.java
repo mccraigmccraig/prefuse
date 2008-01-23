@@ -5,8 +5,9 @@ import prefuse.util.ui.JPrefuseApplet;
 
 public class DataMountain extends JPrefuseApplet {
 
-    public void init() {
+    @Override
+	public void init() {
         this.setContentPane(prefuse.demos.DataMountain.demo());
     }
-    
+
 } // end of class DataMountain

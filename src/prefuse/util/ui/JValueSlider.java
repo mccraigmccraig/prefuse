@@ -26,22 +26,23 @@ import prefuse.util.StringLib;
 /**
  * Swing component that contains a slider, and title label, and editable
  * text box displaying the slider value.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class JValueSlider extends JComponent {
 
-    private Number     m_min, m_max, m_value;
+    private final Number     m_min, m_max;
+	private Number m_value;
     private boolean    m_ignore = false;
-    
-    private JLabel     m_label;
-    private JSlider    m_slider;
-    private JTextField m_field;
-    private List       m_listeners;
-    
+
+    private final JLabel     m_label;
+    private final JSlider    m_slider;
+    private final JTextField m_field;
+    private final List       m_listeners;
+
     private int m_smin = 0;
     private int m_srange = 100;
-    
+
     /**
      * Create a new JValueSlider.
      * @param title the title label of the slider component
@@ -52,7 +53,7 @@ public class JValueSlider extends JComponent {
     public JValueSlider(String title, double min, double max, double value) {
         this(title, new Double(min), new Double(max), new Double(value));
     }
-    
+
     /**
      * Create a new JValueSlider.
      * @param title the title label of the slider component
@@ -63,7 +64,7 @@ public class JValueSlider extends JComponent {
     public JValueSlider(String title, float min, float max, float value) {
         this(title, new Float(min), new Float(max), new Float(value));
     }
-    
+
     /**
      * Create a new JValueSlider.
      * @param title the title label of the slider component
@@ -79,7 +80,7 @@ public class JValueSlider extends JComponent {
         m_slider.setMaximum(max);
         setValue(new Integer(value));
     }
-    
+
     /**
      * Create a new JValueSlider.
      * @param title the title label of the slider component
@@ -90,7 +91,7 @@ public class JValueSlider extends JComponent {
     public JValueSlider(String title, long min, long max, long value) {
         this(title, new Long(min), new Long(max), new Long(value));
     }
-    
+
     /**
      * Create a new JValueSlider.
      * @param title the title label of the slider component
@@ -106,22 +107,24 @@ public class JValueSlider extends JComponent {
         m_label  = new JLabel(title);
         m_field  = new JTextField();
         m_listeners = new ArrayList();
-        
+
         m_field.setBorder(null);
-        
+
         setSliderValue();
         setFieldValue();
-        
+
         initUI();
     }
-    
+
     /**
      * Initialize the UI
      */
     protected void initUI() {
         m_slider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                if ( m_ignore ) return;
+                if ( m_ignore ) {
+					return;
+				}
                 m_ignore = true;
                 // update the value
                 m_value = getSliderValue();
@@ -134,7 +137,9 @@ public class JValueSlider extends JComponent {
         });
         m_field.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if ( m_ignore ) return;
+                if ( m_ignore ) {
+					return;
+				}
                 m_ignore = true;
                 Number v = getFieldValue();
                 if ( v != m_value ) {
@@ -149,32 +154,38 @@ public class JValueSlider extends JComponent {
             }
         });
         m_field.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
+            @Override
+			public void mouseEntered(MouseEvent e) {
                 String s = m_field.getText();
-                if ( isTextObscured(m_field, s) )
-                    m_field.setToolTipText(s);
+                if ( isTextObscured(m_field, s) ) {
+					m_field.setToolTipText(s);
+				}
             }
-            public void mouseExited(MouseEvent e) {
+            @Override
+			public void mouseExited(MouseEvent e) {
                 m_field.setToolTipText(null);
             }
         });
         m_label.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
+            @Override
+			public void mouseEntered(MouseEvent e) {
                 String s = m_label.getText();
-                if ( isTextObscured(m_label, s) )
-                    m_label.setToolTipText(s);
+                if ( isTextObscured(m_label, s) ) {
+					m_label.setToolTipText(s);
+				}
             }
-            public void mouseExited(MouseEvent e) {
+            @Override
+			public void mouseExited(MouseEvent e) {
                 m_label.setToolTipText(null);
             }
         });
-        
+
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         add(m_label);
         add(m_slider);
         add(m_field);
     }
-    
+
     /**
      * Check if any label text is obscured.
      */
@@ -182,11 +193,11 @@ public class JValueSlider extends JComponent {
         Graphics g = c.getGraphics();
         FontMetrics fm = g.getFontMetrics(c.getFont());
         int sw = fm.stringWidth(s);
-        return ( sw > c.getWidth() );
+        return sw > c.getWidth();
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Get the current value ssociated with the slider position.
      * @return the current value
@@ -204,7 +215,7 @@ public class JValueSlider extends JComponent {
         setSliderValue();
         setFieldValue();
     }
-    
+
     /**
      * Compute the current slider value from the current slider position
      * @return the current value
@@ -225,11 +236,11 @@ public class JValueSlider extends JComponent {
             double min = m_min.doubleValue();
             double max = m_max.doubleValue();
             double val = min + f*(max-min);
-            return (m_value instanceof Double ? (Number)new Double(val)
-                                              : new Float((float)val));
+            return m_value instanceof Double ? (Number)new Double(val)
+                                              : new Float((float)val);
         }
     }
-    
+
     /**
      * Private set the slider position based upon the current value
      */
@@ -239,16 +250,16 @@ public class JValueSlider extends JComponent {
             double value = m_value.doubleValue();
             double min = m_min.doubleValue();
             double max = m_max.doubleValue();
-            val = m_smin + (int)Math.round(m_srange*((value-min)/(max-min)));
+            val = m_smin + (int)Math.round(m_srange*(value-min)/(max-min));
         } else {
             long value = m_value.longValue();
             long min = m_min.longValue();
             long max = m_max.longValue();
-            val = m_smin + (int)((m_srange*(value-min))/(max-min));
+            val = m_smin + (int)(m_srange*(value-min)/(max-min));
         }
         m_slider.setValue(val);
     }
-    
+
     /**
      * Get the value in the text field.
      * @return the current text field value
@@ -266,7 +277,7 @@ public class JValueSlider extends JComponent {
                 // TODO handle exception
                 return m_value;
             }
-            return m_value instanceof Double ? (Number)new Double(v) 
+            return m_value instanceof Double ? (Number)new Double(v)
                                              : new Float((float)v);
         } else {
             long v;
@@ -280,32 +291,34 @@ public class JValueSlider extends JComponent {
                 // TODO handle exception
                 return m_value;
             }
-            return m_value instanceof Long ? (Number)new Long(v) 
+            return m_value instanceof Long ? (Number)new Long(v)
                                            : new Integer((int)v);
         }
     }
-    
+
     /**
      * Set the text field value based upon the current value.
      */
     private void setFieldValue() {
         String text;
-        if ( m_value instanceof Double || m_value instanceof Float )
-            text = StringLib.formatNumber(m_value.doubleValue(),3);
-        else
-            text = String.valueOf(m_value.longValue());
+        if ( m_value instanceof Double || m_value instanceof Float ) {
+			text = StringLib.formatNumber(m_value.doubleValue(),3);
+		} else {
+			text = String.valueOf(m_value.longValue());
+		}
         m_field.setText(text);
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * Add a change listener to listen to this component.
      * @param cl the change listener to add
      */
     public void addChangeListener(ChangeListener cl) {
-        if ( !m_listeners.contains(cl) )
-            m_listeners.add(cl);
+        if ( !m_listeners.contains(cl) ) {
+			m_listeners.add(cl);
+		}
     }
 
     /**
@@ -315,55 +328,59 @@ public class JValueSlider extends JComponent {
     public void removeChangeListener(ChangeListener cl) {
         m_listeners.remove(cl);
     }
-    
+
     /**
      * Fire a change event to listeners.
      */
     protected void fireChangeEvent() {
         Iterator iter = m_listeners.iterator();
-        ChangeEvent evt = new ChangeEvent(this); 
+        ChangeEvent evt = new ChangeEvent(this);
         while ( iter.hasNext() ) {
             ChangeListener cl = (ChangeListener)iter.next();
             cl.stateChanged(evt);
         }
     }
-    
+
     // ------------------------------------------------------------------------
-    
+
     /**
      * @see java.awt.Component#setBackground(java.awt.Color)
      */
-    public void setBackground(Color c) {
+    @Override
+	public void setBackground(Color c) {
         m_field.setBackground(c);
         m_label.setBackground(c);
         m_slider.setBackground(c);
         super.setBackground(c);
     }
-    
+
     /**
      * @see java.awt.Component#setForeground(java.awt.Color)
      */
-    public void setForeground(Color c) {
+    @Override
+	public void setForeground(Color c) {
         m_field.setForeground(c);
         m_label.setForeground(c);
         m_slider.setForeground(c);
         super.setForeground(c);
     }
-    
+
     /**
      * @see java.awt.Component#setFont(java.awt.Font)
      */
-    public void setFont(Font f) {
+    @Override
+	public void setFont(Font f) {
         m_field.setFont(f);
         m_label.setFont(f);
         m_slider.setFont(f);
         super.setFont(f);
     }
-    
+
     /**
      * @see javax.swing.JComponent#setPreferredSize(java.awt.Dimension)
      */
-    public void setPreferredSize(Dimension d) {
+    @Override
+	public void setPreferredSize(Dimension d) {
         int fw = Math.min(40, d.width/5);
         int lw = Math.min(100, (d.width-fw)/2);
         int sw = d.width-fw-lw;
@@ -375,5 +392,5 @@ public class JValueSlider extends JComponent {
         dd = new Dimension(fw, d.height);
         m_field.setPreferredSize(dd);
     }
-    
+
 } // end of class JValueSlider

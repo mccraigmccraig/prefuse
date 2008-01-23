@@ -5,29 +5,29 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 
-import prefuse.Constants;
+import prefuse.ShapeType;
 import prefuse.visual.VisualItem;
 
 /**
  * Renderer for drawing simple shapes. This class provides a number of built-in
  * shapes, selected by an integer value retrieved from a VisualItem.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class ShapeRenderer extends AbstractShapeRenderer {
 
     private int m_baseSize = 10;
-    
-    private Ellipse2D   m_ellipse = new Ellipse2D.Double();
-    private Rectangle2D m_rect = new Rectangle2D.Double();
-    private GeneralPath m_path = new GeneralPath();
+
+    private final Ellipse2D   m_ellipse = new Ellipse2D.Double();
+    private final Rectangle2D m_rect = new Rectangle2D.Double();
+    private final GeneralPath m_path = new GeneralPath();
 
     /**
      * Creates a new ShapeRenderer with default base size of 10 pixels.
      */
     public ShapeRenderer() {
     }
-    
+
     /**
      * Creates a new ShapeRenderer with given base size.
      * @param size the base size in pixels
@@ -35,7 +35,7 @@ public class ShapeRenderer extends AbstractShapeRenderer {
     public ShapeRenderer(int size) {
        setBaseSize(size);
     }
-    
+
     /**
      * Sets the base size, in pixels, for shapes drawn by this renderer. The
      * base size is the width and height value used when a VisualItem's size
@@ -46,7 +46,7 @@ public class ShapeRenderer extends AbstractShapeRenderer {
     public void setBaseSize(int size) {
         m_baseSize = size;
     }
-    
+
     /**
      * Returns the base size, in pixels, for shapes drawn by this renderer.
      * @return the base size in pixels
@@ -54,48 +54,51 @@ public class ShapeRenderer extends AbstractShapeRenderer {
     public int getBaseSize() {
         return m_baseSize;
     }
-    
+
     /**
      * @see prefuse.render.AbstractShapeRenderer#getRawShape(prefuse.visual.VisualItem)
      */
-    protected Shape getRawShape(VisualItem item) {
-        int stype = item.getShape();
+    @Override
+	protected Shape getRawShape(VisualItem<?> item) {
+        ShapeType stype = item.getShape();
         double x = item.getX();
-        if ( Double.isNaN(x) || Double.isInfinite(x) )
-            x = 0;
+        if ( Double.isNaN(x) || Double.isInfinite(x) ) {
+			x = 0;
+		}
         double y = item.getY();
-        if ( Double.isNaN(y) || Double.isInfinite(y) )
-            y = 0;
+        if ( Double.isNaN(y) || Double.isInfinite(y) ) {
+			y = 0;
+		}
         double width = m_baseSize*item.getSize();
-        
+
         // Center the shape around the specified x and y
         if ( width > 1 ) {
             x = x-width/2;
             y = y-width/2;
         }
-        
+
         switch ( stype ) {
-        case Constants.SHAPE_NONE:
+        case NONE:
             return null;
-        case Constants.SHAPE_RECTANGLE:
+        case RECTANGLE:
             return rectangle(x, y, width, width);
-        case Constants.SHAPE_ELLIPSE:
+        case ELLIPSE:
             return ellipse(x, y, width, width);
-        case Constants.SHAPE_TRIANGLE_UP:
+        case TRIANGLE_UP:
             return triangle_up((float)x, (float)y, (float)width);
-        case Constants.SHAPE_TRIANGLE_DOWN:
+        case TRIANGLE_DOWN:
             return triangle_down((float)x, (float)y, (float)width);
-        case Constants.SHAPE_TRIANGLE_LEFT:
+        case TRIANGLE_LEFT:
             return triangle_left((float)x, (float)y, (float)width);
-        case Constants.SHAPE_TRIANGLE_RIGHT:
+        case TRIANGLE_RIGHT:
             return triangle_right((float)x, (float)y, (float)width);
-        case Constants.SHAPE_CROSS:
+        case CROSS:
             return cross((float)x, (float)y, (float)width);
-        case Constants.SHAPE_STAR:
+        case STAR:
             return star((float)x, (float)y, (float)width);
-        case Constants.SHAPE_HEXAGON:
+        case HEXAGON:
             return hexagon((float)x, (float)y, (float)width);
-        case Constants.SHAPE_DIAMOND:
+        case DIAMOND:
             return diamond((float)x, (float)y, (float)width);
         default:
             throw new IllegalStateException("Unknown shape type: "+stype);
@@ -117,7 +120,7 @@ public class ShapeRenderer extends AbstractShapeRenderer {
         m_ellipse.setFrame(x, y, width, height);
         return m_ellipse;
     }
-    
+
     /**
      * Returns a up-pointing triangle of the given dimenisions.
      */
@@ -129,7 +132,7 @@ public class ShapeRenderer extends AbstractShapeRenderer {
         m_path.closePath();
         return m_path;
     }
-    
+
     /**
      * Returns a down-pointing triangle of the given dimenisions.
      */
@@ -141,7 +144,7 @@ public class ShapeRenderer extends AbstractShapeRenderer {
         m_path.closePath();
         return m_path;
     }
-    
+
     /**
      * Returns a left-pointing triangle of the given dimenisions.
      */
@@ -153,7 +156,7 @@ public class ShapeRenderer extends AbstractShapeRenderer {
         m_path.closePath();
         return m_path;
     }
-    
+
     /**
      * Returns a right-pointing triangle of the given dimenisions.
      */
@@ -165,7 +168,7 @@ public class ShapeRenderer extends AbstractShapeRenderer {
         m_path.closePath();
         return m_path;
     }
-    
+
     /**
      * Returns a cross shape of the given dimenisions.
      */
@@ -201,12 +204,12 @@ public class ShapeRenderer extends AbstractShapeRenderer {
         float innerMediumSide = innerLongSide*(float)Math.cos(Math.toRadians(36));
 
         m_path.reset();
-        m_path.moveTo(x, y+shortSide);            
+        m_path.moveTo(x, y+shortSide);
         m_path.lineTo((x+innerLongSide),(y+shortSide));
         m_path.lineTo((x+height/2),y);
         m_path.lineTo((x+height-innerLongSide),(y+shortSide));
         m_path.lineTo((x+height),(y+shortSide));
-        m_path.lineTo((x+height-innerMediumSide),(y+shortSide+innerShortSide));        
+        m_path.lineTo((x+height-innerMediumSide),(y+shortSide+innerShortSide));
         m_path.lineTo((x+height-mediumSide),(y+height));
         m_path.lineTo((x+height/2),(y+shortSide+longSide-innerShortSide));
         m_path.lineTo((x+mediumSide),(y+height));
@@ -219,8 +222,8 @@ public class ShapeRenderer extends AbstractShapeRenderer {
      * Returns a hexagon shape of the given dimenisions.
      */
     public Shape hexagon(float x, float y, float height) {
-        float width = height/2;  
-        
+        float width = height/2;
+
         m_path.reset();
         m_path.moveTo(x,            y+0.5f*height);
         m_path.lineTo(x+0.5f*width, y);
@@ -228,7 +231,7 @@ public class ShapeRenderer extends AbstractShapeRenderer {
         m_path.lineTo(x+2.0f*width, y+0.5f*height);
         m_path.lineTo(x+1.5f*width, y+height);
         m_path.lineTo(x+0.5f*width, y+height);
-        m_path.closePath();      
+        m_path.closePath();
         return m_path;
     }
 
@@ -244,5 +247,5 @@ public class ShapeRenderer extends AbstractShapeRenderer {
         m_path.closePath();
         return m_path;
     }
-    
+
 } // end of class ShapeRenderer

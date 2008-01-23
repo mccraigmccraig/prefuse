@@ -6,11 +6,11 @@ import prefuse.data.Graph;
 
 /**
  * Listner interface for monitoring changes to a graph or tree structure.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public interface GraphListener extends EventListener {
-    
+
     /**
      * Notification that a graph has changed.
      * @param g the graph that has changed
@@ -24,7 +24,7 @@ public interface GraphListener extends EventListener {
      * {@link EventConstants#INSERT}, {@link EventConstants#DELETE}, or
      * {@link EventConstants#UPDATE}.
      */
-    public void graphChanged(Graph g, String table, 
+    public void graphChanged(Graph<?,?,?> g, String table,
             int start, int end, int col, int type);
-    
+
 } // end of interface GraphListener

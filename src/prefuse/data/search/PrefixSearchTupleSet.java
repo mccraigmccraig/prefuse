@@ -15,9 +15,9 @@ import prefuse.data.Tuple;
  * in the union of the results for the individual query terms. That is, Tuples
  * that match any one of the terms will be included in the results.
  * </p>
- * 
+ *
  * <p>
- * For more advanced search capabilities, see 
+ * For more advanced search capabilities, see
  * {@link KeywordSearchTupleSet} or {@link RegexSearchTupleSet}.
  * </p>
  *
@@ -25,20 +25,20 @@ import prefuse.data.Tuple;
  * @author <a href="http://jheer.org">jeffrey heer</a>
  * @see prefuse.data.query.SearchQueryBinding
  */
-public class PrefixSearchTupleSet extends SearchTupleSet {
-    
+public class PrefixSearchTupleSet <T extends Tuple<?>> extends SearchTupleSet<T> {
+
     private Trie m_trie;
     private Trie.TrieNode m_curNode;
     private String m_delim = " \t\n\r";
     private String m_query = "";
-    
+
     /**
      * Creates a new KeywordSearchFocusSet that is not case sensitive.
      */
     public PrefixSearchTupleSet() {
         this(false);
     }
-    
+
     /**
      * Creates a new KeywordSearchFocusSet with the indicated case sensitivity.
      * @param caseSensitive true if the search routines should be case
@@ -47,7 +47,7 @@ public class PrefixSearchTupleSet extends SearchTupleSet {
     public PrefixSearchTupleSet(boolean caseSensitive) {
         m_trie = new Trie(caseSensitive);
     }
-    
+
     /**
      * Returns the delimiter string used to divide data values and
      * queries into separate words. By default, the value consists
@@ -59,7 +59,7 @@ public class PrefixSearchTupleSet extends SearchTupleSet {
     public String getDelimiterString() {
         return m_delim;
     }
-    
+
     /**
      * Sets the delimiter string used to divide data values and
      * queries into separate words. By default, the delimiter consists
@@ -72,16 +72,17 @@ public class PrefixSearchTupleSet extends SearchTupleSet {
     public void setDelimiterString(String delim) {
         m_delim = delim;
     }
-    
+
     /**
      * @see prefuse.data.search.SearchTupleSet#getQuery()
      */
-    public String getQuery() {
+    @Override
+	public String getQuery() {
         return m_query;
     }
-    
+
     /**
-     * Searches the indexed Tuple fields for matching string prefixes, 
+     * Searches the indexed Tuple fields for matching string prefixes,
      * adding the Tuple instances for each search match to this TupleSet.
      * The query string is first broken up into separate terms, as determined
      * by the current delimiter string. A search for each term is conducted,
@@ -89,21 +90,26 @@ public class PrefixSearchTupleSet extends SearchTupleSet {
      * @param query the query string to search for.
      * @see #setDelimiterString(String)
      */
-    public void search(String query) {
-        if ( query == null )
-            query = "";
-        
-        if ( query.equals(m_query) )
-            return;
-        
-        Tuple[] rem = clearInternal();    
+    @Override
+	public void search(String query) {
+        if ( query == null ) {
+			query = "";
+		}
+
+        if ( query.equals(m_query) ) {
+			return;
+		}
+
+        Tuple<?>[] rem = clearInternal();
         m_query = query;
         StringTokenizer st = new StringTokenizer(m_query, m_delim);
-        if ( !st.hasMoreTokens() )
-            m_query = "";
-        while ( st.hasMoreTokens() )
-            prefixSearch(st.nextToken());
-        Tuple[] add = getTupleCount() > 0 ? toArray() : null;
+        if ( !st.hasMoreTokens() ) {
+			m_query = "";
+		}
+        while ( st.hasMoreTokens() ) {
+			prefixSearch(st.nextToken());
+		}
+        Tuple<?>[] add = getTupleCount() > 0 ? toArray() : null;
         fireTupleEvent(add, rem);
     }
 
@@ -113,66 +119,75 @@ public class PrefixSearchTupleSet extends SearchTupleSet {
     private void prefixSearch(String query) {
         m_curNode = m_trie.find(query);
         if ( m_curNode != null ) {
-            Iterator iter = trieIterator();
-            while ( iter.hasNext() )
-                addInternal((Tuple)iter.next());
+            Iterator<T> iter = trieIterator();
+            while ( iter.hasNext() ) {
+				addInternal(iter.next());
+			}
         }
     }
-    
+
     /**
      * Indexes the given field of the provided Tuple instance.
      * @see prefuse.data.search.SearchTupleSet#index(prefuse.data.Tuple, java.lang.String)
      */
-    public void index(Tuple t, String field) {
+    @Override
+	public void index(Tuple<?> t, String field) {
         String s;
-        if ( (s=t.getString(field)) == null ) return;
+        if ( (s=t.getString(field)) == null ) {
+			return;
+		}
         StringTokenizer st = new StringTokenizer(s,m_delim);
         while ( st.hasMoreTokens() ) {
             String tok = st.nextToken();
             addString(tok, t);
         }
     }
-    
-    private void addString(String s, Tuple t) {
+
+    private void addString(String s, Tuple<?> t) {
         m_trie.addString(s,t);
     }
-    
+
     /**
      * Returns true, as unidexing is supported by this class.
      * @see prefuse.data.search.SearchTupleSet#isUnindexSupported()
      */
-    public boolean isUnindexSupported() {
+    @Override
+	public boolean isUnindexSupported() {
         return true;
     }
-    
+
     /**
      * @see prefuse.data.search.SearchTupleSet#unindex(prefuse.data.Tuple, java.lang.String)
      */
-    public void unindex(Tuple t, String field) {
+    @Override
+	public void unindex(Tuple<?> t, String field) {
         String s;
-        if ( (s=t.getString(field)) == null ) return;
+        if ( (s=t.getString(field)) == null ) {
+			return;
+		}
         StringTokenizer st = new StringTokenizer(s,m_delim);
         while ( st.hasMoreTokens() ) {
             String tok = st.nextToken();
             removeString(tok, t);
         }
     }
-    
+
     /**
      * Removes all search hits and clears out the index.
      * @see prefuse.data.tuple.TupleSet#clear()
      */
-    public void clear() {
+    @Override
+	public void clear() {
         m_trie = new Trie(m_trie.isCaseSensitive());
         super.clear();
     }
-    
-    private void removeString(String s, Tuple t) {
+
+    private void removeString(String s, Tuple<?> t) {
         m_trie.removeString(s,t);
     }
-    
-    private Iterator trieIterator() {
+
+    private Iterator<T> trieIterator() {
         return m_trie.new TrieIterator(m_curNode);
     }
-    
+
 }  // end of class PrefixSearchTupleSet

@@ -4,12 +4,10 @@
  */
 package prefuse.visual.tuple;
 
-import java.util.Iterator;
-
 import prefuse.data.Graph;
 import prefuse.data.Table;
 import prefuse.data.expression.Predicate;
-import prefuse.data.util.FilterIterator;
+import prefuse.data.util.FilterIterable;
 import prefuse.visual.AggregateItem;
 import prefuse.visual.AggregateTable;
 import prefuse.visual.VisualItem;
@@ -17,12 +15,12 @@ import prefuse.visual.VisualItem;
 /**
  * AggregateItem implementation that uses data values from a backing
  * AggregateTable.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class TableAggregateItem extends TableVisualItem 
-    implements AggregateItem
-{   
+public class TableAggregateItem <V extends VisualItem<?>> extends TableVisualItem<TableAggregateItem<V>>
+    implements AggregateItem<TableAggregateItem<V>, V>
+{
     /**
      * Initialize a new TableAggregateItem for the given table and row. This
      * method is used by the appropriate TupleManager instance, and should not
@@ -32,7 +30,8 @@ public class TableAggregateItem extends TableVisualItem
      * @param graph ignored by this class
      * @param row the table row index
      */
-    protected void init(Table table, Graph graph, int row) {
+    @Override
+	public void init(Table table, Graph graph, int row) {
         m_table = table;
         m_row = m_table.isValidRow(row) ? row : -1;
     }
@@ -47,21 +46,21 @@ public class TableAggregateItem extends TableVisualItem
     /**
      * @see prefuse.visual.AggregateItem#containsItem(prefuse.visual.VisualItem)
      */
-    public boolean containsItem(VisualItem item) {
+    public boolean containsItem(VisualItem<?> item) {
         return ((AggregateTable)m_table).aggregateContains(m_row, item);
     }
 
     /**
      * @see prefuse.visual.AggregateItem#addItem(prefuse.visual.VisualItem)
      */
-    public void addItem(VisualItem item) {
+    public void addItem(V item) {
         ((AggregateTable)m_table).addToAggregate(m_row, item);
     }
 
     /**
      * @see prefuse.visual.AggregateItem#removeItem(prefuse.visual.VisualItem)
      */
-    public void removeItem(VisualItem item) {
+    public void removeItem(VisualItem<?> item) {
         ((AggregateTable)m_table).removeFromAggregate(m_row, item);
     }
 
@@ -75,16 +74,16 @@ public class TableAggregateItem extends TableVisualItem
     /**
      * @see prefuse.visual.AggregateItem#items()
      */
-    public Iterator items() {
-        return ((AggregateTable)m_table).aggregatedTuples(m_row);
+    public Iterable<V> items() {
+        return ((AggregateTable<TableAggregateItem<V>,V>)m_table).aggregatedTuples(m_row);
     }
-    
+
     /**
      * @see prefuse.visual.AggregateItem#items()
      */
-    public Iterator items(Predicate filter) {
-        return new FilterIterator(
-            ((AggregateTable)m_table).aggregatedTuples(m_row), filter);
+    public Iterable<V> items(Predicate filter) {
+        return new FilterIterable<V>(
+            ((AggregateTable<TableAggregateItem<V>,V>)m_table).aggregatedTuples(m_row), filter);
     }
 
 } // end of class TableAggregateItem
