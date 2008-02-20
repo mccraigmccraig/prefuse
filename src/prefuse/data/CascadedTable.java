@@ -450,7 +450,7 @@ public abstract class CascadedTable <T extends Tuple<?>, C extends Tuple<?>> ext
      * @see prefuse.data.Table#hasColumn(java.lang.String)
      */
     @Override
-	protected boolean hasColumn(String name) {
+	public boolean hasColumn(String name) {
         int idx = getColumnNumber(name);
         return idx >= 0 && idx < getLocalColumnCount();
     }

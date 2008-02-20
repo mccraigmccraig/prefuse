@@ -433,10 +433,10 @@ public abstract class Table <T extends Tuple<?>> extends AbstractTupleSet<T> imp
     // Column Operations
 
     /**
-     * Internal method indicating if the given data field is included as a
+     * Method indicating if the given data field is included as a
      * data column.
      */
-    protected boolean hasColumn(String name) {
+    public boolean hasColumn(String name) {
         return getColumnNumber(name) != -1;
     }
 
