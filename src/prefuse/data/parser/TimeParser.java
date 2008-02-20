@@ -46,27 +46,6 @@ public class TimeParser extends DateParser {
     }
 
     /**
-     * @see prefuse.data.parser.DataParser#canParse(java.lang.String)
-     */
-    @Override
-	public boolean canParse(String val) {
-        try {
-            parseTime(val);
-            return true;
-        } catch ( DataParseException e ) {
-            return false;
-        }
-    }
-
-    /**
-     * @see prefuse.data.parser.DataParser#parse(java.lang.String)
-     */
-    @Override
-	public Object parse(String val) throws DataParseException {
-        return parseTime(val);
-    }
-
-    /**
      * Parse a Time value from a text string.
      * @param text the text string to parse
      * @return the parsed Time value

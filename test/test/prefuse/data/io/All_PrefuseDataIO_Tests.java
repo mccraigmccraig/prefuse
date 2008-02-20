@@ -10,6 +10,7 @@ public class All_PrefuseDataIO_Tests {
         //$JUnit-BEGIN$
         suite.addTestSuite(CSVTableReaderTest.class);
         suite.addTestSuite(DelimitedTextTableReaderTest.class);
+        suite.addTestSuite(TreeMLDateTest.class);
         //$JUnit-END$
         return suite;
     }

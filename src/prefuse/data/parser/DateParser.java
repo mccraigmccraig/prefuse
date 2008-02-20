@@ -16,7 +16,7 @@ import java.util.Locale;
  *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class DateParser implements DataParser {
+public class DateParser extends AbstractDateParser {
 
     protected DateFormat    m_dfmt;
     protected ParsePosition m_pos;
@@ -50,38 +50,12 @@ public class DateParser implements DataParser {
     }
 
     /**
-     * @see prefuse.data.parser.DataParser#format(java.lang.Object)
-     */
-    public String format(Object value) {
-        return value==null ? null : m_dfmt.format(value);
-    }
-
-    /**
-     * @see prefuse.data.parser.DataParser#canParse(java.lang.String)
-     */
-    public boolean canParse(String text) {
-        try {
-            parseDate(text);
-            return true;
-        } catch ( DataParseException e ) {
-            return false;
-        }
-    }
-
-    /**
-     * @see prefuse.data.parser.DataParser#parse(java.lang.String)
-     */
-    public Object parse(String text) throws DataParseException {
-        return parseDate(text);
-    }
-
-    /**
      * Parse a Date value from a text string.
      * @param text the text string to parse
      * @return the parsed Date value
      * @throws DataParseException if an error occurs during parsing
      */
-    public Date parseDate(String text) throws DataParseException {
+    public java.util.Date parseDate(String text) throws DataParseException {
         m_pos.setErrorIndex(0);
         m_pos.setIndex(0);
 

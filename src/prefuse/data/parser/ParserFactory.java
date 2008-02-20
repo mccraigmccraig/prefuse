@@ -1,6 +1,8 @@
 package prefuse.data.parser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -27,6 +29,7 @@ public class ParserFactory implements Cloneable {
             new DateParser(),
             new TimeParser(),
             new DateTimeParser(),
+            new JavaDateParser(),
             new IntArrayParser(),
             new LongArrayParser(),
             new FloatArrayParser(),
@@ -54,7 +57,9 @@ public class ParserFactory implements Cloneable {
 		DataParser[] parsers = new DataParser[] { new IntParser(),
 				new LongParser(), new DoubleParser(), new FloatParser(),
 				new BooleanParser(), new ColorIntParser(), new DateParser(locale),
-				new TimeParser(locale), new DateTimeParser(locale), new IntArrayParser(),
+				new TimeParser(locale), new DateTimeParser(locale),
+				new JavaDateParser(locale),
+				new IntArrayParser(),
 				new LongArrayParser(), new FloatArrayParser(),
 				new DoubleArrayParser(), new StringParser() };
 		return new ParserFactory(parsers);
@@ -166,8 +171,7 @@ public class ParserFactory implements Cloneable {
     /**
      * Returns a parser for the specified data type.
      * @param type the Class for the data type to parse
-     * @return a parser for the given data type, or null
-     * if no such parser can be found.
+     * @return the first parser which can parse the given data type, or null if no such parser can be found.
      */
     public DataParser getParser(Class<?> type) {
        for ( int i=0; i<m_parsers.length; ++i ) {
