@@ -12,7 +12,7 @@ import prefuse.data.event.EventConstants;
  * support adding new columns to contained tuples.</p>
  *
  * <p>This TupleSet uses a {@link java.util.LinkedHashSet} to support fast
- * lookup of contained tuples while mainting Tuples in the order in which
+ * lookup of contained tuples while maintaining Tuples in the order in which
  * they are added to the set.</p>
  *
  * @author <a href="http://jheer.org">jeffrey heer</a>
