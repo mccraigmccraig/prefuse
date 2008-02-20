@@ -28,11 +28,10 @@ public class XorPredicate extends CompositePredicate {
 
     /**
      * Create a new XorPredicate.
-     * @param p1 the first clause of this predicate
-     * @param p2 the second clause of this predicate
+     * @param predicates the clauses of this predicate
      */
-    public XorPredicate(Predicate p1, Predicate p2) {
-        super(p1, p2);
+    public XorPredicate(Predicate ... predicates) {
+        super(predicates);
     }
 
     /**
