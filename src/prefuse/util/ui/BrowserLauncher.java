@@ -1,6 +1,8 @@
 package prefuse.util.ui;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -46,10 +48,30 @@ public abstract class BrowserLauncher {
     /**
      * Display a file in the system browser.  If you want to display a
      * file, you must include the absolute path name.
+     *
      * @param url the file's url (the url must start with either
      *   "http://" or "file://").
      */
     public static void showDocument(String url) {
+    	// Try the Java 1.6 way first (java.awt.Desktop.getDesktop().browse(url)) using reflection
+        try
+        {
+            Class  clazz        = Class.forName( "java.awt.Desktop" );
+            Method dtMethod     = clazz.getMethod( "getDesktop" );
+            Object dt           = dtMethod.invoke( null );
+            Method browseMethod = clazz.getMethod( "browse", new Class[] { URI.class } );
+            browseMethod.invoke( dt, new Object[] { new URI( url ) } );
+            return;
+        }
+        catch ( ClassNotFoundException e )
+        {
+        	// Obviously not Java 1.6, fall through
+        }
+        catch ( Exception e )
+        {
+        	// Something bad happened, fall through for now
+        }
+
         boolean windows = isWindowsPlatform();
         String cmd = null;
         try {
