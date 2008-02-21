@@ -202,6 +202,8 @@ public class ActivityManager extends Thread {
      */
     private void _schedule(Activity a, long startTime) {
         if ( a.isScheduled() ) {
+        	// reset the start time for reschedules, bug fix from mgara
+        	a.setStartTime(startTime);
         	try { notifyAll(); } catch ( Exception e ) {}
             return; // already scheduled, do nothing
         }
