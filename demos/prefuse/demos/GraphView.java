@@ -23,6 +23,7 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
@@ -69,6 +70,7 @@ import prefuse.util.display.DisplayLib;
 import prefuse.util.display.ItemBoundsListener;
 import prefuse.util.force.ForceSimulator;
 import prefuse.util.io.IOLib;
+import prefuse.util.ui.DisplayScrollBar;
 import prefuse.util.ui.JForcePanel;
 import prefuse.util.ui.JValueSlider;
 import prefuse.util.ui.UILib;
@@ -243,9 +245,15 @@ public class GraphView extends JPanel {
 
         fpanel.add(Box.createVerticalGlue());
 
+        JPanel scrollableView = new JPanel(new BorderLayout());
+        scrollableView.add(display, BorderLayout.CENTER);
+        scrollableView.add(new DisplayScrollBar(display, JScrollBar.HORIZONTAL), BorderLayout.SOUTH);
+        scrollableView.add(new DisplayScrollBar(display, JScrollBar.VERTICAL), BorderLayout.EAST);
+        
+
         // create a new JSplitPane to present the interface
         JSplitPane split = new JSplitPane();
-        split.setLeftComponent(display);
+        split.setLeftComponent(scrollableView);
         split.setRightComponent(fpanel);
         split.setOneTouchExpandable(true);
         split.setContinuousLayout(false);

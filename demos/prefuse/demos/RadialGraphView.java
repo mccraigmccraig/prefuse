@@ -12,6 +12,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
 
 import prefuse.Alignment;
@@ -35,6 +36,7 @@ import prefuse.controls.DragControl;
 import prefuse.controls.FocusControl;
 import prefuse.controls.HoverActionControl;
 import prefuse.controls.PanControl;
+import prefuse.controls.WheelZoomControl;
 import prefuse.controls.ZoomControl;
 import prefuse.controls.ZoomToFitControl;
 import prefuse.data.Graph;
@@ -54,6 +56,7 @@ import prefuse.render.EdgeRenderer;
 import prefuse.render.LabelRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
+import prefuse.util.ui.DisplayScrollBar;
 import prefuse.util.ui.JFastLabel;
 import prefuse.util.ui.JSearchPanel;
 import prefuse.util.ui.UILib;
@@ -172,6 +175,7 @@ public class RadialGraphView extends Display {
         addControlListener(new DragControl());
         addControlListener(new ZoomToFitControl());
         addControlListener(new ZoomControl());
+        addControlListener(new WheelZoomControl());
         addControlListener(new PanControl());
         addControlListener(new FocusControl(1, "filter"));
         addControlListener(new HoverActionControl("repaint"));
@@ -286,8 +290,14 @@ public class RadialGraphView extends Display {
         box.add(search);
         box.add(Box.createHorizontalStrut(3));
 
+
+        JPanel scrollableView = new JPanel(new BorderLayout());
+        scrollableView.add(gview, BorderLayout.CENTER);
+        scrollableView.add(new DisplayScrollBar(gview, JScrollBar.HORIZONTAL), BorderLayout.SOUTH);
+        scrollableView.add(new DisplayScrollBar(gview, JScrollBar.VERTICAL), BorderLayout.EAST);
+        
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(gview, BorderLayout.CENTER);
+        panel.add(scrollableView, BorderLayout.CENTER);
         panel.add(box, BorderLayout.SOUTH);
 
         Color BACKGROUND = Color.WHITE;

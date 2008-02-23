@@ -15,6 +15,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
@@ -54,6 +55,7 @@ import prefuse.render.AbstractShapeRenderer;
 import prefuse.render.LabelRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
+import prefuse.util.ui.DisplayScrollBar;
 import prefuse.util.ui.JFastLabel;
 import prefuse.util.ui.JSearchPanel;
 import prefuse.visual.VisualItem;
@@ -334,10 +336,15 @@ public class TreeView extends Display {
         box.add(Box.createHorizontalStrut(3));
         box.setBackground(BACKGROUND);
 
+        JPanel scrollableView = new JPanel(new BorderLayout());
+        scrollableView.add(tview, BorderLayout.CENTER);
+        scrollableView.add(new DisplayScrollBar(tview, JScrollBar.HORIZONTAL), BorderLayout.SOUTH);
+        scrollableView.add(new DisplayScrollBar(tview, JScrollBar.VERTICAL), BorderLayout.EAST);
+        
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(BACKGROUND);
         panel.setForeground(FOREGROUND);
-        panel.add(tview, BorderLayout.CENTER);
+        panel.add(scrollableView, BorderLayout.CENTER);
         panel.add(box, BorderLayout.SOUTH);
         return panel;
     }
