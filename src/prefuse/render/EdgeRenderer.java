@@ -124,8 +124,8 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     @Override
 	protected Shape getRawShape(VisualItem<?> item) {
         EdgeItem<?,?>   edge = (EdgeItem<?,?>)item;
-        VisualItem<?> item1 = edge.getSourceItem();
-        VisualItem<?> item2 = edge.getTargetItem();
+        VisualItem<?> item1 = edge.getSourceNode();
+        VisualItem<?> item2 = edge.getTargetNode();
 
         if(item1 != item2) {
         	GraphicsLib.getAlignedPoint(m_tmpPoints[0], item1.getBounds(),
@@ -152,7 +152,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
             Point2D end   = m_tmpPoints[forward?1:0];
 
             // compute the intersection with the target bounding box
-            VisualItem<?> dest = forward ? e.getTargetItem() : e.getSourceItem();
+            VisualItem<?> dest = forward ? e.getTargetNode() : e.getSourceNode();
             int i = GraphicsLib.intersectLineRectangle(start, end,
                     dest.getBounds(), m_isctPoints);
             if ( i > 0 ) {

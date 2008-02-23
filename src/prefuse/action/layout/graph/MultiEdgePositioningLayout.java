@@ -136,8 +136,7 @@ public class MultiEdgePositioningLayout extends Layout
         for ( VisualItem<?> item : m_vis.visibleItems( m_edgeGroup ) )
         {
             EdgeItem<?, ?> edge = (EdgeItem<?, ?>) item;
-			pairToEdges.put(new NodePair(edge.getSourceItem(), edge
-					.getTargetItem()), edge);
+			pairToEdges.put(new NodePair(edge.getSourceNode(), edge.getTargetNode()), edge);
         }
 
         final double halfEdgeSep = edgeSeparation / 2.0d;

@@ -66,18 +66,4 @@ public class TableEdgeItem extends TableVisualItem<TableEdgeItem> implements Edg
         return m_graph.getAdjacentNode(this, n);
     }
 
-    /**
-     * @see prefuse.visual.EdgeItem#getSourceItem()
-     */
-    public TableNodeItem getSourceItem() {
-        return getSourceNode();
-    }
-
-    /**
-     * @see prefuse.visual.EdgeItem#getTargetItem()
-     */
-    public TableNodeItem getTargetItem() {
-        return getTargetNode();
-    }
-
 } // end of class TableEdgeItem
