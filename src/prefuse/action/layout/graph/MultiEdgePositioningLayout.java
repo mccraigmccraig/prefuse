@@ -20,7 +20,9 @@ import prefuse.visual.NodeItem;
 import prefuse.visual.VisualItem;
 
 /**
- * This layout positions the edges in a graph to be half way between 
+ * This layout positions the edges in a graph to be half way between the nodes (as per the
+ * EdgePositioningLayout). If there are multiple node-node edges then the edge positions will be spread out
+ * along the equi-distant line between the nodes.
  * 
  * @author Anton Marsden
  */
@@ -44,10 +46,18 @@ public class MultiEdgePositioningLayout extends Layout
 		m_edgeGroup = PrefuseLib.getGroupName(graph, Graph.EDGES);
 	}
 
+	/**
+	 * Get the separation gap for edges linking the same two nodes.
+	 * @return the edge separation
+	 */
 	public double getEdgeSeparation() {
 		return edgeSeparation;
 	}
 
+	/**
+	 * Sets the separation gap between the edges linking the same two nodes.
+	 * @param edgeSeparation the edge separation
+	 */
 	public void setEdgeSeparation(double edgeSeparation) {
 		this.edgeSeparation = edgeSeparation;
 	}
