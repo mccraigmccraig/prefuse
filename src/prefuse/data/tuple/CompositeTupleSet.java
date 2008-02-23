@@ -271,11 +271,7 @@ public class CompositeTupleSet extends AbstractTupleSet {
             Map.Entry entry = (Map.Entry)it.next();
             TupleSet ts = (TupleSet)entry.getValue();
             if ( ts.isAddColumnSupported() ) {
-                try {
-                    ts.addColumn(name, type, defaultValue);
-                } catch ( IllegalArgumentException iae ) {
-                    // already exists
-                }
+                ts.addColumn(name, type, defaultValue);
             } else {
                 s_logger.fine("Skipped addColumn for "+entry.getKey());
             }
@@ -293,11 +289,7 @@ public class CompositeTupleSet extends AbstractTupleSet {
             Map.Entry entry = (Map.Entry)it.next();
             TupleSet ts = (TupleSet)entry.getValue();
             if ( ts.isAddColumnSupported() ) {
-                try {
-                    ts.addColumn(name, type);
-                } catch ( IllegalArgumentException iae ) {
-                    // already exists
-                }
+                ts.addColumn(name, type);
             } else {
                 s_logger.fine("Skipped addColumn for "+entry.getKey());
             }
@@ -315,11 +307,7 @@ public class CompositeTupleSet extends AbstractTupleSet {
             Map.Entry entry = (Map.Entry)it.next();
             TupleSet ts = (TupleSet)entry.getValue();
             if ( ts.isAddColumnSupported() ) {
-                try {
                     ts.addColumn(name, expr);
-                } catch ( IllegalArgumentException iae ) {
-                    // already exists
-                }
             } else {
                 s_logger.fine("Skipped addColumn for "+entry.getKey());
             }
