@@ -2,6 +2,7 @@ package prefuse.render;
 
 import java.awt.Shape;
 
+import prefuse.PredefinedShape;
 import prefuse.ShapeBuilder;
 import prefuse.visual.VisualItem;
 
@@ -13,6 +14,17 @@ import prefuse.visual.VisualItem;
 public class ShapeRenderer extends AbstractShapeRenderer {
 
     private int m_baseSize = 10;
+
+
+    // Object reuse for PredefinedShapes (share the instance within the Renderer)
+    protected final Shape[] predefinedInstances;
+    {
+    	PredefinedShape[] predefined = PredefinedShape.values();
+    	predefinedInstances = new Shape[predefined.length];
+    	for(int i = 0; i < predefined.length; i++) {
+    		predefinedInstances[i] = predefined[i].createEmptyShape();
+    	}
+    }
 
     /**
      * Creates a new ShapeRenderer with default base size of 10 pixels.
@@ -73,7 +85,15 @@ public class ShapeRenderer extends AbstractShapeRenderer {
             x = x-width/2;
             y = y-width/2;
         }
-        return builder.createShape(x, y, width, width);
+        
+        if (builder instanceof PredefinedShape) {
+        	PredefinedShape p = (PredefinedShape) builder;
+        	Shape shape = predefinedInstances[p.ordinal()];
+        	builder.updateShape(shape, x, y, width, width);
+        	return shape;
+        } else {
+        	return builder.createShape(x, y, width, width);
+        }
     }
 
 } // end of class ShapeRenderer
