@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
-import prefuse.ShapeType;
+import prefuse.ShapeBuilder;
 import prefuse.Visualization;
 import prefuse.data.Schema;
 import prefuse.data.Tuple;
@@ -646,16 +646,16 @@ public interface VisualItem <T extends VisualItem<?>> extends Tuple<T> {
      * (e.g., {@link prefuse.render.ShapeRenderer}.
      * @return the current shape value
      */
-    public ShapeType getShape();
+    public ShapeBuilder getShapeBuilder();
 
     /**
-     * Set the current shape value of the item. This value only has an
+     * Set the current shape builder for the item. This value only has an
      * effect if a Renderer that supports different shapes is used
      * (e.g., {@link prefuse.render.ShapeRenderer}.
-     * @param shape the shape value to use
-     * @see #SHAPE
+     * @param shapeBuilder the shape builder to use
+     * @see #SHAPEBUILDER
      */
-    public void setShape(ShapeType shape);
+    public void setShapeBuilder(ShapeBuilder shapeBuilder);
 
     // ------------------------------------------------------------------------
 
@@ -833,8 +833,8 @@ public interface VisualItem <T extends VisualItem<?>> extends Tuple<T> {
     public static final String ENDSIZE
         = PrefuseLib.getEndField(SIZE);
     /** The shape data field */
-    public static final String SHAPE
-        = PrefuseLib.FIELD_PREFIX+"shape";
+    public static final String SHAPEBUILDER
+        = PrefuseLib.FIELD_PREFIX+"shapeBuilder";
     /** The stroke data field */
     public static final String STROKE
         = PrefuseLib.FIELD_PREFIX+"stroke";

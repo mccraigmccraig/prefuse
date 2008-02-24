@@ -2,50 +2,51 @@ package prefuse.action.assignment;
 
 import java.util.Map;
 
-import prefuse.ShapeType;
+import prefuse.ShapeBuilder;
+import prefuse.PredefinedShape;
 import prefuse.data.tuple.TupleSet;
 import prefuse.util.DataLib;
 import prefuse.visual.VisualItem;
 
 /**
- * <p>
- * Assignment Action that assigns shape values for a group of items based upon
- * a data field. Shape values are simple integer codes that indicate to
- * appropriate renderer instances what shape should be drawn. The
- * list of shape values is included in the {@link prefuse.ShapeType} class.
- * Of course, clients can always create their own shape codes that are handled
- * by a custom Renderer. FIXME: this has changed now that ShapeType is an Enum!
+ * <p>Assignment Action that assigns ShapeBuilder values to VisualItems based on a
+ * data field.</p>
+ * <p>ShapeBuilders know how to draw certain shapes. The default ShapeBuilders are
+ * in the PredefinedShape class. Of course, clients can always create their own
+ * ShapeBuilders.
  * </p>
  *
- * <p>The data field will be assumed to be nominal, and shapes will
+ * <p>The data field will be assumed to be of type nominal, and ShapeBuilders will
  * be assigned to unique values in the order they are encountered. Note that
- * if the number of unique values is greater than the number of shapes (when no
- * palette is given) or the length of a specified palette, then duplicate shapes
- * will start being assigned.</p>
+ * if the number of unique values is greater than the the length of a specified palette
+ * then duplicate shapes will start being assigned.</p>
  *
- * <p>This Action only sets the shape field of the VisualItem. For this value
- * to have an effect, a renderer instance that takes this shape value
+ * <p>This Action only sets the shapeBuilder field of the VisualItem. For this value
+ * to have an effect, a renderer instance that takes this shapeBuilder value
  * into account must be used (e.g., {@link prefuse.render.ShapeRenderer}).
  * </p>
+ * 
+ * @see PredefinedShape
  *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class DataShapeAction extends ShapeAction {
 
     protected String m_dataField;
-    protected ShapeType[]  m_palette;
+    protected ShapeBuilder[]  m_palette;
 
     protected Map<Object,Integer>    m_ordinalMap;
 
 
     /**
-     * Create a new DataShapeAction.
+     * Create a new DataShapeAction
      * @param group the data group to process
      * @param field the data field to base shape assignments on
      */
     public DataShapeAction(String group, String field) {
-        super(group, ShapeType.NONE);
+        super(group, PredefinedShape.NONE);
         m_dataField = field;
+        m_palette = null;
     }
 
     /**
@@ -54,8 +55,8 @@ public class DataShapeAction extends ShapeAction {
      * @param field the data field to base shape assignments on
      * @param palette a palette of shape values to use for the encoding.
      */
-    public DataShapeAction(String group, String field, ShapeType[] palette) {
-        super(group, ShapeType.NONE);
+    public DataShapeAction(String group, String field, ShapeBuilder[] palette) {
+        super(group, PredefinedShape.NONE);
         m_dataField = field;
         m_palette = palette;
     }
@@ -81,10 +82,10 @@ public class DataShapeAction extends ShapeAction {
     /**
      * This operation is not supported by the DataShapeAction type.
      * Calling this method will result in a thrown exception.
-     * @see prefuse.action.assignment.ShapeAction#setDefaultShape(ShapeType)
+     * @see prefuse.action.assignment.ShapeAction#setDefaultShape(PredefinedShape)
      * @throws UnsupportedOperationException
      */
-    public void setDefaultShape(ShapeType defaultShape) {
+    public void setDefaultShape(ShapeBuilder defaultShape) {
         throw new UnsupportedOperationException();
     }
 
@@ -103,10 +104,10 @@ public class DataShapeAction extends ShapeAction {
      * @see prefuse.action.assignment.ShapeAction#getShape(prefuse.visual.VisualItem)
      */
     @Override
-	public ShapeType getShape(VisualItem<?> item) {
+	public ShapeBuilder getShape(VisualItem<?> item) {
         // check for any cascaded rules first
-    	ShapeType shape = super.getShape(item);
-        if ( shape != ShapeType.NONE ) {
+    	ShapeBuilder shape = super.getShape(item);
+        if ( shape != PredefinedShape.NONE ) {
             return shape;
         }
 
@@ -115,8 +116,10 @@ public class DataShapeAction extends ShapeAction {
         int idx = m_ordinalMap.get(v);
 
         if ( m_palette == null ) {
-        	// cater for the ShapeType.UNKNOWN
-            return ShapeType.values()[idx % (ShapeType.values().length - 1) + 1];
+        	// use the PredefinedShapes as the palette
+        	PredefinedShape[] shapes = PredefinedShape.values();
+        	// exclude ShapeType.NONE
+        	return shapes[idx % (shapes.length - 1) + 1];
         } else {
             return m_palette[idx % m_palette.length];
         }

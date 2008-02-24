@@ -14,7 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import prefuse.Display;
-import prefuse.ShapeType;
+import prefuse.PredefinedShape;
 import prefuse.Visualization;
 import prefuse.action.ActionList;
 import prefuse.action.DataType;
@@ -151,7 +151,7 @@ public class AggregateDemo extends Display {
         // add visual data groups
         VisualGraph<?,?,?> vg = m_vis.addGraph(GRAPH, g);
         m_vis.setInteractive(EDGES, null, false);
-        m_vis.setValue(NODES, null, VisualItem.SHAPE, ShapeType.ELLIPSE.ordinal());
+        m_vis.setValue(NODES, null, VisualItem.SHAPEBUILDER, PredefinedShape.ELLIPSE);
 
         AggregateTable<TableAggregateItem<VisualItem<?>>,VisualItem<?>> at = m_vis.<VisualItem<?>>addAggregates(AGGR);
         at.addColumn(VisualItem.POLYGON, float[].class);

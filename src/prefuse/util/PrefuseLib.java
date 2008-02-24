@@ -6,7 +6,8 @@ import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
 
 import prefuse.Display;
-import prefuse.ShapeType;
+import prefuse.ShapeBuilder;
+import prefuse.PredefinedShape;
 import prefuse.data.Schema;
 import prefuse.visual.VisualItem;
 
@@ -389,7 +390,7 @@ public class PrefuseLib {
         s.addInterpolatedColumn(VisualItem.SIZE, double.class, new Double(1));
 
         // shape
-        s.addColumn(VisualItem.SHAPE, int.class, ShapeType.RECTANGLE.ordinal());
+        s.addColumn(VisualItem.SHAPEBUILDER, ShapeBuilder.class, PredefinedShape.NONE);
 
         // stroke
         s.addColumn(VisualItem.STROKE, Stroke.class, new BasicStroke());

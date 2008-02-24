@@ -2,7 +2,8 @@ package prefuse.action.assignment;
 
 import java.util.logging.Logger;
 
-import prefuse.ShapeType;
+import prefuse.ShapeBuilder;
+import prefuse.PredefinedShape;
 import prefuse.action.EncoderAction;
 import prefuse.data.expression.Predicate;
 import prefuse.data.expression.parser.ExpressionParser;
@@ -10,13 +11,10 @@ import prefuse.visual.VisualItem;
 
 
 /**
- * <p>Assignment Action that assigns shape values to VisualItems.
- * Shape values are simple integer codes that indicate to
- * appropriate renderer instances what shape should be drawn. The default
- * list of shape values is included in the prefuse.Constants class,
- * all beginning with the prefix <code>SHAPE</code>. Of course, clients can
- * always create their own shape codes that are handled by a custom Renderer.
- * FIXME: this has changed now that ShapeType is an Enum!
+ * <p>Assignment Action that assigns ShapeBuilder values to VisualItems.
+ * ShapeBuilders know how to draw certain shapes. The default ShapeBuilders are
+ * in the PredefinedShape class. Of course, clients can always create their own
+ * ShapeBuilders.
  * </p>
  *
  * <p>
@@ -42,11 +40,14 @@ import prefuse.visual.VisualItem;
  * <p>To automatically assign shape values based on varying values of a
  * particular data field, consider using the {@link DataShapeAction}.</p>
  *
+ * @see PredefinedShape
+ * @see ShapeRenderer
+ * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class ShapeAction extends EncoderAction {
 
-    protected ShapeType m_defaultShape = ShapeType.RECTANGLE;
+    protected ShapeBuilder m_defaultShape = PredefinedShape.RECTANGLE;
 
     /**
      * Constructor. A default rectangle shape will be used.
@@ -68,7 +69,7 @@ public class ShapeAction extends EncoderAction {
      * @param group the data group processed by this Action.
      * @param shape the default shape value to use
      */
-    public ShapeAction(String group, ShapeType shape) {
+    public ShapeAction(String group, ShapeBuilder shape) {
         super(group);
         m_defaultShape = shape;
     }
@@ -77,7 +78,7 @@ public class ShapeAction extends EncoderAction {
      * Returns the default shape value assigned to items.
      * @return the default shape value
      */
-    public ShapeType getDefaultShape() {
+    public ShapeBuilder getDefaultShape() {
         return m_defaultShape;
     }
 
@@ -86,7 +87,7 @@ public class ShapeAction extends EncoderAction {
      * the default shape if they do not match any registered rules.
      * @param defaultShape the new default shape value
      */
-    public void setDefaultShape(ShapeType defaultShape) {
+    public void setDefaultShape(ShapeBuilder defaultShape) {
         m_defaultShape = defaultShape;
     }
 
@@ -97,8 +98,8 @@ public class ShapeAction extends EncoderAction {
      * @param p the rule Predicate
      * @param shape the shape value
      */
-    public void add(Predicate p, ShapeType shape) {
-        super.add(p, shape.ordinal());
+    public void add(Predicate p, ShapeBuilder shape) {
+        super.add(p, shape);
     }
 
     /**
@@ -111,7 +112,7 @@ public class ShapeAction extends EncoderAction {
      * @throws RuntimeException if the expression does not parse correctly or
      * does not result in a Predicate instance.
      */
-    public void add(String expr, int shape) {
+    public void add(String expr, ShapeBuilder shape) {
         Predicate p = (Predicate)ExpressionParser.parse(expr);
         add(p, shape);
     }
@@ -149,7 +150,7 @@ public class ShapeAction extends EncoderAction {
      */
     @Override
 	public void process(VisualItem<?> item, double frac) {
-        item.setShape(getShape(item));
+        item.setShapeBuilder(getShape(item));
     }
 
     /**
@@ -157,13 +158,13 @@ public class ShapeAction extends EncoderAction {
      * @param item the item for which to get the shape value
      * @return the shape value for the item
      */
-    public ShapeType getShape(VisualItem<?> item) {
+    public ShapeBuilder getShape(VisualItem<?> item) {
         Object o = lookup(item);
         if ( o != null ) {
             if ( o instanceof ShapeAction ) {
                 return ((ShapeAction)o).getShape(item);
-            } else if ( o instanceof Number ) {
-                return ShapeType.values()[((Number)o).intValue()];
+            } else if ( o instanceof ShapeBuilder) {
+            	return (ShapeBuilder) o;
             } else {
                 Logger.getLogger(this.getClass().getName())
                     .warning("Unrecognized Object from predicate chain.");

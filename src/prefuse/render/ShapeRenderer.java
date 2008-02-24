@@ -1,26 +1,18 @@
 package prefuse.render;
 
 import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Rectangle2D;
 
-import prefuse.ShapeType;
+import prefuse.ShapeBuilder;
 import prefuse.visual.VisualItem;
 
 /**
- * Renderer for drawing simple shapes. This class provides a number of built-in
- * shapes, selected by an integer value retrieved from a VisualItem.
+ * Renderer for drawing simple shapes using VisualItem.SHAPEBUILDER.
  *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class ShapeRenderer extends AbstractShapeRenderer {
 
     private int m_baseSize = 10;
-
-    private final Ellipse2D   m_ellipse = new Ellipse2D.Double();
-    private final Rectangle2D m_rect = new Rectangle2D.Double();
-    private final GeneralPath m_path = new GeneralPath();
 
     /**
      * Creates a new ShapeRenderer with default base size of 10 pixels.
@@ -60,7 +52,12 @@ public class ShapeRenderer extends AbstractShapeRenderer {
      */
     @Override
 	protected Shape getRawShape(VisualItem<?> item) {
-        ShapeType stype = item.getShape();
+        ShapeBuilder builder = item.getShapeBuilder();
+        
+        if(builder == null) {
+        	return null;
+        }
+        
         double x = item.getX();
         if ( Double.isNaN(x) || Double.isInfinite(x) ) {
 			x = 0;
@@ -76,176 +73,7 @@ public class ShapeRenderer extends AbstractShapeRenderer {
             x = x-width/2;
             y = y-width/2;
         }
-
-        switch ( stype ) {
-        case NONE:
-            return null;
-        case RECTANGLE:
-            return rectangle(x, y, width, width);
-        case ELLIPSE:
-            return ellipse(x, y, width, width);
-        case TRIANGLE_UP:
-            return triangle_up((float)x, (float)y, (float)width);
-        case TRIANGLE_DOWN:
-            return triangle_down((float)x, (float)y, (float)width);
-        case TRIANGLE_LEFT:
-            return triangle_left((float)x, (float)y, (float)width);
-        case TRIANGLE_RIGHT:
-            return triangle_right((float)x, (float)y, (float)width);
-        case CROSS:
-            return cross((float)x, (float)y, (float)width);
-        case STAR:
-            return star((float)x, (float)y, (float)width);
-        case HEXAGON:
-            return hexagon((float)x, (float)y, (float)width);
-        case DIAMOND:
-            return diamond((float)x, (float)y, (float)width);
-        default:
-            throw new IllegalStateException("Unknown shape type: "+stype);
-        }
-    }
-
-    /**
-     * Returns a rectangle of the given dimenisions.
-     */
-    public Shape rectangle(double x, double y, double width, double height) {
-        m_rect.setFrame(x, y, width, height);
-        return m_rect;
-    }
-
-    /**
-     * Returns an ellipse of the given dimenisions.
-     */
-    public Shape ellipse(double x, double y, double width, double height) {
-        m_ellipse.setFrame(x, y, width, height);
-        return m_ellipse;
-    }
-
-    /**
-     * Returns a up-pointing triangle of the given dimenisions.
-     */
-    public Shape triangle_up(float x, float y, float height) {
-        m_path.reset();
-        m_path.moveTo(x,y+height);
-        m_path.lineTo(x+height/2, y);
-        m_path.lineTo(x+height, (y+height));
-        m_path.closePath();
-        return m_path;
-    }
-
-    /**
-     * Returns a down-pointing triangle of the given dimenisions.
-     */
-    public Shape triangle_down(float x, float y, float height) {
-        m_path.reset();
-        m_path.moveTo(x,y);
-        m_path.lineTo(x+height, y);
-        m_path.lineTo(x+height/2, (y+height));
-        m_path.closePath();
-        return m_path;
-    }
-
-    /**
-     * Returns a left-pointing triangle of the given dimenisions.
-     */
-    public Shape triangle_left(float x, float y, float height) {
-        m_path.reset();
-        m_path.moveTo(x+height, y);
-        m_path.lineTo(x+height, y+height);
-        m_path.lineTo(x, y+height/2);
-        m_path.closePath();
-        return m_path;
-    }
-
-    /**
-     * Returns a right-pointing triangle of the given dimenisions.
-     */
-    public Shape triangle_right(float x, float y, float height) {
-        m_path.reset();
-        m_path.moveTo(x,y+height);
-        m_path.lineTo(x+height, y+height/2);
-        m_path.lineTo(x, y);
-        m_path.closePath();
-        return m_path;
-    }
-
-    /**
-     * Returns a cross shape of the given dimenisions.
-     */
-    public Shape cross(float x, float y, float height) {
-        float h14 = 3*height/8, h34 = 5*height/8;
-        m_path.reset();
-        m_path.moveTo(x+h14, y);
-        m_path.lineTo(x+h34, y);
-        m_path.lineTo(x+h34, y+h14);
-        m_path.lineTo(x+height, y+h14);
-        m_path.lineTo(x+height, y+h34);
-        m_path.lineTo(x+h34, y+h34);
-        m_path.lineTo(x+h34, y+height);
-        m_path.lineTo(x+h14, y+height);
-        m_path.lineTo(x+h14, y+h34);
-        m_path.lineTo(x, y+h34);
-        m_path.lineTo(x, y+h14);
-        m_path.lineTo(x+h14, y+h14);
-        m_path.closePath();
-        return m_path;
-    }
-
-    /**
-     * Returns a star shape of the given dimenisions.
-     */
-    public Shape star(float x, float y, float height) {
-        float s = (float)(height/(2*Math.sin(Math.toRadians(54))));
-        float shortSide = (float)(height/(2*Math.tan(Math.toRadians(54))));
-        float mediumSide = (float)(s*Math.sin(Math.toRadians(18)));
-        float longSide = (float)(s*Math.cos(Math.toRadians(18)));
-        float innerLongSide = (float)(s/(2*Math.cos(Math.toRadians(36))));
-        float innerShortSide = innerLongSide*(float)Math.sin(Math.toRadians(36));
-        float innerMediumSide = innerLongSide*(float)Math.cos(Math.toRadians(36));
-
-        m_path.reset();
-        m_path.moveTo(x, y+shortSide);
-        m_path.lineTo((x+innerLongSide),(y+shortSide));
-        m_path.lineTo((x+height/2),y);
-        m_path.lineTo((x+height-innerLongSide),(y+shortSide));
-        m_path.lineTo((x+height),(y+shortSide));
-        m_path.lineTo((x+height-innerMediumSide),(y+shortSide+innerShortSide));
-        m_path.lineTo((x+height-mediumSide),(y+height));
-        m_path.lineTo((x+height/2),(y+shortSide+longSide-innerShortSide));
-        m_path.lineTo((x+mediumSide),(y+height));
-        m_path.lineTo((x+innerMediumSide),(y+shortSide+innerShortSide));
-        m_path.closePath();
-        return m_path;
-    }
-
-    /**
-     * Returns a hexagon shape of the given dimenisions.
-     */
-    public Shape hexagon(float x, float y, float height) {
-        float width = height/2;
-
-        m_path.reset();
-        m_path.moveTo(x,            y+0.5f*height);
-        m_path.lineTo(x+0.5f*width, y);
-        m_path.lineTo(x+1.5f*width, y);
-        m_path.lineTo(x+2.0f*width, y+0.5f*height);
-        m_path.lineTo(x+1.5f*width, y+height);
-        m_path.lineTo(x+0.5f*width, y+height);
-        m_path.closePath();
-        return m_path;
-    }
-
-    /**
-     * Returns a diamond shape of the given dimenisions.
-     */
-    public Shape diamond(float x, float y, float height) {
-        m_path.reset();
-        m_path.moveTo(x,(y+0.5f*height));
-        m_path.lineTo((x+0.5f*height),y);
-        m_path.lineTo((x+height),(y+0.5f*height));
-        m_path.lineTo((x+0.5f*height),(y+height));
-        m_path.closePath();
-        return m_path;
+        return builder.createShape(x, y, width, width);
     }
 
 } // end of class ShapeRenderer

@@ -21,7 +21,7 @@ import javax.swing.SwingConstants;
 
 import prefuse.Alignment;
 import prefuse.Display;
-import prefuse.ShapeType;
+import prefuse.PredefinedShape;
 import prefuse.Visualization;
 import prefuse.action.ActionList;
 import prefuse.action.DataType;
@@ -186,8 +186,8 @@ public class Congress extends JPanel {
         DataColorAction color = new DataColorAction(group, "Party",
         		DataType.ORDINAL, VisualItem.STROKECOLOR, palette);
 
-        ShapeType[] shapes = new ShapeType[]
-            { ShapeType.RECTANGLE, ShapeType.DIAMOND };
+        PredefinedShape[] shapes = new PredefinedShape[]
+            { PredefinedShape.RECTANGLE, PredefinedShape.DIAMOND };
         DataShapeAction shape = new DataShapeAction(group, "Senate", shapes);
 
         Counter cntr = new Counter(group);

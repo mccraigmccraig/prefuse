@@ -5,7 +5,8 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
-import prefuse.ShapeType;
+import prefuse.ShapeBuilder;
+import prefuse.PredefinedShape;
 import prefuse.Visualization;
 import prefuse.data.Graph;
 import prefuse.data.Table;
@@ -552,17 +553,17 @@ public class TableVisualItem <T extends TableVisualItem<?>> extends TableTuple<T
     // ------------------------------------------------------------------------
 
     /**
-     * @see prefuse.visual.VisualItem#getShape()
+     * @see prefuse.visual.VisualItem#getShapeBuilder()
      */
-    public ShapeType getShape() {
-        return ((VisualTable<?,?>)m_table).getShape(m_row);
+    public ShapeBuilder getShapeBuilder() {
+        return ((VisualTable<?,?>)m_table).getShapeBuilder(m_row);
     }
 
     /**
-     * @see prefuse.visual.VisualItem#setShape(ShapeType)
+     * @see prefuse.visual.VisualItem#setShapeBuilder(ShapeBuilder)
      */
-    public void setShape(ShapeType shape) {
-        ((VisualTable<?,?>)m_table).setShape(m_row, shape);
+    public void setShapeBuilder(ShapeBuilder shapeBuilder) {
+        ((VisualTable<?,?>)m_table).setShapeBuilder(m_row, shapeBuilder);
     }
 
     // ------------------------------------------------------------------------

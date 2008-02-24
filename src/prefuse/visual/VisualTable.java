@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 
-import prefuse.ShapeType;
+import prefuse.ShapeBuilder;
 import prefuse.Visualization;
 import prefuse.data.CascadedTable;
 import prefuse.data.Schema;
@@ -1045,20 +1045,15 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Get the current shape value of the row. This value only has an effect if a Renderer that
+	 * Get the current shape builder of the row. This value only has an effect if a Renderer that
 	 * supports different shapes is used (e.g., {@link prefuse.render.ShapeRenderer}.
 	 * 
 	 * @param row
 	 *            the table row
 	 * @return the current shape value
 	 */
-	public ShapeType getShape(final int row) {
-		final int num = getInt(row, VisualItem.SHAPE);
-
-		// perhaps due to a threading issue, very frequently the num variable is set
-		// to -1, which causes an ArrayIndexOutOfBounds exception here. To counteract this,
-		// we check the value of num, and if it is -1, we return the shape type of NONE instead.
-		return num == -1 ? ShapeType.NONE : ShapeType.values()[num];
+	public ShapeBuilder getShapeBuilder(final int row) {
+	    return (ShapeBuilder) get(row, VisualItem.SHAPEBUILDER);
 	}
 
 	/**
@@ -1070,8 +1065,8 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * @param shape
 	 *            the shape value to use
 	 */
-	public void setShape(final int row, final ShapeType shape) {
-		setInt(row, VisualItem.SHAPE, shape.ordinal());
+	public void setShapeBuilder(final int row, final ShapeBuilder shapeBuilder) {
+		set(row, VisualItem.SHAPEBUILDER, shapeBuilder);
 	}
 
 	// ------------------------------------------------------------------------
