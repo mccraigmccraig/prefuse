@@ -636,7 +636,7 @@ public class Display extends JComponent {
      * Returns the bounds, in absolute (item-space) coordinates, of the total
      * bounds occupied by all currently visible VisualItems. This method
      * allocates a new Rectangle2D instance for the result.
-     * @return the bounding box of all visibile VisualItems
+     * @return the bounding box of all visible VisualItems
      * @see #getItemBounds(Rectangle2D)
      */
     public synchronized Rectangle2D getItemBounds() {
