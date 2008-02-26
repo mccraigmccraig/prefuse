@@ -450,8 +450,8 @@ public class LabelRenderer extends AbstractShapeRenderer {
 
         // fill the shape, if requested
         RenderType type = getRenderType(item);
-        if ( type==AbstractShapeRenderer.RenderType.FILL || type==AbstractShapeRenderer.RenderType.DRAW_AND_FILL ) {
-			GraphicsLib.paint(g, item, shape, getStroke(item), AbstractShapeRenderer.RenderType.FILL);
+        if ( type==RenderType.FILL || type==RenderType.DRAW_AND_FILL ) {
+			GraphicsLib.paint(g, item, shape, getStroke(item), RenderType.FILL);
 		}
 
         // now render the image and text
@@ -588,8 +588,8 @@ public class LabelRenderer extends AbstractShapeRenderer {
         }
 
         // draw border
-        if (type==AbstractShapeRenderer.RenderType.DRAW || type==AbstractShapeRenderer.RenderType.DRAW_AND_FILL) {
-            GraphicsLib.paint(g,item,shape,getStroke(item),AbstractShapeRenderer.RenderType.DRAW);
+        if (type==RenderType.DRAW || type==RenderType.DRAW_AND_FILL) {
+            GraphicsLib.paint(g,item,shape,getStroke(item),RenderType.DRAW);
         }
     }
 

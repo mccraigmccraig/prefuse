@@ -115,7 +115,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
      */
     @Override
 	public RenderType getRenderType(VisualItem<?> item) {
-        return AbstractShapeRenderer.RenderType.DRAW;
+        return RenderType.DRAW;
     }
 
     /**

@@ -33,11 +33,6 @@ import prefuse.visual.VisualItem;
  */
 public abstract class AbstractShapeRenderer implements Renderer {
 
-    public static enum RenderType {
-    	NONE, DRAW, FILL, DRAW_AND_FILL
-    }
-
-
     private RenderType m_renderType = RenderType.DRAW_AND_FILL;
     protected AffineTransform m_transform = new AffineTransform();
     protected boolean m_manageBounds = true;

@@ -15,8 +15,7 @@ import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
 
 import prefuse.Alignment;
-import prefuse.render.AbstractShapeRenderer;
-import prefuse.render.AbstractShapeRenderer.RenderType;
+import prefuse.render.RenderType;
 import prefuse.visual.VisualItem;
 
 /**
@@ -755,18 +754,18 @@ public class GraphicsLib {
                              Shape shape, BasicStroke stroke, RenderType type)
     {
         // if render type is NONE, then there is nothing to do
-        if ( type == AbstractShapeRenderer.RenderType.NONE ) {
+        if ( type == RenderType.NONE ) {
 			return;
 		}
 
         // set up colors
         Color strokeColor = ColorLib.getColor(item.getStrokeColor());
         Color fillColor = ColorLib.getColor(item.getFillColor());
-        boolean sdraw = (type == AbstractShapeRenderer.RenderType.DRAW ||
-                         type == AbstractShapeRenderer.RenderType.DRAW_AND_FILL) &&
+        boolean sdraw = (type == RenderType.DRAW ||
+                         type == RenderType.DRAW_AND_FILL) &&
                         strokeColor.getAlpha() != 0;
-        boolean fdraw = (type == AbstractShapeRenderer.RenderType.FILL ||
-                         type == AbstractShapeRenderer.RenderType.DRAW_AND_FILL) &&
+        boolean fdraw = (type == RenderType.FILL ||
+                         type == RenderType.DRAW_AND_FILL) &&
                         fillColor.getAlpha() != 0;
         if ( !(sdraw || fdraw) ) {
 			return;

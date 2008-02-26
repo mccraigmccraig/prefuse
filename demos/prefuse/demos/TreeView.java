@@ -51,8 +51,8 @@ import prefuse.data.search.PrefixSearchTupleSet;
 import prefuse.data.tuple.TupleSet;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.EdgeRenderer;
-import prefuse.render.AbstractShapeRenderer;
 import prefuse.render.LabelRenderer;
+import prefuse.render.RenderType;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
 import prefuse.util.ui.DisplayScrollBar;
@@ -90,7 +90,7 @@ public class TreeView extends Display {
         m_vis.add(tree, t);
 
         m_nodeRenderer = new LabelRenderer(m_label);
-        m_nodeRenderer.setRenderType(AbstractShapeRenderer.RenderType.FILL);
+        m_nodeRenderer.setRenderType(RenderType.FILL);
         m_nodeRenderer.setHorizontalAlignment(Alignment.LEFT);
         m_nodeRenderer.setRoundedCorner(8,8);
         m_edgeRenderer = new EdgeRenderer(EdgeRenderer.EdgeType.CURVE);
