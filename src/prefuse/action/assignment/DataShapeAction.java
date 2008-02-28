@@ -25,7 +25,7 @@ import prefuse.visual.VisualItem;
  * to have an effect, a renderer instance that takes this shapeBuilder value
  * into account must be used (e.g., {@link prefuse.render.ShapeRenderer}).
  * </p>
- * 
+ *
  * @see PredefinedShape
  *
  * @author <a href="http://jheer.org">jeffrey heer</a>
@@ -82,7 +82,7 @@ public class DataShapeAction extends ShapeAction {
     /**
      * This operation is not supported by the DataShapeAction type.
      * Calling this method will result in a thrown exception.
-     * @see prefuse.action.assignment.ShapeAction#setDefaultShape(PredefinedShape)
+     * @see prefuse.action.assignment.ShapeAction#setDefaultShape(ShapeBuilder)
      * @throws UnsupportedOperationException
      */
     public void setDefaultShape(ShapeBuilder defaultShape) {

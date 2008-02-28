@@ -32,7 +32,7 @@ public class NullRenderer implements Renderer {
     }
 
     /**
-     * @see prefuse.render.Renderer#calculateBounds(VisualItem)
+     * @see prefuse.render.Renderer#calculateBounds(VisualItem,Rectangle2D)
      */
     public void calculateBounds(VisualItem<?> item, Rectangle2D bounds) {
     	bounds.setRect(item.getX(), item.getY(), 0, 0);

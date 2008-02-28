@@ -21,7 +21,7 @@ import prefuse.visual.tuple.TableVisualItem;
  * VisualTable is used to take a raw data table and "strap" visual properties on top of it.
  * VisualTables should not be created directly, they are created automatically by adding data to a
  * Visualization, for example by using the {@link Visualization#addTable(String, Table)} method.
- * 
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> extends CascadedTable<T, C> implements VisualTupleSet<C> {
@@ -73,7 +73,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Create a new VisualTable.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent table whose values this table should inherit
 	 * @param vis
@@ -87,7 +87,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Create a new VisualTable.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent table whose values this table should inherit
 	 * @param vis
@@ -104,7 +104,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Create a new VisualTable.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent table whose values this table should inherit
 	 * @param vis
@@ -127,7 +127,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Create a new VisualTable without a parent table.
-	 * 
+	 *
 	 * @param vis
 	 *            the Visualization associated with this table
 	 * @param group
@@ -139,7 +139,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Create a new VisualTable without a parent table.
-	 * 
+	 *
 	 * @param vis
 	 *            the Visualization associated with this table
 	 * @param group
@@ -153,7 +153,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Initialize this VisualTable
-	 * 
+	 *
 	 * @param vis
 	 *            the Visualization associated with this table
 	 * @param group
@@ -223,7 +223,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the visualization associated with this VisualTable
-	 * 
+	 *
 	 * @param vis
 	 *            the visualization to set
 	 */
@@ -233,7 +233,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Get the visualization data group name for this table
-	 * 
+	 *
 	 * @return the data group name
 	 */
 	public String getGroup() {
@@ -242,7 +242,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the visualization data group name for this table
-	 * 
+	 *
 	 * @param group
 	 *            the data group name for this table
 	 */
@@ -252,7 +252,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Get the VisualItem for the given table row.
-	 * 
+	 *
 	 * @param row
 	 *            a table row index
 	 * @return the VisualItem for the given table row
@@ -264,7 +264,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Add a new row to the table and return the VisualItem for that row. Only allowed if there is
 	 * no parent table, otherwise an exception will result.
-	 * 
+	 *
 	 * @return the VisualItem for the newly added table row.
 	 */
 	public C addItem() {
@@ -277,7 +277,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Indicates if the given row is currently validated. If not, validateBounds() must be run to
 	 * update the bounds to a current value.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return true if validated, false otherwise
@@ -289,7 +289,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Set the given row's validated flag. This is for internal use by prefuse and, in general,
 	 * should not be called by application code.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param value
@@ -303,7 +303,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * Indicates if the given row is currently set to be visible. Items with the visible flag set
 	 * false will not be drawn by a display. Invisible items are also by necessity not interactive,
 	 * regardless of the value of the interactive flag.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return true if visible, false if invisible
@@ -314,7 +314,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the given row's visibility.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param value
@@ -327,7 +327,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Indicates if the start visible flag is set to true. This is the visibility value consulted
 	 * for the staring value of the visibility field at the beginning of an animated transition.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return true if this item starts out visible, false otherwise.
@@ -338,7 +338,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the start visible flag.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param value
@@ -351,7 +351,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Indictes if the end visible flag is set to true. This is the visibility value consulted for
 	 * the ending value of the visibility field at the end of an animated transition.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return true if this items ends visible, false otherwise.
@@ -362,7 +362,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the end visible flag.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param value
@@ -375,7 +375,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Indicates if this item is interactive, meaning it can potentially respond to mouse and
 	 * keyboard input events.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return true if the item is interactive, false otherwise
@@ -386,7 +386,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the interactive status of the given row.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param value
@@ -398,7 +398,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Indicates the given row is expanded. Only used for items that are part of a graph structure.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return true if expanded, false otherwise
@@ -409,7 +409,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the expanded flag.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param value
@@ -422,7 +422,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Indicates if the given row is fixed, and so will not have its position changed by any layout
 	 * or distortion actions.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return true if the item has a fixed position, false otherwise
@@ -433,7 +433,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Sets if the given row is fixed in its position.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param value
@@ -445,7 +445,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Indicates if the given row is highlighted.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return true for highlighted, false for not highlighted
@@ -458,7 +458,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * Set the highlighted status of the given row. How higlighting values are interpreted by the
 	 * system depends on the various processing actions set up for an application (e.g., how a
 	 * {@link prefuse.action.assignment.ColorAction} might assign colors based on the flag).
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param value
@@ -470,7 +470,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Indicates if the given row currently has the mouse pointer over it.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return true if the mouse pointer is over this item, false otherwise
@@ -482,7 +482,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Set the hover flag. This is set automatically by the prefuse framework, so should not need to
 	 * be set explicitly by application code.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param value
@@ -496,7 +496,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Get the current x-coordinate of the given row.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the current x-coordinate
@@ -507,7 +507,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the current x-coordinate of the given row.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param x
@@ -519,7 +519,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Get the current y-coordinate of the given row.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the current y-coordinate
@@ -530,7 +530,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the current y-coordinate of the given row.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param y
@@ -542,7 +542,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Get the starting x-coordinate of the given row.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the starting x-coordinate
@@ -553,7 +553,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the starting x-coordinate of the given row.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param x
@@ -565,7 +565,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Get the starting y-coordinate of the given row.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the starting y-coordinate
@@ -576,7 +576,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the starting y-coordinate of the given row.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param y
@@ -588,7 +588,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Get the ending x-coordinate of the given row.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the ending x-coordinate
@@ -599,7 +599,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the ending x-coordinate of the given row.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param x
@@ -611,7 +611,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Get the ending y-coordinate of the given row.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the ending y-coordinate
@@ -622,7 +622,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the ending y-coordinate of the given row.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param y
@@ -636,7 +636,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * Returns the bounds for the VisualItem at the given row index. The returned reference is for
 	 * the actual bounds object used by the system -- do <b>NOT</b> directly edit the values in
 	 * this returned object!! This will corrupt the state of the system.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the bounding box for the item at the given row
@@ -649,7 +649,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * Set the bounding box for an item. This method is used by Renderer modules when the bounds are
 	 * validated, or set by processing Actions used in conjunction with Renderers that do not
 	 * perform bounds management.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param x
@@ -685,7 +685,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * outlines of shapes. Color values as represented as an integer containing the red, green,
 	 * blue, and alpha (transparency) color channels. A color with a zero alpha component is fully
 	 * transparent and will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the current stroke color, represented as an integer
@@ -700,7 +700,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * outlines of shapes. Color values as represented as an integer containing the red, green,
 	 * blue, and alpha (transparency) color channels. A color with a zero alpha component is fully
 	 * transparent and will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param color
@@ -716,7 +716,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * outlines of shapes. Color values as represented as an integer containing the red, green,
 	 * blue, and alpha (transparency) color channels. A color with a zero alpha component is fully
 	 * transparent and will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the starting stroke color, represented as an integer
@@ -731,7 +731,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * outlines of shapes. Color values as represented as an integer containing the red, green,
 	 * blue, and alpha (transparency) color channels. A color with a zero alpha component is fully
 	 * transparent and will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param color
@@ -747,7 +747,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * outlines of shapes. Color values as represented as an integer containing the red, green,
 	 * blue, and alpha (transparency) color channels. A color with a zero alpha component is fully
 	 * transparent and will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the ending stroke color, represented as an integer
@@ -762,7 +762,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * outlines of shapes. Color values as represented as an integer containing the red, green,
 	 * blue, and alpha (transparency) color channels. A color with a zero alpha component is fully
 	 * transparent and will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param color
@@ -778,7 +778,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * Color values as represented as an integer containing the red, green, blue, and alpha
 	 * (transparency) color channels. A color with a zero alpha component is fully transparent and
 	 * will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the current fill color, represented as an integer
@@ -793,7 +793,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * shapes. Color values as represented as an integer containing the red, green, blue, and alpha
 	 * (transparency) color channels. A color with a zero alpha component is fully transparent and
 	 * will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param color
@@ -809,7 +809,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * shapes. Color values as represented as an integer containing the red, green, blue, and alpha
 	 * (transparency) color channels. A color with zero alpha component is fully transparent and
 	 * will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the starting fill color, represented as an integer
@@ -824,7 +824,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * shapes. Color values as represented as an integer containing the red, green, blue, and alpha
 	 * (transparency) color channels. A color with a zero alpha component is fully transparent and
 	 * will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param color
@@ -840,7 +840,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * Color values as represented as an integer containing the red, green, blue, and alpha
 	 * (transparency) color channels. A color with zero alpha component is fully transparent and
 	 * will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the ending fill color, represented as an integer
@@ -855,7 +855,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * shapes. Color values as represented as an integer containing the red, green, blue, and alpha
 	 * (transparency) color channels. A color with a zero alpha component is fully transparent and
 	 * will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param color
@@ -871,7 +871,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * item. Color values as represented as an integer containing the red, green, blue, and alpha
 	 * (transparency) color channels. A color with zero alpha component is fully transparent and
 	 * will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the current text color, represented as an integer
@@ -886,7 +886,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * item. Color values as represented as an integer containing the red, green, blue, and alpha
 	 * (transparency) color channels. A color with a zero alpha component is fully transparent and
 	 * will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param color
@@ -902,7 +902,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * item. Color values as represented as an integer containing the red, green, blue, and alpha
 	 * (transparency) color channels. A color with zero alpha component is fully transparent and
 	 * will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the starting text color, represented as an integer
@@ -917,7 +917,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * item. Color values as represented as an integer containing the red, green, blue, and alpha
 	 * (transparency) color channels. A color with a zero alpha component is fully transparent and
 	 * will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param color
@@ -933,7 +933,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * item. Color values as represented as an integer containing the red, green, blue, and alpha
 	 * (transparency) color channels. A color with zero alpha component is fully transparent and
 	 * will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the ending text color, represented as an integer
@@ -948,7 +948,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * item. Color values as represented as an integer containing the red, green, blue, and alpha
 	 * (transparency) color channels. A color with a zero alpha component is fully transparent and
 	 * will not be drawn.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param color
@@ -965,7 +965,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * Get the current size value of the row. Size values are typically used to scale an item,
 	 * either in one-dimension (e.g., a bar chart length) or two-dimensions (e.g., using pixel area
 	 * to encode a quantitative value).
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the current size value
@@ -978,7 +978,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * Set the current size value of the row. Size values are typically used to scale an item,
 	 * either in one-dimension (e.g., a bar chart length) or two-dimensions (e.g., using pixel area
 	 * to encode a quantitative value).
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param size
@@ -992,7 +992,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * Get the starting size value of the row. Size values are typically used to scale an item,
 	 * either in one-dimension (e.g., a bar chart length) or two-dimensions (e.g., using pixel area
 	 * to encode a quantitative value).
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the starting size value
@@ -1005,7 +1005,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * Set the starting size value of the row. Size values are typically used to scale an item,
 	 * either in one-dimension (e.g., a bar chart length) or two-dimensions (e.g., using pixel area
 	 * to encode a quantitative value).
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param size
@@ -1019,7 +1019,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * Get the ending size value of the row. Size values are typically used to scale an item, either
 	 * in one-dimension (e.g., a bar chart length) or two-dimensions (e.g., using pixel area to
 	 * encode a quantitative value).
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the ending size value
@@ -1032,7 +1032,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * Set the ending size value of the row. Size values are typically used to scale an item, either
 	 * in one-dimension (e.g., a bar chart length) or two-dimensions (e.g., using pixel area to
 	 * encode a quantitative value).
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param size
@@ -1045,12 +1045,13 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Get the current shape builder of the row. This value only has an effect if a Renderer that
-	 * supports different shapes is used (e.g., {@link prefuse.render.ShapeRenderer}.
-	 * 
+	 * Get the current shape builder of the row. This value only has an effect
+	 * if a Renderer that supports different shapes is used (e.g.,
+	 * {@link prefuse.render.ShapeRenderer}.
+	 *
 	 * @param row
 	 *            the table row
-	 * @return the current shape value
+	 * @return the current ShapeBuilder
 	 */
 	public ShapeBuilder getShapeBuilder(final int row) {
 	    return (ShapeBuilder) get(row, VisualItem.SHAPEBUILDER);
@@ -1059,11 +1060,11 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Set the current shape value of the row. This value only has an effect if a Renderer that
 	 * supports different shapes is used (e.g., {@link prefuse.render.ShapeRenderer}.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
-	 * @param shape
-	 *            the shape value to use
+	 * @param shapeBuilder
+	 *            the ShapeBuilder to use
 	 */
 	public void setShapeBuilder(final int row, final ShapeBuilder shapeBuilder) {
 		set(row, VisualItem.SHAPEBUILDER, shapeBuilder);
@@ -1073,7 +1074,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Get the current stroke used to draw lines and shape outlines for the item at the given row.
-	 * 
+	 *
 	 * @return the stroke used to draw lines and shape outlines
 	 */
 	public BasicStroke getStroke(final int row) {
@@ -1082,7 +1083,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 
 	/**
 	 * Set the current stroke used to draw lines and shape outlines.
-	 * 
+	 *
 	 * @param stroke
 	 *            the stroke to use to draw lines and shape outlines
 	 */
@@ -1095,7 +1096,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Get the current font for the row. The font is used as the default typeface for drawing text
 	 * for this item.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the current font value
@@ -1107,7 +1108,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Set the current font for the the row. The font is used as the default typeface for drawing
 	 * text for this item.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param font
@@ -1120,7 +1121,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Get the starting font for the row. The font is used as the default typeface for drawing text
 	 * for this item.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the starting font value
@@ -1132,7 +1133,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Set the starting font for the row. The font is used as the default typeface for drawing text
 	 * for this item.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param font
@@ -1145,7 +1146,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Get the ending font for the row. The font is used as the default typeface for drawing text
 	 * for this item.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the ending font value
@@ -1157,7 +1158,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	/**
 	 * Set the ending font for the row. The font is used as the default typeface for drawing text
 	 * for this item.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param font
@@ -1174,7 +1175,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * be used to sort items by importance, control item visibility, or influence particular visual
 	 * encodings. A common example is to use the DOI to store the graph distance of a node from the
 	 * nearest selected focus node.
-	 * 
+	 *
 	 * @param row
 	 *            the table row
 	 * @return the DOI value of this item
@@ -1188,7 +1189,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * be used to sort items by importance, control item visibility, or influence particular visual
 	 * encodings. A common example is to use the DOI to store the graph distance of a node from the
 	 * nearest selected focus node.
-	 * 
+	 *
 	 * @param row
 	 *            the table row to set
 	 * @param doi

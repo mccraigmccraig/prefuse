@@ -87,7 +87,7 @@ import prefuse.visual.sort.ItemSorter;
  * {@link #setTransform(java.awt.geom.AffineTransform) setTransform} method
  * allows arbitrary transforms to be applied, while the
  * {@link #pan(double,double) pan} and
- * {@link #zoom(java.awt.geom.Point2D,double) zoom}
+ * {@link #zoom(java.awt.geom.Point2D,double,double) zoom}
  * methods provide convenience methods that appropriately update the current
  * transform to achieve panning and zooming of the presentation space.</p>
  *
@@ -1134,7 +1134,8 @@ public class Display extends JComponent {
      * Zooms the view provided by this display by the given scale,
      * anchoring the zoom at the specified point in screen coordinates.
      * @param p the anchor point for the zoom, in screen coordinates
-     * @param scale the amount to zoom by
+     * @param scaleX the amount to zoom by in the x-dimension
+     * @param scaleY the amount to zoom by in the y-dimension
      */
     public synchronized void zoom(final Point2D p, double scaleX, double scaleY) {
         m_itransform.transform(p, m_tmpPoint);
@@ -1146,7 +1147,8 @@ public class Display extends JComponent {
      * anchoring the zoom at the specified point in absolute coordinates.
      * @param p the anchor point for the zoom, in absolute
      *  (i.e. item-space) co-ordinates
-     * @param scale the amount to zoom by
+     * @param scaleX the amount to zoom by in the x-dimension
+     * @param scaleY the amount to zoom by in the y-dimension
      */
     public synchronized void zoomAbs(final Point2D p, double scaleX, double scaleY) {
         double zx = p.getX(), zy = p.getY();

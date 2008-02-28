@@ -41,8 +41,9 @@ import prefuse.visual.VisualItem;
  * particular data field, consider using the {@link DataShapeAction}.</p>
  *
  * @see PredefinedShape
- * @see ShapeRenderer
- * 
+ * @see prefuse.render.ShapeRenderer
+ * @see VisualItem#SHAPEBUILDER
+ *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class ShapeAction extends EncoderAction {
@@ -149,7 +150,7 @@ public class ShapeAction extends EncoderAction {
      * @see prefuse.action.ItemAction#process(prefuse.visual.VisualItem, double)
      */
     @Override
-	public void process(VisualItem<?> item, double frac) {
+    public void process(VisualItem<?> item, double frac) {
         item.setShapeBuilder(getShape(item));
     }
 
@@ -164,7 +165,7 @@ public class ShapeAction extends EncoderAction {
             if ( o instanceof ShapeAction ) {
                 return ((ShapeAction)o).getShape(item);
             } else if ( o instanceof ShapeBuilder) {
-            	return (ShapeBuilder) o;
+                return (ShapeBuilder) o;
             } else {
                 Logger.getLogger(this.getClass().getName())
                     .warning("Unrecognized Object from predicate chain.");

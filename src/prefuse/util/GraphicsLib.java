@@ -43,8 +43,8 @@ public class GraphicsLib {
      * @param a the first line segment
      * @param b the second line segment
      * @param intersect a Point in which to store the intersection point
-     * @return the intersection code. One of {@link #NO_INTERSECTION},
-     * {@link #COINCIDENT}, or {@link #PARALLEL}.
+     * @return the intersection code. One of {@link IntersectionType#NO_INTERSECTION},
+     * {@link IntersectionType#COINCIDENT}, or {@link IntersectionType#PARALLEL}.
      */
     public static IntersectionType intersectLineLine(Line2D a, Line2D b, Point2D intersect) {
         double a1x = a.getX1(), a1y = a.getY1();
@@ -65,8 +65,8 @@ public class GraphicsLib {
      * @param b2x the x-coordinate of the second endpoint of the second line
      * @param b2y the y-coordinate of the second endpoint of the second line
      * @param intersect a Point in which to store the intersection point
-     * @return the intersection code. One of {@link #NO_INTERSECTION},
-     * {@link #COINCIDENT}, or {@link #PARALLEL}.
+     * @return the intersection code. One of {@link IntersectionType#NO_INTERSECTION},
+     * {@link IntersectionType#COINCIDENT}, or {@link IntersectionType#PARALLEL}.
      */
     public static IntersectionType intersectLineLine(double a1x, double a1y, double a2x,
         double a2y, double b1x, double b1y, double b2x, double b2y,
@@ -98,8 +98,8 @@ public class GraphicsLib {
      * @param r the rectangle
      * @param pts a length 2 or greater array of points in which to store
      * the results
-     * @return the intersection code. One of {@link #NO_INTERSECTION},
-     * {@link #COINCIDENT}, or {@link #PARALLEL}.
+     * @return the intersection code. One of {@link IntersectionType#NO_INTERSECTION},
+     * {@link IntersectionType#COINCIDENT}, or {@link IntersectionType#PARALLEL}.
      */
     public static int intersectLineRectangle(Point2D a1, Point2D a2, Rectangle2D r, Point2D[] pts) {
         double a1x = a1.getX(), a1y = a1.getY();
@@ -142,8 +142,8 @@ public class GraphicsLib {
      * @param r the rectangle
      * @param pts a length 2 or greater array of points in which to store
      * the results
-     * @return the intersection code. One of {@link #NO_INTERSECTION},
-     * {@link #COINCIDENT}, or {@link #PARALLEL}.
+     * @return the intersection code. One of {@link IntersectionType#NO_INTERSECTION},
+     * {@link IntersectionType#COINCIDENT}, or {@link IntersectionType#PARALLEL}.
      */
     public static int intersectLineRectangle(Line2D l, Rectangle2D r, Point2D[] pts) {
         double a1x = l.getX1(), a1y = l.getY1();

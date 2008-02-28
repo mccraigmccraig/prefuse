@@ -185,7 +185,7 @@ public class AxisRenderer extends AbstractShapeRenderer {
     }
 
     /**
-     * @see prefuse.render.Renderer#setBounds(prefuse.visual.VisualItem)
+     * @see prefuse.render.Renderer#calculateBounds(VisualItem,Rectangle2D)
      */
     @Override
 	public void calculateBounds(VisualItem<?> item, Rectangle2D bounds) {

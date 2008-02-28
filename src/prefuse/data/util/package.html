@@ -1,14 +1,14 @@
 <body>
 <p>Utility classes for supporting prefuse data structures, including
-indexes, iterators, filters, and column projections.</p>
+indexes, iterables, filters, and column projections.</p>
 
 <p>Indexes ({@link prefuse.data.util.Index}) support efficient access to
 table rows organized by the data values of a particular column.</p>
 
-<p>Filtered Iterators support selecting subsets of data from data tables.
-This includes optimized queries over table rows (using availabled indexes).
+<p>Filtered Iterables support selecting subsets of data from data tables.
+This includes optimized queries over table rows (using available indexes).
 Currently all query planning is performed by the
-{@link prefuse.data.util.FilterIteratorFactory} class.
+{@link prefuse.data.util.FilterIterableFactory} class.
 </p>
 
 <p>Column Projections filter out unwanted table columns, controlling what
