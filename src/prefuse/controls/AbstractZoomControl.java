@@ -31,6 +31,7 @@ public class AbstractZoomControl extends ControlAdapter {
     /**
      * Zoom the given display at the given point by the zoom factor,
      * in either absolute (item-space) or screen co-ordinates.
+     *
      * @param display the Display to zoom
      * @param p the point to center the zoom upon
      * @param zoom the scale factor by which to zoom
@@ -45,7 +46,7 @@ public class AbstractZoomControl extends ControlAdapter {
 			return NO_ZOOM;
 		}
 
-        double scale = display.getScale();
+        double scale = display.getScaleX();
         double result = scale * zoom;
         int status = ZOOM;
 
@@ -58,9 +59,9 @@ public class AbstractZoomControl extends ControlAdapter {
         }
 
         if ( abs ) {
-			display.zoomAbs(p,zoom);
+			display.zoomAbs(p,zoom, zoom);
 		} else {
-			display.zoom(p,zoom);
+			display.zoom(p, zoom, zoom);
 		}
         display.repaint();
         return status;

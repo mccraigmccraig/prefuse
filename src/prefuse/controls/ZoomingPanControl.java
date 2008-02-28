@@ -135,7 +135,7 @@ public class ZoomingPanControl extends ControlAdapter {
 
             display.pan(deltaX,deltaY);
             if (s != 1.0) {
-				display.zoom(mouseCur, s);
+				display.zoom(mouseCur, s, s);
 			}
 
             if ( repaint ) {
@@ -162,7 +162,7 @@ public class ZoomingPanControl extends ControlAdapter {
             double f = getPace(elapsedTime);
             double s = display.getTransform().getScaleX();
             double z = (f + (1-f)*scale)/s;
-            display.zoom(mouseUp,z);
+            display.zoom(mouseUp, z, z);
             if ( repaint ) {
 				display.repaint();
 			}

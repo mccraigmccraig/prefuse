@@ -94,7 +94,7 @@ public class ExportDisplayAction extends AbstractAction {
                                 new FileOutputStream(f));
             System.out.print("Saving image "+f.getName()+", "+
                              format+" format...");
-            success = display.saveImage(out, format, scale);
+            success = display.saveImage(out, format, scale, scale);
             out.flush();
             out.close();
             System.out.println("\tDONE");

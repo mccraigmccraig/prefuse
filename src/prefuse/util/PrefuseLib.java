@@ -94,8 +94,11 @@ public class PrefuseLib {
         sb.append(StringLib.formatNumber(d.getDisplayX(),2));
         sb.append(", y:");
         sb.append(StringLib.formatNumber(d.getDisplayY(),2));
-        sb.append(", z:");
-        sb.append(StringLib.formatNumber(d.getScale(),5)).append(")");
+        sb.append(", z-x:");
+        sb.append(StringLib.formatNumber(d.getScaleX(),5));
+        sb.append(", z-y:");
+        sb.append(StringLib.formatNumber(d.getScaleY(),5));
+        sb.append(")");
         return sb.toString();
     }
 

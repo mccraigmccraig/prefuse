@@ -691,28 +691,31 @@ public class Display extends JComponent {
      * @param format the image format (e.g., "JPG", "PNG"). The number and kind
      * of available formats varies by platform. See
      * {@link javax.imageio.ImageIO} and related classes for more.
-     * @param scale how much to scale the image by. For example, a value of 2.0
-     * will result in an image with twice the pixel width and height of this
+     * @param scaleX how much to scale the image by in the x-dimension. For example,
+     * a value of 2.0 will result in an image with twice the pixel width of this
+     * Display.
+     * @param scaleY how much to scale the image by in the y-dimension. For example,
+     * a value of 2.0 will result in an image with twice the pixel height of this
      * Display.
      * @return true if image was successfully saved, false if an error occurred.
      */
-    public boolean saveImage(OutputStream output, String format, double scale)
+    public boolean saveImage(OutputStream output, String format, double scaleX, double scaleY)
     {
         try {
             // get an image to draw into
-            Dimension d = new Dimension((int)(scale*getWidth()),
-                                        (int)(scale*getHeight()));
+            Dimension d = new Dimension((int)(scaleX*getWidth()),
+                                        (int)(scaleY*getHeight()));
             BufferedImage img = getNewOffscreenBuffer(d.width, d.height);
             Graphics2D g = (Graphics2D)img.getGraphics();
 
             // set up the display, render, then revert to normal settings
             Point2D p = new Point2D.Double(0,0);
-            zoom(p, scale); // also takes care of damage report
+            zoom(p, scaleX, scaleY); // also takes care of damage report
             boolean q = isHighQuality();
             setHighQuality(true);
             paintDisplay(g, d);
             setHighQuality(q);
-            zoom(p, 1/scale); // also takes care of damage report
+            zoom(p, 1/scaleX, 1/scaleY); // also takes care of damage report
 
             // save the image and return
             ImageIO.write(img, format, output);
@@ -846,7 +849,8 @@ public class Display extends JComponent {
             // compute the approximate size of an "absolute pixel"
             // values too large are OK (though cause unnecessary rendering)
             // values too small will cause incorrect rendering
-            double pixel = 1.0 + 1.0/getScale();
+
+            double pixel = 1.0 + 1.0 / Math.min(getScaleX(), getScaleY());
 
             if ( m_damageRedraw ) {
                 if ( m_clip.isInvalid() ) {
@@ -1033,13 +1037,21 @@ public class Display extends JComponent {
     }
 
     /**
-     * Returns the current scale (zoom) value.
-     * @return the current scale. This is the
-     *  scaling factor along the x-dimension, so be careful when
-     *  using this value in rare non-uniform scaling cases.
+     * Returns the current scale (zoom) value along the x-dimension. This will usually
+     * have the same value as getScaleY().
+     * @return the scaling factor along the x-dimension.
      */
-    public double getScale() {
+    public double getScaleX() {
         return m_transform.getScaleX();
+    }
+
+    /**
+     * Returns the current scale (zoom) value along the y-dimension. This will usually
+     * have the same value as getScaleX().
+     * @return the scaling factor along the y-dimension.
+     */
+    public double getScaleY() {
+        return m_transform.getScaleY();
     }
 
     /**
@@ -1124,9 +1136,9 @@ public class Display extends JComponent {
      * @param p the anchor point for the zoom, in screen coordinates
      * @param scale the amount to zoom by
      */
-    public synchronized void zoom(final Point2D p, double scale) {
+    public synchronized void zoom(final Point2D p, double scaleX, double scaleY) {
         m_itransform.transform(p, m_tmpPoint);
-        zoomAbs(m_tmpPoint, scale);
+        zoomAbs(m_tmpPoint, scaleX, scaleY);
     }
 
     /**
@@ -1136,11 +1148,11 @@ public class Display extends JComponent {
      *  (i.e. item-space) co-ordinates
      * @param scale the amount to zoom by
      */
-    public synchronized void zoomAbs(final Point2D p, double scale) {;
+    public synchronized void zoomAbs(final Point2D p, double scaleX, double scaleY) {
         double zx = p.getX(), zy = p.getY();
         damageReport();
         m_transform.translate(zx, zy);
-        m_transform.scale(scale,scale);
+        m_transform.scale(scaleX, scaleY);
         m_transform.translate(-zx, -zy);
         try {
             m_itransform = m_transform.createInverse();
@@ -1234,48 +1246,52 @@ public class Display extends JComponent {
      * Animate a zoom centered on a given location in screen (pixel)
      * co-ordinates by the given scale using the provided duration.
      * @param p the point to center on in screen (pixel) units
-     * @param scale the scale factor to zoom by
+     * @param scaleX the scale factor (X) to zoom by
+     * @param scaleY the scale factor (Y) to zoom by
      * @param duration the duration of the animation, in milliseconds
      */
-    public synchronized void animateZoom(final Point2D p, double scale, long duration) {
+    public synchronized void animateZoom(final Point2D p, double scaleX, double scaleY, long duration) {
         Point2D pp = new Point2D.Double();
         m_itransform.transform(p,pp);
-        animateZoomAbs(pp,scale,duration);
+        animateZoomAbs(pp, scaleX, scaleY, duration);
     }
 
     /**
      * Animate a zoom centered on a given location in absolute (item-space)
      * co-ordinates by the given scale using the provided duration.
      * @param p the point to center on in absolute (item-space) units
-     * @param scale the scale factor to zoom by
+     * @param scaleX the scale factor (X) to zoom by
+     * @param scaleY the scale factor (Y) to zoom by
      * @param duration the duration of the animation, in milliseconds
      */
-    public synchronized void animateZoomAbs(final Point2D p, double scale, long duration) {
-        m_transact.zoom(p,scale,duration);
+    public synchronized void animateZoomAbs(final Point2D p, double scaleX, double scaleY, long duration) {
+        m_transact.zoom(p, scaleX, scaleY, duration);
     }
 
     /**
      * Animate a pan to the specified location in screen (pixel)
      * co-ordinates and zoom to the given scale using the provided duration.
      * @param p the point to center on in screen (pixel) units
-     * @param scale the scale factor to zoom by
+     * @param scaleX the scale factor (X) to zoom by
+     * @param scaleY the scale factor (Y) to zoom by
      * @param duration the duration of the animation, in milliseconds
      */
-    public synchronized void animatePanAndZoomTo(final Point2D p, double scale, long duration) {
+    public synchronized void animatePanAndZoomTo(final Point2D p, double scaleX, double scaleY, long duration) {
         Point2D pp = new Point2D.Double();
         m_itransform.transform(p,pp);
-        animatePanAndZoomToAbs(pp,scale,duration);
+        animatePanAndZoomToAbs(pp, scaleX, scaleY, duration);
     }
 
     /**
      * Animate a pan to the specified location in absolute (item-space)
      * co-ordinates and zoom to the given scale using the provided duration.
      * @param p the point to center on in absolute (item-space) units
-     * @param scale the scale factor to zoom by
+     * @param scaleX the scale factor (X) to zoom by
+     * @param scaleY the scale factor (Y) to zoom by
      * @param duration the duration of the animation, in milliseconds
      */
-    public synchronized void animatePanAndZoomToAbs(final Point2D p, double scale, long duration) {
-        m_transact.panAndZoom(p,scale,duration);
+    public synchronized void animatePanAndZoomToAbs(final Point2D p, double scaleX, double scaleY, long duration) {
+        m_transact.panAndZoom(p, scaleX, scaleY, duration);
     }
 
     /**
@@ -1290,8 +1306,8 @@ public class Display extends JComponent {
      * Activity for conducting animated view transformations.
      */
     private class TransformActivity extends Activity {
-        // TODO: clean this up to be more general...
-        // TODO: change mechanism so that multiple transform
+
+    	// TODO: change mechanism so that multiple transform
         //        activities can be running at once?
 
         private final double[] src, dst;
@@ -1303,20 +1319,26 @@ public class Display extends JComponent {
             m_at = new AffineTransform();
             setPacingFunction(new SlowInSlowOutPacer());
         }
-        private AffineTransform getTransform() {
+
+        private void prepareChange(long duration) {
             if ( this.isScheduled() ) {
 				m_at.setTransform(dst[0],dst[1],dst[2],dst[3],dst[4],dst[5]);
 			} else {
 				m_at.setTransform(m_transform);
 			}
-            return m_at;
-        }
-        public void panAndZoom(final Point2D p, double scale, long duration) {
-            AffineTransform at = getTransform();
             this.cancel();
             setDuration(duration);
+        }
 
-            m_tmpPoint.setLocation(0,0);
+        private void startChange() {
+            m_at.getMatrix(dst);
+            m_transform.getMatrix(src);
+            this.run();
+        }
+
+        public void panAndZoom(final Point2D p, double scaleX, double scaleY, long duration) {
+        	prepareChange(duration);
+        	m_tmpPoint.setLocation(0,0);
             m_itransform.transform(m_tmpPoint,m_tmpPoint);
             double x = p.getX(); x = Double.isNaN(x) ? 0 : x;
             double y = p.getY(); y = Double.isNaN(y) ? 0 : y;
@@ -1324,36 +1346,24 @@ public class Display extends JComponent {
             double h = getHeight()/(2*m_transform.getScaleY());
             double dx = w-x+m_tmpPoint.getX();
             double dy = h-y+m_tmpPoint.getY();
-            at.translate(dx,dy);
-
-            at.translate(p.getX(), p.getY());
-            at.scale(scale,scale);
-            at.translate(-p.getX(), -p.getY());
-
-            at.getMatrix(dst);
-            m_transform.getMatrix(src);
-            this.run();
+            m_at.translate(dx,dy);
+            m_at.translate(p.getX(), p.getY());
+            m_at.scale(scaleX, scaleY);
+            m_at.translate(-p.getX(), -p.getY());
+            startChange();
         }
         public void pan(double dx, double dy, long duration) {
-            AffineTransform at = getTransform();
-            this.cancel();
-            setDuration(duration);
-            at.translate(dx,dy);
-            at.getMatrix(dst);
-            m_transform.getMatrix(src);
-            this.run();
+        	prepareChange(duration);
+            m_at.translate(dx,dy);
+            startChange();
         }
-        public void zoom(final Point2D p, double scale, long duration) {
-            AffineTransform at = getTransform();
-            this.cancel();
-            setDuration(duration);
+        public void zoom(final Point2D p, double scaleX, double scaleY, long duration) {
+        	prepareChange(duration);
             double zx = p.getX(), zy = p.getY();
-            at.translate(zx, zy);
-            at.scale(scale,scale);
-            at.translate(-zx, -zy);
-            at.getMatrix(dst);
-            m_transform.getMatrix(src);
-            this.run();
+            m_at.translate(zx, zy);
+            m_at.scale(scaleX, scaleY);
+            m_at.translate(-zx, -zy);
+            startChange();
         }
         @Override
 		protected void run(long elapsedTime) {

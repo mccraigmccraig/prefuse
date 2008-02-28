@@ -249,7 +249,7 @@ public class GraphView extends JPanel {
         scrollableView.add(display, BorderLayout.CENTER);
         scrollableView.add(new DisplayScrollBar(display, JScrollBar.HORIZONTAL), BorderLayout.SOUTH);
         scrollableView.add(new DisplayScrollBar(display, JScrollBar.VERTICAL), BorderLayout.EAST);
-        
+
 
         // create a new JSplitPane to present the interface
         JSplitPane split = new JSplitPane();
@@ -363,7 +363,7 @@ public class GraphView extends JPanel {
                 g.getEdgeTable().addColumns(GraphLib.LABEL_SCHEMA);
 
                 TableNode[] nodes = new TableNode[5];
-                
+
                 for ( int i=0; i < 5; i++ ) {
                 	nodes[i] = g.addNode();
                     nodes[i].setString(GraphLib.LABEL, String.valueOf(i));
@@ -537,9 +537,9 @@ public class GraphView extends JPanel {
         private final double m_d = 15;
         public void itemBoundsChanged(Display d) {
             d.getItemBounds(m_temp);
-            GraphicsLib.expand(m_temp, 25/d.getScale());
+            GraphicsLib.expand(m_temp, 25/d.getScaleX());
 
-            double dd = m_d/d.getScale();
+            double dd = m_d/d.getScaleX();
             double xd = Math.abs(m_temp.getMinX()-m_bounds.getMinX());
             double yd = Math.abs(m_temp.getMinY()-m_bounds.getMinY());
             double wd = Math.abs(m_temp.getWidth()-m_bounds.getWidth());

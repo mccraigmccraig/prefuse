@@ -101,9 +101,9 @@ public class DisplayLib {
 
     /**
      * Return the centroid (averaged location) of a group of items.
+     *
      * @param iter an iterator of VisualItems
-     * @return the centroid point. A new Point2D instance is allocated
-     * and returned.
+     * @return the centroid point. A new Point2D instance is allocated and returned.
      */
     public static Point2D getCentroid(Iterable<VisualItem<?>> iter)
     {
@@ -111,7 +111,9 @@ public class DisplayLib {
     }
 
     /**
-     * Set the display view such that the given bounds are within view.
+     * Set the display view such that the given bounds are within view. Uses the same
+     * scaling for x and y dimensions.
+     *
      * @param display the Display instance
      * @param bounds the bounds that should be visible in the Display view
      * @param duration the duration of an animated transition. A value of
@@ -125,7 +127,9 @@ public class DisplayLib {
 
     /**
      * Set the display view such that the given bounds are within view, subject
-     * to a given center point being maintained.
+     * to a given center point being maintained. Uses the same scaling for x and y
+     * dimensions.
+     *
      * @param display the Display instance
      * @param bounds the bounds that should be visible in the Display view
      * @param center the point that should be the center of the Display
@@ -150,17 +154,17 @@ public class DisplayLib {
         // compute scale factor
         //  - figure out if z or y dimension takes priority
         //  - then balance against the current scale factor
-        double scale = Math.min(w/(2*wb),h/(2*hb)) / display.getScale();
+        double scale = Math.min(w/(2*wb),h/(2*hb)) / display.getScaleX();
 
         // animate to new display settings
         if ( center == null ) {
 			center = new Point2D.Double(cx,cy);
 		}
         if ( duration > 0 ) {
-            display.animatePanAndZoomToAbs(center,scale,duration);
+            display.animatePanAndZoomToAbs(center,scale,scale,duration);
         } else {
             display.panToAbs(center);
-            display.zoomAbs(center, scale);
+            display.zoomAbs(center, scale, scale);
         }
     }
 

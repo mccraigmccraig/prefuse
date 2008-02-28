@@ -102,7 +102,7 @@ public class ZoomToFitControl extends ControlAdapter {
         {
             Visualization vis = display.getVisualization();
             Rectangle2D bounds = vis.getBounds(m_group);
-            GraphicsLib.expand(bounds, m_margin + (int)(1/display.getScale()));
+            GraphicsLib.expand(bounds, m_margin + (int)(1/display.getScaleX()));
             DisplayLib.fitViewToBounds(display, bounds, m_duration);
         }
     }
