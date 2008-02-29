@@ -112,7 +112,7 @@ public class UILib {
      * Add a strut, or rigid spacing, to a UI component
      * @param b the component to add the strut to, should be either a Box or a
      * Container using a BoxLayout.
-     * @param horiz indicates if the strust should horizontal (true) or vertical
+     * @param horiz indicates if the struts should horizontal (true) or vertical
      * (false)
      * @param size the length, in pixels, of the strut
      */
