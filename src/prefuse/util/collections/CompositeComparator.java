@@ -38,8 +38,8 @@ public class CompositeComparator<E> implements Comparator<E> {
      * Creates a new CompositeComparator.
      * @param cmp the constituent comparators of this composite
      */
-    public CompositeComparator(Comparator<? super E>[] cmp) {
-        this(cmp, false);
+    public CompositeComparator(Comparator<? super E> ... cmp) {
+        this(false, cmp);
     }
 
     /**
@@ -48,7 +48,7 @@ public class CompositeComparator<E> implements Comparator<E> {
      * @param reverse when true, reverses the sort order of the included
      * comparators, when false, objects are sorted as usual
      */
-    public CompositeComparator(Comparator<? super E>[] cmp, boolean reverse) {
+    public CompositeComparator(boolean reverse, Comparator<? super E> ... cmp) {
         this(cmp.length, reverse);
         System.arraycopy(cmp, 0, m_cmp, 0, cmp.length);
         m_size = cmp.length;
