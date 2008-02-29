@@ -202,11 +202,11 @@ public class IOLib {
      * @throws IOException if an input/ouput error occurs
      */
     public static ByteArrayList readAsBytes(InputStream is) throws IOException {
-        ByteArrayList buf = new ByteArrayList();
+        ByteArrayList buf = new ByteArrayList(8192);
         byte[] b = new byte[8192];
         int nread = -1;
         while ( (nread=is.read(b)) >= 0 ) {
-            buf.add(b, 0, nread);
+            buf.write(b, 0, nread);
         }
         return buf;
     }
