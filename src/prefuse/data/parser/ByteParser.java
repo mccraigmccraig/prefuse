@@ -45,13 +45,13 @@ public class ByteParser implements DataParser {
      * @see prefuse.data.parser.DataParser#parse(java.lang.String)
      */
     public Object parse(String text) throws DataParseException {
-        return new Byte(parseByte(text));
+        return (Byte) parseByte(text);
     }
 
     /**
-     * Parse an int value from a text string.
+     * Parse a byte value from a text string.
      * @param text the text string to parse
-     * @return the parsed int value
+     * @return the parsed byte value
      * @throws DataParseException if an error occurs during parsing
      */
     public static byte parseByte(String text) throws DataParseException {
