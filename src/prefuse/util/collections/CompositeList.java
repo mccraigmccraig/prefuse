@@ -4,46 +4,45 @@ import java.util.AbstractList;
 import java.util.List;
 
 /**
- * IntIterator implementation that combines the results of multiple
- * int iterators.
+ * List implementation that combines multiple Lists (which are assumed to be immutable).
  *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class CompositeList <E> extends AbstractList<E> {
 
-    private final List<E>[] iters;
-    private final int len;
+    private final List<E>[] lists;
+    private final int size;
 
-    public CompositeList(List<E> ... iters) {
-        this.iters = iters;
+    public CompositeList(List<E> ... lists) {
+        this.lists = lists;
         int tmp = 0;
-        for (List<E> element : iters) {
+        for (List<E> element : lists) {
         	tmp += element.size();
         }
-        this.len = tmp;
+        this.size = tmp;
     }
 
 	@Override
 	public E get(int index) {
-		if(index >= len) {
+		if(index >= size) {
 			throw new IndexOutOfBoundsException();
 		}
 		int i = 0;
 		int pos = 0;
-		while(index - pos >= iters[i].size()) {
-			pos += iters[i++].size();
+		while(index - pos >= lists[i].size()) {
+			pos += lists[i++].size();
 		}
-		return iters[i].get(index - pos);
+		return lists[i].get(index - pos);
 	}
 
 	@Override
 	public int size() {
-		return len;
+		return size;
 	}
 
 	public int indexOf(Object o) {
 		int base = 0;
-		for (List<E> element : iters) {
+		for (List<E> element : lists) {
 			int idx = element.indexOf(o);
 			if(idx >= 0) {
 				return base + idx;
