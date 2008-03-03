@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
 import prefuse.ShapeBuilder;
-import prefuse.PredefinedShape;
 import prefuse.Visualization;
 import prefuse.data.Graph;
 import prefuse.data.Table;
