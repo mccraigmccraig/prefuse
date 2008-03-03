@@ -79,7 +79,7 @@ public class IntColumn extends AbstractColumn {
      * @see prefuse.data.column.Column#get(int)
      */
     public Object get(int row) {
-        return new Integer(getInt(row));
+        return (Integer) getInt(row);
     }
 
     /**

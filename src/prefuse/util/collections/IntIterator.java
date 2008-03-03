@@ -16,7 +16,7 @@ public abstract class IntIterator extends AbstractLiteralIterator {
      * @see java.util.Iterator#next()
      */
     public Object next() {
-        return new Integer(nextInt());
+        return (Integer) nextInt();
     }
 
     /**
