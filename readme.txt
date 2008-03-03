@@ -1,5 +1,5 @@
 prefuse README
-beta release - initial release february 2006, current release 2007.10.20
+beta release - initial release february 2006, current release 2008.03.04
 
 --INTRO--
 
@@ -28,9 +28,9 @@ The toolkit distribution uses the following organization:
 
 --REQUIREMENTS--
 
-prefuse is written in Java 1.4, using the Java2D graphics library. To compile
+prefuse is written in Java 1.5, using the Java2D graphics library. To compile
 the prefuse code, and to build and run prefuse applications, you'll need a
-copy of the Java Development Kit (JDK) for version 1.4.2 or greater. You can
+copy of the Java Development Kit (JDK) for version 1.5.0 or greater. You can
 download the most recent version of the JDK from
 http://java.sun.com/j2se/1.5.0/download.html.
 
