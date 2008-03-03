@@ -2,6 +2,7 @@ package prefuse.data.expression;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Abstract base class for Predicate instances that maintain one or
@@ -9,9 +10,9 @@ import java.util.Iterator;
  *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public abstract class CompositePredicate extends AbstractPredicate {
+public abstract class CompositePredicate extends AbstractPredicate implements Cloneable {
 
-    protected final ArrayList<Predicate> m_clauses;
+    protected List<Predicate> m_clauses;
 
     /**
      * Create a new CompositePredicate.
@@ -119,18 +120,11 @@ public abstract class CompositePredicate extends AbstractPredicate {
     public Predicate getSubPredicate(Predicate p) {
         CompositePredicate cp = null;
         try {
-            cp  = this.getClass().newInstance();
-        } catch (InstantiationException e) {
-            // won't happen
-        } catch (IllegalAccessException e) {
-            // won't happen
+            cp  = (CompositePredicate) clone();
+        } catch (CloneNotSupportedException ex) {
+      		throw new RuntimeException(ex);
         }
-        for ( int i=0; i<m_clauses.size(); ++i ) {
-            Predicate pp = m_clauses.get(i);
-            if ( p != pp ) {
-                cp.add(pp);
-            }
-        }
+        cp.remove(p);
         return cp;
     }
 
@@ -201,6 +195,13 @@ public abstract class CompositePredicate extends AbstractPredicate {
 
         sbuf.append(')');
         return sbuf.toString();
+    }
+
+    protected Object clone() throws CloneNotSupportedException {
+    	CompositePredicate clone = (CompositePredicate) super.clone();
+    	// deep copy the clauses
+    	clone.m_clauses = new ArrayList(clone.m_clauses);
+    	return clone;
     }
 
 } // end of abstract class CompositePredicate
