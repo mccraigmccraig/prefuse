@@ -1,5 +1,6 @@
 package prefuse.render;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -448,10 +449,13 @@ public class LabelRenderer extends AbstractShapeRenderer {
 			return;
 		}
 
+        final Color strokeColor = ColorLib.getColor(item.getStrokeColor());
+        final Color fillColor = ColorLib.getColor(item.getFillColor());
+
         // fill the shape, if requested
         RenderType type = getRenderType(item);
         if ( type==RenderType.FILL || type==RenderType.DRAW_AND_FILL ) {
-			GraphicsLib.paint(g, item, shape, getStroke(item), RenderType.FILL);
+			GraphicsLib.paint(g, strokeColor, fillColor, shape, getStroke(item), RenderType.FILL);
 		}
 
         // now render the image and text
@@ -589,7 +593,7 @@ public class LabelRenderer extends AbstractShapeRenderer {
 
         // draw border
         if (type==RenderType.DRAW || type==RenderType.DRAW_AND_FILL) {
-            GraphicsLib.paint(g,item,shape,getStroke(item),RenderType.DRAW);
+            GraphicsLib.paint(g,strokeColor,fillColor,shape,getStroke(item),RenderType.DRAW);
         }
     }
 

@@ -1,12 +1,14 @@
 package prefuse.render;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import prefuse.util.ColorLib;
 import prefuse.util.GraphicsLib;
 import prefuse.visual.VisualItem;
 
@@ -61,7 +63,9 @@ public abstract class AbstractShapeRenderer implements Renderer {
      * can be called by subclasses in custom rendering routines.
      */
     protected void drawShape(Graphics2D g, VisualItem<?> item, Shape shape) {
-        GraphicsLib.paint(g, item, shape, getStroke(item), getRenderType(item));
+        Color strokeColor = ColorLib.getColor(item.getStrokeColor());
+        Color fillColor = ColorLib.getColor(item.getFillColor());
+        GraphicsLib.paint(g, strokeColor, fillColor, shape, getStroke(item), getRenderType(item));
     }
 
     /**
@@ -151,7 +155,7 @@ public abstract class AbstractShapeRenderer implements Renderer {
         if ( shape == null ) {
         	bounds.setRect(item.getX(), item.getY(), 0, 0);
         } else {
-            GraphicsLib.calculateBounds(item, shape, getStroke(item), bounds);
+            GraphicsLib.calculateBounds(shape, getStroke(item), bounds);
         }
     }
 

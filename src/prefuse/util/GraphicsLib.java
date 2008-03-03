@@ -16,7 +16,6 @@ import java.awt.geom.RoundRectangle2D;
 
 import prefuse.Alignment;
 import prefuse.render.RenderType;
-import prefuse.visual.VisualItem;
 
 /**
  * Library of useful computer graphics routines such as geometry routines
@@ -652,37 +651,16 @@ public class GraphicsLib {
     // ------------------------------------------------------------------------
 
     /**
-     * Sets a VisualItem's bounds based on its shape and stroke type. This
+     * Calculates bounds based on a shape and stroke type. This
      * method is optimized to avoid calling .getBounds2D where it can, thus
      * avoiding object initialization and reducing object churn.
-     * @param item the VisualItem whose bounds are to be set
-     * @param shape a Shape from which to determine the item bounds
-     * @param stroke the stroke type that will be used for drawing the object,
-     * and may affect the final bounds. A null value indicates the
-     * default (line width = 1) stroke is used.
-     */
-    public static void setBounds(VisualItem<?> item,
-                                 Shape shape, BasicStroke stroke)
-    {
-    	// TODO: can this be made more efficient - like by avoiding construction of bounds object?
-    	Rectangle2D bounds = new Rectangle2D.Double();
-    	calculateBounds(item, shape, stroke, bounds);
-        item.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
-    }
-
-    /**
-     * Calculates a VisualItem's bounds based on its shape and stroke type. This
-     * method is optimized to avoid calling .getBounds2D where it can, thus
-     * avoiding object initialization and reducing object churn.
-     * @param item the VisualItem whose bounds are to be set
-     * @param shape a Shape from which to determine the item bounds
+     * @param shape a Shape from which to determine the bounds
      * @param stroke the stroke type that will be used for drawing the object,
      * and may affect the final bounds. A null value indicates the
      * default (line width = 1) stroke is used.
      * @param bounds the rectangle to populate with the bounds
      */
-    public static void calculateBounds(VisualItem<?> item,
-                                 Shape shape, BasicStroke stroke, Rectangle2D bounds)
+    public static void calculateBounds(Shape shape, BasicStroke stroke, Rectangle2D bounds)
     {
         double x, y, w, h, lw, lw2;
 
@@ -750,7 +728,7 @@ public class GraphicsLib {
      * @param type the rendering type indicating if the shape should be drawn,
      * filled, or both.
      */
-    public static void paint(Graphics2D g, VisualItem<?> item,
+    public static void paint(Graphics2D g, Color strokeColor, Color fillColor,
                              Shape shape, BasicStroke stroke, RenderType type)
     {
         // if render type is NONE, then there is nothing to do
@@ -759,8 +737,6 @@ public class GraphicsLib {
 		}
 
         // set up colors
-        Color strokeColor = ColorLib.getColor(item.getStrokeColor());
-        Color fillColor = ColorLib.getColor(item.getFillColor());
         boolean sdraw = (type == RenderType.DRAW ||
                          type == RenderType.DRAW_AND_FILL) &&
                         strokeColor.getAlpha() != 0;

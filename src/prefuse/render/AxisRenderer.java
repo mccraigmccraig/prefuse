@@ -1,5 +1,6 @@
 package prefuse.render;
 
+import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Shape;
@@ -142,7 +143,11 @@ public class AxisRenderer extends AbstractShapeRenderer {
     @Override
     public void render(Graphics2D g, VisualItem<?> item) {
     	Shape s = getShape(item);
-    	GraphicsLib.paint(g, item, m_line, getStroke(item), getRenderType(item));
+
+    	Color strokeColor = ColorLib.getColor(item.getStrokeColor());
+        Color fillColor = ColorLib.getColor(item.getFillColor());
+
+    	GraphicsLib.paint(g, strokeColor, fillColor, m_line, getStroke(item), getRenderType(item));
 
     	// check if we have a text label, if so, render it
     	if ( item.canGetString(VisualItem.LABEL) ) {
@@ -150,7 +155,7 @@ public class AxisRenderer extends AbstractShapeRenderer {
 	    	float y = (float)m_box.getMinY() + m_ascent;
 
 	    	// draw label background
-	    	GraphicsLib.paint(g, item, s, null, RenderType.FILL);
+	    	GraphicsLib.paint(g, strokeColor, fillColor, s, null, RenderType.FILL);
 
 	    	String str = item.getString(VisualItem.LABEL);
 	    	AffineTransform origTransform = g.getTransform();
@@ -197,7 +202,7 @@ public class AxisRenderer extends AbstractShapeRenderer {
         if ( shape == null ) {
         	bounds.setRect(item.getX(), item.getY(), 0, 0);
         } else if ( shape == m_line ) {
-            GraphicsLib.calculateBounds(item, shape, getStroke(item), bounds);
+            GraphicsLib.calculateBounds(shape, getStroke(item), bounds);
         } else {
             m_box.add(m_line.getX1(),m_line.getY1());
             m_box.add(m_line.getX2(),m_line.getY2());

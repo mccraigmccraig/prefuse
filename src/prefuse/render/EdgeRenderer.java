@@ -339,7 +339,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
         	bounds.setRect(item.getX(), item.getY(), 0, 0);
 			return;
         }
-        GraphicsLib.calculateBounds(item, shape, getStroke(item), bounds);
+        GraphicsLib.calculateBounds(shape, getStroke(item), bounds);
         if ( m_curArrow != null ) {
             Rectangle2D.union(bounds, m_curArrow.getBounds2D(), bounds);
         }
