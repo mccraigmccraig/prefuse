@@ -2,6 +2,7 @@ package prefuse.data.util;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import prefuse.data.Edge;
 import prefuse.data.Node;
@@ -123,8 +124,8 @@ public class BreadthFirstIterator implements Iterator<Tuple<?>> {
      * @param n a node
      * @return an iterator over edges incident on the node
      */
-    protected Iterable<Edge<?,?>> getEdges(Node<?,?> n) {
-        return (Iterable<Edge<?,?>>) (Object) n.edges(); // TODO: add support for all edges, in links only, out links only
+    protected List<Edge<?,?>> getEdges(Node<?,?> n) {
+        return (List<Edge<?,?>>) (Object) n.edges(); // TODO: add support for all edges, in links only, out links only
     }
 
     /**
