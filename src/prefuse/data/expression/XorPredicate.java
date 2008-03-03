@@ -12,21 +12,6 @@ import prefuse.data.Tuple;
 public class XorPredicate extends CompositePredicate {
 
     /**
-     * Create an empty XorPredicate. Empty XorPredicates return false
-     * by default.
-     */
-    public XorPredicate() {
-    }
-
-    /**
-     * Create a new XorPredicate.
-     * @param p1 the sole clause of this predicate
-     */
-    public XorPredicate(Predicate p1) {
-        add(p1);
-    }
-
-    /**
      * Create a new XorPredicate.
      * @param predicates the clauses of this predicate
      */
@@ -39,7 +24,7 @@ public class XorPredicate extends CompositePredicate {
      */
     @Override
 	public boolean getBoolean(Tuple<?> t) {
-        if ( m_clauses.size() == 0 ) {
+        if ( m_clauses.isEmpty() ) {
 			return false;
 		}
 

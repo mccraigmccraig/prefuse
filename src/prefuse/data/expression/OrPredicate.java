@@ -1,7 +1,5 @@
 package prefuse.data.expression;
 
-import java.util.Iterator;
-
 import prefuse.data.Tuple;
 
 /**
@@ -10,21 +8,6 @@ import prefuse.data.Tuple;
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
 public class OrPredicate extends CompositePredicate {
-
-    /**
-     * Create an empty OrPredicate. Empty OrPredicates return false
-     * by default.
-     */
-    public OrPredicate() {
-    }
-
-    /**
-     * Create a new OrPredicate.
-     * @param p1 the sole clause of this predicate
-     */
-    public OrPredicate(Predicate p1) {
-        add(p1);
-    }
 
     /**
      * Create a new OrPredicate.
@@ -39,16 +22,13 @@ public class OrPredicate extends CompositePredicate {
      */
     @Override
 	public boolean getBoolean(Tuple<?> t) {
-        if ( m_clauses.size() == 0 ) {
+        if ( m_clauses.isEmpty() ) {
 			return false;
 		}
-
-        Iterator<?> iter = m_clauses.iterator();
-        while ( iter.hasNext() ) {
-            Predicate p = (Predicate)iter.next();
-            if ( p.getBoolean(t) ) {
-                return true;
-            }
+        for(Predicate p : m_clauses) {
+        	if(p.getBoolean(t)) {
+        		return true;
+        	}
         }
         return false;
     }
