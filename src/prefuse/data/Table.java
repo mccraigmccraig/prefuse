@@ -62,7 +62,7 @@ import prefuse.util.collections.IntIterator;
  * filtered by providing a {@link prefuse.data.expression.Predicate},
  * allowing tables to be queried for specific values.</p>
  *
- * <p>Columns (alternativele referred to as data fields) can be added to
+ * <p>Columns (alternatively referred to as data fields) can be added to
  * the Table using {@link #addColumn(String, Class)} and a host of
  * similar methods. This method will automatically determine the right
  * kind of backing column instance to use. Furthermore, Table columns
@@ -1665,7 +1665,7 @@ public abstract class Table <T extends Tuple<?>> extends AbstractTupleSet<T> imp
     }
 
     /**
-     * Get an interator over the row numbers of this table.
+     * Get an iterator over the row numbers of this table.
      * @return an iterator over the rows of this table
      */
     public IntIterator rows() {
@@ -1683,8 +1683,8 @@ public abstract class Table <T extends Tuple<?>> extends AbstractTupleSet<T> imp
     }
 
     /**
-     * Get an interator over the row numbers of this table.
-     * @param reverse true to iterate in rever order, false for normal order
+     * Get an iterator over the row numbers of this table.
+     * @param reverse true to iterate in reverse order, false for normal order
      * @return an iterator over the rows of this table
      */
     public IntIterator rows(boolean reverse) {
@@ -1708,7 +1708,7 @@ public abstract class Table <T extends Tuple<?>> extends AbstractTupleSet<T> imp
     }
 
     /**
-     * Return an iterator over a range of rwos in this table, determined
+     * Return an iterator over a range of rows in this table, determined
      * by a bounded range for a given data field. A new index over the
      * data field will be created if it doesn't already exist.
      * @param field the data field for determining the bounded range
@@ -1726,7 +1726,7 @@ public abstract class Table <T extends Tuple<?>> extends AbstractTupleSet<T> imp
     }
 
     /**
-     * Return an iterator over a range of rwos in this table, determined
+     * Return an iterator over a range of rows in this table, determined
      * by a bounded range for a given data field. A new index over the
      * data field will be created if it doesn't already exist.
      * @param field the data field for determining the bounded range
@@ -1744,7 +1744,7 @@ public abstract class Table <T extends Tuple<?>> extends AbstractTupleSet<T> imp
     }
 
     /**
-     * Return an iterator over a range of rwos in this table, determined
+     * Return an iterator over a range of rows in this table, determined
      * by a bounded range for a given data field. A new index over the
      * data field will be created if it doesn't already exist.
      * @param field the data field for determining the bounded range
@@ -1762,7 +1762,7 @@ public abstract class Table <T extends Tuple<?>> extends AbstractTupleSet<T> imp
     }
 
     /**
-     * Return an iterator over a range of rwos in this table, determined
+     * Return an iterator over a range of rows in this table, determined
      * by a bounded range for a given data field. A new index over the
      * data field will be created if it doesn't already exist.
      * @param field the data field for determining the bounded range
@@ -1780,7 +1780,7 @@ public abstract class Table <T extends Tuple<?>> extends AbstractTupleSet<T> imp
     }
 
     /**
-     * Return an iterator over a range of rwos in this table, determined
+     * Return an iterator over a range of rows in this table, determined
      * by a bounded range for a given data field. A new index over the
      * data field will be created if it doesn't already exist.
      * @param field the data field for determining the bounded range
