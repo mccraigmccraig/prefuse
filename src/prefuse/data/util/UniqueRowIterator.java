@@ -7,7 +7,7 @@ import prefuse.util.collections.IntIterator;
 
 /**
  * IntIterator over rows that ensures that no duplicates appear in the
- * iteration. Uses a bitset to note rows it has has seen and not pass along
+ * iteration. Uses a BitSet to note rows it has has seen and not pass along
  * duplicate row values.
  *
  * @author <a href="http://jheer.org">jeffrey heer</a>
