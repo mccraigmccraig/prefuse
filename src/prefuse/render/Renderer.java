@@ -53,7 +53,7 @@ public interface Renderer {
 
     /**
      *
-     * @return true iff the renderer manages the bounds of the items it renders
+     * @return true if and only if the renderer manages the bounds of the items it renders
      */
 	public boolean managesBounds();
 
