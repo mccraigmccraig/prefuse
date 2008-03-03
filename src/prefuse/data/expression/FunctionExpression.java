@@ -482,7 +482,7 @@ class Log10Function extends DoubleFunction {
     public String getName() { return "LOG10"; }
     public double getDouble(Tuple<?> t) {
         if ( paramCount() == 1 ) {
-            return MathLib.log10(param(0).getDouble(t));
+            return Math.log10(param(0).getDouble(t));
         } else {
             missingParams(); return Double.NaN;
         }

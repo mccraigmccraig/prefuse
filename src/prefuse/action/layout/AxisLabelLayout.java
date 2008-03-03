@@ -274,9 +274,9 @@ public class AxisLabelLayout extends Layout {
         double pspan = m_prevhi-m_prevlo;
         double vlo = 0;
         if ( m_lo >= 0 ) {
-            vlo = Math.pow(10, Math.floor(MathLib.log10(m_lo)));
+            vlo = Math.pow(10, Math.floor(Math.log10(m_lo)));
         } else {
-            vlo = -Math.pow(10, 1+Math.floor(MathLib.log10(-m_lo)));
+            vlo = -Math.pow(10, 1+Math.floor(Math.log10(-m_lo)));
         }
         //if ( vlo == 10 || vlo == 1 || vlo == 0.1 ) vlo = 0;
 
@@ -386,7 +386,7 @@ public class AxisLabelLayout extends Layout {
         double lhi = MathLib.safeLog10(m_hi);
         double lspan = lhi - llo;
 
-        double d = MathLib.log10(lhi-llo);
+        double d = Math.log10(lhi-llo);
         int e = (int)Math.floor(d);
         int ilo = (int)Math.floor(llo);
         int ihi = (int)Math.ceil(lhi);

@@ -12,8 +12,6 @@ public class MathLib {
 
     /** The value 2 * PI */
     public static final double TWO_PI = 2*Math.PI;
-    /** The natural logarithm of 10 */
-    public static final double LOG10 = Math.log(10);
     /** The natural logarithm of 2 */
     public static final double LOG2 = Math.log(2);
 
@@ -31,15 +29,6 @@ public class MathLib {
     }
 
     /**
-     * The base 10 logarithm of the input value
-     * @param x the input value
-     * @return the base 10 logarithm
-     */
-    public static double log10(double x) {
-        return Math.log(x)/LOG10;
-    }
-
-    /**
      * The "safe" base 10 logarithm of the input value, handling
      * negative values by simply making them positive and then
      * negating the return value.
@@ -50,7 +39,7 @@ public class MathLib {
         boolean neg = x < 0.0;
         if ( neg ) { x = -x; }
         if ( x < 10.0 ) { x += (10.0-x) / 10; }
-        x = Math.log(x) / LOG10;
+        x = Math.log10(x);
 
         return neg ? -x : x;
     }
