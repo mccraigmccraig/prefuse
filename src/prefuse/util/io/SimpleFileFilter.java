@@ -2,7 +2,6 @@ package prefuse.util.io;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.filechooser.FileFilter;
@@ -14,7 +13,7 @@ import javax.swing.filechooser.FileFilter;
  */
 public class SimpleFileFilter extends FileFilter {
 
-    private final List exts = new ArrayList();
+    private final List<String> exts = new ArrayList<String>();
     private final String desc;
     private Object data;
 
@@ -64,8 +63,7 @@ public class SimpleFileFilter extends FileFilter {
 			return false;
 		}
 
-        for ( Iterator iter = exts.iterator(); iter.hasNext(); ) {
-            String ext = (String)iter.next();
+        for(String ext : exts) {
             if ( ext.equalsIgnoreCase(extension) ) {
 				return true;
 			}
@@ -94,7 +92,7 @@ public class SimpleFileFilter extends FileFilter {
      * @return the first file extension associated with this filter
      */
     public String getExtension() {
-        return (String)exts.get(0);
+        return exts.get(0);
     }
 
 } // end of class SimpleFileFilter
