@@ -11,12 +11,13 @@ import java.net.URL;
  *  (e.g. Internet Explorer or Netscape). If your browser is already open,
  *  a new browser window should be created without starting any new processes.
  * </p>
- *
- * <p>
- * On Windows systems the system's default browser will be used. On UNIX and other
- *  platforms the browser defaults to Netscape. For this default behavior to work,
- *  the command 'netscape' must be on your path.
- * </p>
+ * 
+ * <p>On Java 1.6, java.awt.Desktop.getDesktop().browse() will be called - this is the
+ * preferred (and platform independent) approach.</p>
+ * <p>On Java 1.5 and earlier, platform-specific techniques are used - on Windows systems
+ *  the system's default browser will be used; on UNIX and other platforms the browser
+ *  defaults to Netscape (for this default behavior to work, the command 'netscape' must
+ *  be on your path).</p>
  *
  * <p>
  * This class was inspired by an article at www.javaworld.com by Steven Spencer.
@@ -28,6 +29,7 @@ import java.net.URL;
  *
  * @author Steven Spencer
  * @author jeffrey heer (adapted original author's code)
+ * @author Anton Marsden (added Java-native (1.6) support)
  */
 public abstract class BrowserLauncher {
 
