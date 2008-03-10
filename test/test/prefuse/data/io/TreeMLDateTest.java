@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 import java.util.Date;
 
-import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Tree;
 import prefuse.data.io.TreeMLReader;
