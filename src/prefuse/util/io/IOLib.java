@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -218,12 +219,12 @@ public class IOLib {
      * @throws IOException if an input/ouput error occurs
      */
     public static String readAsString(InputStream is) throws IOException {
+    	InputStreamReader isr = new InputStreamReader(is);
         StringBuffer buf = new StringBuffer();
-        byte[] b = new byte[8192];
+        char[] cc = new char[8192];
         int nread = -1;
-        while ( (nread=is.read(b)) >= 0 ) {
-            String s = new String(b, 0, nread);
-            buf.append(s);
+        while ( (nread=isr.read(cc)) >= 0 ) {
+            buf.append(cc, 0, nread);
         }
         return buf.toString();
     }
