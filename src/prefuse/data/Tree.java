@@ -441,6 +441,14 @@ public class Tree <T extends Tuple<?>, N extends Node<N,E>, E extends Edge<N,E>>
         return n<0 ? null : getNode(n);
     }
 
+    /**
+     * Get the depth of the given node in the tree.
+     * @param node a node
+     * @return the depth of the node in tree. The root node
+     * is at a depth level of 0, with each child at a greater
+     * depth level. -1 is returned if the input node is not
+     * in the tree.
+     */
 	public int getDepth(N n) {
 		return getDepth(n.getRow());
 	}

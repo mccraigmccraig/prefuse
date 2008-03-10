@@ -9,7 +9,7 @@ import prefuse.data.Node;
  * This is a base implementation for a declarative tree. Subclasses should override some of the more inefficient
  * operations where possible.
  *
- * @author Anton
+ * @author Anton Marsden
  *
  * @param <N>
  * @param <E>
