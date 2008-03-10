@@ -17,7 +17,7 @@ import prefuse.data.Node;
  */
 public class TreeNodeIterator <N extends Node<?,?>> implements Iterator<N> {
 
-    private ArrayList<N> m_stack;
+    private List<N> m_stack;
     private N m_root;
     private boolean m_preorder = true;
 
