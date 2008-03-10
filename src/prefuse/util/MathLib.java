@@ -12,6 +12,10 @@ public class MathLib {
 
     /** The value 2 * PI */
     public static final double TWO_PI = 2*Math.PI;
+
+    /** The value PI / 2 */
+    public static final double PI_DIV_2 = Math.PI / 2.0d;
+    
     /** The natural logarithm of 2 */
     public static final double LOG2 = Math.log(2);
 

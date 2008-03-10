@@ -17,6 +17,7 @@ import java.util.List;
 import prefuse.Alignment;
 import prefuse.util.ColorLib;
 import prefuse.util.GraphicsLib;
+import prefuse.util.MathLib;
 import prefuse.util.StrokeLib;
 import prefuse.visual.EdgeItem;
 import prefuse.visual.VisualItem;
@@ -50,8 +51,6 @@ public class EdgeRenderer extends AbstractShapeRenderer {
 	    REVERSE
 
 	}
-
-    protected static final double HALF_PI = Math.PI / 2;
 
     protected Line2D       m_line  = new Line2D.Float();
     protected CubicCurve2D m_cubic = new CubicCurve2D.Float();
@@ -268,7 +267,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
                                             double width)
     {
         m_arrowTrans.setToTranslation(p2.getX(), p2.getY());
-        m_arrowTrans.rotate(-HALF_PI +
+        m_arrowTrans.rotate(-MathLib.PI_DIV_2 +
             Math.atan2(p2.getY()-p1.getY(), p2.getX()-p1.getX()));
         if ( width > 1 ) {
             double scalar = width/4;

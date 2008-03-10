@@ -1,5 +1,7 @@
 package prefuse.util.force;
 
+import prefuse.util.MathLib;
+
 /**
  * Represents a constant gravitational force, like the pull of gravity
  * for an object on the Earth (F = mg). The force experienced by a
@@ -20,7 +22,7 @@ public class GravitationalForce extends AbstractForce {
     public static final float DEFAULT_MIN_FORCE_CONSTANT = 1E-5f;
     public static final float DEFAULT_MAX_FORCE_CONSTANT = 1E-3f;
 
-    public static final float DEFAULT_DIRECTION = (float)-Math.PI/2;
+    public static final float DEFAULT_DIRECTION = (float)-MathLib.PI_DIV_2;
     public static final float DEFAULT_MIN_DIRECTION = (float)-Math.PI;
     public static final float DEFAULT_MAX_DIRECTION = (float)Math.PI;
 
