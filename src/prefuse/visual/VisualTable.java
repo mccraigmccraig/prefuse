@@ -95,7 +95,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * @param group
 	 *            the data group of this table
 	 * @param rowFilter
-	 *            a predicate determing which rows of the parent table should be inherited by this
+	 *            a predicate determining which rows of the parent table should be inherited by this
 	 *            table and which should be filtered out
 	 */
 	public VisualTable(final Table<T> parent, final Visualization vis, final String group, final Predicate rowFilter) {
@@ -112,7 +112,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * @param group
 	 *            the data group of this table
 	 * @param rowFilter
-	 *            a predicate determing which rows of the parent table should be inherited by this
+	 *            a predicate determining which rows of the parent table should be inherited by this
 	 *            table and which should be filtered out
 	 * @param schema
 	 *            the data schema to use for the table's local columns
@@ -455,7 +455,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	}
 
 	/**
-	 * Set the highlighted status of the given row. How higlighting values are interpreted by the
+	 * Set the highlighted status of the given row. How highlighting values are interpreted by the
 	 * system depends on the various processing actions set up for an application (e.g., how a
 	 * {@link prefuse.action.assignment.ColorAction} might assign colors based on the flag).
 	 *
@@ -655,7 +655,7 @@ public abstract class VisualTable<T extends Tuple<?>, C extends VisualItem<?>> e
 	 * @param x
 	 *            the minimum x-coordinate
 	 * @param y
-	 *            the minimum y-coorindate
+	 *            the minimum y-coordinate
 	 * @param w
 	 *            the width of this item
 	 * @param h
