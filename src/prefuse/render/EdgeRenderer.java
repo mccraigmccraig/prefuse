@@ -460,7 +460,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     }
 
     /**
-     * Get the horizontal aligment of the edge mount point with the first node.
+     * Get the horizontal alignment of the edge mount point with the first node.
      * @return the horizontal alignment
      */
     public Alignment getHorizontalAlignment1() {
@@ -468,7 +468,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     }
 
     /**
-     * Get the vertical aligment of the edge mount point with the first node.
+     * Get the vertical alignment of the edge mount point with the first node.
      * @return the vertical alignment
      */
     public Alignment getVerticalAlignment1() {
@@ -476,7 +476,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     }
 
     /**
-     * Get the horizontal aligment of the edge mount point with the second
+     * Get the horizontal alignment of the edge mount point with the second
      * node.
      * @return the horizontal alignment
      */
@@ -485,7 +485,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     }
 
     /**
-     * Get the vertical aligment of the edge mount point with the second node.
+     * Get the vertical alignment of the edge mount point with the second node.
      * @return the vertical alignment
      */
     public Alignment getVerticalAlignment2() {
@@ -493,7 +493,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     }
 
     /**
-     * Set the horizontal aligment of the edge mount point with the first node.
+     * Set the horizontal alignment of the edge mount point with the first node.
      * @param align the horizontal alignment
      */
     public void setHorizontalAlignment1(Alignment align) {
@@ -501,7 +501,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     }
 
     /**
-     * Set the vertical aligment of the edge mount point with the first node.
+     * Set the vertical alignment of the edge mount point with the first node.
      * @param align the vertical alignment
      */
     public void setVerticalAlignment1(Alignment align) {
@@ -509,7 +509,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     }
 
     /**
-     * Set the horizontal aligment of the edge mount point with the second
+     * Set the horizontal alignment of the edge mount point with the second
      * node.
      * @param align the horizontal alignment
      */
@@ -518,7 +518,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
     }
 
     /**
-     * Set the vertical aligment of the edge mount point with the second node.
+     * Set the vertical alignment of the edge mount point with the second node.
      * @param align the vertical alignment
      */
     public void setVerticalAlignment2(Alignment align) {
