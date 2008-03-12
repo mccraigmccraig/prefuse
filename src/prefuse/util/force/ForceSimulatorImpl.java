@@ -133,7 +133,7 @@ public class ForceSimulatorImpl implements ForceSimulator {
     /* (non-Javadoc)
 	 * @see prefuse.util.force.ForceSimulator#getItems()
 	 */
-    public Iterable<ForceItem> getItems() {
+    public List<ForceItem> getItems() {
         return items;
     }
 
@@ -166,7 +166,7 @@ public class ForceSimulatorImpl implements ForceSimulator {
     /* (non-Javadoc)
 	 * @see prefuse.util.force.ForceSimulator#getSprings()
 	 */
-    public Iterable<Spring> getSprings() {
+    public List<Spring> getSprings() {
         return springs;
     }
 

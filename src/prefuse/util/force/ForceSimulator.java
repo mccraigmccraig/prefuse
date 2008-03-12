@@ -1,5 +1,7 @@
 package prefuse.util.force;
 
+import java.util.List;
+
 /**
  *
  * @author Anton Marsden
@@ -47,7 +49,7 @@ public interface ForceSimulator {
 	 * Get an iterator over all registered ForceItems.
 	 * @return an iterator over the ForceItems.
 	 */
-	Iterable<ForceItem> getItems();
+	List<ForceItem> getItems();
 
 	/**
 	 * Add a Spring to the simulation.
@@ -80,7 +82,7 @@ public interface ForceSimulator {
 	 * Get an iterator over all registered Springs.
 	 * @return an iterator over the Springs.
 	 */
-	Iterable<Spring> getSprings();
+	List<Spring> getSprings();
 
 	/**
 	 * Run the simulator for one timestep.
