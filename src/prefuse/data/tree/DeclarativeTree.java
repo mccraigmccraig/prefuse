@@ -2,20 +2,24 @@ package prefuse.data.tree;
 
 import java.util.List;
 
+import prefuse.action.layout.graph.DeclarativeTreeLayout;
 import prefuse.data.Edge;
 import prefuse.data.Node;
 
 /**
- * Implementors can define arbitrary tree structures within their Graphs. SpanningTree implements this interface, and
- * other interfaces can easily be defined.
- * 
- * This interface could be used in user-defined layouts.
- * 
+ * <p>This is intended to be a lightweight means of defining a Tree across an existing Graph.</p>
+ *
+ * <p>Implementors can define arbitrary tree structures within their Graphs. SpanningTree implements this interface, and
+ * other interfaces can easily be defined.</p>
+ *
+ * <p>This interface could be used in user-defined layouts.</p>
+ *
  * @author Anton Marsden
  * @param <N>
  * @param <E>
  * @see SpanningTree
  * @see NodeBasedDeclarativeTree
+ * @see DeclarativeTreeLayout
  */
 public interface DeclarativeTree<N extends Node<?,?>, E extends Edge<?,?>> {
 
@@ -24,7 +28,7 @@ public interface DeclarativeTree<N extends Node<?,?>, E extends Edge<?,?>> {
      * @return the root Node
      */
 	N getRoot();
-	
+
     /**
      * Get all the children of the parent node.
      * @param n the parent node
