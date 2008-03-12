@@ -6,6 +6,7 @@ package prefuse.visual;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import prefuse.Visualization;
 import prefuse.data.Schema;
@@ -194,14 +195,14 @@ public abstract class AggregateTable <T extends AggregateItem<T, V>, V extends V
     }
 
     /**
-     * Get an iterator over all AggregateItems that contain the given Tuple.
+     * Get a Set of all AggregateItems which contain the input Tuple.
      * @param t the input tuple
-     * @return an iterator over all AggregateItems that contain the input Tuple
+     * @return a Set of all AggregateItems which contain the input Tuple
      */
-    public Iterable<Tuple<?>> getAggregates(Tuple<?> t) {
+    public Set<Tuple<?>> getAggregates(Tuple<?> t) {
         int hash = getHashCode(t);
         IntIterator iit = m_aggregated.getIndex(MEMBER_HASH).rows(hash);
-        HashSet<Tuple<?>> set = new HashSet<Tuple<?>>();
+        Set<Tuple<?>> set = new HashSet<Tuple<?>>();
         while ( iit.hasNext() ) {
             int r = iit.nextInt();
             set.add(getTuple(m_aggregated.getInt(r, AGGREGATE)));
