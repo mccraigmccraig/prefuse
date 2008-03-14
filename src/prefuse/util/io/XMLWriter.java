@@ -470,10 +470,9 @@ public class XMLWriter {
 	private static final String[] VALID = { "&lt;", "&gt;", "&quot;", "&apos;",
 			"&amp;" };
 
-	protected static final int HIGH_SURR_START = 0xD800;
-	protected static final int HIGH_SURR_END = 0xDBFF;
-	protected static final int LOW_SURR_START = 0xDC00;
-	protected static final int LOW_SURR_END = 0xDFFF;
+	// UTF-16 surrogate pair identification
+	private static final int HIGH_SURR_START = 0xD800;
+	private static final int HIGH_SURR_END = 0xDBFF;
 
 	/**
 	 * Escape a string such that it is safe to use in an XML document.
