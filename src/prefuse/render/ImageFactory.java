@@ -230,22 +230,23 @@ public class ImageFactory {
      *
      * @param iter an Iterator of {@link prefuse.data.Tuple} instances
      * @param field the data field that contains the image location
-     *
-     * TODO: use Iterable for the first argument
      */
-    public void preloadImages(Iterator<? extends Tuple<?>> iter, String field) {
+    public void preloadImages(Iterable<? extends Tuple<?>> tuples, String field) {
         boolean synch = m_asynch;
         m_asynch = false;
 
         String loc = null;
-        while ( iter.hasNext() && imageCache.size() <= m_imageCacheSize ) {
-            // get the string describing the image location
-            Tuple<?> t = iter.next();
-            loc = t.getString(field);
+        
+        for(Tuple<?> t : tuples) {
+        	if(imageCache.size() > m_imageCacheSize) {
+        		break;
+        	}
+        	loc = t.getString(field);
             if ( loc != null ) {
                 getImage(loc);
             }
         }
+        
         m_asynch = synch;
     }
 

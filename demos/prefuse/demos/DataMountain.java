@@ -100,7 +100,7 @@ public class DataMountain extends Display {
         addControlListener(new DataMountainControl());
 
         // pre-load images, otherwise they will be loaded asynchronously
-        nodeRenderer.getImageFactory().preloadImages(m_vis.items().iterator(),"image");
+        nodeRenderer.getImageFactory().preloadImages(m_vis.items(),"image");
 
         // initialize and present the interface
         m_vis.run("init");
