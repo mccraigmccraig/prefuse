@@ -11,6 +11,7 @@ public class All_PrefuseDataIO_Tests {
         suite.addTestSuite(CSVTableReaderTest.class);
         suite.addTestSuite(DelimitedTextTableReaderTest.class);
         suite.addTestSuite(TreeMLDateTest.class);
+        suite.addTestSuite(TreeMLReaderTest.class);
         //$JUnit-END$
         return suite;
     }
