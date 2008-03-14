@@ -30,7 +30,7 @@ public class FilterRowIterator extends IntIterator {
         this.predicate = p;
         this.rows = rows;
         this.t = t;
-        next = advance();
+        this.next = advance();
     }
 
     private int advance() {
