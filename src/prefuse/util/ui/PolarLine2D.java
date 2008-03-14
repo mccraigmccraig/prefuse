@@ -1,7 +1,7 @@
 /**
  *
  */
-package prefuse.util.display;
+package prefuse.util.ui;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;

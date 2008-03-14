@@ -15,7 +15,7 @@ import prefuse.util.MathLib;
 import prefuse.util.ObjectPair;
 import prefuse.util.PrefuseLib;
 import prefuse.util.collections.MultiMap;
-import prefuse.util.display.PolarLine2D;
+import prefuse.util.ui.PolarLine2D;
 
 import prefuse.visual.EdgeItem;
 import prefuse.visual.NodeItem;
