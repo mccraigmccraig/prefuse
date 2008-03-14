@@ -5,6 +5,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Maps keys to multiple values.
+ * 
+ * @param <K>
+ * @param <V>
+ * 
+ * @author Anton Marsden
+ */
 public class MultiMap<K, V> {
 
 	private final Map<K, Set<V>> m;
