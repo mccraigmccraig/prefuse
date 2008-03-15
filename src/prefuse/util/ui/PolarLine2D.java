@@ -7,6 +7,11 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+/**
+ * A line defined by polar coordinates (a start position, a radius and an angle).
+ * 
+ * @author Anton Marsden
+ */
 public class PolarLine2D extends Line2D
 {
     private double x;
@@ -14,16 +19,35 @@ public class PolarLine2D extends Line2D
     private double theta;
     private double r;
 
+    /**
+     * Construct a new line.
+     * 
+     * @param start the start coordinate of the line
+     * @param end the end coordinate of the line
+     */
     public PolarLine2D( Point2D start, Point2D end )
     {
         setLine( start.getX(), start.getY(), end.getX(), end.getY() );
     }
 
+    /**
+     * Construct a new line from an existing line.
+     * 
+     * @param line the line to get the coordinates from.
+     */
     public PolarLine2D( Line2D line )
     {
         setLine( line.getX1(), line.getY1(), line.getX2(), line.getY2() );
     }
 
+    /**
+     * Construct a new line.
+     * 
+     * @param x the starting X coordinate
+     * @param y the starting Y coordinate
+     * @param r the radius (length) of the line
+     * @param theta the angle of the line
+     */
     public PolarLine2D( double x, double y, double r, double theta )
     {
         this.x     = x;
@@ -32,21 +56,38 @@ public class PolarLine2D extends Line2D
         this.theta = theta;
     }
 
+    /**
+     * 
+     * @return the radius (length) of the line
+     */
     public double getRadius()
     {
         return r;
     }
 
+    /**
+     * Set the radius (length) of the line.
+     * 
+     * @param radius the radius (length) of the line
+     */
     public void setRadius( double radius )
     {
         this.r = radius;
     }
 
+    /**
+     * @return the angle of the line (in radians)
+     */
     public double getTheta()
     {
         return theta;
     }
 
+    /**
+     * Set the angle of the line
+     * 
+     * @param theta the angle of the line, in radians
+     */
     public void setTheta( double theta )
     {
         this.theta = theta;
