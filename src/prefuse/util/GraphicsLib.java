@@ -16,6 +16,7 @@ import java.awt.geom.RoundRectangle2D;
 
 import prefuse.Alignment;
 import prefuse.render.RenderType;
+import prefuse.visual.VisualItem;
 
 /**
  * Library of useful computer graphics routines such as geometry routines
@@ -651,6 +652,25 @@ public class GraphicsLib {
     // ------------------------------------------------------------------------
 
     /**
+     * Sets a VisualItem's bounds based on its shape and stroke type. This
+     * method is optimized to avoid calling .getBounds2D where it can, thus
+     * avoiding object initialization and reducing object churn.
+     * @param item the VisualItem whose bounds are to be set
+     * @param shape a Shape from which to determine the item bounds
+     * @param stroke the stroke type that will be used for drawing the object,
+     * and may affect the final bounds. A null value indicates the
+     * default (line width = 1) stroke is used.
+     */
+    public static void setBounds(VisualItem<?> item,
+                                 Shape shape, BasicStroke stroke)
+    {
+    	// TODO: can this be made more efficient - like by avoiding construction of bounds object?
+    	Rectangle2D bounds = new Rectangle2D.Double();
+    	calculateBounds(shape, stroke, bounds);
+        item.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
+    }
+
+    /**
      * Calculates bounds based on a shape and stroke type. This
      * method is optimized to avoid calling .getBounds2D where it can, thus
      * avoiding object initialization and reducing object churn.
@@ -711,7 +731,6 @@ public class GraphicsLib {
         bounds.setRect(x, y, w, h);
     }
 
-
     /**
      * Render a shape associated with a VisualItem into a graphics context. This
      * method uses the {@link java.awt.Graphics} interface methods when it can,
@@ -723,6 +742,29 @@ public class GraphicsLib {
      * @param g the graphics context to render to
      * @param item the item being represented by the shape, this instance is
      * used to get the correct color values for the drawing
+     * @param shape the shape to render
+     * @param stroke the stroke type to use for drawing the object.
+     * @param type the rendering type indicating if the shape should be drawn,
+     * filled, or both.
+     * @deprecated use the other paint() method instead
+     */
+    public static void paint(Graphics2D g, VisualItem<?> item, Shape shape,
+			BasicStroke stroke, RenderType type) {
+		paint(g, ColorLib.getColor(item.getStrokeColor()), ColorLib
+				.getColor(item.getFillColor()), shape, stroke, type);
+	}
+    
+    /**
+     * Render a shape associated with a VisualItem into a graphics context. This
+     * method uses the {@link java.awt.Graphics} interface methods when it can,
+     * as opposed to the {@link java.awt.Graphics2D} methods such as
+     * {@link java.awt.Graphics2D#draw(java.awt.Shape)} and
+     * {@link java.awt.Graphics2D#fill(java.awt.Shape)}, resulting in a
+     * significant performance increase on the Windows platform, particularly
+     * for rectangle and line drawing calls.
+     * @param g the graphics context to render to
+     * @param strokeColor the stroke color to use for drawing the object.
+     * @param fillColor the fill color to use for drawing the object.
      * @param shape the shape to render
      * @param stroke the stroke type to use for drawing the object.
      * @param type the rendering type indicating if the shape should be drawn,
