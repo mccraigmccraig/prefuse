@@ -38,12 +38,12 @@ public class JSearchPanel extends JPanel
     implements DocumentListener, ActionListener
 {
     private Object m_lock;
-    private SearchTupleSet m_searcher;
+    protected final SearchTupleSet m_searcher;
 
-    private final JTextField m_queryF  = new JTextField(15);
-    private final JLabel     m_resultL = new JLabel("          ");
-    private final JLabel     m_searchL = new JLabel("search >> ");
-    private final Box        m_sbox    = new Box(BoxLayout.X_AXIS);
+    protected final JTextField m_queryF  = new JTextField(15);
+    protected final JLabel     m_resultL = new JLabel("          ");
+    protected final JLabel     m_searchL = new JLabel("search >> ");
+    protected final Box        m_sbox    = new Box(BoxLayout.X_AXIS);
 
     private final String[] m_fields;
 
@@ -379,6 +379,8 @@ public class JSearchPanel extends JPanel
 		}
         searchUpdate();
     }
+
+
 
     /**
      * Get the query string in the text field.
