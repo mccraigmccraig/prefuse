@@ -2,6 +2,7 @@ package prefuse.action.layout;
 
 import java.awt.geom.Rectangle2D;
 import prefuse.data.tuple.TupleSet;
+import prefuse.util.MathLib;
 import prefuse.visual.VisualItem;
 
 /**
@@ -73,7 +74,7 @@ public class CircleLayout extends Layout {
         int i = 0;
 
         for(VisualItem<?> n : ts.tuples()) {
-            double angle = 2*Math.PI*i / nn;
+            double angle = MathLib.TWO_PI * i / nn;
             double x = Math.cos(angle)*radius + cx;
             double y = Math.sin(angle)*radius + cy;
             setX(n, null, x);
