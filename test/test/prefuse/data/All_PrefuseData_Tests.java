@@ -13,6 +13,7 @@ public class All_PrefuseData_Tests {
         suite.addTestSuite(TableTest.class);
         suite.addTestSuite(GraphTest.class);
         suite.addTestSuite(TreeTest.class);
+        suite.addTestSuite(SchemaTest.class);
         //$JUnit-END$
         return suite;
     }
