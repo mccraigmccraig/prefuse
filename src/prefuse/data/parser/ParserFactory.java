@@ -32,6 +32,7 @@ public class ParserFactory implements Cloneable {
             new LongArrayParser(),
             new FloatArrayParser(),
             new DoubleArrayParser(),
+            new JavaDateArrayParser(),
             new StringParser()
         };
 
@@ -44,7 +45,7 @@ public class ParserFactory implements Cloneable {
     /**
      * Returns the default parser factory. The default factory tests for the
      * following data types (in the provided order of precedence):
-     *   int, long, double, float, boolean, Date, Time, DateTime, String.
+     *   int, long, double, float, boolean, Date, Time, DateTime, Java Date, String.
      * @return the default parser factory.
      */
     public static ParserFactory getDefaultFactory() {
@@ -59,7 +60,7 @@ public class ParserFactory implements Cloneable {
 				new JavaDateParser(locale),
 				new IntArrayParser(),
 				new LongArrayParser(), new FloatArrayParser(),
-				new DoubleArrayParser(), new StringParser() };
+				new DoubleArrayParser(), new JavaDateArrayParser(), new StringParser() };
 		return new ParserFactory(parsers);
 	}
 
@@ -76,8 +77,8 @@ public class ParserFactory implements Cloneable {
 
     /**
      * Constructor. Uses a default collection of parsers, testing for the
-     * following data type in the followinf order of precedence:
-     *   int, long, double, float, boolean, Date, Time, DateTime, String.
+     * following data type in the following order of precedence:
+     *   int, long, double, float, boolean, Date, Time, DateTime, Java Date, String.
      */
     public ParserFactory() {
         this(DEFAULT_PARSERS);
@@ -110,7 +111,7 @@ public class ParserFactory implements Cloneable {
      *
      * <p>
      * The ordering of parsers in the array is taken to be the desired order
-     * of precendence of the parsers. For example, if both parser[0] and
+     * of precedence of the parsers. For example, if both parser[0] and
      * parser[2] can parse all the available samples, parser[0] will be
      * returned.
      * </p>
