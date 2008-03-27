@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 
 import prefuse.Alignment;
 import prefuse.Display;
+import prefuse.PredefinedShape;
 import prefuse.Visualization;
 import prefuse.action.Action;
 import prefuse.action.ActionList;
@@ -26,6 +27,7 @@ import prefuse.data.Schema;
 import prefuse.data.Table;
 import prefuse.data.Tuple;
 import prefuse.data.event.TupleSetListener;
+import prefuse.data.expression.BooleanLiteral;
 import prefuse.data.expression.FunctionExpression;
 import prefuse.data.expression.FunctionTable;
 import prefuse.data.expression.Predicate;
@@ -100,6 +102,8 @@ public class ZipDecode extends Display {
         vt.addColumn("zipstr", "LPAD(zip,5,'0')");
         // now add a formatted label to show within the visualization
         vt.addColumn("label", "CONCAT(CAP(city),', ',STATE(state),' ',zipstr)");
+
+        m_vis.setValue(DATA, BooleanLiteral.TRUE, VisualItem.SHAPEBUILDER, PredefinedShape.RECTANGLE);
 
         // create a filter controlling label appearance
         Predicate loneResult = (Predicate)ExpressionParser.parse(
