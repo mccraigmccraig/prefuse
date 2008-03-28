@@ -664,7 +664,6 @@ public class GraphicsLib {
     public static void setBounds(VisualItem<?> item,
                                  Shape shape, BasicStroke stroke)
     {
-    	// TODO: can this be made more efficient - like by avoiding construction of bounds object?
     	Rectangle2D bounds = new Rectangle2D.Double();
     	calculateBounds(shape, stroke, bounds);
         item.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
@@ -753,7 +752,7 @@ public class GraphicsLib {
 		paint(g, ColorLib.getColor(item.getStrokeColor()), ColorLib
 				.getColor(item.getFillColor()), shape, stroke, type);
 	}
-    
+
     /**
      * Render a shape associated with a VisualItem into a graphics context. This
      * method uses the {@link java.awt.Graphics} interface methods when it can,
