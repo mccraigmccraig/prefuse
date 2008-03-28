@@ -538,9 +538,9 @@ public class Visualization {
     
     /**
      * Add a group of aggregates to this visualization. Aggregates are
-     * used to visually represent groups of VisualItems.
-     * @param group the data group name for the aggregates.
-     * @param schema the data schema to use for the AggregateTable
+     * used to visually represent groups of VisualItems.  
+     * @param group the data group name for the aggregates. 
+     * @param schema the data schema to use for the AggregateTable, should usually extend VisualItem.SCHEMA
      * @return the generated AggregateTable
      * @see prefuse.visual.AggregateTable
      */
