@@ -139,7 +139,7 @@ import prefuse.util.StringLib;
  *     Raise <code>x</code> to the exponent <code>y</code>
  * </li>
  * <li><strong><code>x % y</code> (modulo)</strong><br/>
- *     Return the remainder of <code>x</code> divded by <code>y</code>
+ *     Return the remainder of <code>x</code> divided by <code>y</code>
  * </li>
  * <li><strong><code>x = y, x == y</code> (equality)</strong><br/>
  *     Indicates if <code>x</code> and <code>y</code> are equal
@@ -177,7 +177,7 @@ import prefuse.util.StringLib;
  *     <code>y</code>
  * </li>
  * <li><strong><code>()</code> (parentheses)</strong><br/>
- *     Groups expressions together to enfore a particular order of evaluation. For example,
+ *     Groups expressions together to enforce a particular order of evaluation. For example,
  *     <code>1+2*3</code> evaluates to <code>7</code>, while <code>(1+2)*3</code> evaluates
  *     to <code>9</code>.
  * </li>
