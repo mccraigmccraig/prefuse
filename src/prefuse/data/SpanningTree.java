@@ -61,10 +61,7 @@ public class SpanningTree extends Tree {
      * @param root the root node of the spanning tree
      */
     public void buildSpanningTree(Node root) {
-        // re-use a previously allocated tree if possible
-        super.clearEdges();
-        super.setRoot(root);
-            
+    	initialize(root);
         // build unweighted spanning tree by BFS
         LinkedList q = new LinkedList();
         BitSet visit = new BitSet();
@@ -85,6 +82,17 @@ public class SpanningTree extends Tree {
         }
     }
 
+    /** 
+     * Clear the current tree and reset the root.
+     * 
+     * @param root the root node of the spanning tree
+     */
+    protected void initialize(Node root) {
+    	// re-use a previously allocated tree if possible
+        super.clearEdges();
+        super.setRoot(root);
+    }
+    
     // ------------------------------------------------------------------------
     // Disallow most mutator methods
     
