@@ -58,11 +58,17 @@ public class SpanningTree extends Tree {
     /**
      * Build the spanning tree, starting at the given root. Uses an
      * unweighted breadth first traversal to build the spanning tree.
+     * If backing graph is directed, only traverses outward facing nodes from
+     * root.
+     * 
      * @param root the root node of the spanning tree
      */
     public void buildSpanningTree(Node root) {
-    	initialize(root);
-        // build unweighted spanning tree by BFS
+    	// re-use a previously allocated tree if possible
+        super.clearEdges();
+        super.setRoot(root);
+
+    	// build unweighted spanning tree by BFS
         LinkedList q = new LinkedList();
         BitSet visit = new BitSet();
         q.add(root); visit.set(root.getRow());
@@ -82,17 +88,6 @@ public class SpanningTree extends Tree {
         }
     }
 
-    /** 
-     * Clear the current tree and reset the root.
-     * 
-     * @param root the root node of the spanning tree
-     */
-    protected void initialize(Node root) {
-    	// re-use a previously allocated tree if possible
-        super.clearEdges();
-        super.setRoot(root);
-    }
-    
     // ------------------------------------------------------------------------
     // Disallow most mutator methods
     
