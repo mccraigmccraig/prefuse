@@ -143,6 +143,10 @@ public class GraphMLReader extends AbstractGraphReader  implements GraphReader {
 
         @Override
 		public void endDocument() throws SAXException {
+
+        	// Initialise the schemas just in case there are no nodes or edges
+        	schemaCheck();
+
             // time to actually set up the edges
             IntIterator rows = m_edges.rows();
             while (rows.hasNext()) {
