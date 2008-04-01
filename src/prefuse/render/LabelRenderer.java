@@ -360,15 +360,7 @@ public class LabelRenderer extends AbstractShapeRenderer {
     @Override
 	protected Shape getRawShape(VisualItem<?> item) {
         m_text = getText(item);
-        Image  img  = getImage(item);
         double size = item.getSize();
-
-        // get image dimensions
-        double iw=0, ih=0;
-        if ( img != null ) {
-            ih = img.getHeight(null);
-            iw = img.getWidth(null);
-        }
 
         // get text dimensions
         int tw=0, th=0;
@@ -376,6 +368,17 @@ public class LabelRenderer extends AbstractShapeRenderer {
             m_text = computeTextDimensions(item, m_text, size);
             th = m_textDim.height;
             tw = m_textDim.width;
+        }
+
+        // get image dimensions
+        final Image  img  = getImage(item);
+        final double iw, ih;
+        if ( img != null ) {
+            ih = img.getHeight(null);
+            iw = img.getWidth(null);
+        } else {
+        	iw = 0;
+        	ih = 0;
         }
 
         // get bounding box dimensions
