@@ -254,7 +254,7 @@ public class RadialTreeLayout extends TreeLayout {
         }
 
         final List<NodeItem<?,?>> children = (List<NodeItem<?,?>>) (Object) n.children();
-        int cc = n.children().size();
+        int cc = children.size();
         if ( cc == 0 ) {
 			return null;
 		}
