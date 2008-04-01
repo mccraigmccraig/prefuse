@@ -77,7 +77,7 @@ public class TreeTest extends TestCase {
 
         Node<?,?>[] nodes = new Node[13];
         Edge<?,?>[] edges = new Edge[13];
-        Iterator<Node<?,?>> iter = new TreeNodeIterator<Node<?,?>>(c);
+        Iterator<Node<?,?>> iter = new TreeNodeIterator(c);
         for ( int i=0; iter.hasNext(); ++i ) {
             nodes[i] = iter.next();
             edges[i] = nodes[i].getParentEdge();

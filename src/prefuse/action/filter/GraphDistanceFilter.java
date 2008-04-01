@@ -7,7 +7,7 @@ import prefuse.data.expression.Predicate;
 import prefuse.data.tuple.TupleSet;
 import prefuse.data.util.BreadthFirstIterator;
 import prefuse.data.util.FilterIterable;
-import prefuse.data.util.BreadthFirstIterator.TraversalType;
+import prefuse.data.util.TraversalType;
 import prefuse.util.PrefuseLib;
 import prefuse.visual.VisualItem;
 import prefuse.visual.expression.InGroupPredicate;

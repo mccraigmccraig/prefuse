@@ -9,8 +9,11 @@ import java.util.List;
 
 import prefuse.data.Graph;
 import prefuse.data.Schema;
+import prefuse.data.tree.DeclarativeTree;
+import prefuse.data.tree.NodeBasedDeclarativeTree;
 import prefuse.data.tuple.TupleSet;
 import prefuse.data.util.TreeNodeIterator;
+import prefuse.data.util.TreeNodeIterator.TraversalMode;
 import prefuse.visual.EdgeItem;
 import prefuse.visual.NodeItem;
 import prefuse.visual.VisualItem;
@@ -134,7 +137,7 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
     /**
      * Compute the pixel areas of nodes based on their size values.
      */
-    private void computeAreas(NodeItem<?,?> root) {
+    private void computeAreas(final NodeItem<?,?> root) {
         int leafCount = 0;
 
         // ensure area data column exists
@@ -143,7 +146,7 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
         nodes.addColumns(AREA_SCHEMA);
 
         // reset all sizes to zero
-        Iterator<NodeItem<?,?>> iter = new TreeNodeIterator<NodeItem<?,?>>(root);
+        Iterator<NodeItem<?,?>> iter = new TreeNodeIterator(root);
         while ( iter.hasNext() ) {
             NodeItem<?,?> n = iter.next();
             n.setDouble(AREA, 0);
@@ -151,7 +154,7 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
 
 
         // set raw sizes, compute leaf count
-        iter = new TreeNodeIterator<NodeItem<?,?>>( root, false);
+        iter = new TreeNodeIterator( root, TraversalMode.POST_ORDER);
         while ( iter.hasNext() ) {
             NodeItem<?,?> n = iter.next();
             double area = 0;
@@ -173,7 +176,7 @@ public class SquarifiedTreeMapLayout extends TreeLayout {
         Rectangle2D b = getLayoutBounds();
         double area = (b.getWidth()-1)*(b.getHeight()-1);
         double scale = area/root.getDouble(AREA);
-        iter = new TreeNodeIterator<NodeItem<?,?>>(root);
+        iter = new TreeNodeIterator(root);
         while ( iter.hasNext() ) {
             NodeItem<?,?> n = iter.next();
             n.setDouble(AREA, n.getDouble(AREA)*scale);
