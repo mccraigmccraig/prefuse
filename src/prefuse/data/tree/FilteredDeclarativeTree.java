@@ -21,21 +21,28 @@ import prefuse.data.util.FilteredList;
 public class FilteredDeclarativeTree <N extends Node<N,E>, E extends Edge<N,E>> extends AbstractDeclarativeTree<N,E> {
 
 	protected Predicate nodeFilter;
+	protected boolean reverse;
 
 	public FilteredDeclarativeTree(N root, Predicate nodeFilter) {
 		super(root);
 		this.nodeFilter = nodeFilter;
 	}
 
+	public FilteredDeclarativeTree(N root, Predicate nodeFilter, boolean reverse) {
+		super(root);
+		this.nodeFilter = nodeFilter;
+		this.reverse = reverse;
+	}
+
 	public List<N> children(N parent) {
-		return new FilteredList<N>(parent.children(), nodeFilter);
+		return new FilteredList<N>(reverse ? parent.inNeighbors() : parent.outNeighbors(), nodeFilter);
 	}
 
 	public N getParent(N child) {
 		if(child == getRoot()) {
 			return null;
 		}
-		Iterator<N> ni = child.inNeighbors().iterator();
+		Iterator<N> ni = (reverse ? child.outNeighbors() : child.inNeighbors()).iterator();
 		return (ni.hasNext() ? ni.next() : null);
 	}
 
@@ -43,7 +50,7 @@ public class FilteredDeclarativeTree <N extends Node<N,E>, E extends Edge<N,E>> 
 		if(child == getRoot()) {
 			return null;
 		}
-		Iterator<E> ne = child.inEdges().iterator();
+		Iterator<E> ne = (reverse ? child.outEdges() : child.inEdges()).iterator();
 		return (ne.hasNext() ? ne.next() : null);
 	}
 
@@ -69,7 +76,8 @@ public class FilteredDeclarativeTree <N extends Node<N,E>, E extends Edge<N,E>> 
 					}
 
 					public E next() {
-						return nodeIter.next().inEdges().iterator().next();
+						N n = nodeIter.next();
+						return (reverse ? n.outEdges() : n.inEdges()).iterator().next();
 					}
 
 					public int nextIndex() {
@@ -77,7 +85,8 @@ public class FilteredDeclarativeTree <N extends Node<N,E>, E extends Edge<N,E>> 
 					}
 
 					public E previous() {
-						return nodeIter.previous().inEdges().iterator().next();
+						N p = nodeIter.previous();
+						return (reverse ? p.outEdges() : p.inEdges()).iterator().next();
 					}
 
 					public int previousIndex() {
