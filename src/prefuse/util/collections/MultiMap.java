@@ -7,10 +7,10 @@ import java.util.Set;
 
 /**
  * Maps keys to multiple values.
- * 
+ *
  * @param <K>
  * @param <V>
- * 
+ *
  * @author Anton Marsden
  */
 public class MultiMap<K, V> {
@@ -18,7 +18,15 @@ public class MultiMap<K, V> {
 	private final Map<K, Set<V>> m;
 
 	public MultiMap() {
-		this.m = new HashMap<K, Set<V>>();
+		this.m = createMap();
+	}
+
+	protected Map<K, Set<V>> createMap() {
+		return new HashMap<K, Set<V>>();
+	}
+
+	protected Set<V> createSet() {
+		return new HashSet<V>();
 	}
 
 	public boolean containsValue(Object key, Object value) {
@@ -33,7 +41,7 @@ public class MultiMap<K, V> {
 	public V put(K key, V value) {
 		Set<V> values = m.get(key);
 		if(values == null) {
-			values = new HashSet<V>();
+			values = createSet();
 			m.put(key,values);
 		}
 		return values.add(value) ? value : null;
@@ -71,11 +79,11 @@ public class MultiMap<K, V> {
 	public Set<Map.Entry<K, Set<V>>> entrySet() {
 		return m.entrySet();
 	}
-	
+
 	public boolean isEmpty() {
 		return m.isEmpty();
 	}
-	
+
 	public void clear() {
 		m.clear();
 	}
