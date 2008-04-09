@@ -58,15 +58,13 @@ public abstract class AbstractShapeRenderer implements Renderer {
     }
 
     /**
-     * Draws the specified shape into the provided Graphics context, using
-     * stroke and fill color values from the specified VisualItem. This method
+     * Draws the specified shape into the provided Graphics context. This method
      * can be called by subclasses in custom rendering routines.
      */
     protected void drawShape(Graphics2D g, VisualItem<?> item, Shape shape) {
-        Color strokeColor = ColorLib.getColor(item.getStrokeColor());
-        Color fillColor = ColorLib.getColor(item.getFillColor());
-        GraphicsLib.paint(g, strokeColor, fillColor, shape, getStroke(item), getRenderType(item));
-    }
+		GraphicsLib.paint(g, getStrokeColor(item), getFillColor(item), shape,
+				getStroke(item), getRenderType(item));
+	}
 
     /**
      * Returns the shape describing the boundary of an item. The shape's
@@ -78,6 +76,32 @@ public abstract class AbstractShapeRenderer implements Renderer {
         Shape rawShape = getRawShape(item);
         return at==null || rawShape==null ? rawShape
                  : at.createTransformedShape(rawShape);
+    }
+
+    /**
+     * Returns the stroke color to use for drawing lines and shape outlines. By
+     * default returns the value of {@link VisualItem#getStrokeColor()}.
+     * Subclasses can override this method to implement custom stroke color
+     * assignment, though changing the <code>VisualItem</code>'s stroke color
+     * value is preferred.
+     * @param item the VisualItem
+     * @return the stroke color to use for drawing lines and shape outlines
+     */
+    protected Color getStrokeColor(VisualItem<?> item) {
+    	return ColorLib.getColor(item.getStrokeColor());
+    }
+
+    /**
+     * Returns the fill color to use for painting shapes. By
+     * default returns the value of {@link VisualItem#getFillColor()}.
+     * Subclasses can override this method to implement custom fill color
+     * assignment, though changing the <code>VisualItem</code>'s fill color
+     * value is preferred.
+     * @param item the VisualItem
+     * @return the fill color to use for painting shapes
+     */
+    protected Color getFillColor(VisualItem<?> item) {
+    	return ColorLib.getColor(item.getFillColor());
     }
 
     /**
