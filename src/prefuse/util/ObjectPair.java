@@ -1,12 +1,14 @@
 /**
- * 
+ *
  */
 package prefuse.util;
 
 
 /**
- * TODO: add some documentation
- * 
+ * Represents a pair of objects where the pair order does not matter.
+ *
+ * TODO: add some more documentation.
+ *
  * @author Anton Marsden
  */
 public class ObjectPair<O>
@@ -19,7 +21,7 @@ public class ObjectPair<O>
         this.a = a;
         this.b = b;
     }
-    
+
     public O getA() {
     	return a;
     }
@@ -27,7 +29,7 @@ public class ObjectPair<O>
     public O getB() {
     	return b;
     }
-    
+
 
     public boolean equals( Object other )
     {
