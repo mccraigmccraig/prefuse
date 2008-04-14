@@ -1,5 +1,6 @@
 package prefuse.render;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -442,6 +443,10 @@ public class LabelRenderer extends AbstractShapeRenderer {
         p.setLocation(x,y);
     }
 
+    protected Color getTextColor(VisualItem<?> item) {
+    	return ColorLib.getColor(item.getTextColor());
+    }
+
     /**
      * @see prefuse.render.Renderer#render(java.awt.Graphics2D, prefuse.visual.VisualItem)
      */
@@ -452,13 +457,14 @@ public class LabelRenderer extends AbstractShapeRenderer {
 			return;
 		}
 
-        final Color strokeColor = ColorLib.getColor(item.getStrokeColor());
-        final Color fillColor = ColorLib.getColor(item.getFillColor());
+        final Color strokeColor = getStrokeColor(item);
+        final Color fillColor = getFillColor(item);
+        final BasicStroke stroke = getStroke(item);
 
         // fill the shape, if requested
         RenderType type = getRenderType(item);
         if ( type==RenderType.FILL || type==RenderType.DRAW_AND_FILL ) {
-			GraphicsLib.paint(g, strokeColor, fillColor, shape, getStroke(item), RenderType.FILL);
+			GraphicsLib.paint(g, strokeColor, fillColor, shape, stroke, RenderType.FILL);
 		}
 
         // now render the image and text
@@ -543,9 +549,9 @@ public class LabelRenderer extends AbstractShapeRenderer {
         }
 
         // render text
-        int textColor = item.getTextColor();
-        if ( text != null && ColorLib.alpha(textColor) > 0 ) {
-            g.setPaint(ColorLib.getColor(textColor));
+        final Color textColor = getTextColor(item);
+        if ( text != null && textColor.getAlpha() > 0 ) {
+            g.setPaint(textColor);
             g.setFont(m_font);
             FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(m_font);
 
@@ -557,7 +563,7 @@ public class LabelRenderer extends AbstractShapeRenderer {
                 tw = shape.getWidth() - 2*size*m_horizBorder;
                 break;
             default:
-                tw = m_textDim.width;
+                tw = (img != null ? m_textDim.width : shape.getWidth() - 2*size*m_horizBorder);
             }
 
             // compute available height
@@ -568,7 +574,7 @@ public class LabelRenderer extends AbstractShapeRenderer {
                 th = shape.getHeight() - 2*size*m_vertBorder;
                 break;
             default:
-                th = m_textDim.height;
+                th = (img != null ? m_textDim.height : shape.getHeight() - 2*size*m_vertBorder);
             }
 
             // compute starting y-coordinate
@@ -596,7 +602,7 @@ public class LabelRenderer extends AbstractShapeRenderer {
 
         // draw border
         if (type==RenderType.DRAW || type==RenderType.DRAW_AND_FILL) {
-            GraphicsLib.paint(g,strokeColor,fillColor,shape,getStroke(item),RenderType.DRAW);
+            GraphicsLib.paint(g,strokeColor,fillColor,shape,stroke,RenderType.DRAW);
         }
     }
 
