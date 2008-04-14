@@ -1,5 +1,6 @@
 package prefuse.action.layout.graph;
 
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
 import java.util.Map;
@@ -26,7 +27,7 @@ import prefuse.visual.VisualItem;
  * (as per the EdgePositioningLayout). If there are multiple node-node edges
  * then the edge positions will be spread out along the equi-distant line
  * between the nodes.
- * 
+ *
  * @author Anton Marsden
  */
 public class MultiEdgePositioningLayout extends Layout {
@@ -39,6 +40,8 @@ public class MultiEdgePositioningLayout extends Layout {
 
 	protected double edgeSeparation = 50.0;
 
+	protected boolean considerNodeBounds;
+
 	private final MultiMap<ObjectPair<? extends NodeItem<?, ?>>, EdgeItem<?, ?>> pairToEdges = new MultiMap<ObjectPair<? extends NodeItem<?, ?>>, EdgeItem<?, ?>>();
 
 	public MultiEdgePositioningLayout(String graph) {
@@ -48,7 +51,7 @@ public class MultiEdgePositioningLayout extends Layout {
 
 	/**
 	 * Get the separation gap for edges linking the same two nodes.
-	 * 
+	 *
 	 * @return the edge separation
 	 */
 	public double getEdgeSeparation() {
@@ -57,7 +60,7 @@ public class MultiEdgePositioningLayout extends Layout {
 
 	/**
 	 * Sets the separation gap between the edges linking the same two nodes.
-	 * 
+	 *
 	 * @param edgeSeparation
 	 *            the edge separation
 	 */
@@ -67,7 +70,7 @@ public class MultiEdgePositioningLayout extends Layout {
 
 	/**
 	 * Get the horizontal alignment of the edge mount point with the first node.
-	 * 
+	 *
 	 * @return the horizontal alignment
 	 */
 	public Alignment getHorizontalAlignment1() {
@@ -76,7 +79,7 @@ public class MultiEdgePositioningLayout extends Layout {
 
 	/**
 	 * Get the vertical alignment of the edge mount point with the first node.
-	 * 
+	 *
 	 * @return the vertical alignment
 	 */
 	public Alignment getVerticalAlignment1() {
@@ -86,7 +89,7 @@ public class MultiEdgePositioningLayout extends Layout {
 	/**
 	 * Get the horizontal alignment of the edge mount point with the second
 	 * node.
-	 * 
+	 *
 	 * @return the horizontal alignment
 	 */
 	public Alignment getHorizontalAlignment2() {
@@ -95,7 +98,7 @@ public class MultiEdgePositioningLayout extends Layout {
 
 	/**
 	 * Get the vertical aligment of the edge mount point with the second node.
-	 * 
+	 *
 	 * @return the vertical alignment
 	 */
 	public Alignment getVerticalAlignment2() {
@@ -104,7 +107,7 @@ public class MultiEdgePositioningLayout extends Layout {
 
 	/**
 	 * Set the horizontal alignment of the edge mount point with the first node.
-	 * 
+	 *
 	 * @param align
 	 *            the horizontal alignment
 	 */
@@ -114,7 +117,7 @@ public class MultiEdgePositioningLayout extends Layout {
 
 	/**
 	 * Set the vertical alignment of the edge mount point with the first node.
-	 * 
+	 *
 	 * @param align
 	 *            the vertical alignment
 	 */
@@ -125,7 +128,7 @@ public class MultiEdgePositioningLayout extends Layout {
 	/**
 	 * Set the horizontal alignment of the edge mount point with the second
 	 * node.
-	 * 
+	 *
 	 * @param align
 	 *            the horizontal alignment
 	 */
@@ -135,12 +138,28 @@ public class MultiEdgePositioningLayout extends Layout {
 
 	/**
 	 * Set the vertical alignment of the edge mount point with the second node.
-	 * 
+	 *
 	 * @param align
 	 *            the vertical alignment
 	 */
 	public void setVerticalAlignment2(Alignment align) {
 		m_yAlign2 = align;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public boolean getConsiderNodeBounds() {
+		return considerNodeBounds;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public void setConsiderNodeBounds(boolean considerNodeBounds) {
+		this.considerNodeBounds = considerNodeBounds;
 	}
 
 	public void run(double frac) {
@@ -165,7 +184,7 @@ public class MultiEdgePositioningLayout extends Layout {
 			if (edges.size() == 1) {
 				EdgeItem<?, ?> edge = edges.iterator().next();
 				if (!edge.isFixed()) {
-					getCentroid(centroid, nodePair);
+					getMidPoint(centroid, nodePair);
 					PrefuseLib.setX(edge, null, centroid.getX());
 					PrefuseLib.setY(edge, null, centroid.getY());
 				}
@@ -174,7 +193,7 @@ public class MultiEdgePositioningLayout extends Layout {
 				// directions
 				final boolean odd = edges.size() % 2 == 1;
 				final PolarLine2D origLine = getPolarLine(nodePair);
-				getCentroid(centroid, nodePair);
+				getMidPoint(centroid, nodePair);
 				PolarLine2D perpLine = new PolarLine2D(centroid.getX(),
 						centroid.getY(), 0.0, origLine.getTheta());
 				int count = 0;
@@ -185,12 +204,14 @@ public class MultiEdgePositioningLayout extends Layout {
 							perpLine.setRadius(edgeSeparation
 									* ((count + 1) / 2));
 							perpLine.setTheta(origLine.getTheta()
-									+ (count % 2 == 0 ? MathLib.PI_DIV_2 : -MathLib.PI_DIV_2));
+									+ (count % 2 == 0 ? MathLib.PI_DIV_2
+											: -MathLib.PI_DIV_2));
 						} else {
 							perpLine.setRadius(halfEdgeSep + edgeSeparation
 									* (count / 2));
 							perpLine.setTheta(origLine.getTheta()
-									+ (count % 2 == 0 ? MathLib.PI_DIV_2 : -MathLib.PI_DIV_2));
+									+ (count % 2 == 0 ? MathLib.PI_DIV_2
+											: -MathLib.PI_DIV_2));
 						}
 
 						PrefuseLib.setX(edge, null, perpLine.getX2());
@@ -215,7 +236,7 @@ public class MultiEdgePositioningLayout extends Layout {
 		return new PolarLine2D(start, end);
 	}
 
-	protected void getCentroid(Point2D p,
+	protected void getMidPoint(Point2D p,
 			ObjectPair<? extends NodeItem<?, ?>> pair) {
 		Point2D start = new Point2D.Double();
 		Point2D end = new Point2D.Double();
@@ -223,6 +244,20 @@ public class MultiEdgePositioningLayout extends Layout {
 				m_yAlign1);
 		GraphicsLib.getAlignedPoint(end, pair.getB().getBounds(), m_xAlign2,
 				m_yAlign2);
+		if (considerNodeBounds) {
+			// find intersections
+			Line2D line = new Line2D.Double(start, end);
+			Point2D[] points = new Point2D[2];
+			points[0] = new Point2D.Double();
+			points[1] = new Point2D.Double();
+			if (GraphicsLib.intersectLineRectangle(line, pair.getB().getBounds(), points) > 0) {
+				end.setLocation(points[0]);
+			}
+			line.setLine(line.getX2(), line.getY2(), line.getX1(), line.getY1());
+			if (GraphicsLib.intersectLineRectangle(line, pair.getA().getBounds(), points) > 0) {
+				start.setLocation(points[0]);
+			}
+		}
 		p.setLocation((end.getX() + start.getX()) / 2.0, (end.getY() + start
 				.getY()) / 2.0);
 
