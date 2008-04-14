@@ -29,7 +29,7 @@ public class CompositeRenderer implements Renderer {
 	}
 
 	public void calculateBounds(VisualItem<?> item, Rectangle2D bounds) {
-		// TODO: handle empty bounds - don't use createUnion
+		// TODO: handle empty bounds - don't use createUnion???
 		interactiveRenderer.calculateBounds(item, bounds);
 		Rectangle2D supp = new Rectangle2D.Double();
 		supportingRenderer.calculateBounds(item, supp);
