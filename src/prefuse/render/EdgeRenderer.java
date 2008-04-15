@@ -129,6 +129,7 @@ public class EdgeRenderer extends AbstractShapeRenderer {
 
 	/**
 	 * @see prefuse.render.AbstractShapeRenderer#getRawShape(prefuse.visual.VisualItem)
+	 * TODO: refactor this method - it is far too complicated now
 	 */
 	@Override
 	protected Shape getRawShape(VisualItem<?> item) {
@@ -213,14 +214,15 @@ public class EdgeRenderer extends AbstractShapeRenderer {
 		}
 
 		// reposition the start/end points
-
-		if (!pointUpdated[0] && srcIntersection > 0) {
-			m_tmpPoints[0] = m_intersectSourcePoints[0];
-			pointUpdated[0] = true;
-		}
-		if (!pointUpdated[1] && tgtIntersection > 0) {
-			m_tmpPoints[1] = m_intersectTargetPoints[0];
-			pointUpdated[1] = true;
+		if(m_edgeType == EdgeType.CURVE_VIA_EDGE) {
+			if (!pointUpdated[0] && srcIntersection > 0) {
+				m_tmpPoints[0] = m_intersectSourcePoints[0];
+				pointUpdated[0] = true;
+			}
+			if (!pointUpdated[1] && tgtIntersection > 0) {
+				m_tmpPoints[1] = m_intersectTargetPoints[0];
+				pointUpdated[1] = true;
+			}
 		}
 
 		// draw self-referencing edges
@@ -236,14 +238,14 @@ public class EdgeRenderer extends AbstractShapeRenderer {
 
 		switch (m_edgeType) {
 		case LINE:
-			m_line.setLine(n1x, n1y, n2x, n2y);
+			m_line.setLine(m_tmpPoints[0].getX(), m_tmpPoints[0].getY(), m_tmpPoints[1].getX(), m_tmpPoints[1].getY());
 			shape = m_line;
 			break;
 		case CURVE:
-			getCurveControlPoints(edge, m_ctrlPoints, n1x, n1y, n2x, n2y);
+			getCurveControlPoints(edge, m_ctrlPoints, m_tmpPoints[0].getX(), m_tmpPoints[0].getY(), m_tmpPoints[1].getX(), m_tmpPoints[1].getY());
 			m_cubic.setCurve(n1x, n1y, m_ctrlPoints[0].getX(), m_ctrlPoints[0]
 					.getY(), m_ctrlPoints[1].getX(), m_ctrlPoints[1].getY(),
-					n2x, n2y);
+					m_tmpPoints[1].getX(), m_tmpPoints[1].getY());
 			shape = m_cubic;
 			break;
 		case CURVE_VIA_EDGE:
