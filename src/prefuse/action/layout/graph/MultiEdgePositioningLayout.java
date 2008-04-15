@@ -42,6 +42,8 @@ public class MultiEdgePositioningLayout extends Layout {
 
 	protected boolean considerNodeBounds;
 
+	protected boolean positionHiddenEdges;
+
 	private final MultiMap<ObjectPair<? extends NodeItem<?, ?>>, EdgeItem<?, ?>> pairToEdges = new MultiMap<ObjectPair<? extends NodeItem<?, ?>>, EdgeItem<?, ?>>();
 
 	public MultiEdgePositioningLayout(String graph) {
@@ -162,11 +164,30 @@ public class MultiEdgePositioningLayout extends Layout {
 		this.considerNodeBounds = considerNodeBounds;
 	}
 
+	/**
+	 *
+	 * @return
+	 */
+	public boolean isPositionHiddenEdges() {
+		return positionHiddenEdges;
+	}
+
+	/**
+	 *
+	 * @param positionHiddenEdges
+	 */
+	public void setPositionHiddenEdges(boolean positionHiddenEdges) {
+		this.positionHiddenEdges = positionHiddenEdges;
+	}
+
 	public void run(double frac) {
 		pairToEdges.clear();
 
 		// locate all the edges
-		for (VisualItem<?> item : m_vis.visibleItems(m_edgeGroup)) {
+
+
+
+		for (VisualItem<?> item : (positionHiddenEdges ? m_vis.items(m_edgeGroup) : m_vis.visibleItems(m_edgeGroup))) {
 			EdgeItem<?, ?> edge = (EdgeItem<?, ?>) item;
 			pairToEdges.put(new ObjectPair(edge.getSourceNode(), edge
 					.getTargetNode()), edge);
