@@ -9,8 +9,6 @@ import java.util.List;
 
 import prefuse.data.Graph;
 import prefuse.data.Schema;
-import prefuse.data.tree.DeclarativeTree;
-import prefuse.data.tree.NodeBasedDeclarativeTree;
 import prefuse.data.tuple.TupleSet;
 import prefuse.data.util.TreeNodeIterator;
 import prefuse.data.util.TreeNodeIterator.TraversalMode;
