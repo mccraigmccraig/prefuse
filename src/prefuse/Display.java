@@ -53,6 +53,7 @@ import prefuse.util.display.DebugStatsPainter;
 import prefuse.util.display.ExportDisplayAction;
 import prefuse.util.display.ItemBoundsListener;
 import prefuse.util.display.PaintListener;
+import prefuse.util.display.PrintDisplayAction;
 import prefuse.util.display.RenderingQueue;
 import prefuse.visual.VisualItem;
 import prefuse.visual.expression.VisiblePredicate;
@@ -263,6 +264,7 @@ public class Display extends JComponent {
      * <ul><li><b>ctrl D</b> - Toggle debug info display</li>
      *     <li><b>ctrl H</b> - Toggle high quality rendering</li>
      *     <li><b>ctrl E</b> - Export display view to an image file</li></ul>
+     *     <li><b>ctrl P</b> - Print the display</li></ul>
      * Subclasses can override this method to prevent these commands from
      * being set. Additional commands can be registered using the
      * <code>registerKeyboardAction</code> method.
@@ -297,6 +299,12 @@ public class Display extends JComponent {
         try {
             registerKeyboardAction(new ExportDisplayAction(this),
              "export display", KeyStroke.getKeyStroke("ctrl E"), WHEN_FOCUSED);
+        } catch (SecurityException se) {
+        }
+
+        try {
+            registerKeyboardAction(new PrintDisplayAction(this),
+             "print display", KeyStroke.getKeyStroke("ctrl P"), WHEN_FOCUSED);
         } catch (SecurityException se) {
         }
     }
@@ -994,8 +1002,10 @@ public class Display extends JComponent {
      */
     @Override
 	protected void printComponent(Graphics g) {
+    	boolean wasDoubleBuffered = isDoubleBuffered();
         boolean wasHighQuality = m_highQuality;
         try {
+    		setDoubleBuffered(false);
             // Set the quality to high for the duration of the printing.
             m_highQuality = true;
             // Paint directly to the print graphics context.
@@ -1003,6 +1013,7 @@ public class Display extends JComponent {
         } finally {
             // Reset the quality to the state it was in before printing.
             m_highQuality = wasHighQuality;
+            setDoubleBuffered(wasDoubleBuffered);
         }
     }
 
