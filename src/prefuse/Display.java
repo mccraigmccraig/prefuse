@@ -224,6 +224,39 @@ public class Display extends JComponent {
         setSize(400,400); // set a default size
     }
 
+
+    /**
+     * Clears out lots of references from the Display. This should be called when you are finished with the Display.
+     */
+    public synchronized void destroy() {
+    	setVisualization(null);
+    	if(m_predicate != null) {
+    		m_predicate.clear();
+    		m_predicate = null;
+    	}
+    	if(m_controls != null) {
+    		m_controls.clear();
+    		m_controls = null;
+    	}
+    	if(m_painters != null) {
+    		m_painters.clear();
+    		m_painters = null;
+    	}
+    	if(m_bounders != null) {
+    		m_bounders.clear();
+    		m_bounders = null;
+    	}
+    	m_offscreen = null;
+    	m_bgpainter = null;
+    	if(m_queue != null) {
+    		m_queue.clear();
+    		m_queue = null;
+    	}
+    	m_customToolTip = null;
+    	m_editor = null;
+    	m_editItem = null;
+    }
+
     /**
      * Registers default keystroke commands on the Display. The default
      * commands are
