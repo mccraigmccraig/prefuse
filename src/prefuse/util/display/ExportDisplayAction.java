@@ -28,7 +28,7 @@ public class ExportDisplayAction extends AbstractAction {
 
     private final Display display;
     private JFileChooser chooser;
-    private ScaleSelector scaler;
+    private ScaleSelector scalerX;
 
     /**
      * Create a new ExportDisplayAction for the given Display.
@@ -39,7 +39,7 @@ public class ExportDisplayAction extends AbstractAction {
     }
 
     private void init() {
-        scaler  = new ScaleSelector();
+        scalerX  = new ScaleSelector();
         chooser = new JFileChooser();
         chooser.setDialogType(JFileChooser.SAVE_DIALOG);
         chooser.setDialogTitle("Export Prefuse Display...");
@@ -56,7 +56,7 @@ public class ExportDisplayAction extends AbstractAction {
             }
         }
         seen.clear(); seen = null;
-        chooser.setAccessory(scaler);
+        chooser.setAccessory(scalerX);
     }
 
     /**
@@ -71,7 +71,7 @@ public class ExportDisplayAction extends AbstractAction {
 
         // open image save dialog
         File f = null;
-        scaler.setImage(display.getOffscreenBuffer());
+        scalerX.setImage(display.getOffscreenBuffer());
         int returnVal = chooser.showSaveDialog(display);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
            f = chooser.getSelectedFile();
@@ -85,7 +85,7 @@ public class ExportDisplayAction extends AbstractAction {
             f = new File(f.toString()+"."+format);
         }
 
-        double scale = scaler.getScale();
+        double scale = scalerX.getScale();
 
         // save image
         boolean success = false;
