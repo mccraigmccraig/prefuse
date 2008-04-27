@@ -85,8 +85,8 @@ public class ActivityManager extends Thread {
     }
 
     /**
-     * Stops the activity manager thread. All scheduled actvities are
-     * canceled, and then the thread is then notified to stop running.
+     * Stops the activity manager thread. All scheduled activities are
+     * cancelled, and then the thread is then notified to stop running.
      */
     public static void stopThread() {
         ActivityManager am;
@@ -204,7 +204,7 @@ public class ActivityManager extends Thread {
         if ( a.isScheduled() ) {
         	// reset the start time for reschedules, bug fix from mgara
         	a.setStartTime(startTime);
-        	try { notifyAll(); } catch ( Exception e ) {}
+        	try { notifyAll(); } catch ( Exception e ) { }
             return; // already scheduled, do nothing
         }
         a.setStartTime(startTime);
@@ -243,7 +243,7 @@ public class ActivityManager extends Thread {
      * first Activity is cancelled, the second one will not run.
      *
      * This functionality is provided by using an ActivityListener to monitor
-     * the first Activity. The listener will persist across mulitple runs,
+     * the first Activity. The listener will persist across multiple runs,
      * meaning the second Activity will always be evoked upon a successful
      * finish of the first.
      *
@@ -258,7 +258,7 @@ public class ActivityManager extends Thread {
     /**
      * Cancels an action, called by an Activity when it is cancelled.
      * Application code should not call this method! Instead, use
-     * Activity.cancel() to stop a sheduled or running Activity.
+     * Activity.cancel() to stop a scheduled or running Activity.
      * @param a The Activity to cancel
      */
     private void _cancelActivity(Activity a){
@@ -300,7 +300,7 @@ public class ActivityManager extends Thread {
      * Removes an Activity from this manager, called by an
      * Activity when it finishes or is cancelled. Application
      * code should not call this method! Instead, use
-     * Activity.cancel() to stop a sheduled or running Activity.
+     * Activity.cancel() to stop a scheduled or running Activity.
      * @param a
      * @return true if the activity was found and removed, false
      *  if the activity is not scheduled with this manager.
