@@ -1,7 +1,12 @@
 package prefuse.activity;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>Maps between Activity instances and user-defined keys. Can be used to
@@ -18,7 +23,7 @@ import java.util.Map;
  *
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
-public class ActivityMap {
+public class ActivityMap extends AbstractMap<String, Activity> {
 
     private final Map<String, Activity>     m_map;
     private ActivityMap m_parent;
@@ -64,7 +69,7 @@ public class ActivityMap {
      * @return the requested Activity instance, or null if not found by this map
      * or the parent map.
      */
-    public Activity get(String key) {
+    public Activity get(Object key) {
         Activity a = m_map.get(key);
         return a==null && m_parent!=null ? m_parent.get(key) : a;
     }
@@ -167,17 +172,8 @@ public class ActivityMap {
      * is not effected by this method.
      * @param key the key of the mapping to remove
      */
-    public void remove(Object key) {
-        m_map.remove(key);
-    }
-
-    /**
-     * Returns an array consisting of all the keys associated with this
-     * map. This does not include any mappings in the parent map.
-     * @return an array of all keys in this ActivityMap
-     */
-    public Object[] keys() {
-        return m_map.keySet().toArray();
+    public Activity remove(Object key) {
+        return m_map.remove(key);
     }
 
     /**
@@ -185,18 +181,12 @@ public class ActivityMap {
      * parent's parent, etc.
      * @return an array of all keys in this ActivityMap and its parents
      */
-    public Object[] allKeys() {
-        Object[] a1 = m_map.keySet().toArray();
-        if ( m_parent != null ) {
-            Object[] a2 = m_parent.allKeys();
-            if ( a2 != null && a2.length > 0 ) {
-                Object[] o = new Object[a1.length+a2.length];
-                System.arraycopy(a1,0,o,0,a1.length);
-                System.arraycopy(a2,0,o,a1.length,a2.length);
-                return o;
-            }
-        }
-        return a1;
+    public List<String> allKeys() {
+    	List<String> keys = new ArrayList<String>();
+    	for(ActivityMap m = this; m != null; m = m.getParent()) {
+    		keys.addAll(m.keySet());
+    	}
+        return keys;
     }
 
     /**
@@ -216,5 +206,10 @@ public class ActivityMap {
     public ActivityMap getParent() {
         return m_parent;
     }
+
+	@Override
+	public Set<Map.Entry<String, Activity>> entrySet() {
+		return m_map.entrySet();
+	}
 
 } // end of class ActivityMap

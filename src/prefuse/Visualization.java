@@ -1230,6 +1230,20 @@ public class Visualization {
     }
 
     /**
+     * Remove all data processing Actions registered with this visualization.
+     * If the removed action is currently running, it will be cancelled.
+     * The visualization reference held by the removed Actions will be set to
+     * null.
+     * <p>
+     * TODO: this will not handle "always run after" relations appropriately.
+     */
+    public void removeAllActions() {
+    	for(String key : m_actions.allKeys()) {
+    		removeAction(key);
+    	}
+    }
+
+    /**
      * Schedule the Action with the given name to run immediately. The running
      * of all Actions is managed by the
      * {@link prefuse.activity.ActivityManager}, which runs in a dedicated
