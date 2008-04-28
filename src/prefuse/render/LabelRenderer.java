@@ -295,6 +295,9 @@ public class LabelRenderer extends AbstractShapeRenderer {
         return imageLoc == null ? null : m_images.getImage(imageLoc);
     }
 
+    protected Font getFont(VisualItem<?> item) {
+    	return item.getFont();
+    }
 
     // ------------------------------------------------------------------------
     // Rendering
@@ -303,7 +306,7 @@ public class LabelRenderer extends AbstractShapeRenderer {
                                          double size)
     {
         // put item font in temp member variable
-        m_font = item.getFont();
+        m_font = getFont(item);
         // scale the font as needed
         if ( size != 1 ) {
             m_font = FontLib.getFont(m_font.getName(), m_font.getStyle(),
