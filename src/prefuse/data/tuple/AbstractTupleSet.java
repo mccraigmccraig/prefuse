@@ -154,12 +154,9 @@ public abstract class AbstractTupleSet <T extends Tuple<?>> implements TupleSet<
     public void addColumns(Schema schema) {
         if ( isAddColumnSupported() ) {
             for ( int i=0; i<schema.getColumnCount(); ++i ) {
-                try {
-                    addColumn(schema.getColumnName(i),
-                              schema.getColumnType(i),
-                              schema.getDefault(i));
-                } catch ( IllegalArgumentException iae ) {
-                }
+                addColumn(schema.getColumnName(i),
+                          schema.getColumnType(i),
+                          schema.getDefault(i));
             }
         } else {
             throw new UnsupportedOperationException();

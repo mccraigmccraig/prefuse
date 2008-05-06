@@ -566,8 +566,12 @@ public abstract class Table <T extends Tuple<?>> extends AbstractTupleSet<T> imp
     protected void addColumn(String name, Column col) {
         int idx = getColumnNumber(name);
         if ( idx >= 0 && idx < m_columns.size() ) {
-            throw new IllegalArgumentException(
-                "Table already has column with name \""+name+"\"");
+        	if (!getColumnType(idx).equals(col.getColumnType())) {
+            	throw new IllegalArgumentException(
+            			"Table already has column with name \""+name+"\"" + " and type " + getColumnType(idx));
+            }
+            // column already exists with given type, do nothing
+            return;
         }
 
         // add the column
