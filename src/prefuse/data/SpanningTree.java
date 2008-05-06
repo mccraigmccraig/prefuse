@@ -62,6 +62,8 @@ public class SpanningTree <T extends Tuple<?>, N extends Node<N,E>, E extends Ed
     /**
      * Build the spanning tree, starting at the given root. Uses an
      * unweighted breadth first traversal to build the spanning tree.
+     * If backing graph is directed, only traverses outward facing nodes from
+     * root.
      * @param root the root node of the spanning tree
      */
     public void buildSpanningTree(N root) {
