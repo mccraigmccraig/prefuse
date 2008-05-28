@@ -73,7 +73,9 @@ public class ActivityManager extends Thread {
 	 * Create a new ActivityManger.
 	 */
 	private ActivityManager() {
-		super(null, null, "prefuse_ActivityManager", 1024 * 1024);
+		// reserve 5 megabytes for the activity manager thread. This allows for a large recursion
+		// depth before we get a stack overflow or out of memory exception.
+		super(null, null, "prefuse_ActivityManager", 5 * 1024 * 1024);
 		m_activities = new ArrayList<Activity>();
 		m_tmp = new ArrayList<Activity>();
 		m_nextTime = Long.MAX_VALUE;
