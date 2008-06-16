@@ -6,13 +6,14 @@ package prefuse.util.ui;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
 
 /**
  * A line defined by polar coordinates (a start position, a radius and an angle).
  * 
  * @author Anton Marsden
  */
-public class PolarLine2D extends Line2D
+public class PolarLine2D extends Line2D implements Serializable
 {
     private double x;
     private double y;
