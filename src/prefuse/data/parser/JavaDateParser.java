@@ -55,15 +55,6 @@ public class JavaDateParser extends AbstractDateParser {
 			d = m_dfmt.parse(text, m_pos);
 		}
 
-		if (d == null) {
-			try {
-				d = CalendarParser.parse(text).getTime();
-				m_pos.setIndex(text.length());
-			} catch (final CalendarParserException e) {
-				d = null;
-			}
-		}
-
 		// date format will parse substrings successfully, so we need
 		// to check the position to make sure the whole value was used
 		if (d == null || m_pos.getIndex() < text.length()) {
