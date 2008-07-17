@@ -23,7 +23,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.VolatileImage;
+import java.awt.image.BufferedImage;
 import java.io.OutputStream;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
@@ -116,7 +116,7 @@ public class Display extends JComponent {
 	protected CopyOnWriteArrayList<ItemBoundsListener> m_bounders;
 
 	// display
-	protected VolatileImage m_offscreen;
+	protected BufferedImage m_offscreen;
 	protected Clip m_clip = new Clip();
 	protected Clip m_screen = new Clip();
 	protected Clip m_bounds = new Clip();
@@ -271,10 +271,9 @@ public class Display extends JComponent {
 	 * <li><b>ctrl H</b> - Toggle high quality rendering</li>
 	 * <li><b>ctrl E</b> - Export display view to an image file</li>
 	 * </ul>
-	 * <li><b>ctrl P</b> - Print the display</li>
-	 * </ul>
-	 * Subclasses can override this method to prevent these commands from being set. Additional
-	 * commands can be registered using the <code>registerKeyboardAction</code> method.
+	 * <li><b>ctrl P</b> - Print the display</li></ul> Subclasses can override this method to
+	 * prevent these commands from being set. Additional commands can be registered using the
+	 * <code>registerKeyboardAction</code> method.
 	 */
 	protected void registerDefaultCommands() {
 		// add debugging output control
@@ -722,24 +721,24 @@ public class Display extends JComponent {
 	 * 
 	 * @return the offscreen buffer
 	 */
-	public VolatileImage getOffscreenBuffer() {
+	public BufferedImage getOffscreenBuffer() {
 		return m_offscreen;
 	}
 
 	/**
 	 * Creates a new buffered image to use as an offscreen buffer.
 	 */
-	protected VolatileImage getNewOffscreenBuffer(final int width, final int height) {
-		VolatileImage img = null;
+	protected BufferedImage getNewOffscreenBuffer(final int width, final int height) {
+		BufferedImage img = null;
 		if (!GraphicsEnvironment.isHeadless()) {
 			try {
-				img = createVolatileImage(width, height);
+				img = (BufferedImage) createImage(width, height);
 			} catch (final Exception e) {
 				img = null;
 			}
 		}
 		if (img == null) {
-			return createVolatileImage(width, height);// , BufferedImage.TYPE_INT_RGB);
+			return new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		}
 		return img;
 	}
@@ -765,7 +764,7 @@ public class Display extends JComponent {
 		try {
 			// get an image to draw into
 			final Dimension d = new Dimension((int) (scaleX * getWidth()), (int) (scaleY * getHeight()));
-			final VolatileImage img = getNewOffscreenBuffer(d.width, d.height);
+			final BufferedImage img = getNewOffscreenBuffer(d.width, d.height);
 			final Graphics2D g = (Graphics2D) img.getGraphics();
 
 			// set up the display, render, then revert to normal settings
@@ -778,7 +777,7 @@ public class Display extends JComponent {
 			zoom(p, 1 / scaleX, 1 / scaleY); // also takes care of damage report
 
 			// save the image and return
-			ImageIO.write(img.getSnapshot(), format, output);
+			ImageIO.write(img, format, output);
 			return true;
 		} catch (final Exception e) {
 			e.printStackTrace();
@@ -1234,7 +1233,7 @@ public class Display extends JComponent {
 	 *            the amount to zoom by in the y-dimension
 	 */
 	public synchronized void zoomAbs(final Point2D p, final double scaleX, final double scaleY) {
-		double zx = p.getX(), zy = p.getY();
+		final double zx = p.getX(), zy = p.getY();
 		damageReport();
 		m_transform.translate(zx, zy);
 		m_transform.scale(scaleX, scaleY);
@@ -1269,7 +1268,7 @@ public class Display extends JComponent {
 	 *            the angle to rotation by, in radians
 	 */
 	public synchronized void rotateAbs(final Point2D p, final double theta) {
-		double zx = p.getX(), zy = p.getY();
+		final double zx = p.getX(), zy = p.getY();
 		damageReport();
 		m_transform.translate(zx, zy);
 		m_transform.rotate(theta);
@@ -1493,7 +1492,7 @@ public class Display extends JComponent {
 
 		public void zoom(final Point2D p, final double scaleX, final double scaleY, final long duration) {
 			prepareChange(duration);
-			double zx = p.getX(), zy = p.getY();
+			final double zx = p.getX(), zy = p.getY();
 			m_at.translate(zx, zy);
 			m_at.scale(scaleX, scaleY);
 			m_at.translate(-zx, -zy);
