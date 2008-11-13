@@ -1,6 +1,8 @@
 package prefuse.data.parser;
 
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 /**
@@ -12,75 +14,87 @@ import java.util.StringTokenizer;
  */
 public class JavaDateArrayParser implements DataParser {
 
-	private final JavaDateParser dateParser = new JavaDateParser();
+    private final JavaDateParser dateParser;
 
-	/**
-	 * Returns java.util.Date[].class.
-	 *
-	 * @see prefuse.data.parser.DataParser#getType()
-	 */
-	public Class<?> getType() {
-		return Date[].class;
-	}
+    public JavaDateArrayParser(DateFormat dateFormat) {
+    	this.dateParser = new JavaDateParser(dateFormat);
+    }
 
-	/**
-	 * @see prefuse.data.parser.DataParser#format(java.lang.Object)
-	 */
-	public String format(Object value) {
-		if (value == null) {
-			return null;
-		}
-		if (!(value instanceof Date[])) {
-			throw new IllegalArgumentException(
-					"This class can only format Objects of type java.util.Date[].");
-		}
+    public JavaDateArrayParser() {
+        this.dateParser = new JavaDateParser();
+    }
 
-		Date[] values = (Date[]) value;
-		StringBuffer sbuf = new StringBuffer();
-		sbuf.append('[');
-		for (int i = 0; i < values.length; ++i) {
-			if (i > 0) {
-				sbuf.append(",");
-			}
-			sbuf.append(dateParser.format(values[i]));
-		}
-		sbuf.append(']');
-		return sbuf.toString();
-	}
+    public JavaDateArrayParser(Locale locale) {
+        this.dateParser = new JavaDateParser(locale);
+    }
 
-	/**
-	 * @see prefuse.data.parser.DataParser#canParse(java.lang.String)
-	 */
-	public boolean canParse(String text) {
+    /**
+     * Returns java.util.Date[].class.
+     *
+     * @see prefuse.data.parser.DataParser#getType()
+     */
+    public Class<?> getType() {
+        return Date[].class;
+    }
 
-		try {
-			StringTokenizer st = new StringTokenizer(text, "\"[](){},");
-			while (st.hasMoreTokens()) {
-				dateParser.parseDate(st.nextToken());
-			}
-			return true;
-		} catch (DataParseException e) {
-			return false;
-		}
-	}
+    /**
+     * @see prefuse.data.parser.DataParser#format(java.lang.Object)
+     */
+    public String format(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (!(value instanceof Date[])) {
+            throw new IllegalArgumentException(
+                    "This class can only format Objects of type java.util.Date[].");
+        }
 
-	/**
-	 * Parse a Date array from a text string.
-	 *
-	 * @param text
-	 *            the text string to parse
-	 * @return the parsed Date array
-	 * @throws DataParseException
-	 *             if an error occurs during parsing
-	 */
-	public Object parse(String text) throws DataParseException {
-		StringTokenizer st = new StringTokenizer(text, "\"[](){},");
-		Date[] array = new Date[st.countTokens()];
-		for (int i = 0; st.hasMoreTokens(); ++i) {
-			String tok = st.nextToken();
-			array[i] = dateParser.parseDate(tok);
-		}
-		return array;
-	}
+        Date[] values = (Date[]) value;
+        StringBuffer sbuf = new StringBuffer();
+        sbuf.append('[');
+        for (int i = 0; i < values.length; ++i) {
+            if (i > 0) {
+                sbuf.append(",");
+            }
+            sbuf.append(dateParser.format(values[i]));
+        }
+        sbuf.append(']');
+        return sbuf.toString();
+    }
+
+    /**
+     * @see prefuse.data.parser.DataParser#canParse(java.lang.String)
+     */
+    public boolean canParse(String text) {
+
+        try {
+            StringTokenizer st = new StringTokenizer(text, "\"[](){},");
+            while (st.hasMoreTokens()) {
+                dateParser.parseDate(st.nextToken());
+            }
+            return true;
+        } catch (DataParseException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Parse a Date array from a text string.
+     *
+     * @param text
+     *            the text string to parse
+     * @return the parsed Date array
+     * @throws DataParseException
+     *             if an error occurs during parsing
+     */
+    public Object parse(String text) throws DataParseException {
+        StringTokenizer st = new StringTokenizer(text, "\"[](){},");
+        Date[] array = new Date[st.countTokens()];
+        for (int i = 0; st.hasMoreTokens(); ++i) {
+            String tok = st.nextToken();
+            array[i] = dateParser.parseDate(tok);
+        }
+        return array;
+    }
 
 } // end of class LongArrayParser
