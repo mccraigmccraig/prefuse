@@ -76,7 +76,7 @@ public class MathLib {
      * {@link prefuse.Constants#LOG_SCALE},
      * {@link prefuse.Constants#SQRT_SCALE}, or
      * {@link prefuse.Constants#QUANTILE_SCALE}.
-     * @param val the interpolation value, a fraction between 0 and 1.0.
+     * @param val a value within the distribution
      * @param dist a double array describing the distribution of the data.
      * For the {@link prefuse.Constants#QUANTILE_SCALE} option, this should
      * be a collection of quantile boundaries, as determined by the
@@ -105,10 +105,11 @@ public class MathLib {
     /**
      * Interpolates a value between a given minimum and maximum value using
      * a linear scale.
-     * @param val the interpolation value, a fraction between 0 and 1.0.
+     * @param val a value between the minimum and maximum
      * @param min the minimum value of the interpolation range
      * @param max the maximum value of the interpolation range
-     * @return the resulting interpolated value
+     * @return the fractional position of the value within the scale,
+     * a double between 0 and 1.
      */
     public static double linearInterp(double val, double min, double max) {
         double denominator = (max-min);
@@ -120,10 +121,11 @@ public class MathLib {
     /**
      * Interpolates a value between a given minimum and maximum value using
      * a base-10 logarithmic scale.
-     * @param val the interpolation value, a fraction between 0 and 1.0.
+     * @param val a value between the minimum and maximum
      * @param min the minimum value of the interpolation range
      * @param max the maximum value of the interpolation range
-     * @return the resulting interpolated value
+     * @return the fractional position of the value within the scale,
+     * a double between 0 and 1.
      */
     public static double logInterp(double val, double min, double max) {
         double logMin = safeLog10(min);
@@ -136,10 +138,11 @@ public class MathLib {
     /**
      * Interpolates a value between a given minimum and maximum value using
      * a square root scale.
-     * @param val the interpolation value, a fraction between 0 and 1.0.
+     * @param val a value between the minimum and maximum
      * @param min the minimum value of the interpolation range
      * @param max the maximum value of the interpolation range
-     * @return the resulting interpolated value
+     * @return the fractional position of the value within the scale,
+     * a double between 0 and 1.
      */
     public static double sqrtInterp(double val, double min, double max) {
         double sqrtMin = safeSqrt(min);
