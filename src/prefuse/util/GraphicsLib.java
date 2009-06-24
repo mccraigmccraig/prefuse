@@ -3,6 +3,7 @@ package prefuse.util;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
@@ -13,6 +14,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
+import java.util.Arrays;
 
 import prefuse.Alignment;
 import prefuse.render.RenderType;
@@ -895,7 +897,7 @@ public class GraphicsLib {
 		if (!(sdraw || fdraw)) {
 			return;
 		}
-
+		
 		Stroke origStroke = null;
 		if (sdraw) {
 			origStroke = g.getStroke();
@@ -989,6 +991,11 @@ public class GraphicsLib {
 				g.fill(shape);
 			}
 			if (sdraw) {
+				// there is an issue deep within Java that shows itself if the 
+				// scale values are incredibly small. 
+				if (at.getScaleX() < 1e-5 || at.getScaleY()< 1e-5) {
+					return;
+				}
 				g.setPaint(strokeColor);
 				g.draw(shape);
 			}
