@@ -8,7 +8,7 @@ import prefuse.visual.VisualItem;
 
 
 /**
- * Animator that inerpolates an array of numerical values.
+ * Animator that interpolates an array of numerical values.
  * 
  * @author <a href="http://jheer.org">jeffrey heer</a>
  */
